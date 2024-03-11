@@ -3,7 +3,15 @@
   "private": true,
   "version": "0.0.0",
   "description": "Monorepo for WithRunes.",
-  "author": "Hunter Johnston <https://github.com/huntabyte>",
+  "contributors": [
+    {
+      "name": "Thomas G. Lopes",
+      "url": "https://thomasglopes.com"
+    },
+    {
+      "name": "Hunter Johnston"
+    }
+  ],
   "main": "index.js",
   "repository": {
     "type": "git",
