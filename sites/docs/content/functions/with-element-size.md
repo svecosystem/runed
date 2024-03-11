@@ -15,30 +15,15 @@ import { WithElementSizeDemo } from '$lib/components/demos';
 
 ```svelte
 <script lang="ts">
+	<script lang="ts">
 	import { withElementSize } from "withrunes";
 
-	let count = $state(0);
-	let logged = $state("");
-	let isFirstTime = $state(true);
-
-	const logCount = withElementSize(() => {
-		if (isFirstTime) {
-			isFirstTime = false;
-			logged = `You pressed the button ${count} times!`;
-		} else {
-			logged = `You pressed the button ${count} times since last time!`;
-		}
-		count = 0;
-	}, 1000);
-
-	function ding() {
-		count++;
-		logCount();
-	}
+	let el: HTMLElement | undefined = $state(undefined);
+	const size = withElementSize(() => el);
 </script>
 
 <div>
-	<button onclick={ding}>DING DING DING</button>
-	<p>{logged || "Press the button!"}</p>
+	<textarea bind:this={el} />
+	<p>Width: {size.width} Height: {size.height}</p>
 </div>
 ```
