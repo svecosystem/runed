@@ -4,7 +4,6 @@ description: What this project is all about.
 ---
 
 <script>
-	import { HorizontalDemo, VerticalDemo, NestedGroupsDemo } from '$lib/components/demos'
 </script>
 
 WithRunes provides utilities to power your applications using the magic of [Svelte Runes](https://svelte.dev/blog/runes).

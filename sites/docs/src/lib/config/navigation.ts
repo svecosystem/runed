@@ -58,12 +58,12 @@ export const navigation: Navigation = {
 		},
 
 		{
-			title: "Examples",
+			title: "Functions",
 			collapsible: true,
 			items: [
 				{
-					title: "This is an example",
-					href: "/docs/examples/example",
+					title: "withDebounce",
+					href: "/docs/functions/with-debounce",
 					items: [],
 				},
 			],
