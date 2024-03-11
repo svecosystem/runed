@@ -21,9 +21,9 @@
 	}
 </script>
 
-<div class="bg-card rounded-md p-8">
+<div class="rounded-md bg-card p-8">
 	<button
-		class="bg-brand/50 hover:bg-brand/25 relative z-20 inline-flex items-center justify-center rounded-md border px-3 py-1.5 text-sm font-medium transition-all focus:outline-none"
+		class="relative z-20 inline-flex items-center justify-center rounded-md border bg-brand/50 px-3 py-1.5 text-sm font-medium transition-all hover:bg-brand/25 focus:outline-none"
 		onclick={ding}>DING DING DING</button
 	>
 	<p>{logged || "Press the button!"}</p>
