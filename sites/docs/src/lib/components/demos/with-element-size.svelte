@@ -6,7 +6,7 @@
 	const text = $derived(`Width: ${size.width}\nHeight: ${size.height}`);
 </script>
 
-<div class="bg-card rounded-md p-8">
+<div class="rounded-md bg-card p-8">
 	<textarea
 		bind:this={el}
 		class="h-[200px] min-h-[100px] w-[300px] min-w-[200px] resize rounded-md bg-neutral-800 p-4"
