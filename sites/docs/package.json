@@ -49,7 +49,7 @@
 		"contentlayer": "^0.3.4",
 		"eslint": "^8.56.0",
 		"eslint-config-prettier": "^9.1.0",
-		"eslint-plugin-svelte": "^2.35.1",
+		"eslint-plugin-svelte": "^2.36.0-next.10",
 		"mdsx": "^0.0.3",
 		"phosphor-svelte": "^1.4.2",
 		"postcss": "^8.4.35",
