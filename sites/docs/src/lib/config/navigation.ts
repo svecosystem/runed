@@ -66,6 +66,11 @@ export const navigation: Navigation = {
 					href: "/docs/functions/with-debounce",
 					items: [],
 				},
+				{
+					title: "withElementSize",
+					href: "/docs/functions/with-element-size",
+					items: [],
+				},
 			],
 		},
 	],
