@@ -1,0 +1,114 @@
+.markdown code:not(pre > code) {
+	@apply relative rounded bg-muted px-[0.3rem] py-[0.2rem] font-mono text-sm;
+}
+
+.link {
+	@apply inline-flex items-center gap-1 font-medium underline underline-offset-4;
+}
+
+[data-theme*=" "] {
+	display: flex !important;
+	flex-direction: column;
+}
+
+[data-rehype-pretty-code-figure] [data-line-numbers] > [data-line]::before {
+	@apply text-xs text-muted-foreground;
+	counter-increment: line;
+	content: counter(line);
+	display: inline-block;
+	width: 1.35rem;
+	margin-right: 0.5rem;
+	text-align: center;
+}
+
+[data-metadata] [data-code-copy] {
+	@apply top-16 !important;
+}
+
+[data-rehype-pretty-code-figure] {
+	@apply relative;
+
+	& pre {
+		@apply mb-4 mt-6 overflow-x-auto rounded-lg border border-border bg-[#f1f1f1] py-4 text-sm font-medium;
+	}
+
+	& code {
+		@apply grid min-w-fit break-words rounded-none border-0 bg-transparent p-0;
+		counter-reset: line;
+		box-decoration-break: clone;
+	}
+
+	& code[data-line-numbers] {
+		font-size: 13px !important;
+	}
+
+	& [data-line] {
+		@apply inline-block min-h-[1.5rem] w-full border-l-2 border-l-transparent px-4 py-0.5;
+	}
+
+	& [data-chars-id] {
+		@apply pb-0.5 shadow-none;
+	}
+
+	& [data-highlighted-line] {
+		@apply z-10 w-full border-l-primary bg-foreground/5;
+	}
+
+	& [data-highlighted-line][data-highlighted-line-id="add"] {
+		@apply border-l-green-600 data-[highlighted-line-id="add"]:bg-green-100;
+	}
+
+	& [data-highlighted-line][data-highlighted-line-id="remove"] {
+		@apply border-l-red-600 data-[highlighted-line-id="remove"]:bg-red-100;
+	}
+
+	& [data-line-numbers] [data-line] {
+		@apply pr-2;
+	}
+}
+
+[data-rehype-pretty-code-title] {
+	@apply mt-6 flex rounded-t-lg border-l border-r border-t border-border bg-muted px-4 py-3 text-sm text-muted-foreground;
+}
+
+[data-rehype-pretty-code-title] + pre {
+	@apply mt-0 rounded-t-none;
+}
+
+[data-callout] > p:last-child {
+	@apply mb-0 !important;
+}
+
+code[data-theme*=" "],
+code[data-theme*=" "] span {
+	color: var(--shiki-light);
+	background-color: var(--shiki-light-bg);
+}
+
+/* Dark mode specific overrides */
+
+.dark {
+	& code[data-theme*=" "],
+	code[data-theme*=" "] span {
+		color: var(--shiki-dark);
+		background-color: var(--shiki-dark-bg);
+	}
+
+	& [data-rehype-pretty-code-figure] {
+		& pre {
+			@apply bg-[#181818];
+		}
+
+		& [data-highlighted-line] {
+			@apply bg-muted;
+		}
+
+		& [data-highlighted-line][data-highlighted-line-id="add"] {
+			@apply border-l-green-500 data-[highlighted-line-id="add"]:bg-green-600/20;
+		}
+
+		& [data-highlighted-line][data-highlighted-line-id="remove"] {
+			@apply border-l-red-500 data-[highlighted-line-id="remove"]:bg-red-500/20;
+		}
+	}
+}
