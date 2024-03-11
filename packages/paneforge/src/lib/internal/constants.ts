@@ -1,0 +1,2 @@
+export const LOCAL_STORAGE_DEBOUNCE_INTERVAL = 100;
+export const PRECISION = 10;
