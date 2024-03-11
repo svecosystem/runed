@@ -1,5 +1,12 @@
 # docs
 
+## 0.0.4
+
+### Patch Changes
+
+- Updated dependencies [[`66cfe5d7284d548a6f0071a61cc36cf308f9ceb7`](https://github.com/svecosystem/withrunes/commit/66cfe5d7284d548a6f0071a61cc36cf308f9ceb7)]:
+  - withrunes@0.0.1
+
 ## 0.0.3
 
 ### Patch Changes
