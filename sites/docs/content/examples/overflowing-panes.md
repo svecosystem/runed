@@ -10,7 +10,7 @@ description: An example of how panes with overflowing content are handled.
 
 <OverflowDemo />
 
-<ViewExampleCode href="https://github.com/svecosystem/paneforge/blob/main/sites/docs/src/lib/components/demos/overflow-demo.svelte" />
+<ViewExampleCode href="https://github.com/svecosystem/withrunes/blob/main/sites/docs/src/lib/components/demos/overflow-demo.svelte" />
 
 ## Anatomy
 
@@ -18,7 +18,7 @@ Here's the high-level structure of the example above:
 
 ```svelte
 <script lang="ts">
-	import { PaneGroup, Pane, PaneResizer } from "paneforge";
+	import { PaneGroup, Pane, PaneResizer } from "withrunes";
 </script>
 
 <PaneGroup direction="horizontal">

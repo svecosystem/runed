@@ -14,7 +14,7 @@ When conditionally rendering panes, you need to use the `order` prop to ensure t
 	<ConditionalDemo />
 </div>
 
-<ViewExampleCode href="https://github.com/svecosystem/paneforge/blob/main/sites/docs/src/lib/components/demos/conditional-demo.svelte" />
+<ViewExampleCode href="https://github.com/svecosystem/withrunes/blob/main/sites/docs/src/lib/components/demos/conditional-demo.svelte" />
 
 ## Anatomy
 
@@ -22,7 +22,7 @@ Here's the high-level structure of the example above:
 
 ```svelte
 <script lang="ts">
-	import { PaneGroup, Pane, PaneResizer } from "paneforge";
+	import { PaneGroup, Pane, PaneResizer } from "withrunes";
 
 	let showPaneOne = true;
 	let showPaneThree = true;

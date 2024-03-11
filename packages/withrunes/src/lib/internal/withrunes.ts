@@ -53,7 +53,7 @@ export const defaultStorage: PaneGroupStorage = {
 	},
 };
 
-export type CreatePaneForgeProps = {
+export type CreateWithRunesProps = {
 	autoSaveId: string | null;
 	direction: Direction;
 	id: string | null | undefined;
@@ -62,7 +62,7 @@ export type CreatePaneForgeProps = {
 	storage: PaneGroupStorage;
 };
 
-const defaultProps: CreatePaneForgeProps = {
+const defaultProps: CreateWithRunesProps = {
 	id: null,
 	onLayout: null,
 	keyboardResizeBy: null,
@@ -71,7 +71,7 @@ const defaultProps: CreatePaneForgeProps = {
 	storage: defaultStorage,
 };
 
-export function createPaneForge(props: CreatePaneForgeProps) {
+export function createWithRunes(props: CreateWithRunesProps) {
 	const withDefaults = {
 		...defaultProps,
 		...removeUndefined(props),

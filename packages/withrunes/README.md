@@ -48,16 +48,6 @@ The components ship only with the styles necessary to position the panes in the 
 
 For more information, see the [Documentation](https://withrunes.com).
 
-## Sponsors
-
-This project is supported by the following beautiful people/organizations:
-
-<p align="center">
-  <a href="https://github.com/sponsors/huntabyte">
-    <img src='https://cdn.jsdelivr.net/gh/huntabyte/static/sponsors.svg' alt="Logos from Sponsors" />
-  </a>
-</p>
-
 ## License
 
 <!-- automd:contributors license=MIT author="huntabyte" -->

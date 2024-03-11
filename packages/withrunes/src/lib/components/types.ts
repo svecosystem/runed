@@ -1,4 +1,4 @@
-import type { PaneGroupOnLayout } from "$lib/internal/paneforge.js";
+import type { PaneGroupOnLayout } from "$lib/internal/withrunes.js";
 import type {
 	Direction,
 	PaneOnCollapse,
@@ -186,7 +186,7 @@ export type PaneGroupAPI = {
 
 /**
  * Data attributes applied to the element rendered by
- * the [Pane](https://paneforge.com/docs/components/pane) component.
+ * the [Pane](https://withrunes.com/docs/components/pane) component.
  */
 export type PaneAttributes = {
 	/** Applied to every pane element. */

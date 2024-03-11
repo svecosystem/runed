@@ -2,7 +2,7 @@
 	import { setCtx } from "./ctx.js";
 	import { type PaneGroupStorage } from "$lib/internal/utils/index.js";
 	import type { PaneGroupOnLayout } from "./pane-group.js";
-	import { defaultStorage } from "$lib/internal/paneforge.js";
+	import { defaultStorage } from "$lib/internal/withrunes.js";
 	import type { PaneGroupProps } from "./types.js";
 
 	type $$Props = PaneGroupProps;

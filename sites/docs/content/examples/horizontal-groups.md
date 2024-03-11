@@ -10,7 +10,7 @@ description: An example of a horizontal group of panes.
 
 <HorizontalDemo />
 
-<ViewExampleCode href="https://github.com/svecosystem/paneforge/blob/main/sites/docs/src/lib/components/demos/horizontal-demo.svelte" />
+<ViewExampleCode href="https://github.com/svecosystem/withrunes/blob/main/sites/docs/src/lib/components/demos/horizontal-demo.svelte" />
 
 ## Anatomy
 
@@ -18,7 +18,7 @@ Here's the high-level structure of the example above:
 
 ```svelte
 <script lang="ts">
-	import { PaneGroup, Pane, PaneResizer } from "paneforge";
+	import { PaneGroup, Pane, PaneResizer } from "withrunes";
 </script>
 
 <PaneGroup direction="horizontal">

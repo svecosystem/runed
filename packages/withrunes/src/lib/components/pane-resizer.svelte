@@ -2,7 +2,7 @@
 	import {
 		getResizeHandleElementIndex,
 		getResizeHandleElementsForGroup,
-	} from "$lib/internal/paneforge.js";
+	} from "$lib/internal/withrunes.js";
 	import type { ResizeHandler } from "$lib/internal/types.js";
 	import { getCursorStyle, generateId, styleToString } from "$lib/internal/utils/index.js";
 	import { onMount } from "svelte";

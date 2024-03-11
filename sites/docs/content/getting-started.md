@@ -1,23 +1,23 @@
 ---
 title: Getting Started
-description: Learn how to install and use Paneforge in your projects.
+description: Learn how to install and use WithRunes in your projects.
 ---
 
 ## Installation
 
-Install Paneforge using your favorite package manager:
+Install WithRunes using your favorite package manager:
 
 ```bash
-npm install paneforge
+npm install withrunes
 ```
 
 ## Basic Usage
 
-Here's a simple example of how to use Paneforge to create a horizontal pane group with two panes:
+Here's a simple example of how to use WithRunes to create a horizontal pane group with two panes:
 
 ```svelte
 <script lang="ts">
-	import { PaneGroup, Pane, PaneResizer } from "paneforge";
+	import { PaneGroup, Pane, PaneResizer } from "withrunes";
 </script>
 
 <PaneGroup direction="horizontal">

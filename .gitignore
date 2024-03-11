@@ -75,4 +75,4 @@ web_modules/
 .env.local
 
 sites/docs/.vercel
-packages/paneforge/doc
+packages/withrunes/doc

@@ -1,6 +1,6 @@
 {
 	"name": "docs",
-	"description": "Docs for Paneforge",
+	"description": "Docs for WithRunes",
 	"version": "0.0.3",
 	"private": true,
 	"scripts": {
@@ -74,7 +74,7 @@
 		"@melt-ui/svelte": "^0.74.0",
 		"bits-ui": "^0.18.1",
 		"mode-watcher": "^0.2.1",
-		"paneforge": "workspace:^",
+		"withrunes": "workspace:^",
 		"rehype-slug": "^6.0.0",
 		"svelte-sonner": "^0.3.17",
 		"vaul-svelte": "^0.2.3"
