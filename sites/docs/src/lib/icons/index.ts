@@ -30,3 +30,4 @@ export { default as Trash } from "phosphor-svelte/lib/Trash";
 export { default as Plus } from "phosphor-svelte/lib/Plus";
 export { default as SpinnerGap } from "phosphor-svelte/lib/SpinnerGap";
 export { default as DotsSixVertical } from "phosphor-svelte/lib/DotsSixVertical";
+export { default as Pentagram } from "phosphor-svelte/lib/Pentagram";

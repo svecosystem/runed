@@ -56,64 +56,14 @@ export const navigation: Navigation = {
 				},
 			],
 		},
-		{
-			title: "Components",
-			collapsible: true,
-			items: [
-				{
-					title: "PaneGroup",
-					href: "/docs/components/pane-group",
-					items: [],
-				},
-				{
-					title: "Pane",
-					href: "/docs/components/pane",
-					items: [],
-				},
-				{
-					title: "PaneResizer",
-					href: "/docs/components/pane-resizer",
-					items: [],
-				},
-			],
-		},
+
 		{
 			title: "Examples",
 			collapsible: true,
 			items: [
 				{
-					title: "Horizontal Group",
-					href: "/docs/examples/horizontal-groups",
-					items: [],
-				},
-				{
-					title: "Vertical Group",
-					href: "/docs/examples/vertical-groups",
-					items: [],
-				},
-				{
-					title: "Nested Groups",
-					href: "/docs/examples/nested-groups",
-					items: [],
-				},
-				{
-					title: "Overflowing Panes",
-					href: "/docs/examples/overflowing-panes",
-					items: [],
-				},
-				{
-					title: "Collapsible Panes",
-					href: "/docs/examples/collapsible-panes",
-					items: [],
-				},
-				{
-					title: "Conditional Panes",
-					href: "/docs/examples/conditional-panes",
-					items: [],
-				},
-				{
-					title: "Persistent Layouts",
-					href: "/docs/examples/persistent-layouts",
+					title: "This is an example",
+					href: "/docs/examples/example",
 					items: [],
 				},
 			],

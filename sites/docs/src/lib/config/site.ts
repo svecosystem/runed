@@ -7,9 +7,9 @@ export const siteConfig = {
 		github: "https://github.com/svecosystem/withrunes",
 		releases: "https://github.com/svecosystem/withrunes/releases",
 	},
-	author: "Huntabyte",
+	author: "Huntabyte & Thomas G. Lopes",
 	keywords:
-		"Svelte resizable panels,svelte panels,svelte panes,withrunes,svelte pane,svelte pane forge,svelte resizable",
+		"Svelte runes utilities,svelte runes,svelte utilities,withrunes,svelte helpers,svelte utils,svelte functions",
 	ogImage: {
 		url: "https://withrunes.com/og.png",
 		width: "1200",

@@ -53,7 +53,7 @@ For more information, see the [Documentation](https://withrunes.com).
 <!-- automd:contributors license=MIT author="huntabyte" -->
 
 Published under the [MIT](https://github.com/svecosystem/withrunes/blob/main/LICENSE) license.
-Made by [@huntabyte](https://github.com/huntabyte) and [community](https://github.com/svecosystem/withrunes/graphs/contributors) 💛
+Made by [@tglide](https://github.com/tglide), [@huntabyte](https://github.com/huntabyte) and [community](https://github.com/svecosystem/withrunes/graphs/contributors) 💛
 <br><br>
 <a href="https://github.com/svecosystem/withrunes/graphs/contributors">
 <img src="https://contrib.rocks/image?repo=svecosystem/withrunes" />
