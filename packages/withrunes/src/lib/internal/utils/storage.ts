@@ -40,7 +40,7 @@ export function initializeStorage(storageObject: PaneGroupStorage): void {
  * Returns the key to use for storing the pane group state in local storage.
  */
 function getPaneGroupKey(autoSaveId: string): string {
-	return `paneforge:${autoSaveId}`;
+	return `withrunes:${autoSaveId}`;
 }
 
 /**

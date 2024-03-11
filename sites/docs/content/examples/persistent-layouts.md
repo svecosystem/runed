@@ -15,7 +15,7 @@ The `PaneGroup` component has an `autoSaveId` prop that can be used to uniquely 
 
 <StorageDemo />
 
-<ViewExampleCode href="https://github.com/svecosystem/paneforge/blob/main/sites/docs/src/lib/components/demos/storage-demo.svelte" />
+<ViewExampleCode href="https://github.com/svecosystem/withrunes/blob/main/sites/docs/src/lib/components/demos/storage-demo.svelte" />
 
 ### Anatomy
 
@@ -23,7 +23,7 @@ Here's the high-level structure of the example above:
 
 ```svelte title="+page.svelte"
 <script lang="ts">
-	import { PaneGroup, Pane, PaneResizer } from "paneforge";
+	import { PaneGroup, Pane, PaneResizer } from "withrunes";
 </script>
 
 <PaneGroup direction="horizontal" autoSaveId="someGroupId">
@@ -39,7 +39,7 @@ Local storage is not available on the server, so you can use cookies to persist 
 
 <CookieDemo layout={data.layout} />
 
-<ViewExampleCode href="https://github.com/svecosystem/paneforge/blob/main/sites/docs/src/lib/components/demos/cookie-demo.svelte" />
+<ViewExampleCode href="https://github.com/svecosystem/withrunes/blob/main/sites/docs/src/lib/components/demos/cookie-demo.svelte" />
 
 ### Anatomy
 
@@ -49,7 +49,7 @@ Here's the high-level structure of the example above:
 import type { PageServerLoad } from "./$types";
 
 export const load: PageServerLoad = async (event) => {
-	let layout = event.cookies.get("PaneForge:layout");
+	let layout = event.cookies.get("WithRunes:layout");
 	if (layout) {
 		layout = JSON.parse(layout);
 	}
@@ -62,11 +62,11 @@ export const load: PageServerLoad = async (event) => {
 
 ```svelte
 <script lang="ts">
-	import { PaneGroup, Pane, PaneResizer } from "paneforge";
+	import { PaneGroup, Pane, PaneResizer } from "withrunes";
 
 	export let layout: number[] | undefined = undefined;
 	function onLayoutChange(sizes: number[]) {
-		document.cookie = `PaneForge:layout=${JSON.stringify(sizes)}`;
+		document.cookie = `WithRunes:layout=${JSON.stringify(sizes)}`;
 	}
 </script>
 

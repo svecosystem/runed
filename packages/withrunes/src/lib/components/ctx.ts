@@ -1,14 +1,14 @@
-import { createPaneForge, type CreatePaneForgeProps } from "$lib/internal/paneforge.js";
+import { createWithRunes, type CreateWithRunesProps } from "$lib/internal/withrunes.js";
 import { getContext, hasContext, setContext } from "svelte";
 import { removeUndefined, getOptionUpdater } from "$lib/internal/utils/index.js";
 
 const PF_GROUP_CTX = Symbol("PF_GROUP_CTX");
 
-export function setCtx(props: CreatePaneForgeProps) {
-	const paneForge = createPaneForge(removeUndefined(props));
-	const updateOption = getOptionUpdater(paneForge.options);
+export function setCtx(props: CreateWithRunesProps) {
+	const withrunes = createWithRunes(removeUndefined(props));
+	const updateOption = getOptionUpdater(withrunes.options);
 
-	const ctxValue = { ...paneForge, updateOption };
+	const ctxValue = { ...withrunes, updateOption };
 
 	setContext(PF_GROUP_CTX, ctxValue);
 	return ctxValue;

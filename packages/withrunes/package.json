@@ -1,5 +1,5 @@
 {
-	"name": "paneforge",
+	"name": "withrunes",
 	"version": "0.0.2",
 	"author": {
 		"name": "Hunter Johnston",
@@ -7,8 +7,8 @@
 	},
 	"repository": {
 		"type": "git",
-		"url": "https://github.com/huntabyte/paneforge",
-		"directory": "packages/paneforge"
+		"url": "https://github.com/huntabyte/withrunes",
+		"directory": "packages/withrunes"
 	},
 	"scripts": {
 		"dev": "pnpm watch",

@@ -16,7 +16,7 @@ You can also use the `onCollapse` and `onExpand` callbacks to perform actions wh
 	<CollapsibleDemo />
 </div>
 
-<ViewExampleCode href="https://github.com/svecosystem/paneforge/blob/main/sites/docs/src/lib/components/demos/collapsible-demo.svelte" />
+<ViewExampleCode href="https://github.com/svecosystem/withrunes/blob/main/sites/docs/src/lib/components/demos/collapsible-demo.svelte" />
 
 ## Anatomy
 
@@ -24,7 +24,7 @@ Here's the high-level structure of the example above:
 
 ```svelte
 <script lang="ts">
-	import { PaneGroup, Pane, PaneResizer, type PaneAPI } from "paneforge";
+	import { PaneGroup, Pane, PaneResizer, type PaneAPI } from "withrunes";
 
 	let paneOne: PaneAPI;
 	let collapsed = false;
