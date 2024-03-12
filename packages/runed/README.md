@@ -20,22 +20,12 @@ Runed provides utilities to power your applications using the magic of [Svelte R
 npm install runed
 ```
 
-## Sponsors
-
-This project is supported by the following beautiful people/organizations:
-
-<p align="center">
-  <a href="https://github.com/sponsors/huntabyte">
-    <img src='https://cdn.jsdelivr.net/gh/huntabyte/static/sponsors.svg' alt="Logos from Sponsors" />
-  </a>
-</p>
-
 ## License
 
 <!-- automd:contributors license=MIT author="huntabyte" -->
 
 Published under the [MIT](https://github.com/svecosystem/runed/blob/main/LICENSE) license.
-Made by [@TGlide](https://github.com/tglide), [@huntabyte](https://github.com/huntabyte) and [community](https://github.com/svecosystem/runed/graphs/contributors) 💛
+Made by [@tglide](https://github.com/tglide), [@huntabyte](https://github.com/huntabyte) and [community](https://github.com/svecosystem/runed/graphs/contributors) 💛
 <br><br>
 <a href="https://github.com/svecosystem/runed/graphs/contributors">
 <img src="https://contrib.rocks/image?repo=svecosystem/runed" />

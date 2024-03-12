@@ -6,7 +6,7 @@ description: What this project is all about.
 <script>
 </script>
 
-WithRunes provides utilities to power your applications using the magic of [Svelte Runes](https://svelte.dev/blog/runes).
+Runed provides utilities to power your applications using the magic of [Svelte Runes](https://svelte.dev/blog/runes).
 
 Here are some tools that are provided:
 
@@ -17,4 +17,4 @@ Here are some tools that are provided:
 
 ## Next Steps
 
-Start using WithRunes in your Svelte app by following the [Getting Started](/docs/getting-started) guide. If you have any questions or need help, feel free to ask in the [Discord](https://discord.gg/hbAGu6akVy)!
+Start using Runed in your Svelte app by following the [Getting Started](/docs/getting-started) guide. If you have any questions or need help, feel free to ask in the [Discord](https://discord.gg/hbAGu6akVy)!

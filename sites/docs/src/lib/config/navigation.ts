@@ -34,7 +34,7 @@ export const navigation: Navigation = {
 		},
 		{
 			title: "Releases",
-			href: "https://github.com/svecosystem/withrunes/releases",
+			href: "https://github.com/svecosystem/runed/releases",
 			external: true,
 		},
 	],

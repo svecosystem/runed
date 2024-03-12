@@ -15,7 +15,7 @@ importers:
         specifier: ^1.1.0
         version: 1.1.0
 
-  packages/withrunes:
+  packages/runed:
     dependencies:
       nanoid:
         specifier: ^5.0.4
@@ -111,15 +111,15 @@ importers:
       rehype-slug:
         specifier: ^6.0.0
         version: 6.0.0
+      runed:
+        specifier: workspace:^
+        version: link:../../packages/runed
       svelte-sonner:
         specifier: ^0.3.17
         version: 0.3.17(svelte@5.0.0-next.75)
       vaul-svelte:
         specifier: ^0.2.3
         version: 0.2.3(svelte@5.0.0-next.75)
-      withrunes:
-        specifier: workspace:^
-        version: link:../../packages/withrunes
     devDependencies:
       '@sveltejs/adapter-cloudflare':
         specifier: ^4.1.0
@@ -576,6 +576,10 @@ packages:
     peerDependencies:
       '@effect-ts/otel-node': '*'
     peerDependenciesMeta:
+      '@effect-ts/core':
+        optional: true
+      '@effect-ts/otel':
+        optional: true
       '@effect-ts/otel-node':
         optional: true
     dependencies:

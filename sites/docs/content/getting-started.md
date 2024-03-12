@@ -1,19 +1,19 @@
 ---
 title: Getting Started
-description: Learn how to install and use WithRunes in your projects.
+description: Learn how to install and use Runed in your projects.
 ---
 
 ## Installation
 
-Install WithRunes using your favorite package manager:
+Install Runed using your favorite package manager:
 
 ```bash
-npm install withrunes
+npm install runed
 ```
 
 ## Basic Usage
 
-Here's a simple example of how to use WithRunes
+Here's a simple example of how to use Runed
 
 ```svelte
 <!-- TODO -->

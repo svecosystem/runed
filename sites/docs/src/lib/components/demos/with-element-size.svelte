@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { withElementSize } from "withrunes";
+	import { withElementSize } from "runed";
 
 	let el: HTMLElement | undefined = $state(undefined);
 	const size = withElementSize(() => el);

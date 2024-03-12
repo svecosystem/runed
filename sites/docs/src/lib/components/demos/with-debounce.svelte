@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { withDebounce } from "withrunes";
+	import { withDebounce } from "runed";
 
 	let count = $state(0);
 	let logged = $state("");

@@ -1,19 +1,20 @@
 {
-	"name": "withrunes",
-	"version": "0.0.1",
+	"name": "runed",
+	"version": "0.0.0",
 	"contributors": [
 		{
 			"name": "Thomas G. Lopes",
 			"url": "https://thomasglopes.com"
 		},
 		{
-			"name": "Hunter Johnston"
+			"name": "Hunter Johnston",
+			"url": "https://x.com/huntabyte"
 		}
 	],
 	"repository": {
 		"type": "git",
-		"url": "https://github.com/svecosystem/withrunes",
-		"directory": "packages/withrunes"
+		"url": "https://github.com/svecosystem/runed",
+		"directory": "packages/runed"
 	},
 	"scripts": {
 		"dev": "pnpm watch",

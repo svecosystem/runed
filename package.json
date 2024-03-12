@@ -2,20 +2,21 @@
   "name": "root",
   "private": true,
   "version": "0.0.0",
-  "description": "Monorepo for WithRunes.",
+  "description": "Monorepo for Runed.",
   "contributors": [
     {
       "name": "Thomas G. Lopes",
       "url": "https://thomasglopes.com"
     },
     {
-      "name": "Hunter Johnston"
+      "name": "Hunter Johnston",
+	  "url": "https://x.com/huntabyte"
     }
   ],
   "main": "index.js",
   "repository": {
     "type": "git",
-    "url": "https://github.com/svecosystem/withrunes"
+    "url": "https://github.com/svecosystem/runed"
   },
   "scripts": {
     "test": "pnpm -r test",

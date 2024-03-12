@@ -1,7 +1,7 @@
 {
 	"name": "docs",
-	"description": "Docs for WithRunes",
-	"version": "0.0.4",
+	"description": "Docs for Runed",
+	"version": "0.0.0",
 	"private": true,
 	"scripts": {
 		"dev": "concurrently \"pnpm:dev:content\" \"pnpm:dev:svelte\"",
@@ -31,7 +31,7 @@
 	],
 	"repository": {
 		"type": "git",
-		"url": "https://github.com/svecosystem/withrunes.git"
+		"url": "https://github.com/svecosystem/runed.git"
 	},
 	"devDependencies": {
 		"@sveltejs/adapter-cloudflare": "^4.1.0",
@@ -79,7 +79,7 @@
 		"@melt-ui/svelte": "^0.74.0",
 		"bits-ui": "^0.18.1",
 		"mode-watcher": "^0.2.1",
-		"withrunes": "workspace:^",
+		"runed": "workspace:^",
 		"rehype-slug": "^6.0.0",
 		"svelte-sonner": "^0.3.17",
 		"vaul-svelte": "^0.2.3"
