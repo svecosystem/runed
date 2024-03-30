@@ -16,9 +16,7 @@ Runed provides utilities to power your applications using the magic of [Svelte R
 
 ## Installation
 
-```bash
-npm install runed
-```
+Runed will be published to NPM once Svelte 5 is released.
 
 ## License
 
