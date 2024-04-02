@@ -1,10 +1,10 @@
 <script lang="ts">
-	import { cn } from "$lib/utils";
 	import type {
-		TableOfContentsItem,
-		TableOfContentsElements,
 		TableOfContents,
+		TableOfContentsElements,
+		TableOfContentsItem,
 	} from "@melt-ui/svelte";
+	import { cn } from "$lib/utils";
 
 	export let tree: TableOfContentsItem[] = [];
 	export let activeHeadingIdxs: number[];
@@ -53,6 +53,7 @@
 						use:hoverAction
 						class="transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-foreground focus-visible:ring-offset-2 focus-visible:ring-offset-background data-[active]:text-foreground"
 					>
+						<!-- eslint-disable-next-line svelte/no-at-html-tags -->
 						{@html nodeWithoutSpan}
 					</a>
 				</div>

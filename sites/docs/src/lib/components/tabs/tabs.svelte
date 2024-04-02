@@ -1,7 +1,7 @@
 <script lang="ts">
-	import * as Tabs from "$lib/components/ui/tabs/index.js";
 	import { writable } from "svelte/store";
 	import { setTabsCtx } from ".";
+	import * as Tabs from "$lib/components/ui/tabs/index.js";
 
 	const items = writable([]);
 

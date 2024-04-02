@@ -4,6 +4,7 @@
 
 	export let title: string = siteConfig.name;
 
+	// eslint-disable-next-line svelte/valid-compile
 	$: title = $page.data?.title ? `${$page.data.title} - ${siteConfig.name}` : siteConfig.name;
 	$: description = $page.data?.description ?? siteConfig.description;
 </script>

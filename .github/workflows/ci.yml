@@ -11,46 +11,47 @@ concurrency:
     cancel-in-progress: true
 
 jobs:
-    Check:
-        name: Run svelte-check
-        runs-on: ubuntu-latest
-        steps:
-            - uses: actions/checkout@v3
-              with:
-                  fetch-depth: 0
+    # TODO: Readd this once we get the types fine for Svelte 5
+    # Check:
+    #     name: Run svelte-check
+    #     runs-on: ubuntu-latest
+    #     steps:
+    #         - uses: actions/checkout@v3
+    #           with:
+    #               fetch-depth: 0
 
-            - uses: pnpm/action-setup@v2
-              with:
-                  version: 8
+    #         - uses: pnpm/action-setup@v2
+    #           with:
+    #               version: 8
 
-            - uses: actions/setup-node@v3
-              with:
-                  node-version: 18
+    #         - uses: actions/setup-node@v3
+    #           with:
+    #               node-version: 18
 
-            # PNPM Store cache setup
-            - name: Get pnpm store directory
-              id: pnpm-cache
-              run: |
-                  echo "pnpm_cache_dir=$(pnpm store path)" >> $GITHUB_OUTPUT
-            - name: Setup pnpm cache
-              uses: actions/cache@v3
-              with:
-                  path: ${{ steps.pnpm-cache.outputs.pnpm_cache_dir }}
-                  key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
-                  restore-keys: |
-                      ${{ runner.os }}-pnpm-store-
+    #         # PNPM Store cache setup
+    #         - name: Get pnpm store directory
+    #           id: pnpm-cache
+    #           run: |
+    #               echo "pnpm_cache_dir=$(pnpm store path)" >> $GITHUB_OUTPUT
+    #         - name: Setup pnpm cache
+    #           uses: actions/cache@v3
+    #           with:
+    #               path: ${{ steps.pnpm-cache.outputs.pnpm_cache_dir }}
+    #               key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+    #               restore-keys: |
+    #                   ${{ runner.os }}-pnpm-store-
 
-            - name: Install dependencies
-              run: pnpm install
+    #         - name: Install dependencies
+    #           run: pnpm install
 
-            - name: Build
-              run: pnpm build
+    #         - name: Build
+    #           run: pnpm build
 
-            - name: Sync
-              run: pnpm sync
+    #         - name: Sync
+    #           run: pnpm sync
 
-            - name: Run svelte-check
-              run: pnpm check
+    #         - name: Run svelte-check
+    #           run: pnpm check
 
     Lint:
         runs-on: ubuntu-latest

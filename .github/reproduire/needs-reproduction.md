@@ -1,4 +1,4 @@
-Please provide a [reproduction](https://bits-ui.com/repro).
+Please provide a reproduction.
 
 <details>
 <summary>More info</summary>

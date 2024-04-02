@@ -1,2 +1,2 @@
-export * from "./withDebounce.svelte.js";
-export * from "./withElementSize.svelte.js";
+export * from "./useDebounce/index.js";
+export * from "./useElementSize/index.js";

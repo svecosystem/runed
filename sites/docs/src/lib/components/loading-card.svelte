@@ -1,8 +1,8 @@
 <script lang="ts">
+	import type { HTMLAttributes } from "svelte/elements";
 	import { cn } from "$lib/utils/index.js";
 	import * as Card from "$lib/components/ui/card/index.js";
 	import { SpinnerGap } from "$icons/index.js";
-	import type { HTMLAttributes } from "svelte/elements";
 
 	type $$Props = HTMLAttributes<HTMLDivElement>;
 

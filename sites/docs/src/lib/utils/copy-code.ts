@@ -21,8 +21,8 @@ export function createCopyCodeButton() {
 	}
 
 	return {
-		copied: copied,
-		copyCode: copyCode,
-		setCodeString: setCodeString,
+		copied,
+		copyCode,
+		setCodeString,
 	};
 }

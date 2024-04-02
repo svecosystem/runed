@@ -1,6 +1,6 @@
 <script lang="ts">
-	import { navigation } from "$lib/config";
 	import SidebarNavItem from "./sidebar-nav-item.svelte";
+	import { navigation } from "$lib/config";
 </script>
 
 <ul>
