@@ -1,2 +1,2 @@
-export { default as WithDebounceDemo } from "./with-debounce.svelte";
-export { default as WithElementSizeDemo } from "./with-element-size.svelte";
+export { default as UseDebounceDemo } from "./use-debounce.svelte";
+export { default as UseElementSizeDemo } from "./use-element-size.svelte";

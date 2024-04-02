@@ -1,6 +1,6 @@
 <script lang="ts">
 	import * as Alert from "$lib/components/ui/alert/index.js";
-	import { RocketLaunch, Info, WarningOctagon, Warning } from "$lib/icons/index.js";
+	import { Info, RocketLaunch, Warning, WarningOctagon } from "$lib/icons/index.js";
 
 	export let type: "note" | "warning" | "danger" | "tip" = "note";
 	export let title: string | undefined = type

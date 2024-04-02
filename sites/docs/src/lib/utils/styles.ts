@@ -14,14 +14,18 @@ type FlyAndScaleParams = {
 	duration?: number;
 };
 
-export const flyAndScale = (
+export function flyAndScale(
 	node: Element,
 	params: FlyAndScaleParams = { y: -8, x: 0, start: 0.95, duration: 150 }
-): TransitionConfig => {
+): TransitionConfig {
 	const style = getComputedStyle(node);
 	const transform = style.transform === "none" ? "" : style.transform;
 
-	const scaleConversion = (valueA: number, scaleA: [number, number], scaleB: [number, number]) => {
+	const scaleConversion = (
+		valueA: number,
+		scaleA: [number, number],
+		scaleB: [number, number]
+	) => {
 		const [minA, maxA] = scaleA;
 		const [minB, maxB] = scaleB;
 
@@ -34,7 +38,7 @@ export const flyAndScale = (
 	const styleToString = (style: Record<string, number | string | undefined>): string => {
 		return Object.keys(style).reduce((str, key) => {
 			if (style[key] === undefined) return str;
-			return str + `${key}:${style[key]};`;
+			return `${str}${key}:${style[key]};`;
 		}, "");
 	};
 
@@ -53,4 +57,4 @@ export const flyAndScale = (
 		},
 		easing: cubicOut,
 	};
-};
+}

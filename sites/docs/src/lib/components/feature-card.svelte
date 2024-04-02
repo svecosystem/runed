@@ -1,6 +1,6 @@
 <script lang="ts">
-	import * as Card from "$lib/components/ui/card/index.js";
 	import type { ComponentType } from "svelte";
+	import * as Card from "$lib/components/ui/card/index.js";
 
 	export let title: string;
 	export let icon: ComponentType;

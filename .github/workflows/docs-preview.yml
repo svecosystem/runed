@@ -18,7 +18,7 @@ on:
   pull_request_target:
     paths:
       - sites/docs/**
-      - packages/withrunes/**
+      - packages/runed/**
 
 # cancel in-progress runs on new commits to same PR (github.event.number)
 concurrency:
@@ -71,7 +71,7 @@ jobs:
           apiToken: ${{ secrets.CF_API_TOKEN }}
           accountId: ${{ secrets.CF_ACCOUNT_ID }}
           githubToken: ${{ secrets.GITHUB_TOKEN }}
-          projectName: withrunes
+          projectName: runed
           directory: ./.svelte-kit/cloudflare
           workingDirectory: sites/docs
           deploymentName: Preview

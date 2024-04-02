@@ -13,10 +13,6 @@
 		"build:content-cachebust": "contentlayer build --clearCache",
 		"preview": "vite preview",
 		"check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
-		"check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
-		"test": "vitest",
-		"lint": "prettier --check . && eslint .",
-		"format": "prettier --write .",
 		"sync": "svelte-kit sync"
 	},
 	"license": "MIT",
@@ -26,7 +22,8 @@
 			"url": "https://thomasglopes.com"
 		},
 		{
-			"name": "Hunter Johnston"
+			"name": "Hunter Johnston",
+			"url": "https://github.com/huntabyte"
 		}
 	],
 	"repository": {
@@ -38,25 +35,16 @@
 		"@sveltejs/kit": "^2.5.0",
 		"@sveltejs/vite-plugin-svelte": "^3.0.2",
 		"@tailwindcss/typography": "^0.5.10",
-		"@types/eslint": "8.56.2",
 		"@types/hast": "^3.0.4",
 		"@types/mdast": "^4.0.3",
-		"@typescript-eslint/eslint-plugin": "^7.0.1",
-		"@typescript-eslint/parser": "^7.0.1",
 		"autoprefixer": "^10.4.17",
 		"clsx": "^2.1.0",
 		"concurrently": "^8.2.2",
 		"contentlayer": "^0.3.4",
-		"eslint": "^8.56.0",
-		"eslint-config-prettier": "^9.1.0",
-		"eslint-plugin-svelte": "^2.36.0-next.10",
 		"mdsx": "^0.0.3",
 		"phosphor-svelte": "^1.4.2",
 		"postcss": "^8.4.35",
 		"postcss-load-config": "^5.0.3",
-		"prettier": "^3.2.5",
-		"prettier-plugin-svelte": "^3.2.1",
-		"prettier-plugin-tailwindcss": "^0.5.11",
 		"rehype-pretty-code": "^0.13.0",
 		"remark-gfm": "^4.0.0",
 		"shiki": "^1.1.3",

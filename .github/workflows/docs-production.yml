@@ -5,7 +5,7 @@ on:
       - main
     paths:
       - sites/docs/**
-      - packages/withrunes/**
+      - packages/runed/**
 
 concurrency: ${{ github.workflow }}-${{ github.ref }}
 
@@ -50,7 +50,7 @@ jobs:
           apiToken: ${{ secrets.CF_API_TOKEN }}
           accountId: ${{ secrets.CF_ACCOUNT_ID }}
           githubToken: ${{ secrets.GITHUB_TOKEN }}
-          projectName: withrunes
+          projectName: runed
           directory: ./.svelte-kit/cloudflare
           workingDirectory: sites/docs
           deploymentName: Production

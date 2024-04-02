@@ -10,10 +10,10 @@ Runed provides utilities to power your applications using the magic of [Svelte R
 
 Here are some tools that are provided:
 
-- Debouncing utilities synced with state
-- Element size tracking
-- RequestAnimationFrame helpers
-- etc.
+-   Debouncing utilities synced with state
+-   Element size tracking
+-   RequestAnimationFrame helpers
+-   etc.
 
 ## Next Steps
 

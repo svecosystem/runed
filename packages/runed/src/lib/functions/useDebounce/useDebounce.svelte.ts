@@ -15,9 +15,9 @@ import type { FunctionArgs, ValueOrGetter } from "$lib/internal/types.js";
  * @export
  * @template {FunctionArgs} Callback
  * @param {Callback} callback
- * @param {number} [wait=250]
+ * @param {number} wait
  */
-export function withDebounce<Callback extends FunctionArgs>(
+export function useDebounce<Callback extends FunctionArgs>(
 	callback: Callback,
 	wait: ValueOrGetter<number> = 250
 ) {
