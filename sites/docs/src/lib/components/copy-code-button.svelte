@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { cn } from "$lib/utils/index.js";
-	import { CopySimple, Check } from "$lib/icons/index.js";
+	import { Check, CopySimple } from "$lib/icons/index.js";
 	let className: string | undefined | null = undefined;
 	export let copyCode: () => void;
 	export let copied = false;

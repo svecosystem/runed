@@ -1,8 +1,8 @@
 <script lang="ts">
-	import { cn } from "$lib/utils/index.js";
-	import { ArrowUpRight } from "$lib/icons/index.js";
 	import type { HTMLAnchorAttributes } from "svelte/elements";
 	import { Drawer } from "vaul-svelte";
+	import { cn } from "$lib/utils/index.js";
+	import { ArrowUpRight } from "$lib/icons/index.js";
 
 	type $$Props = HTMLAnchorAttributes & {
 		external?: boolean;

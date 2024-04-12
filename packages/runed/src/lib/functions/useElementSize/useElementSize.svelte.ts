@@ -9,7 +9,7 @@ type Options = {
 	box?: "content-box" | "border-box";
 };
 
-export function withElementSize(
+export function useElementSize(
 	_node: ValueOrGetter<HTMLElement | undefined>,
 	options: Options = {
 		box: "border-box",
@@ -26,7 +26,8 @@ export function withElementSize(
 
 		const observer = new ResizeObserver((entries) => {
 			for (const entry of entries) {
-				const boxSize = options.box === "content-box" ? entry.contentBoxSize : entry.borderBoxSize;
+				const boxSize =
+					options.box === "content-box" ? entry.contentBoxSize : entry.borderBoxSize;
 				const boxSizeArr = Array.isArray(boxSize) ? boxSize : [boxSize];
 				size.width = boxSizeArr.reduce((acc, size) => Math.max(acc, size.inlineSize), 0);
 				size.height = boxSizeArr.reduce((acc, size) => Math.max(acc, size.blockSize), 0);

@@ -1,5 +1,5 @@
-import type { ValueOrGetter } from "../types.js";
 import { isFunction } from "./is.js";
+import type { ValueOrGetter } from "$lib/internal/types.js";
 
 export function boxed<T>(value: ValueOrGetter<T>) {
 	return {

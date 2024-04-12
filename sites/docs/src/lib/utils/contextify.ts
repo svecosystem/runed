@@ -4,7 +4,7 @@ import { getContext, hasContext, setContext } from "svelte";
 export function createContext<T>(): [() => T, (value: T) => T, symbol];
 
 export function createContext<T>() {
-	const key = Symbol();
+	const key = Symbol("CTX");
 
 	const getCtx = () => {
 		if (!hasContext(key)) {

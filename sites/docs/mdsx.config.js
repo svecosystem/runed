@@ -1,10 +1,10 @@
 // @ts-check
+import { fileURLToPath } from "node:url";
+import { resolve } from "node:path";
+import { readFileSync } from "node:fs";
 import remarkGfm from "remark-gfm";
 import rehypePrettyCode from "rehype-pretty-code";
-import { fileURLToPath } from "url";
 import { visit } from "unist-util-visit";
-import { resolve } from "path";
-import { readFileSync } from "fs";
 import { getHighlighter } from "shiki";
 import rehypeSlug from "rehype-slug";
 import { defineConfig } from "mdsx";
@@ -24,10 +24,14 @@ const __dirname = fileURLToPath(new URL(".", import.meta.url));
 const prettyCodeOptions = {
 	theme: {
 		dark: JSON.parse(
-			String(readFileSync(resolve(__dirname, "./src/lib/styles/themes/tokyo-night-storm.json")))
+			String(
+				readFileSync(resolve(__dirname, "./src/lib/styles/themes/tokyo-night-storm.json"))
+			)
 		),
 		light: JSON.parse(
-			String(readFileSync(resolve(__dirname, "./src/lib/styles/themes/tokyo-night-light.json")))
+			String(
+				readFileSync(resolve(__dirname, "./src/lib/styles/themes/tokyo-night-light.json"))
+			)
 		),
 	},
 	getHighlighter: (options) =>
@@ -82,7 +86,7 @@ export const mdsxConfig = defineConfig({
  * itself and checking for it in the code block, but that's not something we need
  * at the moment.
  *
- * @returns {MdastTransformer}
+ * @returns {MdastTransformer} - A unified transformer
  *
  */
 function remarkRemovePrettierIgnore() {
@@ -101,7 +105,7 @@ function remarkRemovePrettierIgnore() {
  * We use this to style elements within the `<figure>` differently if a `<figcaption>`
  * is present.
  *
- * @returns {HastTransformer}
+ * @returns {HastTransformer} - A unified transformer
  */
 function rehypeHandleMetadata() {
 	return async (tree) => {

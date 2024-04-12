@@ -1,25 +1,24 @@
 ---
-title: WithElementSize
+title: useElementSize
 description: A higher-order function that debounces the execution of a function.
 ---
 
 <script>
-import { WithElementSizeDemo } from '$lib/components/demos';
+	import { UseElementSizeDemo } from '$lib/components/demos';
 </script>
 
 ## Demo
 
-<WithElementSizeDemo />
+<UseElementSizeDemo />
 
 ## Usage
 
 ```svelte
 <script lang="ts">
-	<script lang="ts">
-	import { withElementSize } from "runed";
+	import { useElementSize } from "runed";
 
-	let el: HTMLElement | undefined = $state(undefined);
-	const size = withElementSize(() => el);
+	let el = $state() as HTMLElement;
+	const size = useElementSize(() => el);
 </script>
 
 <div>

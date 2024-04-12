@@ -1,6 +1,6 @@
 <script lang="ts">
-	import { cn } from "$lib/utils";
 	import { Select as SelectPrimitive } from "bits-ui";
+	import { cn } from "$lib/utils";
 	import { Check } from "$icons/index.js";
 
 	type $$Props = SelectPrimitive.ItemProps;

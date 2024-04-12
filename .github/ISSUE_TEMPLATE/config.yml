@@ -1,8 +1,8 @@
 blank_issues_enabled: false
 contact_links:
   - name: Get Help
-    url: https://github.com/svecosystem/withrunes/discussions/new?category=help
+    url: https://github.com/svecosystem/runed/discussions/new?category=help
     about: If you can't get something to work the way you expect, open a question in our discussion forums.
   - name: Discord
-    url: https://hbyt.us/discord
+    url: https://discord.gg/WMa8MjNyCz
     about: If you need to have a back-and-forth conversation, join the Discord server.

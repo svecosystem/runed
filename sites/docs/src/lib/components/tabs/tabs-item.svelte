@@ -1,6 +1,6 @@
 <script lang="ts">
-	import * as Tabs from "$lib/components/ui/tabs/index.js";
 	import { getTabsCtx } from "./index.js";
+	import * as Tabs from "$lib/components/ui/tabs/index.js";
 
 	const { items } = getTabsCtx();
 
