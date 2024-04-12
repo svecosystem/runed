@@ -1,5 +1,5 @@
 ---
-title: WithActiveElement
+title: UseActiveElement
 description: A function that returns the currently active element.
 ---
 
@@ -15,9 +15,9 @@ import { UseActiveElementDemo } from '$lib/components/demos';
 
 ```svelte
 <script lang="ts">
-	import { withActiveElement } from "runed";
+	import { useActiveElement } from "runed";
 
-	const activeElement = withActiveElement();
+	const activeElement = useActiveElement();
 </script>
 
 <div class="rounded-md bg-card p-8">
