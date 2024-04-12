@@ -4,12 +4,12 @@ description: A function that returns the currently active element.
 ---
 
 <script>
-import { WithActiveElementDemo } from '$lib/components/demos';
+import { UseActiveElementDemo } from '$lib/components/demos';
 </script>
 
 ## Demo
 
-<WithActiveElementDemo />
+<UseActiveElementDemo />
 
 ## Usage
 

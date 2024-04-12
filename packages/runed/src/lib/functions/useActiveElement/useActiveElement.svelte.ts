@@ -1,4 +1,4 @@
-import { documentDefined } from "$lib/internal/utils/defined.js";
+import { documentDefined } from "../../internal/utils/defined.js";
 
 export function withActiveElement(): { value: Readonly<Element | null> } {
 	const activeElement = $state({ value: documentDefined() ? document.activeElement : null });
