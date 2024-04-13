@@ -1,24 +1,24 @@
 import { describe, expect, it } from "vitest";
+import { tick } from "svelte";
 import { useActiveElement } from "./index.js";
+import { testWithEffect } from "$lib/test/util.svelte.js";
 
 describe("useActiveElement", () => {
-	it("initializes with `document.activeElement`", () => {
-		const cleanup = $effect.root(() => {
-			const activeElement = useActiveElement();
-			expect(activeElement.value).toBe(document.activeElement);
-		});
-		cleanup();
+	testWithEffect("initializes with `document.activeElement`", () => {
+		const activeElement = useActiveElement();
+		expect(activeElement.value).toBe(document.activeElement);
 	});
-	it("updates accordingly when `document.activeElement` element changes", () => {
-		const input = document.createElement("input");
-		const cleanup = $effect.root(() => {
-			const activeElement = useActiveElement();
+	testWithEffect(
+		"updates accordingly when `document.activeElement` element changes",
+		async () => {
+			const input = document.createElement("input");
+			document.body.appendChild(input);
 			input.focus();
-			requestAnimationFrame(() => {
-				expect(document.activeElement).toBe(input);
-				expect(activeElement.value).toBe(input);
-			});
-		});
-		cleanup();
-	});
+
+			const activeElement = useActiveElement();
+			await tick();
+			expect(document.activeElement).toBe(input);
+			expect(activeElement.value).toBe(input);
+		}
+	);
 });
