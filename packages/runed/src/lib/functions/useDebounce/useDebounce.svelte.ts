@@ -12,10 +12,6 @@ import type { FunctionArgs, ValueOrGetter } from "$lib/internal/types.js";
  * The second parameter is the time to wait before calling the original callback.
  * Alternatively, it can also be a getter function that returns the time to wait.
  *
- * @export
- * @template {FunctionArgs} Callback
- * @param {Callback} callback
- * @param {number} wait
  */
 export function useDebounce<Callback extends FunctionArgs>(
 	callback: Callback,
