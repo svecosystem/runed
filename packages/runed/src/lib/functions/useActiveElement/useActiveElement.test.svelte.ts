@@ -1,4 +1,4 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect } from "vitest";
 import { tick } from "svelte";
 import { useActiveElement } from "./index.js";
 import { testWithEffect } from "$lib/test/util.svelte.js";
