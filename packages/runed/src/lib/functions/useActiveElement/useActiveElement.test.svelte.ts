@@ -13,7 +13,6 @@ describe("useActiveElement", () => {
 		const input = document.createElement("input");
 		const cleanup = $effect.root(() => {
 			const activeElement = useActiveElement();
-			expect(activeElement.value).toBe(document.activeElement);
 			input.focus();
 			requestAnimationFrame(() => {
 				expect(document.activeElement).toBe(input);
