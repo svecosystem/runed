@@ -1,3 +1,3 @@
-export function documentDefined() {
+export function isBrowser() {
 	return typeof document !== "undefined";
 }
