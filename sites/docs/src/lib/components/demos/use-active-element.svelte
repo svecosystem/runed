@@ -1,7 +1,7 @@
 <script lang="ts">
-	import { withActiveElement } from "runed";
+	import { useActiveElement } from "runed";
 
-	const activeElement = withActiveElement();
+	const activeElement = useActiveElement();
 </script>
 
 <div class="rounded-md bg-card p-8">

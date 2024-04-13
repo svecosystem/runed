@@ -1,6 +1,6 @@
 import { documentDefined } from "../../internal/utils/defined.js";
 
-export function withActiveElement(): { value: Readonly<Element | null> } {
+export function useActiveElement(): { value: Readonly<Element | null> } {
 	const activeElement = $state({ value: documentDefined() ? document.activeElement : null });
 
 	function onFocusChange() {
