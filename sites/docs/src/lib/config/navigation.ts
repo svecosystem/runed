@@ -62,6 +62,11 @@ export const navigation: Navigation = {
 			collapsible: true,
 			items: [
 				{
+					title: "useActiveElement",
+					href: "/docs/functions/use-active-element",
+					items: [],
+				},
+				{
 					title: "useDebounce",
 					href: "/docs/functions/use-debounce",
 					items: [],
