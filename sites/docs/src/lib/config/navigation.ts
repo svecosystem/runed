@@ -76,6 +76,11 @@ export const navigation: Navigation = {
 					href: "/docs/functions/use-element-size",
 					items: [],
 				},
+				{
+					title: "useEventListener",
+					href: "/docs/functions/use-event-listener",
+					items: [],
+				},
 			],
 		},
 	],

@@ -1,21 +1,21 @@
 ---
-title: UseActiveElement
-description: A function that returns the currently active element.
+title: UseEventListener
+description: A function that attaches an automatically disposed event listener.
 ---
 
 <script>
-import { UseActiveElementDemo } from '$lib/components/demos';
+import { UseEventListenerDemo } from '$lib/components/demos';
 </script>
 
 ## Demo
 
-<UseActiveElementDemo />
+<UseEventListenerDemo />
 
 ## Usage
 
 ```svelte
 <script lang="ts">
-	import { useActiveElement } from "runed";
+	import { useEventListener } from "runed";
 
 	const activeElement = useActiveElement();
 	const text = $derived(
