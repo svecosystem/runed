@@ -41,7 +41,7 @@
 		"clsx": "^2.1.0",
 		"concurrently": "^8.2.2",
 		"contentlayer": "^0.3.4",
-		"mdsx": "^0.0.3",
+		"mdsx": "^0.0.5",
 		"phosphor-svelte": "^1.4.2",
 		"postcss": "^8.4.35",
 		"postcss-load-config": "^5.0.3",
@@ -67,8 +67,8 @@
 		"@melt-ui/svelte": "^0.74.0",
 		"bits-ui": "^0.18.1",
 		"mode-watcher": "^0.2.1",
-		"runed": "workspace:^",
 		"rehype-slug": "^6.0.0",
+		"runed": "workspace:^",
 		"svelte-sonner": "^0.3.17",
 		"vaul-svelte": "^0.2.3"
 	}
