@@ -137,8 +137,8 @@ importers:
         specifier: ^0.3.4
         version: 0.3.4(esbuild@0.20.0)
       mdsx:
-        specifier: ^0.0.3
-        version: 0.0.3(svelte@5.0.0-next.75)
+        specifier: ^0.0.5
+        version: 0.0.5(svelte@5.0.0-next.75)
       phosphor-svelte:
         specifier: ^1.4.2
         version: 1.4.2(svelte@5.0.0-next.75)
@@ -5659,8 +5659,8 @@ packages:
       '@types/mdast': 4.0.3
     dev: true
 
-  /mdsx@0.0.3(svelte@5.0.0-next.75):
-    resolution: {integrity: sha512-DjrWAAUT7/n16ZJ6zxzAG9X1fAQGDMsnUyAz1T5O8xhsOz/Otyp9bfBkgIHc9E5Cpfu9phTuIIkPXLWPRem8mQ==}
+  /mdsx@0.0.5(svelte@5.0.0-next.75):
+    resolution: {integrity: sha512-crYbZC0L5kQjaRABvHIXj9H2O1qikIw9KKqS3bo2En4XVgvHH7TO5bJ2X86PxJK7H6QEBAubjUma9+qpbsPC5A==}
     peerDependencies:
       svelte: ^4.0.0
     dependencies:
