@@ -10,30 +10,30 @@ type Options = {
 };
 
 
+
 /**
  * Returns a reactive value holding the size of `node`.
- *
- * @export
- * @param {ValueOrGetter<HTMLElement | undefined>} node
- * @param {Options} [options={
- * 		box: "border-box",
- * 	}]
- * @returns {*}
+ * 
+ * Accepts an `options` object with the following properties:
+ * - `initialSize`: The initial size of the element. Defaults to `{ width: 0, height: 0 }`.
+ * - `box`: The box model to use. Can be either `"content-box"` or `"border-box"`. Defaults to `"border-box"`.
+ * 
+ * @returns an object with `width` and `height` properties.
  */
 export function useElementSize(
-	node: ValueOrGetter<HTMLElement | undefined>,
+	_node: ValueOrGetter<HTMLElement | undefined>,
 	options: Options = {
 		box: "border-box",
 	}
-) {
-	const $node = boxed(node);
+): { width: number; height: number; } {
+	const node = boxed(_node);
 	const size = $state({
 		width: options.initialSize?.width ?? 0,
 		height: options.initialSize?.height ?? 0,
 	});
 
 	$effect(() => {
-		if (!$node.value) return;
+		if (!node.value) return;
 
 		const observer = new ResizeObserver((entries) => {
 			for (const entry of entries) {
@@ -44,7 +44,7 @@ export function useElementSize(
 				size.height = boxSizeArr.reduce((acc, size) => Math.max(acc, size.blockSize), 0);
 			}
 		});
-		observer.observe($node.value);
+		observer.observe(node.value);
 
 		return () => {
 			observer.disconnect();
