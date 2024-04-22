@@ -29,5 +29,4 @@ import { UseEventListenerDemo } from '$lib/components/demos';
 <div bind:this={wrapper}>
 	<p>You've clicked {count} {count === 1 ? "time" : "times"}</p>
 </div>
-
 ```

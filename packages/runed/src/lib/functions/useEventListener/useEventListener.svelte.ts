@@ -43,6 +43,6 @@ export function useEventListener(
 
 	$effect(() => {
 		if (target.value === undefined || target.value === null) return;
-		return addEventListener(target.value, event, handler, options)
+		return addEventListener(target.value, event, handler, options);
 	});
-} 
+}
