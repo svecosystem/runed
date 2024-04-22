@@ -8,9 +8,7 @@
 	<p>
 		Currently active element:
 		<span class="font-bold">
-			{activeElement.value !== null
-				? activeElement.value.localName
-				: "No active element found"}
+			{activeElement.value?.localName ?? "No active element found"}
 		</span>
 	</p>
 </div>

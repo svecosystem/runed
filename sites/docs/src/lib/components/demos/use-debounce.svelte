@@ -23,7 +23,8 @@
 
 <div class="rounded-md bg-card p-8">
 	<button
-		class="relative z-20 inline-flex items-center justify-center rounded-md border bg-brand/50 px-3 py-1.5 text-sm font-medium transition-all hover:bg-brand/25 focus:outline-none"
+		class="relative z-20 inline-flex items-center justify-center rounded-md border bg-brand/50
+		px-3 py-1.5 text-sm font-medium transition-all hover:bg-brand/25 focus:outline-none active:bg-brand/15"
 		onclick={ding}>DING DING DING</button
 	>
 	<p>{logged || "Press the button!"}</p>
