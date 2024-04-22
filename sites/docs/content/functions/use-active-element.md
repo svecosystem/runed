@@ -18,16 +18,10 @@ import { UseActiveElementDemo } from '$lib/components/demos';
 	import { useActiveElement } from "runed";
 
 	const activeElement = useActiveElement();
-	const text = $derived(
-		`Currently active element: ${
-			activeElement.value !== nulla
-				? activeElement.value.localName
-				: "No active element found"
-		}`a
-	);
 </script>
 
-<div class="rounded-md bg-card p-8">
-	<p>{text}</p>
-</div>
+<p>
+	Currently active element: 
+	{activeElement.value?.localName ?? 'No active element found'}
+</p>
 ```

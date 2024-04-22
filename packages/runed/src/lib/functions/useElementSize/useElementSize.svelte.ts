@@ -9,20 +9,31 @@ type Options = {
 	box?: "content-box" | "border-box";
 };
 
+
+/**
+ * Returns a reactive value holding the size of `node`.
+ *
+ * @export
+ * @param {ValueOrGetter<HTMLElement | undefined>} node
+ * @param {Options} [options={
+ * 		box: "border-box",
+ * 	}]
+ * @returns {*}
+ */
 export function useElementSize(
-	_node: ValueOrGetter<HTMLElement | undefined>,
+	node: ValueOrGetter<HTMLElement | undefined>,
 	options: Options = {
 		box: "border-box",
 	}
 ) {
-	const node = boxed(_node);
+	const $node = boxed(node);
 	const size = $state({
 		width: options.initialSize?.width ?? 0,
 		height: options.initialSize?.height ?? 0,
 	});
 
 	$effect(() => {
-		if (!node.value) return;
+		if (!$node.value) return;
 
 		const observer = new ResizeObserver((entries) => {
 			for (const entry of entries) {
@@ -33,7 +44,7 @@ export function useElementSize(
 				size.height = boxSizeArr.reduce((acc, size) => Math.max(acc, size.blockSize), 0);
 			}
 		});
-		observer.observe(node.value);
+		observer.observe($node.value);
 
 		return () => {
 			observer.disconnect();
