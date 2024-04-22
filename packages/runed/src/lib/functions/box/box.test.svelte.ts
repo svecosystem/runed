@@ -1,6 +1,6 @@
 import { describe, expect, expectTypeOf, test } from "vitest";
 import { type ReadonlyBox, readonlyBox } from "../readonlyBox/readonlyBox.svelte.js";
-import { type Box, box } from "./box.svelte.js";
+import { type Box, type ValueOrBox, box } from "./box.svelte.js";
 import type { Getter } from "$lib/internal/types.js";
 
 describe("box", () => {
@@ -77,4 +77,10 @@ describe("box types", () => {
 		expectTypeOf(count).toMatchTypeOf<Box<number>>();
 		expectTypeOf(count).not.toMatchTypeOf<ReadonlyBox<number>>();
 	})
+
+	test("box of ValueOrBox", () => {
+		const count = undefined as unknown as ValueOrBox<number>; // typing this as number casts it
+		const readonlyCount = box(count);
+		expectTypeOf(readonlyCount).toMatchTypeOf<Box<number>>;
+	});
 })
