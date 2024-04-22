@@ -1,6 +1,4 @@
-
-
-import { type ReadonlyBox, isReadonlyBox } from '../readonlyBox/readonlyBox.svelte.js';
+import { type ReadonlyBox, isReadonlyBox } from "../readonlyBox/readonlyBox.svelte.js";
 import type { Getter, Setter } from "$lib/internal/types.js";
 import { isFunction, isObject } from "$lib/internal/utils/is.js";
 

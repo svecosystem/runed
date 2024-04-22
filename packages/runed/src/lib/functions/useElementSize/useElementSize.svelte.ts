@@ -1,7 +1,5 @@
-
 import type { ValueOrReadonlyBox } from "$lib/index.js";
 import { readonlyBox } from "$lib/index.js";
-
 
 type Options = {
 	initialSize?: {

@@ -1,1 +1,1 @@
-export * from './readonlyBox.svelte.js'
+export * from "./readonlyBox.svelte.js";

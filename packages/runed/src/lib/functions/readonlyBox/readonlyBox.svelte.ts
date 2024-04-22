@@ -1,6 +1,6 @@
 import { type Box, isBox } from "../box/box.svelte.js";
 import { isFunction, isObject } from "$lib/internal/utils/is.js";
-import type { Getter, } from "$lib/internal/types.js";
+import type { Getter } from "$lib/internal/types.js";
 
 const ReadonlyBoxSymbol = Symbol("ReadonlyBox");
 

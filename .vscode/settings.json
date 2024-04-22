@@ -4,7 +4,7 @@
 	// Auto fix
 	"editor.codeActionsOnSave": {
 		"source.fixAll.eslint": "explicit",
-		"source.organizeImports": "never",
+		"source.organizeImports": "never"
 	},
 	"editor.formatOnSave": true,
 	// Enable eslint for all supported languages
@@ -22,5 +22,5 @@
 		"yaml",
 		"toml",
 		"astro"
-	],
+	]
 }

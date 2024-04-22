@@ -1,6 +1,3 @@
-import type { ReadonlyBox } from "$lib/functions/index.js";
-
-
 // eslint-disable-next-line ts/no-explicit-any
 export type FunctionArgs<Args extends any[] = any[], Return = void> = (...args: Args) => Return;
 

@@ -1,1 +1,1 @@
-export * from './box.svelte.js'
+export * from "./box.svelte.js";
