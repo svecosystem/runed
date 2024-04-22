@@ -24,9 +24,11 @@
     "url": "https://github.com/svecosystem/runed"
   },
   "scripts": {
-    "test": "pnpm -r test",
     "dev": "pnpm sync && pnpm --parallel dev",
-    "build": "pnpm -r build",
+    "test": "pnpm -r test",
+    "test:package": "pnpm -F \"./packages/**\" test",
+    "test:package:watch": "pnpm -F \"./packages/**\" test:watch",
+		"build": "pnpm -r build",
     "build:packages": "pnpm -F \"./packages/**\" --parallel build",
     "build:content": "pnpm -F \"./sites/**\" --parallel build:content",
     "ci:publish": "pnpm build:packages && changeset publish",
