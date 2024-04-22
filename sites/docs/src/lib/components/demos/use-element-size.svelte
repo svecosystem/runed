@@ -11,5 +11,5 @@
 		bind:this={el}
 		class="h-[200px] min-h-[100px] w-[300px] min-w-[200px] resize rounded-md bg-muted p-4"
 		value={text}
-	/>
+	></textarea>
 </div>

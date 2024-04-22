@@ -21,7 +21,7 @@ import { UseActiveElementDemo } from '$lib/components/demos';
 </script>
 
 <p>
-	Currently active element: 
-	{activeElement.value?.localName ?? 'No active element found'}
+	Currently active element:
+	{activeElement.value?.localName ?? "No active element found"}
 </p>
 ```

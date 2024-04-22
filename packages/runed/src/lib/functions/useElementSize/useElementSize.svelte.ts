@@ -9,15 +9,13 @@ type Options = {
 	box?: "content-box" | "border-box";
 };
 
-
-
 /**
  * Returns a reactive value holding the size of `node`.
- * 
+ *
  * Accepts an `options` object with the following properties:
  * - `initialSize`: The initial size of the element. Defaults to `{ width: 0, height: 0 }`.
  * - `box`: The box model to use. Can be either `"content-box"` or `"border-box"`. Defaults to `"border-box"`.
- * 
+ *
  * @returns an object with `width` and `height` properties.
  */
 export function useElementSize(
@@ -25,7 +23,7 @@ export function useElementSize(
 	options: Options = {
 		box: "border-box",
 	}
-): { width: number; height: number; } {
+): { width: number; height: number } {
 	const node = boxed(_node);
 	const size = $state({
 		width: options.initialSize?.width ?? 0,
