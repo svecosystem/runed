@@ -22,7 +22,7 @@
 			class="fixed bottom-0 left-0 right-0 z-[70] mt-24 flex max-h-[96%] flex-col rounded-t-[10px] bg-background"
 		>
 			<div class="max-h-[96%] flex-1 overflow-y-auto rounded-t-[10px] bg-card p-4">
-				<div class="mx-auto mb-8 h-1.5 w-12 flex-shrink-0 rounded-full bg-primary/20" />
+				<div class="mx-auto mb-8 h-1.5 w-12 flex-shrink-0 rounded-full bg-primary/20"></div>
 				<div class="mx-auto max-w-md">
 					<Drawer.Title class="sr-only mb-4 font-medium">Navigation</Drawer.Title>
 					<nav>
