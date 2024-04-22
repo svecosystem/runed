@@ -1,5 +1,5 @@
 ---
-title: UseEventListener
+title: useEventListener
 description: A function that attaches an automatically disposed event listener.
 ---
 

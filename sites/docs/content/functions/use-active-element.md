@@ -1,5 +1,5 @@
 ---
-title: UseActiveElement
+title: useActiveElement
 description: A function that returns the currently active element.
 ---
 
