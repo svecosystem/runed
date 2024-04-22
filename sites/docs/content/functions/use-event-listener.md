@@ -1,5 +1,5 @@
 ---
-title: UseEventListener
+title: useEventListener
 description: A function that attaches an automatically disposed event listener.
 ---
 
@@ -22,8 +22,11 @@ import { UseEventListenerDemo } from '$lib/components/demos';
 		count++;
 	}
 
-	useEventListener(() => document, "click", increment);
+	let wrapper = $state<HTMLElement>();
+	useEventListener(() => wrapper, "click", increment);
 </script>
 
-<p>You've clicked {count} {count === 1 ? "Time" : "Times"}</p>
+<div bind:this={wrapper}>
+	<p>You've clicked {count} {count === 1 ? "time" : "times"}</p>
+</div>
 ```
