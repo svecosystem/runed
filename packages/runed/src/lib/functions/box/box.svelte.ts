@@ -1,4 +1,6 @@
-import { type ReadonlyBox, isReadonlyBox } from "../readonlyBox/index.js";
+
+
+import { type ReadonlyBox, isReadonlyBox } from '../readonlyBox/readonlyBox.svelte.js';
 import type { Getter, Setter } from "$lib/internal/types.js";
 import { isFunction, isObject } from "$lib/internal/utils/is.js";
 
@@ -15,6 +17,8 @@ export type Box<T> = {
 export function isBox<T>(value: unknown): value is Box<T> {
 	return isObject(value) && BoxSymbol in value;
 }
+
+export type ValueOrBox<T> = T | Box<T>;
 
 /**
  * Not allowed. Use `readonlyBox` instead.
@@ -51,6 +55,11 @@ export function box<T>(box: Box<T>): Box<T>;
  * Useful to pass state to other functions. *
  */
 export function box<T>(get: Getter<T>, set: Setter<T>): Box<T>;
+/**
+ * Re-returns the box if it's already a box.
+ * Useful for when you want to accept a prop that can be a box or a value.
+ */
+export function box<T>(box: ValueOrBox<T>): Box<T>;
 /**
  * Creates internal $state with an initial value equal to what is passed in.
  *

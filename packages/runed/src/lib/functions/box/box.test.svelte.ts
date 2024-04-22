@@ -1,6 +1,6 @@
 import { describe, expect, expectTypeOf, test } from "vitest";
-import { box } from "./box.svelte.js";
-import type { Box, ReadonlyBox } from "./types.js";
+import { type ReadonlyBox, readonlyBox } from "../readonlyBox/readonlyBox.svelte.js";
+import { type Box, box } from "./box.svelte.js";
 import type { Getter } from "$lib/internal/types.js";
 
 describe("box", () => {
@@ -30,9 +30,9 @@ describe("box", () => {
 		expect(countBox.value).toBe(1);
 	})
 
-	// test("box of readonly box should throw", () => {
-	// 	expect(() => box(box(() => 0))).toThrow();
-	// })
+	test("box of readonly box should throw", () => {
+		expect(() => box(readonlyBox(() => 0))).toThrow();
+	})
 
 	test("box of box should be settable", () => {
 		const count = box(box(0));

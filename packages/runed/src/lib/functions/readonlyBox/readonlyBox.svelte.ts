@@ -1,6 +1,6 @@
 import { type Box, isBox } from "../box/box.svelte.js";
 import { isFunction, isObject } from "$lib/internal/utils/is.js";
-import type { Getter, Setter } from "$lib/internal/types.js";
+import type { Getter, } from "$lib/internal/types.js";
 
 const ReadonlyBoxSymbol = Symbol("ReadonlyBox");
 
@@ -16,11 +16,8 @@ export function isReadonlyBox<T>(value: unknown): value is ReadonlyBox<T> {
 	return isObject(value) && ReadonlyBoxSymbol in value;
 }
 
-/**
- * Re-returns the readonlyBox if it's already a readonlyBox.
- * Useful for when you want to accept a prop that can be a readonlyBox or a value.
- */
-export function readonlyBox<T>(readonlybox: ReadonlyBox<T>): ReadonlyBox<T>;
+export type ValueOrReadonlyBox<T> = T | ReadonlyBox<T>;
+
 /**
  * Makes the box readonly.
  */
@@ -43,6 +40,11 @@ export function readonlyBox<T>(box: Box<T>): ReadonlyBox<T>;
  * Useful to pass state to other functions. *
  */
 export function readonlyBox<T>(get: Getter<T>): ReadonlyBox<T>;
+/**
+ * Re-returns the readonlyBox if it's already a readonlyBox.
+ * Useful for when you want to accept a prop that can be a readonlyBox or a value.
+ */
+export function readonlyBox<T>(readonlybox: ValueOrReadonlyBox<T>): ReadonlyBox<T>;
 /**
  * @returns An object with a static `value` property.
  */
