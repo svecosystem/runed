@@ -1,1 +1,1 @@
-export * from "./useEventListener.js";
+export * from "./useEventListener.svelte.js";

@@ -18,13 +18,12 @@ import { UseEventListenerDemo } from '$lib/components/demos';
 	import { useEventListener } from "runed";
 
 	let count = $state(0);
+	function increment() {
+		count++;
+	}
 
-	$effect(() => {
-		useEventListener(document, "click", () => count++);
-	});
+	useEventListener(() => document, "click", increment);
 </script>
 
-<div class="rounded-md bg-card p-8">
-	<p>You've clicked {count} {count === 1 ? "Time" : "Times"}</p>
-</div>
+<p>You've clicked {count} {count === 1 ? "Time" : "Times"}</p>
 ```

@@ -34,12 +34,12 @@ export function useEventListener(
 ): void;
 
 export function useEventListener(
-	target: ValueOrGetter<EventTarget>,
+	_target: ValueOrGetter<EventTarget>,
 	event: string,
 	handler: EventListenerOrEventListenerObject,
 	options?: boolean | AddEventListenerOptions
 ) {
-	const $target = boxed(target);
+	const target = boxed(_target);
 
-	$effect(() => addEventListener($target.value, event, handler, options));
+	$effect(() => addEventListener(target.value, event, handler, options));
 }
