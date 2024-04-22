@@ -6,9 +6,10 @@
 		count++;
 	}
 
-	useEventListener(() => document, "click", increment);
+	let wrapper = $state<HTMLElement>();
+	useEventListener(() => wrapper, "click", increment);
 </script>
 
-<div class="select-none rounded-md bg-card p-8">
-	<p>You've clicked {count} {count === 1 ? "Time" : "Times"}</p>
+<div class="select-none rounded-md bg-card p-8" bind:this={wrapper}>
+	<p>You've clicked {count} {count === 1 ? "time" : "times"}</p>
 </div>
