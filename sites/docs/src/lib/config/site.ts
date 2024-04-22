@@ -1,6 +1,6 @@
 export const siteConfig = {
 	name: "Runed",
-	url: "https://runed.com",
+	url: "https://runed.dev",
 	description: "Resizable pane components for Svelte and SvelteKit.",
 	links: {
 		x: "https://x.com/huntabyte",
@@ -11,7 +11,7 @@ export const siteConfig = {
 	keywords:
 		"Svelte runes utilities,svelte runes,svelte utilities,runed,svelte helpers,svelte utils,svelte functions",
 	ogImage: {
-		url: "https://runed.com/og.png",
+		url: "https://runed.dev/og.png",
 		width: "1200",
 		height: "630",
 	},
