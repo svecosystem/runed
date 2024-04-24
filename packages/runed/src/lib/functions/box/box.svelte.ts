@@ -69,34 +69,40 @@ export function box<T>(): WritableBox<T | undefined>;
  * Creates a box with an initial value, or re-returns the value if it's already a box.
  *
  * @param initialValue The initial value of the box, or a box that contains the initial value.
- * 
+ *
  * @example
  * const count = box(0);
  * const reCount = box(count);
  * count.value = 5;
  * reCount.value = 10;
- * console.log(`${count.value}, ${reCount.value}`); // "10, 10" 
- * 
- * 
+ * console.log(`${count.value}, ${reCount.value}`); // "10, 10"
+ *
+ *
  * @returns A box with a `value` property which can be set to a new value.
  * Useful to pass state to other functions.
  */
-export function box<T>(initialValue: T): T extends WritableBox<infer U> ? WritableBox<U> : T extends ReadableBox<infer U> ? ReadableBox<U> : WritableBox<T>;
+export function box<T>(
+	initialValue: T
+): T extends WritableBox<infer U>
+	? WritableBox<U>
+	: T extends ReadableBox<infer U>
+		? ReadableBox<U>
+		: WritableBox<T>;
 /**
  * Creates a writable box with an initial value.
  *
  * @param initialValue The initial value of the box.
  * @param setter (optional) A function that controls how the value is set.
  * Its argument is the value trying to be set. The returned value will be the new value.
- * 
+ *
  * @example
  * const count = box(0);
  * const doubleCount = box(0, (c) => c * 2);
  * count.value = 5;
  * doubleCount.value = 10;
- * console.log(`${count.value}, ${doubleCount.value}`); // "5, 20" 
- * 
- * 
+ * console.log(`${count.value}, ${doubleCount.value}`); // "5, 20"
+ *
+ *
  * @returns A box with a `value` property which can be set to a new value.
  * Useful to pass state to other functions.
  */
