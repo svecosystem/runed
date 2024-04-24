@@ -1,129 +1,163 @@
-import { type ReadonlyBox, isReadonlyBox } from "../readonlyBox/readonlyBox.svelte.js";
-import type { Getter, Setter } from "$lib/internal/types.js";
-import { isFunction, isObject } from "$lib/internal/utils/is.js";
-
-const BoxSymbol = Symbol("Box");
-
-export type Box<T> = {
-	readonly [BoxSymbol]: true;
-	value: T;
-};
-
 /**
- * @returns Whether the value is a settable Box
+ * Box
+ *
+ * This module contains utilities to provide boxes to use throughout runes-powered
+ * Svelte applications.
+ *
+ * The practicality of box comes due to the fact that runes are based on primitives, rather than
+ * providing the closures directly. So to pass runes around, you need to provide said closures yourself.
+ *
+ * With the box utilities, we aim to achieve certain goals.
+ *
+ * - Be able to pass state around in a reactive manner.
+ * - Be able to set passed state.
+ * - Control how said state gets read and set.
+ * - Initiate state inside a box, rather than always requiring a pre-existing state.
+ * - Easily receive boxed state inside functions
+ *
+ * We provide several functions to this end, which can either provide a ReadonlyBox or a Box.
+ *
+ * WritableBox should extend from ReadonlyBox, as a function that accepts a ReadonlyBox should also accept a WritableBox.
+ * The inverse is not true, as a function that accepts a WritableBox should not necessarily accept a ReadonlyBox,
+ * as the WritableBox can be set, while the ReadonlyBox cannot.
  */
-export function isBox<T>(value: unknown): value is Box<T> {
-	return isObject(value) && BoxSymbol in value;
+
+import { isObject } from "$lib/internal/utils/is.js";
+
+const BoxSymbol = Symbol("box");
+const isWritableSymbol = Symbol("is-writable");
+
+export interface ReadableBox<T> {
+	readonly [BoxSymbol]: true;
+	readonly value: T;
 }
 
-export type ValueOrBox<T> = T | Box<T>;
+export interface WritableBox<T> extends ReadableBox<T> {
+	readonly [isWritableSymbol]: true;
+	value: T;
+}
 
 /**
- * Not allowed. Use `readonlyBox` instead.
+ * @returns Whether the value is a Box
  */
-export function box<T>(box: ReadonlyBox<T>): never;
+function isBox<T>(value: unknown): value is ReadableBox<T> {
+	return isObject(value) && BoxSymbol in value;
+}
 /**
- * Not allowed. Use `readonlyBox` instead, or pass a setter function to `box`.
+ * @returns Whether the value is a WritableBox
  */
-export function box<T>(get: Getter<T>): never;
+function isWritableBox<T>(value: unknown): value is WritableBox<T> {
+	return isBox(value) && isWritableSymbol in value;
+}
 
 /**
  * Re-returns the box if it's already a box.
- * Useful for when you want to accept a prop that can be a box or a value.
+ *
+ * @param boxed The box to re-return
+ * @returns The box if it's already a box. This is useful when you want to accept a prop that can be a box or a value.
  */
-export function box<T>(box: Box<T>): Box<T>;
+export function box<T>(boxed: WritableBox<T>): WritableBox<T>;
+export function box<T>(boxed: ReadableBox<T>): ReadableBox<T>;
 /**
- * Creates an internal $derived that's equal to the value returned from
- * the get function.
+ * Creates a writable box.
  *
- * Accepts a setter prop that is run whenever setting the returned object's
- * `value` property.
- *
- * @example
- * e.g.
- * ```ts
- * let count = $state(0)
- * let countBox = box(() => count, (c) => count = c)
- * console.log(countBox.value) // 0
- * countBox.value = 1
- * console.log(countBox.value) // 1
- * ```
- *
- * @returns An object with a `value` property which can be set to a new value.
- * Useful to pass state to other functions. *
- */
-export function box<T>(get: Getter<T>, set: Setter<T>): Box<T>;
-/**
- * Re-returns the box if it's already a box.
- * Useful for when you want to accept a prop that can be a box or a value.
- */
-export function box<T>(box: ValueOrBox<T>): Box<T>;
-/**
- * Creates internal $state with an initial value equal to what is passed in.
- *
- * @returns An object with a `value` property which can be set to a new value.
+ * @returns A box with a `value` property which can be set to a new value.
  * Useful to pass state to other functions.
  */
-export function box<T>(initial: T): Box<T>;
+export function box<T>(): WritableBox<T | undefined>;
 /**
- * Creates internal $state with an initial value equal to what is passed in.
+ * Creates a box with an initial value, or re-returns the value if it's already a box.
  *
- * Accepts a setter prop to choose how you want to update the state.
- *
+ * @param initialValue The initial value of the box, or a box that contains the initial value.
+ * 
  * @example
- * ```ts
- * const doubleWhenSet = box(0, (value) => value * 2);
- * doubleWhenSet.value = 2;
- * console.log(doubleWhenSet.value); // 4
- * ```
- *
- * @returns An object with a `value` property which can be set to a new value.
+ * const count = box(0);
+ * const reCount = box(count);
+ * count.value = 5;
+ * reCount.value = 10;
+ * console.log(`${count.value}, ${reCount.value}`); // "10, 10" 
+ * 
+ * 
+ * @returns A box with a `value` property which can be set to a new value.
  * Useful to pass state to other functions.
  */
-export function box<T>(initial: T, set: Setter<T>): Box<T>;
-export function box<T>(valueOrGetterOrBox: T | Getter<T> | Box<T>, set?: Setter<T>) {
-	if (isReadonlyBox(valueOrGetterOrBox)) {
-		throw new Error("A `ReadonlyBox` cannot be passed onto `box`. Use `readonlyBox` instead.");
-	}
+export function box<T>(initialValue: T): T extends WritableBox<infer U> ? WritableBox<U> : T extends ReadableBox<infer U> ? ReadableBox<U> : WritableBox<T>;
+/**
+ * Creates a writable box with an initial value.
+ *
+ * @param initialValue The initial value of the box.
+ * @param setter (optional) A function that controls how the value is set.
+ * Its argument is the value trying to be set. The returned value will be the new value.
+ * 
+ * @example
+ * const count = box(0);
+ * const doubleCount = box(0, (c) => c * 2);
+ * count.value = 5;
+ * doubleCount.value = 10;
+ * console.log(`${count.value}, ${doubleCount.value}`); // "5, 20" 
+ * 
+ * 
+ * @returns A box with a `value` property which can be set to a new value.
+ * Useful to pass state to other functions.
+ */
+export function box<T>(initialValue: T, setter?: (v: T) => T): WritableBox<T>;
 
-	if (isBox(valueOrGetterOrBox)) {
-		return valueOrGetterOrBox;
-	}
+export function box(initialValue?: unknown, setter?: (v: unknown) => unknown) {
+	if (isBox(initialValue) && !setter) return initialValue;
 
-	if (isFunction(valueOrGetterOrBox)) {
-		if (!isFunction(set)) {
-			throw new Error(
-				"A setter function must be provided when passing a getter function to `box`."
-			);
-		}
+	let value = $state(initialValue);
 
-		const value = $derived(valueOrGetterOrBox());
+	return {
+		[BoxSymbol]: true,
+		[isWritableSymbol]: true,
+		get value() {
+			return value as unknown;
+		},
+		set value(v: unknown) {
+			value = setter ? setter(v) : v;
+		},
+	};
+}
 
+/**
+ * Creates a readonly box
+ *
+ * @param getter Function to get the value of the box
+ * @returns A box with a `value` property whose value is the result of the getter.
+ * Useful to pass state to other functions.
+ */
+function boxWith<T>(getter: () => T): ReadableBox<T>;
+/**
+ * Creates a writable box
+ *
+ * @param getter Function to get the value of the box
+ * @param setter Function to set the value of the box
+ * @returns A box with a `value` property which can be set to a new value.
+ * Useful to pass state to other functions.
+ */
+function boxWith<T>(getter: () => T, setter: (v: T) => void): WritableBox<T>;
+function boxWith<T>(getter: () => T, setter?: (v: T) => void) {
+	if (setter) {
 		return {
 			[BoxSymbol]: true,
+			[isWritableSymbol]: true,
 			get value() {
-				return value;
+				return getter();
 			},
-			set value(newValue: T) {
-				set(newValue);
+			set value(v: T) {
+				setter(v);
 			},
 		};
 	}
 
-	// If box holds its own state
-	let value = $state(valueOrGetterOrBox);
-
 	return {
 		[BoxSymbol]: true,
 		get value() {
-			return value;
-		},
-		set value(newValue: T) {
-			if (isFunction(set)) {
-				value = set(newValue) ?? value;
-			} else {
-				value = newValue;
-			}
+			return getter();
 		},
 	};
 }
+
+box.with = boxWith;
+box.isBox = isBox;
+box.isWritableBox = isWritableBox;

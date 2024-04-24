@@ -4,4 +4,3 @@ export type FunctionArgs<Args extends any[] = any[], Return = void> = (...args: 
 export type Getter<T> = () => T;
 export type ValueOrGetter<T> = T | (() => T);
 
-export type Setter<T> = (value: T) => void | T;

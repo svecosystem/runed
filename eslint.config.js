@@ -5,4 +5,7 @@ const CUSTOM_IGNORES = ["**/.github/**", "CHANGELOG.md", "**/.contentlayer"];
 export default config({
 	svelte: true,
 	ignores: [...DEFAULT_IGNORES, ...CUSTOM_IGNORES],
+	rules: {
+		"ts/consistent-type-definitions": "off",
+	},
 });
