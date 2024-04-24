@@ -17,13 +17,13 @@ export interface WritableBox<T> extends ReadableBox<T> {
 /**
  * @returns Whether the value is a Box
  */
-function isBox<T>(value: unknown): value is ReadableBox<T> {
+function isBox(value: unknown): value is ReadableBox<unknown> {
 	return isObject(value) && BoxSymbol in value;
 }
 /**
  * @returns Whether the value is a WritableBox
  */
-function isWritableBox<T>(value: unknown): value is WritableBox<T> {
+function isWritableBox(value: unknown): value is WritableBox<unknown> {
 	return isBox(value) && isWritableSymbol in value;
 }
 
@@ -100,13 +100,12 @@ function boxWith<T>(getter: () => T, setter?: (v: T) => void) {
 
 export type BoxFrom<T> =
 	T extends WritableBox<infer U>
-	? WritableBox<U>
-	: T extends ReadableBox<infer U>
-	? ReadableBox<U>
-	: T extends Getter<infer U>
-	? ReadableBox<U>
-	: WritableBox<T>;
-
+		? WritableBox<U>
+		: T extends ReadableBox<infer U>
+			? ReadableBox<U>
+			: T extends Getter<infer U>
+				? ReadableBox<U>
+				: WritableBox<T>;
 
 /**
  * Creates a box from either a static value, a box, or a getter function.
@@ -120,7 +119,7 @@ function boxFrom<T>(value: T): BoxFrom<T> {
 	return box(value) as BoxFrom<T>;
 }
 
-box.from = boxFrom
+box.from = boxFrom;
 box.with = boxWith;
 box.isBox = isBox;
 box.isWritableBox = isWritableBox;

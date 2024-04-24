@@ -6,4 +6,4 @@ export type FunctionArgs<Args extends any[] = any[], Return = void> = (...args: 
 export type Getter<T> = () => T;
 export type MaybeGetter<T> = T | (() => T);
 
-export type MaybeBoxOrGetter<T> = T | Getter<T> | ReadableBox<T>
+export type MaybeBoxOrGetter<T> = T | Getter<T> | ReadableBox<T>;

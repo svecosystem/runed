@@ -19,7 +19,7 @@ describe("box.from", () => {
 	});
 
 	test("box of readable box should not be settable", () => {
-		const count = box.from(box.with(() => 0))
+		const count = box.from(box.with(() => 0));
 		expect(count.value).toBe(0);
 		// @ts-expect-error -- we're testing that the setter is not run
 		expect(() => (count.value = 1)).toThrow();
@@ -32,7 +32,7 @@ describe("box.from", () => {
 		reCount.value = 1;
 		expect(reCount.value).toBe(1);
 	});
-})
+});
 
 describe("box.with", () => {
 	test("box with getter only should return value and not be settable", () => {
