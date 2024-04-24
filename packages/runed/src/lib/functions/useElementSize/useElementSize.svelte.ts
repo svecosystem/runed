@@ -1,5 +1,5 @@
-import type { ValueOrReadonlyBox } from "$lib/index.js";
-import { readonlyBox } from "$lib/index.js";
+import { box } from "../box/box.svelte.js";
+import type { MaybeBoxOrGetter } from "$lib/internal/types.js";
 
 type Options = {
 	initialSize?: {
@@ -19,12 +19,12 @@ type Options = {
  * @returns an object with `width` and `height` properties.
  */
 export function useElementSize(
-	_node: ValueOrReadonlyBox<HTMLElement | undefined>,
+	_node: MaybeBoxOrGetter<HTMLElement | undefined>,
 	options: Options = {
 		box: "border-box",
 	}
 ): { width: number; height: number } {
-	const node = readonlyBox(_node);
+	const node = box.from(_node);
 	const size = $state({
 		width: options.initialSize?.width ?? 0,
 		height: options.initialSize?.height ?? 0,

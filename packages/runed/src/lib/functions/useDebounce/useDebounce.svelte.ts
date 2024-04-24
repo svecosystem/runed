@@ -1,4 +1,4 @@
-import type { FunctionArgs, ValueOrGetter } from "$lib/internal/types.js";
+import type { FunctionArgs, MaybeGetter } from "$lib/internal/types.js";
 
 /**
  * Function that takes a callback, and returns a debounced version of it.
@@ -15,7 +15,7 @@ import type { FunctionArgs, ValueOrGetter } from "$lib/internal/types.js";
  */
 export function useDebounce<Callback extends FunctionArgs>(
 	callback: Callback,
-	wait: ValueOrGetter<number> = 250
+	wait: MaybeGetter<number> = 250
 ) {
 	let timeout: ReturnType<typeof setTimeout> | undefined;
 	let resolve: (value: ReturnType<Callback>) => void;

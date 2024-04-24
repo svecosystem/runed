@@ -8,8 +8,6 @@ describe("box", () => {
 		count.value = 1;
 		expect(count.value).toBe(1);
 	});
-
-
 });
 
 describe("box.from", () => {

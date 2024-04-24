@@ -2,4 +2,4 @@
 "runed": minor
 ---
 
-add `box` and `readonlyBox` utilities
+add `box`  utilities
