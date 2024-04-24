@@ -9,22 +9,19 @@ describe("box", () => {
 		expect(count.value).toBe(1);
 	});
 
-	test("box setter should run setter when setting value", () => {
-		const double = box(0, (c) => c * 2);
-		expect(double.value).toBe(0);
-		double.value = 1;
-		expect(double.value).toBe(2);
-	});
 
+});
+
+describe("box.from", () => {
 	test("box of writable box should be settable", () => {
-		const count = box(box(0));
+		const count = box.from(box(0));
 		expect(count.value).toBe(0);
 		count.value = 1;
 		expect(count.value).toBe(1);
 	});
 
 	test("box of readable box should not be settable", () => {
-		const count = box(box.with(() => 0));
+		const count = box.from(box.with(() => 0))
 		expect(count.value).toBe(0);
 		// @ts-expect-error -- we're testing that the setter is not run
 		expect(() => (count.value = 1)).toThrow();
@@ -32,12 +29,12 @@ describe("box", () => {
 
 	test("can set box of box or value", () => {
 		const count = 0 as number | WritableBox<number>;
-		const reCount = box(count);
+		const reCount = box.from(count);
 		expect(reCount.value).toBe(0);
 		reCount.value = 1;
 		expect(reCount.value).toBe(1);
 	});
-});
+})
 
 describe("box.with", () => {
 	test("box with getter only should return value and not be settable", () => {
@@ -82,7 +79,7 @@ describe("box.isWritableBox", () => {
 	});
 
 	test("readable box should not be a writable box", () => {
-		const count = box.with(() => 0);
+		const count = box.from(() => 0);
 		expect(box.isWritableBox(count)).toBe(false);
 	});
 });
@@ -100,20 +97,20 @@ describe("box types", () => {
 		expectTypeOf(count).toMatchTypeOf<ReadableBox<number>>();
 	});
 
-	test("box of writable box", () => {
-		const count = box(box(0));
+	test("box from writable box", () => {
+		const count = box.from(box(0));
 		expectTypeOf(count).toMatchTypeOf<WritableBox<number>>();
 	});
 
-	test("box of readable box", () => {
-		const count = box(box.with(() => 0));
+	test("box from readable box", () => {
+		const count = box.from(box.with(() => 0));
 		expectTypeOf(count).toMatchTypeOf<ReadableBox<number>>();
 		expectTypeOf(count).not.toMatchTypeOf<WritableBox<number>>();
 	});
 
-	test("box of box or value", () => {
+	test("box from box or value", () => {
 		const count = 0 as number | ReadableBox<number>;
-		const count2 = box(count);
+		const count2 = box.from(count);
 		expectTypeOf(count2).toMatchTypeOf<ReadableBox<number>>();
 	});
 
