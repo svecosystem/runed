@@ -10,15 +10,11 @@ const CUSTOM_IGNORES = [
 	"*.md",
 ];
 
-export default config(
-	{
-		svelte: true,
-		ignores: [...DEFAULT_IGNORES, ...CUSTOM_IGNORES],
-		rules: {
-			"ts/consistent-type-definitions": "off",
-		},
+export default config({
+	svelte: true,
+	ignores: [...DEFAULT_IGNORES, ...CUSTOM_IGNORES],
+}).override("antfu/typescript/rules", {
+	rules: {
+		"ts/consistent-type-definitions": "off",
 	},
-	{
-		ignores: [...DEFAULT_IGNORES, ...CUSTOM_IGNORES],
-	}
-);
+});

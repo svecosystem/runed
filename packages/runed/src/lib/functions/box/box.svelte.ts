@@ -100,12 +100,12 @@ function boxWith<T>(getter: () => T, setter?: (v: T) => void) {
 
 export type BoxFrom<T> =
 	T extends WritableBox<infer U>
-	? WritableBox<U>
-	: T extends ReadableBox<infer U>
-	? ReadableBox<U>
-	: T extends Getter<infer U>
-	? ReadableBox<U>
-	: WritableBox<T>;
+		? WritableBox<U>
+		: T extends ReadableBox<infer U>
+			? ReadableBox<U>
+			: T extends Getter<infer U>
+				? ReadableBox<U>
+				: WritableBox<T>;
 
 /**
  * Creates a box from either a static value, a box, or a getter function.
@@ -131,16 +131,16 @@ type BoxFlatten<R extends Record<string, unknown>> = Expand<
 		},
 		never
 	> &
-	RemoveValues<
-		{
-			readonly [K in keyof R]: R[K] extends WritableBox<infer _>
-			? never
-			: R[K] extends ReadableBox<infer T>
-			? T
-			: never;
-		},
-		never
-	>
+		RemoveValues<
+			{
+				readonly [K in keyof R]: R[K] extends WritableBox<infer _>
+					? never
+					: R[K] extends ReadableBox<infer T>
+						? T
+						: never;
+			},
+			never
+		>
 > &
 	RemoveValues<
 		{
