@@ -154,6 +154,13 @@ describe("box types", () => {
 			expectTypeOf(count).toMatchTypeOf<WritableBox<number>>();
 		}
 	});
+
+	test("box.readonly should return a non-settable box", () => {
+		const count = box(0);
+		const readonlyCount = box.readonly(count);
+		expectTypeOf(readonlyCount).toMatchTypeOf<ReadableBox<number>>();
+		expectTypeOf(readonlyCount).not.toMatchTypeOf<WritableBox<number>>();
+	});
 });
 
 describe("box.readonly", () => {
