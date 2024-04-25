@@ -7,7 +7,6 @@ const CUSTOM_IGNORES = [
 	"**/node_modules/**",
 	"**/.svelte-kit/**",
 	".svelte-kit/**/*",
-	"*.md",
 ];
 
 export default config({
