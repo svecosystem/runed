@@ -17,7 +17,7 @@ Box provides several utilities to make sending and receiving reactive values eas
 
 ### `box`
 
-Initializes boxed state
+Initializes the boxed state.
 
 ```svelte
 <script lang="ts">

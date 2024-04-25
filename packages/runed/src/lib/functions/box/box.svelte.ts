@@ -24,7 +24,7 @@ function isBox(value: unknown): value is ReadableBox<unknown> {
  * @returns Whether the value is a WritableBox
  */
 function isWritableBox(value: unknown): value is WritableBox<unknown> {
-	return isBox(value) && isWritableSymbol in value;
+	return box.isBox(value) && isWritableSymbol in value;
 }
 
 /**
@@ -115,7 +115,7 @@ export type BoxFrom<T> =
  */
 function boxFrom<T>(value: T): BoxFrom<T> {
 	if (box.isBox(value)) return value as BoxFrom<T>;
-	if (isFunction(value)) return boxWith(value) as BoxFrom<T>;
+	if (isFunction(value)) return box.with(value) as BoxFrom<T>;
 	return box(value) as BoxFrom<T>;
 }
 

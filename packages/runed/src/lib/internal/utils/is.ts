@@ -2,6 +2,6 @@ export function isFunction(value: unknown): value is (...args: unknown[]) => unk
 	return typeof value === "function";
 }
 
-export function isObject(value: unknown): value is Record<string, unknown> {
+export function isObject(value: unknown): value is Record<PropertyKey, unknown> {
 	return value !== null && typeof value === "object";
 }
