@@ -8,7 +8,8 @@
 
 <!-- /automd -->
 
-Runed provides utilities to power your applications using the magic of [Svelte Runes](https://svelte.dev/blog/runes).
+Runed provides utilities to power your applications using the magic of
+[Svelte Runes](https://svelte.dev/blog/runes).
 
 ## Features
 
@@ -30,11 +31,10 @@ This project is supported by the following beautiful people/organizations:
 
 <!-- automd:contributors license=MIT author="huntabyte" -->
 
-Published under the [MIT](https://github.com/svecosystem/runed/blob/main/LICENSE) license.
-Made by [@TGlide](https://github.com/tglide), [@huntabyte](https://github.com/huntabyte) and [community](https://github.com/svecosystem/runed/graphs/contributors) 💛
-<br><br>
+Published under the [MIT](https://github.com/svecosystem/runed/blob/main/LICENSE) license. Made by
+[@TGlide](https://github.com/tglide), [@huntabyte](https://github.com/huntabyte) and
+[community](https://github.com/svecosystem/runed/graphs/contributors) 💛 <br><br>
 <a href="https://github.com/svecosystem/runed/graphs/contributors">
-<img src="https://contrib.rocks/image?repo=svecosystem/runed" />
-</a>
+<img src="https://contrib.rocks/image?repo=svecosystem/runed" /> </a>
 
 <!-- /automd -->

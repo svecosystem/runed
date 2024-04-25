@@ -9,7 +9,9 @@ import { UseActiveElementDemo } from '$lib/components/demos';
 
 ## Description
 
-State in runes is based on primitives, which provides a concise syntax. However, when sending these primitives across boundaries, e.g. in function arguments, the state is not reactive, and rather, the static value gets sent.
+State in runes is based on primitives, which provides a concise syntax. However, when sending these
+primitives across boundaries, e.g. in function arguments, the state is not reactive, and rather, the
+static value gets sent.
 
 Box provides several utilities to make sending and receiving reactive values easier.
 
@@ -45,7 +47,7 @@ Allows you to use getters and setters to define a box. Useful to pass around sta
 				count.value++;
 			},
 			// We pass a box that doubles the count value
-			double: box.with(() => count.value * 2),
+			double: box.with(() => count.value * 2)
 		};
 	}
 
@@ -67,8 +69,8 @@ Allows you to use getters and setters to define a box. Useful to pass around sta
 
 ### `box.from`
 
-Creates a box from an existing box, a getter function, or a static value.
-Used in functions to receive props that are optionally reactive.
+Creates a box from an existing box, a getter function, or a static value. Used in functions to
+receive props that are optionally reactive.
 
 ```svelte
 <script lang="ts">
@@ -83,7 +85,7 @@ Used in functions to receive props that are optionally reactive.
 				count.value++;
 			},
 			// We pass a box that doubles the count value
-			double: box.with(() => count.value * 2),
+			double: box.with(() => count.value * 2)
 		};
 	}
 
@@ -123,7 +125,7 @@ const flat = box.flatten({
 	double: box.with(() => count.value * 2),
 	increment() {
 		count.value++;
-	},
+	}
 });
 
 console.log(flat.count); // 1
@@ -137,13 +139,13 @@ console.log(flat.count); // 2
 Creates a readonly box from a writable box that remains in sync with the original box.
 
 ```ts
-const count = box(1)
-const readonlyCount = box.readonly(count)
-console.log(readonlyCount.value) // 1
-count.value++
-console.log(readonlyCount.value) // 2
+const count = box(1);
+const readonlyCount = box.readonly(count);
+console.log(readonlyCount.value); // 1
+count.value++;
+console.log(readonlyCount.value); // 2
 
-readonlyCount.value = 3 // Error: Cannot assign to read only property 'value' of object
+readonlyCount.value = 3; // Error: Cannot assign to read only property 'value' of object
 ```
 
 ### `box.isBox`
