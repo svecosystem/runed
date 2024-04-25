@@ -1,6 +1,7 @@
 import { box } from "../box/box.svelte.js";
 import type { MaybeBoxOrGetter } from "$lib/internal/types.js";
 import { addEventListener } from "$lib/internal/utils/event.js";
+
 export function useEventListener<TEvent extends keyof WindowEventMap>(
 	target: MaybeBoxOrGetter<Window | null | undefined>,
 	event: TEvent,
