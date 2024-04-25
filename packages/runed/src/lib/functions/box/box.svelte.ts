@@ -163,12 +163,10 @@ function boxFlatten<R extends Record<string, unknown>>(boxes: R): BoxFlatten<R> 
 			return Object.assign(acc, { [key]: b });
 		}
 
-		const value = $derived(b.value);
-
 		if (box.isWritableBox(b)) {
 			Object.defineProperty(acc, key, {
 				get() {
-					return value;
+					return b.value;
 				},
 				// eslint-disable-next-line ts/no-explicit-any
 				set(v: any) {
@@ -178,7 +176,7 @@ function boxFlatten<R extends Record<string, unknown>>(boxes: R): BoxFlatten<R> 
 		} else {
 			Object.defineProperty(acc, key, {
 				get() {
-					return value;
+					return b.value;
 				},
 			});
 		}

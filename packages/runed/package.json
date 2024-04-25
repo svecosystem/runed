@@ -24,7 +24,7 @@
 		"dev": "pnpm sync && pnpm watch",
 		"build": "pnpm package",
 		"package": "svelte-kit sync && svelte-package && publint",
-		"test": "vitest",
+		"test": "vitest --run",
 		"test:watch": "vitest --watch",
 		"check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
 		"watch": "svelte-kit sync && svelte-package --watch"
