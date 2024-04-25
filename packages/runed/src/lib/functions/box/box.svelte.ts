@@ -185,8 +185,25 @@ function boxFlatten<R extends Record<string, unknown>>(boxes: R): BoxFlatten<R> 
 	}, {} as BoxFlatten<R>);
 }
 
+/**
+ * Function that converts a box to a readonly box.
+ *
+ * @example
+ * const count = box(0) // WritableBox<number>
+ * const countReadonly = box.readonly(count) // ReadableBox<number>
+ */
+function toReadonlyBox<T>(box: ReadableBox<T>): ReadableBox<T> {
+	return {
+		[BoxSymbol]: true,
+		get value() {
+			return box.value;
+		},
+	};
+}
+
 box.from = boxFrom;
 box.with = boxWith;
 box.flatten = boxFlatten;
+box.readonly = toReadonlyBox;
 box.isBox = isBox;
 box.isWritableBox = isWritableBox;
