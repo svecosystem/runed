@@ -1,13 +1,12 @@
 {
 	// Enable the ESlint flat config support
 	"eslint.experimental.useFlatConfig": true,
-
 	// Auto fix
 	"editor.codeActionsOnSave": {
 		"source.fixAll.eslint": "explicit",
 		"source.organizeImports": "never"
 	},
-
+	"editor.formatOnSave": true,
 	// Enable eslint for all supported languages
 	"eslint.validate": [
 		"javascript",

@@ -24,8 +24,10 @@
     "url": "https://github.com/svecosystem/runed"
   },
   "scripts": {
-    "test": "pnpm -r test",
     "dev": "pnpm sync && pnpm --parallel dev",
+    "test": "pnpm -r test",
+    "test:package": "pnpm -F \"./packages/**\" test",
+    "test:package:watch": "pnpm -F \"./packages/**\" test:watch",
     "build": "pnpm -r build",
     "build:packages": "pnpm -F \"./packages/**\" --parallel build",
     "build:content": "pnpm -F \"./sites/**\" --parallel build:content",
@@ -39,14 +41,14 @@
   "license": "MIT",
   "devDependencies": {
     "@changesets/cli": "^2.26.2",
-    "@huntabyte/eslint-config": "^0.2.0",
+    "@huntabyte/eslint-config": "^0.3.1",
     "@svitejs/changesets-changelog-github-compact": "^1.1.0",
-    "eslint": "^8.56.0",
-    "eslint-plugin-svelte": "2.36.0-next.13",
+    "eslint": "^9.1.1",
+    "eslint-plugin-svelte": "2.38.0",
     "prettier": "^3.2.5",
-    "prettier-plugin-svelte": "^3.2.2",
-    "prettier-plugin-tailwindcss": "^0.5.13",
-    "svelte-eslint-parser": "^0.33.1"
+    "prettier-plugin-svelte": "^3.2.3",
+    "prettier-plugin-tailwindcss": "^0.5.14",
+    "svelte-eslint-parser": "^0.35.0"
   },
   "type": "module"
 }

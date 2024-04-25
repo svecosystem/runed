@@ -1,5 +1,5 @@
-import type { ValueOrGetter } from "$lib/internal/types.js";
-import { boxed } from "$lib/internal/utils/boxed.svelte.js";
+import { box } from "../box/box.svelte.js";
+import type { MaybeBoxOrGetter } from "$lib/internal/types.js";
 
 type Options = {
 	initialSize?: {
@@ -19,12 +19,12 @@ type Options = {
  * @returns an object with `width` and `height` properties.
  */
 export function useElementSize(
-	_node: ValueOrGetter<HTMLElement | undefined>,
+	_node: MaybeBoxOrGetter<HTMLElement | undefined>,
 	options: Options = {
 		box: "border-box",
 	}
 ): { width: number; height: number } {
-	const node = boxed(_node);
+	const node = box.from(_node);
 	const size = $state({
 		width: options.initialSize?.width ?? 0,
 		height: options.initialSize?.height ?? 0,

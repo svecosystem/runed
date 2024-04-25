@@ -62,6 +62,11 @@ export const navigation: Navigation = {
 			collapsible: true,
 			items: [
 				{
+					title: "Box",
+					href: "/docs/functions/box",
+					items: [],
+				},
+				{
 					title: "useActiveElement",
 					href: "/docs/functions/use-active-element",
 					items: [],
