@@ -62,8 +62,8 @@ export const navigation: Navigation = {
 			collapsible: true,
 			items: [
 				{
-					title: 'Box',
-					href: '/docs/functions/box',
+					title: "Box",
+					href: "/docs/functions/box",
 					items: [],
 				},
 				{

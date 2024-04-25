@@ -123,7 +123,7 @@ const flat = box.flatten({
 	double: box.with(() => count.value * 2),
 	increment() {
 		count.value++;
-	}
+	},
 });
 
 console.log(flat.count); // 1
