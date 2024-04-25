@@ -175,4 +175,16 @@ describe("box.readonly", () => {
 
 		expect(setReadOnlyCount).toThrow();
 	});
+
+	test("box.readonly returned box should update with original box", () => {
+		const count = box(0);
+		const readonlyCount = box.readonly(count);
+
+		expect(readonlyCount.value).toBe(0);
+		count.value = 1;
+		expect(readonlyCount.value).toBe(1);
+
+		count.value = 2;
+		expect(readonlyCount.value).toBe(2);
+	});
 });
