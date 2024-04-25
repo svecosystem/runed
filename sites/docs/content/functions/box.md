@@ -132,6 +132,20 @@ flat.increment();
 console.log(flat.count); // 2
 ```
 
+### `box.readonly`
+
+Creates a readonly box from a writable box that remains in sync with the original box.
+
+```ts
+const count = box(1)
+const readonlyCount = box.readonly(count)
+console.log(readonlyCount.value) // 1
+count.value++
+console.log(readonlyCount.value) // 2
+
+readonlyCount.value = 3 // Error: Cannot assign to read only property 'value' of object
+```
+
 ### `box.isBox`
 
 Checks if a value is a `Box`.
