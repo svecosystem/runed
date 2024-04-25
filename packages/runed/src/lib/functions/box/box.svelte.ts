@@ -1,4 +1,5 @@
-import type { Getter } from "$lib/internal/types.js";
+import { derived } from "svelte/store";
+import type { Expand, Getter } from "$lib/internal/types.js";
 import { isFunction, isObject } from "$lib/internal/utils/is.js";
 
 const BoxSymbol = Symbol("box");
@@ -100,12 +101,12 @@ function boxWith<T>(getter: () => T, setter?: (v: T) => void) {
 
 export type BoxFrom<T> =
 	T extends WritableBox<infer U>
-		? WritableBox<U>
-		: T extends ReadableBox<infer U>
-			? ReadableBox<U>
-			: T extends Getter<infer U>
-				? ReadableBox<U>
-				: WritableBox<T>;
+	? WritableBox<U>
+	: T extends ReadableBox<infer U>
+	? ReadableBox<U>
+	: T extends Getter<infer U>
+	? ReadableBox<U>
+	: WritableBox<T>;
 
 /**
  * Creates a box from either a static value, a box, or a getter function.
@@ -119,7 +120,62 @@ function boxFrom<T>(value: T): BoxFrom<T> {
 	return box(value) as BoxFrom<T>;
 }
 
+type GetKeys<T, U> = {
+	[K in keyof T]: T[K] extends U ? K : never
+}[keyof T]
+type RemoveValues<T, U> = Omit<T, GetKeys<T, U>>
+
+type BoxFlatten<R extends Record<string, unknown>> = Expand<RemoveValues<{
+
+	[K in keyof R]: R[K] extends WritableBox<infer T> ? T : never
+}, never> & RemoveValues<{
+	readonly [K in keyof R]: R[K] extends WritableBox<infer _> ? never : R[K] extends ReadableBox<infer T> ? T : never
+}, never>> & RemoveValues<{
+	[K in keyof R]: R[K] extends ReadableBox<infer _> ? never : R[K]
+}, never>
+
+/** 
+ * Function that gets an object of boxes, and returns an object of reactive values
+ * 
+ * @example
+ * const count = box(0)
+ * const flat = box.flatten({ count, double: box.with(() => count.value) })
+ * // type of flat is { count: number, readonly double: number }
+ */
+function boxFlatten<R extends Record<string, unknown>>(boxes: R): BoxFlatten<R> {
+	return Object.entries(boxes).reduce<BoxFlatten<R>>((acc, [key, b]) => {
+		if (!box.isBox(b)) {
+			return Object.assign(acc, { [key]: b })
+		}
+
+		const value = $derived(b.value);
+
+		if (box.isWritableBox(b)) {
+
+			Object.defineProperty(acc, key, {
+				get() {
+					return value;
+				},
+				// eslint-disable-next-line ts/no-explicit-any
+				set(v: any) {
+					b.value = v;
+				}
+			})
+		} else {
+
+			Object.defineProperty(acc, key, {
+				get() {
+					return value;
+				}
+			})
+		}
+
+		return acc
+	}, {} as BoxFlatten<R>)
+}
+
 box.from = boxFrom;
 box.with = boxWith;
+box.flatten = boxFlatten
 box.isBox = isBox;
 box.isWritableBox = isWritableBox;

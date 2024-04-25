@@ -6,6 +6,7 @@ const CUSTOM_IGNORES = [
 	"**/.contentlayer",
 	"**/node_modules/**",
 	"**/.svelte-kit/**",
+	".svelte-kit/**/*",
 ];
 
 export default config({

@@ -82,6 +82,39 @@ describe("box.isWritableBox", () => {
 	});
 });
 
+describe("box.flatten", () => {
+	test("flattens an object of boxes", () => {
+		const count = box(0);
+		const double = box.with(() => count.value * 2);
+		function increment() {
+			count.value++;
+		}
+		const flat = box.flatten({ count, double, increment });
+
+		expect(flat.count).toBe(0);
+		expect(flat.double).toBe(0);
+
+		count.value = 1;
+		expect(flat.count).toBe(1);
+		expect(flat.double).toBe(2);
+
+		flat.count = 2;
+		expect(count.value).toBe(2);
+		expect(flat.count).toBe(2);
+		expect(double.value).toBe(4);
+		expect(flat.double).toBe(4);
+
+		// @ts-expect-error -- we're testing that the setter is not run
+		expect(() => (flat.double = 3)).toThrow();
+
+		flat.increment();
+		expect(count.value).toBe(3);
+		expect(double.value).toBe(6);
+		expect(flat.count).toBe(3);
+		expect(flat.double).toBe(6);
+	});
+});
+
 describe("box types", () => {
 	test("box without initial value", () => {
 		const count = box<number>();
