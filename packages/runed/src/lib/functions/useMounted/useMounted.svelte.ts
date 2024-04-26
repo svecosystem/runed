@@ -10,6 +10,10 @@ export function useMounted(): ReadableBox<boolean> {
 
 	$effect(() => {
 		untrack(() => (isMounted.value = true));
+
+		return () => {
+			isMounted.value = false;
+		};
 	});
 
 	return box.readonly(isMounted);

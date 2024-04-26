@@ -1,7 +1,7 @@
 import { box } from "../box/box.svelte.js";
 import type { MaybeBoxOrGetter } from "$lib/internal/types.js";
 
-type Options = {
+export type UseElementSizeOptions = {
 	initialSize?: {
 		width: number;
 		height: number;
@@ -20,7 +20,7 @@ type Options = {
  */
 export function useElementSize(
 	_node: MaybeBoxOrGetter<HTMLElement | undefined>,
-	options: Options = {
+	options: UseElementSizeOptions = {
 		box: "border-box",
 	}
 ): { width: number; height: number } {
