@@ -66,7 +66,7 @@ export function addEventListener(
 	event: string | string[],
 	handler: EventListenerOrEventListenerObject,
 	options?: boolean | AddEventListenerOptions
-) {
+): VoidFunction {
 	const events = Array.isArray(event) ? event : [event];
 
 	for (const event of events) {
