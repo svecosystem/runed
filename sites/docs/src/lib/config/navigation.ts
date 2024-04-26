@@ -86,6 +86,11 @@ export const navigation: Navigation = {
 					href: "/docs/functions/use-event-listener",
 					items: [],
 				},
+				{
+					title: "useMounted",
+					href: "/docs/functions/use-mounted",
+					items: [],
+				},
 			],
 		},
 	],
