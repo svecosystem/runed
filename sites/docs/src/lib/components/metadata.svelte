@@ -2,11 +2,11 @@
 	import { page } from "$app/stores";
 	import { siteConfig } from "$lib/config/site";
 
-	export let title: string = siteConfig.name;
-
-	// eslint-disable-next-line svelte/valid-compile
-	$: title = $page.data?.title ? `${$page.data.title} - ${siteConfig.name}` : siteConfig.name;
-	$: description = $page.data?.description ?? siteConfig.description;
+	const title = $derived(
+		// eslint-disable-next-line svelte/valid-compile
+		$page.data?.title ? `${$page.data.title} - ${siteConfig.name}` : siteConfig.name
+	);
+	const description = $derived($page.data?.description ?? siteConfig.description);
 </script>
 
 <svelte:head>

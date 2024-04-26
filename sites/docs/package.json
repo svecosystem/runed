@@ -48,7 +48,7 @@
 		"rehype-pretty-code": "^0.13.0",
 		"remark-gfm": "^4.0.0",
 		"shiki": "^1.1.3",
-		"svelte": "^5.0.0-next.75",
+		"svelte": "^5.0.0-next.110",
 		"svelte-check": "^3.6.4",
 		"tailwind-merge": "^2.2.1",
 		"tailwind-variants": "^0.2.0",
@@ -65,11 +65,11 @@
 	"type": "module",
 	"dependencies": {
 		"@melt-ui/svelte": "^0.74.0",
-		"bits-ui": "^0.18.1",
-		"mode-watcher": "^0.2.1",
+		"bits-ui": "^0.21.5",
+		"mode-watcher": "^0.3.0",
 		"rehype-slug": "^6.0.0",
 		"runed": "workspace:^",
-		"svelte-sonner": "^0.3.17",
-		"vaul-svelte": "^0.2.3"
+		"svelte-sonner": "^0.3.22",
+		"vaul-svelte": "^0.3.0"
 	}
 }
