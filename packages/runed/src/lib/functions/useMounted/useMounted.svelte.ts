@@ -1,11 +1,11 @@
 import { untrack } from "svelte";
-import { box } from "../box/box.svelte.js";
+import { type ReadableBox, box } from "../box/box.svelte.js";
 
 /**
- * Returns the mounted state of the component containing
- * this function in a box.
+ * Returns a box with the mounted state of the component
+ * that invokes this function.
  */
-export function useMounted() {
+export function useMounted(): ReadableBox<boolean> {
 	const isMounted = box(false);
 
 	$effect(() => {
