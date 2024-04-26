@@ -141,7 +141,6 @@ describe("box.readonly", () => {
 	});
 });
 
-
 describe("box types", () => {
 	test("box without initial value", () => {
 		const count = box<number>();
@@ -189,4 +188,3 @@ describe("box types", () => {
 		expectTypeOf(readonlyCount).not.toMatchTypeOf<WritableBox<number>>();
 	});
 });
-
