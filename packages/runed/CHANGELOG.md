@@ -1,5 +1,11 @@
 # runed
 
+## 0.3.0
+
+### Minor Changes
+
+- feat: `useMounted` ([#22](https://github.com/svecosystem/runed/pull/22))
+
 ## 0.2.0
 
 ### Minor Changes
