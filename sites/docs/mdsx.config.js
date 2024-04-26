@@ -64,7 +64,7 @@ const prettyCodeOptions = {
 
 export const mdsxConfig = defineConfig({
 	extensions: [".md"],
-	remarkPlugins: [remarkGfm, remarkRemovePrettierIgnore],
+	remarkPlugins: [remarkGfm, remarkRemovePrettierIgnore, remarkTabsToSpaces],
 	rehypePlugins: [[rehypePrettyCode, prettyCodeOptions], rehypeHandleMetadata, rehypeSlug],
 	blueprints: {
 		default: {
@@ -96,6 +96,22 @@ function remarkRemovePrettierIgnore() {
 				// @ts-expect-error - not dealing with this rn
 				.replaceAll("<!-- prettier-ignore -->\n", "")
 				.replaceAll("// prettier-ignore\n", "");
+		});
+	};
+}
+
+/**
+ * Converts tabs to spaces in code blocks to fit more into the viewport.
+ *
+ * @returns {MdastTransformer} - A unified transformer
+ *
+ */
+function remarkTabsToSpaces() {
+	return async (tree) => {
+		visit(tree, "code", (node) => {
+			node.value = node.value
+				// @ts-expect-error - not dealing with this rn
+				.replaceAll("\t", "  ");
 		});
 	};
 }

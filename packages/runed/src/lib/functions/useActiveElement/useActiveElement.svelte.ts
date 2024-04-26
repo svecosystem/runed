@@ -1,14 +1,15 @@
+import { type ReadableBox, box } from "../box/box.svelte.js";
 import { isBrowser } from "$lib/internal/utils/browser.js";
 
 /**
  * Returns a reactive value that is equal to `document.activeElement`.
  * It automatically listens for changes, keeping the reference up to date.
  *
- * @returns an object with a reactive value `value` that is equal to `document.activeElement`, or `null`
- * if there's no active element.
+ * @returns an object with a reactive value `value` that is equal to `document.activeElement`,
+ * or `null` if there's no active element.
  */
-export function useActiveElement(): { value: Readonly<Element | null> } {
-	const activeElement = $state({ value: isBrowser() ? document.activeElement : null });
+export function useActiveElement(): ReadableBox<Element | null> {
+	const activeElement = box(isBrowser() ? document.activeElement : null);
 
 	function onFocusChange() {
 		activeElement.value = document.activeElement;
@@ -24,5 +25,5 @@ export function useActiveElement(): { value: Readonly<Element | null> } {
 		};
 	});
 
-	return activeElement;
+	return box.readonly(activeElement);
 }

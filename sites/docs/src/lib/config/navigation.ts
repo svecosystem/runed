@@ -91,6 +91,11 @@ export const navigation: Navigation = {
 					href: "/docs/functions/use-mounted",
 					items: [],
 				},
+				{
+					title: "useSupported",
+					href: "/docs/functions/use-supported",
+					items: [],
+				},
 			],
 		},
 	],
