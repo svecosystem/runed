@@ -115,6 +115,33 @@ describe("box.flatten", () => {
 	});
 });
 
+describe("box.readonly", () => {
+	test("box.readonly returns a non-settable box", () => {
+		const count = box(0);
+		const readonlyCount = box.readonly(count);
+
+		function setReadOnlyCount() {
+			// eslint-disable-next-line ts/no-explicit-any
+			(readonlyCount as any).value = 1;
+		}
+
+		expect(setReadOnlyCount).toThrow();
+	});
+
+	test("box.readonly returned box should update with original box", () => {
+		const count = box(0);
+		const readonlyCount = box.readonly(count);
+
+		expect(readonlyCount.value).toBe(0);
+		count.value = 1;
+		expect(readonlyCount.value).toBe(1);
+
+		count.value = 2;
+		expect(readonlyCount.value).toBe(2);
+	});
+});
+
+
 describe("box types", () => {
 	test("box without initial value", () => {
 		const count = box<number>();
@@ -163,28 +190,3 @@ describe("box types", () => {
 	});
 });
 
-describe("box.readonly", () => {
-	test("box.readonly returns a non-settable box", () => {
-		const count = box(0);
-		const readonlyCount = box.readonly(count);
-
-		function setReadOnlyCount() {
-			// eslint-disable-next-line ts/no-explicit-any
-			(readonlyCount as any).value = 1;
-		}
-
-		expect(setReadOnlyCount).toThrow();
-	});
-
-	test("box.readonly returned box should update with original box", () => {
-		const count = box(0);
-		const readonlyCount = box.readonly(count);
-
-		expect(readonlyCount.value).toBe(0);
-		count.value = 1;
-		expect(readonlyCount.value).toBe(1);
-
-		count.value = 2;
-		expect(readonlyCount.value).toBe(2);
-	});
-});
