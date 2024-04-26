@@ -38,6 +38,9 @@ importers:
       svelte-eslint-parser:
         specifier: ^0.35.0
         version: 0.35.0(svelte@5.0.0-next.110)
+      wrangler:
+        specifier: ^3.52.0
+        version: 3.52.0
 
   packages/runed:
     dependencies:
