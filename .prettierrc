@@ -1,32 +1,31 @@
 {
-  "useTabs": true,
-  "tabWidth": 4,
-  "singleQuote": false,
-  "trailingComma": "es5",
-  "semi": true,
-  "printWidth": 100,
-  "plugins": ["prettier-plugin-svelte", "prettier-plugin-tailwindcss"],
-  "overrides": [
-    {
-      "files": "*.svelte",
-      "options": {
-        "parser": "svelte"
-      }
-    },
-	{
-		"files": "*.md",
-		"options": {
-			"parser": "markdown",
-			"printWidth": 100,
-			"proseWrap": "always",
-			"tabWidth": 2,
-			"useTabs": true,
-			"semi": true,
-			"trailingComma": "none",
-			"bracketSameLine": true
+	"useTabs": true,
+	"tabWidth": 4,
+	"singleQuote": false,
+	"trailingComma": "es5",
+	"semi": true,
+	"printWidth": 100,
+	"plugins": ["prettier-plugin-svelte", "prettier-plugin-tailwindcss"],
+	"overrides": [
+		{
+			"files": "*.svelte",
+			"options": {
+				"parser": "svelte"
+			}
+	  	},
+		{
+			"files": "*.md",
+			"options": {
+				"parser": "markdown",
+				"printWidth": 100,
+				"proseWrap": "always",
+				"tabWidth": 2,
+				"useTabs": true,
+				"trailingComma": "none",
+				"bracketSameLine": true
+			}
 		}
-	}
-  ],
-  "tailwindConfig": "./sites/docs/tailwind.config.js",
-  "tailwindFunctions": ["clsx", "cn", "tv"]
+	],
+	"tailwindConfig": "./sites/docs/tailwind.config.js",
+	"tailwindFunctions": ["clsx", "cn", "tv"]
 }

@@ -1,3 +1,4 @@
+// @ts-check
 import { fontFamily } from "tailwindcss/defaultTheme";
 import typography from "@tailwindcss/typography";
 
