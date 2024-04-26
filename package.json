@@ -50,5 +50,10 @@
     "prettier-plugin-tailwindcss": "^0.5.14",
     "svelte-eslint-parser": "^0.35.0"
   },
-  "type": "module"
+  "type": "module",
+  "pnpm": {
+		"overrides": {
+			"bits-ui@0.16.0": "^0.21.5"
+		}
+	}
 }
