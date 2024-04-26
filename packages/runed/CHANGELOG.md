@@ -1,5 +1,15 @@
 # runed
 
+## 0.2.0
+
+### Minor Changes
+
+- Add `box.readonly` utility ([#17](https://github.com/svecosystem/runed/pull/17))
+
+### Patch Changes
+
+- box.readonly perfomance adjustment ([#21](https://github.com/svecosystem/runed/pull/21))
+
 ## 0.1.0
 
 ### Minor Changes
