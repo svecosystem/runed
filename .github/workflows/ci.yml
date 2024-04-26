@@ -4,7 +4,11 @@ on:
   push:
     branches:
       - main
+    paths-ignore:
+      - '.changeset/**'
   pull_request:
+    paths-ignore:
+      - '.changeset/**'
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.number || github.sha }}
