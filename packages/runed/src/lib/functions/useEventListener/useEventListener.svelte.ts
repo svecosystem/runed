@@ -4,14 +4,14 @@ import { addEventListener } from "$lib/internal/utils/event.js";
 
 export function useEventListener<TEvent extends keyof WindowEventMap>(
 	target: MaybeBoxOrGetter<Window | null | undefined>,
-	event: TEvent,
+	event: TEvent | TEvent[],
 	handler: (this: Window, event: WindowEventMap[TEvent]) => unknown,
 	options?: boolean | AddEventListenerOptions
 ): void;
 
 export function useEventListener<TEvent extends keyof DocumentEventMap>(
 	target: MaybeBoxOrGetter<Document | null | undefined>,
-	event: TEvent,
+	event: TEvent | TEvent[],
 	handler: (this: Document, event: DocumentEventMap[TEvent]) => unknown,
 	options?: boolean | AddEventListenerOptions
 ): void;
@@ -21,21 +21,21 @@ export function useEventListener<
 	TEvent extends keyof HTMLElementEventMap,
 >(
 	target: MaybeBoxOrGetter<TElement | null | undefined>,
-	event: TEvent,
+	event: TEvent | TEvent[],
 	handler: (this: TElement, event: HTMLElementEventMap[TEvent]) => unknown,
 	options?: boolean | AddEventListenerOptions
 ): void;
 
 export function useEventListener(
 	target: MaybeBoxOrGetter<EventTarget | null | undefined>,
-	event: string,
+	event: string | string[],
 	handler: EventListenerOrEventListenerObject,
 	options?: boolean | AddEventListenerOptions
 ): void;
 
 export function useEventListener(
 	_target: MaybeBoxOrGetter<EventTarget | null | undefined>,
-	event: string,
+	event: string | string[],
 	handler: EventListenerOrEventListenerObject,
 	options?: boolean | AddEventListenerOptions
 ) {
