@@ -1,3 +1,5 @@
+import { untrack } from "svelte";
+import { box } from "../box/box.svelte.js";
 import type { MaybeBoxOrGetter } from "$lib/internal/types.js";
 
 export type UseElementBoundingOptions = {
@@ -6,7 +8,7 @@ export type UseElementBoundingOptions = {
 	 *
 	 * @defaultValue true
 	 */
-	resetOnDestroy?: boolean;
+	reset?: boolean;
 
 	/**
 	 * Listen to window resize events.
@@ -23,20 +25,50 @@ export type UseElementBoundingOptions = {
 	windowScroll?: boolean;
 };
 
+const defaultSize = {
+	height: 0,
+	width: 0,
+	x: 0,
+	y: 0,
+	bottom: 0,
+	left: 0,
+	right: 0,
+	top: 0,
+};
+
 export function useElementBounding(
-	target: MaybeBoxOrGetter<HTMLElement | undefined | null>,
+	_node: MaybeBoxOrGetter<HTMLElement | undefined | null>,
 	options: UseElementBoundingOptions = {}
 ) {
+	const node = box.from(_node);
 	const { reset = true, windowResize = true, windowScroll = true } = options;
 
-	const size = $state({
-		height: 0,
-		width: 0,
-		x: 0,
-		y: 0,
-		bottom: 0,
-		left: 0,
-		right: 0,
-		top: 0,
+	const size = $state(defaultSize);
+
+	function update() {
+		if (!node.value) {
+			if (reset) {
+				untrack(() => {
+					Object.assign(size, defaultSize);
+				});
+			}
+			return;
+		}
+		const rect = node.value.getBoundingClientRect();
+
+		untrack(() => {
+			size.width = rect.width;
+			size.height = rect.height;
+			size.x = rect.x;
+			size.y = rect.y;
+			size.bottom = rect.bottom;
+			size.left = rect.left;
+			size.right = rect.right;
+			size.top = rect.top;
+		});
+	}
+
+	$effect(() => {
+		update();
 	});
 }
