@@ -12,7 +12,7 @@ importers:
   .:
     devDependencies:
       '@changesets/cli':
-        specifier: ^2.26.2
+        specifier: ^2.27.1
         version: 2.27.1
       '@huntabyte/eslint-config':
         specifier: ^0.3.1
