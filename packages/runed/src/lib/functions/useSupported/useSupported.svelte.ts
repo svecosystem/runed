@@ -1,16 +1,24 @@
 import { type ReadableBox, box } from "../box/box.svelte.js";
 
 /**
- * A hook that takes a callback and returns a boolean indicating whether the
- * callback is supported by the current environment.
+ * A hook that takes a predicate determine if a browser API is supported.
  *
  * Useful for checking if a browser API is supported before attempting to use it.
+ *
+ * @example
+ * ```ts
+ * const isSupported = useSupported(() => navigator);
+ *
+ * if (isSupported) {
+ * 	// do something with navigator
+ * }
+ * ```
  */
-export function useSupported(callback: () => unknown): ReadableBox<boolean> {
+export function useSupported(predicate: () => unknown): ReadableBox<boolean> {
 	const isSupported = box(false);
 
 	$effect(() => {
-		isSupported.value = Boolean(callback());
+		isSupported.value = Boolean(predicate());
 	});
 
 	return box.readonly(isSupported);
