@@ -56,7 +56,7 @@ Useful for passing synced reactive values across boundaries.
 	}
 
 	let count = $state(0);
-	// We pass count with box.with so it stays in sync
+	// We pass count to box.with so it stays in sync
 	const { double, increment } = useCounter(
 		box.with(
 			() => count.value,
