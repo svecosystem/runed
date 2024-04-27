@@ -1,6 +1,7 @@
 ---
 title: useEventListener
 description: A function that attaches an automatically disposed event listener.
+category: Browser
 ---
 
 <script>

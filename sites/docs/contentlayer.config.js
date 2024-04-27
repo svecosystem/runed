@@ -23,7 +23,7 @@ const computedFields = {
 
 export const Doc = defineDocumentType(() => ({
 	name: "Doc",
-	filePathPattern: `**/*.md`,
+	filePathPattern: `./*.md`,
 	fields: {
 		title: {
 			type: "string",
@@ -41,8 +41,28 @@ export const Doc = defineDocumentType(() => ({
 	computedFields,
 }));
 
+export const FunctionDoc = defineDocumentType(() => ({
+	name: "FunctionDoc",
+	filePathPattern: "functions/**/*.md",
+	fields: {
+		title: {
+			type: "string",
+			required: true,
+		},
+		description: {
+			type: "string",
+			required: true,
+		},
+		category: {
+			type: "string",
+			required: true,
+		},
+	},
+	computedFields,
+}));
+
 export default makeSource({
 	contentDirPath: "./content",
-	documentTypes: [Doc],
+	documentTypes: [Doc, FunctionDoc],
 	disableImportAliasWarning: true,
 });

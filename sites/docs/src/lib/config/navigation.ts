@@ -1,3 +1,5 @@
+import { allFunctionDocs } from "../../../.contentlayer/generated";
+
 export type NavItem = {
 	title: string;
 	href?: string;
@@ -20,8 +22,54 @@ export type Navigation = {
 	sidebar: SidebarNavItem[];
 };
 
+const CATEGORIES = ["State", "Elements", "Browser", "Component", "Utilities"] as const;
+type Category = (typeof CATEGORIES)[number];
+
+function isCategory(category: string): category is Category {
+	return CATEGORIES.includes(category as Category);
+}
+
+function generateFunctionsNav() {
+	const categories = new Set(
+		allFunctionDocs
+			.map((doc) => doc.category)
+			.filter((category): category is Category => isCategory(category))
+	);
+
+	const navItems: SidebarNavItem[] = [];
+
+	// Create a map to store the items for each category
+	const categoryItemsMap: Record<string, SidebarNavItem["items"]> = {};
+
+	// Populate the map with items for each category
+	for (const doc of allFunctionDocs) {
+		if (!categoryItemsMap[doc.category]) {
+			categoryItemsMap[doc.category] = [];
+		}
+		categoryItemsMap[doc.category]?.push({
+			title: doc.title,
+			href: `/docs/functions/${doc.slug}`,
+			items: [],
+		});
+	}
+
+	// Sort the categories based on the provided sort order
+	const sortedCategories = CATEGORIES.filter((category) => categories.has(category));
+
+	// Create the navItems array based on the sorted categories
+	for (const category of sortedCategories) {
+		const items = categoryItemsMap[category] ?? [];
+		navItems.push({
+			title: category,
+			items,
+			collapsible: false,
+		});
+	}
+
+	return navItems;
+}
+
 export const navigation: Navigation = {
-	// By default, `main` navigation items are rendered in the top navigation bar.
 	main: [
 		{
 			title: "Documentation",
@@ -38,7 +86,6 @@ export const navigation: Navigation = {
 			external: true,
 		},
 	],
-	// By default, `sidebar` navigation only supports 2 levels of navigation.
 	sidebar: [
 		{
 			title: "Overview",
@@ -56,47 +103,6 @@ export const navigation: Navigation = {
 				},
 			],
 		},
-
-		{
-			title: "Functions",
-			collapsible: true,
-			items: [
-				{
-					title: "Box",
-					href: "/docs/functions/box",
-					items: [],
-				},
-				{
-					title: "useActiveElement",
-					href: "/docs/functions/use-active-element",
-					items: [],
-				},
-				{
-					title: "useDebounce",
-					href: "/docs/functions/use-debounce",
-					items: [],
-				},
-				{
-					title: "useElementSize",
-					href: "/docs/functions/use-element-size",
-					items: [],
-				},
-				{
-					title: "useEventListener",
-					href: "/docs/functions/use-event-listener",
-					items: [],
-				},
-				{
-					title: "useMounted",
-					href: "/docs/functions/use-mounted",
-					items: [],
-				},
-				{
-					title: "useSupported",
-					href: "/docs/functions/use-supported",
-					items: [],
-				},
-			],
-		},
+		...generateFunctionsNav(),
 	],
 };
