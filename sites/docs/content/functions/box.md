@@ -1,6 +1,7 @@
 ---
 title: Box
 description: Box your state and take it anywhere
+category: State
 ---
 
 <script>
@@ -9,23 +10,23 @@ import { UseActiveElementDemo } from '$lib/components/demos';
 
 ## Description
 
-State in runes is based on primitives, which provides a concise syntax. However, when sending these
-primitives across boundaries, e.g. in function arguments, the state is not reactive, and rather, the
-static value gets sent.
+Runes for state are primitives. They provide a concise syntax for local reactivity. However, when we
+send these state primitives across boundaries (e.g. in function arguments), the state loses it's
+reactivity and becomes a static value.
 
-Box provides several utilities to make sending and receiving reactive values easier.
+Boxes provide several utilities to make passing reactive state across boundaries easier.
 
 ## Usage
 
 ### `box`
 
-Initializes the boxed state.
+Initializes a writable boxed state.
 
 ```svelte
 <script lang="ts">
 	import { box } from "runed";
 
-	let count = box(0);
+	const count = box(0);
 </script>
 
 <button onclick={() => count.value++}>
@@ -35,7 +36,10 @@ Initializes the boxed state.
 
 ### `box.with`
 
-Allows you to use getters and setters to define a box. Useful to pass around state.
+Creates reactive state using getter and setter functions. If a setter function is provided, the box
+is writable. If not, the box is readonly.
+
+Useful for passing synced reactive values across boundaries.
 
 ```svelte
 <script lang="ts">
@@ -52,7 +56,7 @@ Allows you to use getters and setters to define a box. Useful to pass around sta
 	}
 
 	let count = $state(0);
-	// We pass count with box.with
+	// We pass count with box.with so it stays in sync
 	const { double, increment } = useCounter(
 		box.with(
 			() => count.value,
@@ -69,8 +73,9 @@ Allows you to use getters and setters to define a box. Useful to pass around sta
 
 ### `box.from`
 
-Creates a box from an existing box, a getter function, or a static value. Used in functions to
-receive props that are optionally reactive.
+Creates a box from an existing box, a getter function, or a static value.
+
+Useful for receiving arguments that may or may not be reactive.
 
 ```svelte
 <script lang="ts">
@@ -116,7 +121,8 @@ receive props that are optionally reactive.
 
 ### `box.flatten`
 
-Transforms any boxes inside an object to reactive properties, flattening the `.value` onto them.
+Transforms any boxes within an object to reactive properties, removing the need to access each
+property with `.value`.
 
 ```ts
 const count = box(1);

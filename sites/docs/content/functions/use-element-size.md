@@ -1,6 +1,7 @@
 ---
 title: useElementSize
 description: A higher-order function that debounces the execution of a function.
+category: Elements
 ---
 
 <script>

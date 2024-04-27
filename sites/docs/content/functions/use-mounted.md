@@ -1,6 +1,7 @@
 ---
 title: useMounted
 description: A function that returns the mounted state of the component it's called in.
+category: Component
 ---
 
 <script>
