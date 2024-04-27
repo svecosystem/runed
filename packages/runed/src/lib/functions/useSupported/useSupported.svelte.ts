@@ -14,11 +14,11 @@ import { type ReadableBox, box } from "../box/box.svelte.js";
  * }
  * ```
  */
-export function useSupported(predicate: () => unknown): ReadableBox<boolean> {
+export function useSupported(predicate: () => boolean): ReadableBox<boolean> {
 	const isSupported = box(false);
 
 	$effect(() => {
-		isSupported.value = Boolean(predicate());
+		isSupported.value = predicate();
 	});
 
 	return box.readonly(isSupported);
