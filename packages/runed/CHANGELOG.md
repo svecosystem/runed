@@ -1,5 +1,11 @@
 # runed
 
+## 0.4.1
+
+### Patch Changes
+
+- Fix addEventListener overloads ([#16](https://github.com/svecosystem/runed/pull/16))
+
 ## 0.4.0
 
 ### Minor Changes
