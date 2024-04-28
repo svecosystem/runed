@@ -1,5 +1,6 @@
 import { describe, expect, expectTypeOf, test } from "vitest";
 import { type ReadableBox, type WritableBox, box } from "./box.svelte.js";
+import type { MaybeBoxOrGetter } from "$lib/internal/types.js";
 
 describe("box", () => {
 	test("box with initial value should be settable", () => {
@@ -170,6 +171,12 @@ describe("box types", () => {
 		const count2 = box.from(count);
 		expectTypeOf(count2).toMatchTypeOf<ReadableBox<number>>();
 	});
+
+	test("box from maybe box or getter", () => {
+		const count = 0 as MaybeBoxOrGetter<number>;
+		const count2 = box.from(count);
+		expectTypeOf(count2).toMatchTypeOf<ReadableBox<number>>();
+	})
 
 	test("box.isWritableBox = true should allow box to be settable", () => {
 		const count = box(0) as WritableBox<number> | ReadableBox<number>;
