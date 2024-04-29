@@ -5,12 +5,12 @@ category: Utilities
 ---
 
 <script>
-	import { UseDebounceDemo } from '$lib/components/demos';
+	import Demo from '$lib/components/demos/use-debounce.svelte';
 </script>
 
 ## Demo
 
-<UseDebounceDemo />
+<Demo />
 
 ## Usage
 
