@@ -7,6 +7,8 @@ import { isBrowser } from "$lib/internal/utils/browser.js";
  *
  * @returns an object with a reactive value `value` that is equal to `document.activeElement`,
  * or `null` if there's no active element.
+ * 
+ * @see {@link https://runed.dev/docs/functions/use-active-element}
  */
 export function useActiveElement(): ReadableBox<Element | null> {
 	const activeElement = box(isBrowser() ? document.activeElement : null);

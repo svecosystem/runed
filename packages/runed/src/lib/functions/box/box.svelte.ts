@@ -16,12 +16,16 @@ export interface WritableBox<T> extends ReadableBox<T> {
 
 /**
  * @returns Whether the value is a Box
+ * 
+ * @see {@link https://runed.dev/docs/functions/box}
  */
 function isBox(value: unknown): value is ReadableBox<unknown> {
 	return isObject(value) && BoxSymbol in value;
 }
 /**
  * @returns Whether the value is a WritableBox
+ * 
+ * @see {@link https://runed.dev/docs/functions/box}
  */
 function isWritableBox(value: unknown): value is WritableBox<unknown> {
 	return box.isBox(value) && isWritableSymbol in value;
@@ -32,6 +36,8 @@ function isWritableBox(value: unknown): value is WritableBox<unknown> {
  *
  * @returns A box with a `value` property which can be set to a new value.
  * Useful to pass state to other functions.
+ * 
+ * @see {@link https://runed.dev/docs/functions/box}
  */
 export function box<T>(): WritableBox<T | undefined>;
 /**
@@ -40,6 +46,8 @@ export function box<T>(): WritableBox<T | undefined>;
  * @param initialValue The initial value of the box.
  * @returns A box with a `value` property which can be set to a new value.
  * Useful to pass state to other functions.
+ * 
+ * @see {@link https://runed.dev/docs/functions/box}
  */
 export function box<T>(initialValue: T): WritableBox<T>;
 export function box(initialValue?: unknown) {
@@ -63,6 +71,8 @@ export function box(initialValue?: unknown) {
  * @param getter Function to get the value of the box
  * @returns A box with a `value` property whose value is the result of the getter.
  * Useful to pass state to other functions.
+ * 
+ * @see {@link https://runed.dev/docs/functions/box}
  */
 function boxWith<T>(getter: () => T): ReadableBox<T>;
 /**
@@ -72,6 +82,8 @@ function boxWith<T>(getter: () => T): ReadableBox<T>;
  * @param setter Function to set the value of the box
  * @returns A box with a `value` property which can be set to a new value.
  * Useful to pass state to other functions.
+ * 
+ * @see {@link https://runed.dev/docs/functions/box}
  */
 function boxWith<T>(getter: () => T, setter: (v: T) => void): WritableBox<T>;
 function boxWith<T>(getter: () => T, setter?: (v: T) => void) {
@@ -105,6 +117,8 @@ function boxWith<T>(getter: () => T, setter?: (v: T) => void) {
  * Useful when you want to receive any of these types of values and generate a boxed version of it.
  *
  * @returns A box with a `value` property whose value.
+ * 
+ * @see {@link https://runed.dev/docs/functions/box}
  */
 function boxFrom<T>(value: T | WritableBox<T>): WritableBox<T>;
 function boxFrom<T>(value: ReadableBox<T>): ReadableBox<T>;
@@ -154,6 +168,8 @@ type BoxFlatten<R extends Record<string, unknown>> = Expand<
  * const count = box(0)
  * const flat = box.flatten({ count, double: box.with(() => count.value) })
  * // type of flat is { count: number, readonly double: number }
+ * 
+ * @see {@link https://runed.dev/docs/functions/box}
  */
 function boxFlatten<R extends Record<string, unknown>>(boxes: R): BoxFlatten<R> {
 	return Object.entries(boxes).reduce<BoxFlatten<R>>((acc, [key, b]) => {
@@ -189,6 +205,8 @@ function boxFlatten<R extends Record<string, unknown>>(boxes: R): BoxFlatten<R> 
  * @example
  * const count = box(0) // WritableBox<number>
  * const countReadonly = box.readonly(count) // ReadableBox<number>
+ * 
+ * @see {@link https://runed.dev/docs/functions/box}
  */
 function toReadonlyBox<T>(b: ReadableBox<T>): ReadableBox<T> {
 	if (!box.isWritableBox(b)) return b;

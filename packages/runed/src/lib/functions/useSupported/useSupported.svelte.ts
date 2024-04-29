@@ -13,6 +13,8 @@ import { type ReadableBox, box } from "../box/box.svelte.js";
  * 	// do something with navigator
  * }
  * ```
+ * 
+ * @see {@link https://runed.dev/docs/functions/use-supported}
  */
 export function useSupported(predicate: () => boolean): ReadableBox<boolean> {
 	const isSupported = box(false);
