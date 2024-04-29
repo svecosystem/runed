@@ -1,7 +1,6 @@
+import { untrack } from "svelte";
 import { box } from "../index.js";
 import type { BoxOrGetter } from "$lib/internal/types.js";
-
-
 
 /**
  * Holds the previous value of a box or getter.
@@ -10,13 +9,13 @@ import type { BoxOrGetter } from "$lib/internal/types.js";
  */
 export function usePrevious<T>(value: BoxOrGetter<T>) {
   const boxed = box.from(value);
-  let curr: T | undefined
+  let curr: T | undefined = $state()
   const previous = box<T | undefined>(undefined);
 
   $effect(() => {
-    previous.value = curr
-    curr = boxed.value
-  })
+    previous.value = untrack(() => curr);
+    curr = boxed.value;
+  });
 
-  return previous
+  return previous;
 }
