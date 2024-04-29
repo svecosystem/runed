@@ -1,6 +1,6 @@
 ---
 title: useElementSize
-description: A higher-order function that debounces the execution of a function.
+description: A function that returns the size of an element.
 category: Elements
 ---
 

@@ -11,11 +11,11 @@
 Runed provides utilities to power your applications using the magic of
 [Svelte Runes](https://svelte.dev/blog/runes).
 
-## Features
-
 ## Installation
 
-Runed will be published to NPM once Svelte 5 is released.
+```bash
+npm install runed
+```
 
 ## Sponsors
 
