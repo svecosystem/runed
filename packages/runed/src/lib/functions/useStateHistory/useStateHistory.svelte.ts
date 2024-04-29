@@ -1,8 +1,6 @@
-import { untrack } from "svelte";
-import { type ReadableBox, type WritableBox, box } from "../box/box.svelte.js";
+import { type WritableBox, box } from "../box/box.svelte.js";
 import { watch } from "../watch/watch.svelte.js";
-import type { Getter, MaybeBoxOrGetter } from "$lib/internal/types.js";
-import { at, last } from "$lib/internal/utils/array.js";
+import type { MaybeBoxOrGetter } from "$lib/internal/types.js";
 
 type UseStateHistoryOptions = {
 	capacity?: MaybeBoxOrGetter<number>
@@ -13,7 +11,11 @@ type LogEvent<T> = {
 	timestamp: number
 }
 
-
+/**
+ * Tracks the change history of a box, providing undo and redo capabilities.
+ *
+ * @see {@link https://runed.dev/docs/functions/use-state-history}
+ */
 export function useStateHistory<T>(b: WritableBox<T>, options?: UseStateHistoryOptions) {
 	const capacity = box.from(options?.capacity)
 
