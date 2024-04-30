@@ -1,13 +1,10 @@
-import { it } from "vitest";
+import { onTestFinished, test } from "vitest";
 
 export function testWithEffect(name: string, fn: () => void) {
-	it(name, async () => {
-		let promise: Promise<void> | void;
-		const cleanup = $effect.root(() => (promise = fn()));
-		try {
-			await promise!;
-		} finally {
-			cleanup();
-		}
+	test(name, () => {
+		const cleanup = $effect.root(() => {
+			fn();
+		});
+		onTestFinished(cleanup);
 	});
 }
