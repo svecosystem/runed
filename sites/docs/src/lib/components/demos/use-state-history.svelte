@@ -46,7 +46,7 @@
 	<div class="mt-4">
 		<p class="m-0 opacity-75">History (limited to 10 records for demo)</p>
 		<div class="mt-2 rounded-sm bg-neutral-800/75 p-2">
-			{#each history.log as event}
+			{#each history.log.toReversed() as event}
 				<div class="flex items-center gap-4">
 					<span class="font-mono opacity-50">{format(event.timestamp)}</span>
 					<span>{`{ value: ${event.snapshot} }`}</span>

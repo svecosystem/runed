@@ -26,14 +26,21 @@ export function useStateHistory<T>(b: WritableBox<T>, options?: UseStateHistoryO
 	const canRedo = box.with(() => redoStack.value.length > 0)
 
 	let ignoreUpdate = false;
+
+	function addEvent(event: LogEvent<T>) {
+		log.value.push(event)
+		if (capacity.value && log.value.length > capacity.value) {
+			log.value = log.value.slice(-capacity.value)
+		}
+	}
+
 	watch(() => b.value, (v) => {
 		if (ignoreUpdate) {
 			ignoreUpdate = false
 			return
 		}
 
-		const timestamp = new Date().getTime()
-		log.value = [{ snapshot: v, timestamp }, ...log.value].slice(0, capacity.value)
+		addEvent({ snapshot: v, timestamp: new Date().getTime() })
 		redoStack.value = []
 	})
 
@@ -44,20 +51,19 @@ export function useStateHistory<T>(b: WritableBox<T>, options?: UseStateHistoryO
 
 
 	function undo() {
-		const [curr, prev] = log.value
+		const [prev, curr] = log.value.slice(-2)
 		if (!curr || !prev) return;
 		ignoreUpdate = true;
-		redoStack.value = [curr, ...redoStack.value]
-		log.value = log.value.slice(1)
+		redoStack.value.push(curr)
+		log.value.pop()
 		b.value = prev.snapshot
 	}
 
 	function redo() {
-		const nextEvent = redoStack.value[0]
+		const nextEvent = redoStack.value.pop()
 		if (!nextEvent) return;
 		ignoreUpdate = true;
-		log.value = [nextEvent, ...log.value].slice(0, capacity.value)
-		redoStack.value = redoStack.value.slice(1)
+		addEvent(nextEvent)
 		b.value = nextEvent.snapshot
 	}
 
