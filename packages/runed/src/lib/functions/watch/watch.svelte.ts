@@ -21,11 +21,11 @@ export type WatchSource<T> = ReadableBox<T> | Getter<T>;
 
 export type WatchOptions = {
 	/**
-	 * If `false`, the effect doesn't run until one of the `sources` changes.
+	 * If `true`, the effect doesn't run until one of the `sources` changes.
 	 *
-	 * @default true
+	 * @default false
 	 */
-	immediate?: boolean;
+	lazy?: boolean;
 
 	/**
 	 * If `true`, the effect only runs once.
@@ -44,7 +44,7 @@ function runWatcher<T>(
 	flush: "pre" | "post",
 	options: WatchOptions
 ) {
-	const { immediate = true, once = false } = options;
+	const { lazy = false, once = false } = options;
 
 	const cleanupRoot = $effect.root(() => {
 		let initialRun = true;
@@ -59,7 +59,7 @@ function runWatcher<T>(
 			const values = Array.isArray(sources) ? sources.map(unbox) : unbox(sources);
 
 			let cleanupEffect: void | (() => void);
-			if (immediate || !initialRun) {
+			if (!lazy || !initialRun) {
 				// On the first run, if this fn received an array, pass an array of `undefined`
 				// values instead of `undefined` to allow destructuring.
 				//
