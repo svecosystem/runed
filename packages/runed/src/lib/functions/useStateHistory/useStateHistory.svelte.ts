@@ -3,13 +3,13 @@ import { watch } from "../watch/watch.svelte.js";
 import type { MaybeBoxOrGetter } from "$lib/internal/types.js";
 
 type UseStateHistoryOptions = {
-	capacity?: MaybeBoxOrGetter<number>
-}
+	capacity?: MaybeBoxOrGetter<number>;
+};
 
 type LogEvent<T> = {
-	snapshot: T
-	timestamp: number
-}
+	snapshot: T;
+	timestamp: number;
+};
 
 /**
  * Tracks the change history of a box, providing undo and redo capabilities.
@@ -17,63 +17,66 @@ type LogEvent<T> = {
  * @see {@link https://runed.dev/docs/functions/use-state-history}
  */
 export function useStateHistory<T>(b: WritableBox<T>, options?: UseStateHistoryOptions) {
-	const capacity = box.from(options?.capacity)
+	const capacity = box.from(options?.capacity);
 
-	const log = box<LogEvent<T>[]>([])
-	const redoStack = box<LogEvent<T>[]>([])
+	const log = box<LogEvent<T>[]>([]);
+	const redoStack = box<LogEvent<T>[]>([]);
 
-	const canUndo = box.with(() => log.value.length > 1)
-	const canRedo = box.with(() => redoStack.value.length > 0)
+	const canUndo = box.with(() => log.value.length > 1);
+	const canRedo = box.with(() => redoStack.value.length > 0);
 
 	let ignoreUpdate = false;
 
 	function addEvent(event: LogEvent<T>) {
-		log.value.push(event)
+		log.value.push(event);
 		if (capacity.value && log.value.length > capacity.value) {
-			log.value = log.value.slice(-capacity.value)
+			log.value = log.value.slice(-capacity.value);
 		}
 	}
 
-	watch(() => b.value, (v) => {
-		if (ignoreUpdate) {
-			ignoreUpdate = false
-			return
+	watch(
+		() => b.value,
+		(v) => {
+			if (ignoreUpdate) {
+				ignoreUpdate = false;
+				return;
+			}
+
+			addEvent({ snapshot: v, timestamp: new Date().getTime() });
+			redoStack.value = [];
 		}
+	);
 
-		addEvent({ snapshot: v, timestamp: new Date().getTime() })
-		redoStack.value = []
-	})
-
-	watch(() => capacity.value, (c) => {
-		if (!c) return;
-		log.value = log.value.slice(-c)
-	})
-
+	watch(
+		() => capacity.value,
+		(c) => {
+			if (!c) return;
+			log.value = log.value.slice(-c);
+		}
+	);
 
 	function undo() {
-		const [prev, curr] = log.value.slice(-2)
+		const [prev, curr] = log.value.slice(-2);
 		if (!curr || !prev) return;
 		ignoreUpdate = true;
-		redoStack.value.push(curr)
-		log.value.pop()
-		b.value = prev.snapshot
+		redoStack.value.push(curr);
+		log.value.pop();
+		b.value = prev.snapshot;
 	}
 
 	function redo() {
-		const nextEvent = redoStack.value.pop()
+		const nextEvent = redoStack.value.pop();
 		if (!nextEvent) return;
 		ignoreUpdate = true;
-		addEvent(nextEvent)
-		b.value = nextEvent.snapshot
+		addEvent(nextEvent);
+		b.value = nextEvent.snapshot;
 	}
-
 
 	return box.flatten({
 		log,
 		undo,
 		canUndo,
 		redo,
-		canRedo
-	})
-
+		canRedo,
+	});
 }

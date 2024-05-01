@@ -24,14 +24,10 @@ const __dirname = fileURLToPath(new URL(".", import.meta.url));
 const prettyCodeOptions = {
 	theme: {
 		dark: JSON.parse(
-			String(
-				readFileSync(resolve(__dirname, "./src/lib/styles/themes/tokyo-night-storm.json"))
-			)
+			String(readFileSync(resolve(__dirname, "./src/lib/styles/themes/tokyo-night-storm.json")))
 		),
 		light: JSON.parse(
-			String(
-				readFileSync(resolve(__dirname, "./src/lib/styles/themes/tokyo-night-light.json"))
-			)
+			String(readFileSync(resolve(__dirname, "./src/lib/styles/themes/tokyo-night-light.json")))
 		),
 	},
 	getHighlighter: (options) =>

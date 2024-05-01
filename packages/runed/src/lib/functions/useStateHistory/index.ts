@@ -1,1 +1,1 @@
-export * from './useStateHistory.svelte.js'
+export * from "./useStateHistory.svelte.js";

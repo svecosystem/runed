@@ -1,1 +1,1 @@
-export * from './watch.svelte.js'
+export * from "./watch.svelte.js";

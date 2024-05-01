@@ -1,1 +1,1 @@
-export * from './usePrevious.svelte.js'
+export * from "./usePrevious.svelte.js";

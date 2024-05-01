@@ -8,17 +8,14 @@ describe("useActiveElement", () => {
 		const activeElement = useActiveElement();
 		expect(activeElement.value).toBe(document.activeElement);
 	});
-	testWithEffect(
-		"updates accordingly when `document.activeElement` element changes",
-		async () => {
-			const input = document.createElement("input");
-			document.body.appendChild(input);
-			input.focus();
+	testWithEffect("updates accordingly when `document.activeElement` element changes", async () => {
+		const input = document.createElement("input");
+		document.body.appendChild(input);
+		input.focus();
 
-			const activeElement = useActiveElement();
-			await tick();
-			expect(document.activeElement).toBe(input);
-			expect(activeElement.value).toBe(input);
-		}
-	);
+		const activeElement = useActiveElement();
+		await tick();
+		expect(document.activeElement).toBe(input);
+		expect(activeElement.value).toBe(input);
+	});
 });

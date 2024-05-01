@@ -17,7 +17,7 @@ export type UseElementSizeOptions = {
  * - `box`: The box model to use. Can be either `"content-box"` or `"border-box"`. Defaults to `"border-box"`.
  *
  * @returns an object with `width` and `height` properties.
- * 
+ *
  * @see {@link https://runed.dev/docs/functions/use-element-size}
  */
 export function useElementSize(
@@ -37,8 +37,7 @@ export function useElementSize(
 
 		const observer = new ResizeObserver((entries) => {
 			for (const entry of entries) {
-				const boxSize =
-					options.box === "content-box" ? entry.contentBoxSize : entry.borderBoxSize;
+				const boxSize = options.box === "content-box" ? entry.contentBoxSize : entry.borderBoxSize;
 				const boxSizeArr = Array.isArray(boxSize) ? boxSize : [boxSize];
 				size.width = boxSizeArr.reduce((acc, size) => Math.max(acc, size.inlineSize), 0);
 				size.height = boxSizeArr.reduce((acc, size) => Math.max(acc, size.blockSize), 0);

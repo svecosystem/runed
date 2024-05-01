@@ -1,8 +1,7 @@
-import { describe, expect, test } from "vitest"
-
+import { describe, expect, test } from "vitest";
 
 describe("useStateHistory", () => {
-  test("dummy test", () => {
-    expect(true).toBe(true)
-  })
-})
+	test("dummy test", () => {
+		expect(true).toBe(true);
+	});
+});
