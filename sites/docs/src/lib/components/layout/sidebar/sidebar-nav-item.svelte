@@ -51,10 +51,7 @@
 		</ul>
 	</Collapsible.Root>
 {:else}
-	<a
-		href={navItem.href}
-		class="group mb-4 flex items-center font-semibold lg:text-sm lg:leading-6"
-	>
+	<a href={navItem.href} class="group mb-4 flex items-center font-semibold lg:text-sm lg:leading-6">
 		{navItem.title}
 	</a>
 {/if}

@@ -99,10 +99,7 @@ export function watch<T>(
 
 export function watch<T extends unknown[]>(
 	sources: { [K in keyof T]: WatchSource<T[K]> },
-	effect: (
-		values: T,
-		previousValues: { [K in keyof T]: T[K] | undefined }
-	) => void | (() => void),
+	effect: (values: T, previousValues: { [K in keyof T]: T[K] | undefined }) => void | (() => void),
 	options?: WatchOptions
 ): void;
 
@@ -125,10 +122,7 @@ function watchPre<T>(
 
 function watchPre<T extends unknown[]>(
 	sources: { [K in keyof T]: WatchSource<T[K]> },
-	effect: (
-		values: T,
-		previousValues: { [K in keyof T]: T[K] | undefined }
-	) => void | (() => void),
+	effect: (values: T, previousValues: { [K in keyof T]: T[K] | undefined }) => void | (() => void),
 	options?: WatchOptions
 ): void;
 

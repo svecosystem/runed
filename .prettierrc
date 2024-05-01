@@ -1,6 +1,5 @@
 {
 	"useTabs": true,
-	"tabWidth": 4,
 	"singleQuote": false,
 	"trailingComma": "es5",
 	"semi": true,
@@ -19,7 +18,6 @@
 				"parser": "markdown",
 				"printWidth": 100,
 				"proseWrap": "always",
-				"tabWidth": 2,
 				"useTabs": true,
 				"trailingComma": "none",
 				"bracketSameLine": true
