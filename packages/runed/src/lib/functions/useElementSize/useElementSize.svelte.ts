@@ -17,6 +17,8 @@ export type UseElementSizeOptions = {
  * - `box`: The box model to use. Can be either `"content-box"` or `"border-box"`. Defaults to `"border-box"`.
  *
  * @returns an object with `width` and `height` properties.
+ * 
+ * @see {@link https://runed.dev/docs/functions/use-element-size}
  */
 export function useElementSize(
 	_node: MaybeBoxOrGetter<HTMLElement | undefined>,

@@ -5,12 +5,12 @@ category: Elements
 ---
 
 <script>
-	import { UseElementSizeDemo } from '$lib/components/demos';
+	import Demo from '$lib/components/demos/use-element-size.svelte';
 </script>
 
 ## Demo
 
-<UseElementSizeDemo />
+<Demo />
 
 ## Usage
 
