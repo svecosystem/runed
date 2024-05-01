@@ -1,60 +1,60 @@
 {
-  "name": "root",
-  "description": "Monorepo for Runed.",
-  "private": true,
-  "version": "0.0.0",
-  "homepage": "https://runed.dev",
-  "contributors": [
-    {
-      "name": "Thomas G. Lopes",
-      "url": "https://thomasglopes.com"
-    },
-    {
-      "name": "Hunter Johnston",
-      "url": "https://x.com/huntabyte"
-    }
-  ],
-  "funding": [
-    "https://github.com/sponsors/huntabyte",
-    "https://github.com/sponsors/tglide"
-  ],
-  "main": "index.js",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/svecosystem/runed"
-  },
-  "scripts": {
-    "dev": "pnpm sync && pnpm --parallel dev",
-    "test": "pnpm -r test",
-    "test:package": "pnpm -F \"./packages/**\" test",
-    "test:package:watch": "pnpm -F \"./packages/**\" test:watch",
-    "build": "pnpm -r build",
-    "build:packages": "pnpm -F \"./packages/**\" --parallel build",
-    "build:content": "pnpm -F \"./sites/**\" --parallel build:content",
-    "ci:publish": "pnpm build:packages && changeset publish",
-    "lint": "prettier --check . && eslint .",
-    "format": "prettier --write .",
-    "check": "pnpm -r check",
-    "sync": "pnpm -r sync",
-    "postinstall": "pnpm -r sync"
-  },
-  "license": "MIT",
-  "devDependencies": {
-    "@changesets/cli": "^2.27.1",
-    "@huntabyte/eslint-config": "^0.3.1",
-    "@svitejs/changesets-changelog-github-compact": "^1.1.0",
-    "eslint": "^9.1.1",
-    "eslint-plugin-svelte": "2.38.0",
-    "prettier": "^3.2.5",
-    "prettier-plugin-svelte": "^3.2.3",
-    "prettier-plugin-tailwindcss": "^0.5.14",
-    "svelte-eslint-parser": "^0.35.0",
-    "wrangler": "^3.52.0"
-  },
-  "type": "module",
-  "pnpm": {
-    "overrides": {
-      "bits-ui@0.16.0": "^0.21.5"
-    }
-  }
+	"name": "root",
+	"description": "Monorepo for Runed.",
+	"private": true,
+	"version": "0.0.0",
+	"homepage": "https://runed.dev",
+	"contributors": [
+		{
+			"name": "Thomas G. Lopes",
+			"url": "https://thomasglopes.com"
+		},
+		{
+			"name": "Hunter Johnston",
+			"url": "https://x.com/huntabyte"
+		}
+	],
+	"funding": [
+		"https://github.com/sponsors/huntabyte",
+		"https://github.com/sponsors/tglide"
+	],
+	"main": "index.js",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/svecosystem/runed"
+	},
+	"scripts": {
+		"dev": "pnpm sync && pnpm --parallel dev",
+		"test": "pnpm -r test",
+		"test:package": "pnpm -F \"./packages/**\" test",
+		"test:package:watch": "pnpm -F \"./packages/**\" test:watch",
+		"build": "pnpm -r build",
+		"build:packages": "pnpm -F \"./packages/**\" --parallel build",
+		"build:content": "pnpm -F \"./sites/**\" --parallel build:content",
+		"ci:publish": "pnpm build:packages && changeset publish",
+		"lint": "prettier --check . && eslint .",
+		"format": "prettier --write .",
+		"check": "pnpm -r check",
+		"sync": "pnpm -r sync",
+		"postinstall": "pnpm -r sync"
+	},
+	"license": "MIT",
+	"devDependencies": {
+		"@changesets/cli": "^2.27.1",
+		"@huntabyte/eslint-config": "^0.3.1",
+		"@svitejs/changesets-changelog-github-compact": "^1.1.0",
+		"eslint": "^9.1.1",
+		"eslint-plugin-svelte": "2.38.0",
+		"prettier": "^3.2.5",
+		"prettier-plugin-svelte": "^3.2.3",
+		"prettier-plugin-tailwindcss": "^0.5.14",
+		"svelte-eslint-parser": "^0.35.0",
+		"wrangler": "^3.52.0"
+	},
+	"type": "module",
+	"pnpm": {
+		"overrides": {
+			"bits-ui@0.16.0": "^0.21.5"
+		}
+	}
 }

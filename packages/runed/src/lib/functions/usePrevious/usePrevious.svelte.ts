@@ -8,14 +8,14 @@ import type { BoxOrGetter } from "$lib/internal/types.js";
  * @see {@link https://runed.dev/docs/functions/use-previous}
  */
 export function usePrevious<T>(value: BoxOrGetter<T>) {
-  const boxed = box.from(value);
-  let curr: T | undefined = $state()
-  const previous = box<T | undefined>(undefined);
+	const boxed = box.from(value);
+	let curr: T | undefined = $state();
+	const previous = box<T | undefined>(undefined);
 
-  $effect(() => {
-    previous.value = untrack(() => curr);
-    curr = boxed.value;
-  });
+	$effect(() => {
+		previous.value = untrack(() => curr);
+		curr = boxed.value;
+	});
 
-  return previous;
+	return previous;
 }

@@ -6,5 +6,5 @@ export * from "./useEventListener/index.js";
 export * from "./useMounted/index.js";
 export * from "./useSupported/index.js";
 export * from "./useStateHistory/index.js";
-export * from './watch/index.js';
-export * from './usePrevious/index.js';
+export * from "./watch/index.js";
+export * from "./usePrevious/index.js";

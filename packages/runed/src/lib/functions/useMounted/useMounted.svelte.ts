@@ -4,7 +4,7 @@ import { type ReadableBox, box } from "../box/box.svelte.js";
 /**
  * Returns a box with the mounted state of the component
  * that invokes this function.
- * 
+ *
  * @see {@link https://runed.dev/docs/functions/use-mounted}
  */
 export function useMounted(): ReadableBox<boolean> {

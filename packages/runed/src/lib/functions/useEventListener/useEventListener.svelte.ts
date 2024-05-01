@@ -8,7 +8,7 @@ import { addEventListener } from "$lib/internal/utils/event.js";
  * @param event The event(s) to listen for.
  * @param handler The function to be called when the event is triggered.
  * @param options An optional object that specifies characteristics about the event listener.
- * 
+ *
  * @see {@link https://runed.dev/docs/functions/use-event-listener}
  */
 export function useEventListener<TEvent extends keyof WindowEventMap>(
@@ -31,7 +31,7 @@ export function useEventListener<TEvent extends keyof DocumentEventMap>(
  * @param event The event(s) to listen for.
  * @param handler The function to be called when the event is triggered.
  * @param options An optional object that specifies characteristics about the event listener.
- * 
+ *
  * @see {@link https://runed.dev/docs/functions/use-event-listener}
  */
 export function useEventListener<
@@ -50,7 +50,7 @@ export function useEventListener<
  * @param event The event(s) to listen for.
  * @param handler The function to be called when the event is triggered.
  * @param options An optional object that specifies characteristics about the event listener.
- * 
+ *
  * @see {@link https://runed.dev/docs/functions/use-event-listener}
  */
 export function useEventListener(
