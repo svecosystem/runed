@@ -29,53 +29,44 @@ import { watch, box } from "runed";
 
 let count = $state(0);
 watch(
-  () => count,
-  () => {
-    console.log(count);
-  }
+	() => count,
+	() => {
+		console.log(count);
+	}
 );
 
-let double = box.with(() => count * 2)
-watch(
-  double,
-  () => {
-    console.log(double.value);
-  }
-);
+let double = box.with(() => count * 2);
+watch(double, () => {
+	console.log(double.value);
+});
 ```
 
 It also accepts an array of sources.
 
 ```ts
 let age = $state(24);
-let name = $state("Thomas")
-watch(
-  [() => age, () => name],
-  () => {
-    console.log(`${name} is ${age} years old`);
-  }
-);
+let name = $state("Thomas");
+watch([() => age, () => name], () => {
+	console.log(`${name} is ${age} years old`);
+});
 ```
 
 The callback receives two arguments: The current value of the sources, and the previous value.
 
 ```ts
 let count = box(0);
-watch(
-  count,
-  (curr, prev) => {
-    console.log(`count is ${curr}, was ${prev}`);
-  }
-);
+watch(count, (curr, prev) => {
+	console.log(`count is ${curr}, was ${prev}`);
+});
 ```
 
 `watch` also accepts an `options` object.
 
 ```ts
 watch(sources, callback, {
-  lazy: true, // First run will only happen after sources change
-  once: true // Will only run once
-})
+	lazy: true, // First run will only happen after sources change
+	once: true // Will only run once
+});
 ```
 
 ### `watch.pre`

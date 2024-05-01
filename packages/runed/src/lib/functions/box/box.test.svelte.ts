@@ -176,7 +176,7 @@ describe("box types", () => {
 		const count = 0 as MaybeBoxOrGetter<number>;
 		const count2 = box.from(count);
 		expectTypeOf(count2).toMatchTypeOf<ReadableBox<number>>();
-	})
+	});
 
 	test("box.isWritableBox = true should allow box to be settable", () => {
 		const count = box(0) as WritableBox<number> | ReadableBox<number>;
