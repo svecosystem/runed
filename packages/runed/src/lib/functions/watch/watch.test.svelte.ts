@@ -9,12 +9,9 @@ describe("watch", () => {
 		let count = $state(0);
 		let runs = $state(0);
 
-		watch(
-			() => count,
-			() => {
-				runs = runs + 1;
-			}
-		);
+		watch(() => count, () => {
+			runs = runs + 1;
+		});
 
 		// Watchers run immediately by default
 		await vi.waitFor(() => {

@@ -1,7 +1,7 @@
 ---
 title: Box
 description: Box your state and take it anywhere
-category: State
+category: Reactivity
 ---
 
 ## Description

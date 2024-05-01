@@ -22,7 +22,7 @@ export type Navigation = {
 	sidebar: SidebarNavItem[];
 };
 
-const CATEGORIES = ["State", "Elements", "Browser", "Component", "Utilities"] as const;
+const CATEGORIES = ["Reactivity", "State", "Elements", "Browser", "Component", "Utilities"] as const;
 type Category = (typeof CATEGORIES)[number];
 
 function isCategory(category: string): category is Category {

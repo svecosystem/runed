@@ -1,5 +1,4 @@
-import { untrack } from "svelte";
-import { box } from "../index.js";
+import { box, watch } from "../index.js";
 import type { BoxOrGetter } from "$lib/internal/types.js";
 
 /**
@@ -9,13 +8,11 @@ import type { BoxOrGetter } from "$lib/internal/types.js";
  */
 export function usePrevious<T>(value: BoxOrGetter<T>) {
   const boxed = box.from(value);
-  let curr: T | undefined = $state()
   const previous = box<T | undefined>(undefined);
 
-  $effect(() => {
-    previous.value = untrack(() => curr);
-    curr = boxed.value;
-  });
+  watch(boxed, (_, prev) => {
+    previous.value = prev
+  })
 
   return previous;
 }
