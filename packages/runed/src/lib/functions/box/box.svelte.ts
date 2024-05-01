@@ -1,4 +1,4 @@
-import type { Expand, Getter } from "$lib/internal/types.js";
+import type { Expand, Getter, MaybeBoxOrGetter } from "$lib/internal/types.js";
 import { isFunction, isObject } from "$lib/internal/utils/is.js";
 
 const BoxSymbol = Symbol("box");
@@ -16,12 +16,16 @@ export interface WritableBox<T> extends ReadableBox<T> {
 
 /**
  * @returns Whether the value is a Box
+ * 
+ * @see {@link https://runed.dev/docs/functions/box}
  */
 function isBox(value: unknown): value is ReadableBox<unknown> {
 	return isObject(value) && BoxSymbol in value;
 }
 /**
  * @returns Whether the value is a WritableBox
+ * 
+ * @see {@link https://runed.dev/docs/functions/box}
  */
 function isWritableBox(value: unknown): value is WritableBox<unknown> {
 	return box.isBox(value) && isWritableSymbol in value;
@@ -32,6 +36,8 @@ function isWritableBox(value: unknown): value is WritableBox<unknown> {
  *
  * @returns A box with a `value` property which can be set to a new value.
  * Useful to pass state to other functions.
+ * 
+ * @see {@link https://runed.dev/docs/functions/box}
  */
 export function box<T>(): WritableBox<T | undefined>;
 /**
@@ -40,6 +46,8 @@ export function box<T>(): WritableBox<T | undefined>;
  * @param initialValue The initial value of the box.
  * @returns A box with a `value` property which can be set to a new value.
  * Useful to pass state to other functions.
+ * 
+ * @see {@link https://runed.dev/docs/functions/box}
  */
 export function box<T>(initialValue: T): WritableBox<T>;
 export function box(initialValue?: unknown) {
@@ -63,6 +71,8 @@ export function box(initialValue?: unknown) {
  * @param getter Function to get the value of the box
  * @returns A box with a `value` property whose value is the result of the getter.
  * Useful to pass state to other functions.
+ * 
+ * @see {@link https://runed.dev/docs/functions/box}
  */
 function boxWith<T>(getter: () => T): ReadableBox<T>;
 /**
@@ -72,6 +82,8 @@ function boxWith<T>(getter: () => T): ReadableBox<T>;
  * @param setter Function to set the value of the box
  * @returns A box with a `value` property which can be set to a new value.
  * Useful to pass state to other functions.
+ * 
+ * @see {@link https://runed.dev/docs/functions/box}
  */
 function boxWith<T>(getter: () => T, setter: (v: T) => void): WritableBox<T>;
 function boxWith<T>(getter: () => T, setter?: (v: T) => void) {
@@ -98,25 +110,25 @@ function boxWith<T>(getter: () => T, setter?: (v: T) => void) {
 	};
 }
 
-export type BoxFrom<T> =
-	T extends WritableBox<infer U>
-		? WritableBox<U>
-		: T extends ReadableBox<infer U>
-			? ReadableBox<U>
-			: T extends Getter<infer U>
-				? ReadableBox<U>
-				: WritableBox<T>;
+
 
 /**
  * Creates a box from either a static value, a box, or a getter function.
  * Useful when you want to receive any of these types of values and generate a boxed version of it.
  *
  * @returns A box with a `value` property whose value.
+ * 
+ * @see {@link https://runed.dev/docs/functions/box}
  */
-function boxFrom<T>(value: T): BoxFrom<T> {
-	if (box.isBox(value)) return value as BoxFrom<T>;
-	if (isFunction(value)) return box.with(value) as BoxFrom<T>;
-	return box(value) as BoxFrom<T>;
+function boxFrom<T>(value: T | WritableBox<T>): WritableBox<T>;
+function boxFrom<T>(value: ReadableBox<T>): ReadableBox<T>;
+function boxFrom<T>(value: Getter<T>): ReadableBox<T>;
+function boxFrom<T>(value: MaybeBoxOrGetter<T>): ReadableBox<T>
+function boxFrom<T>(value: T): WritableBox<T>;
+function boxFrom<T>(value: MaybeBoxOrGetter<T>) {
+	if (box.isBox(value)) return value;
+	if (isFunction(value)) return box.with(value);
+	return box(value)
 }
 
 type GetKeys<T, U> = {
@@ -131,16 +143,16 @@ type BoxFlatten<R extends Record<string, unknown>> = Expand<
 		},
 		never
 	> &
-		RemoveValues<
-			{
-				readonly [K in keyof R]: R[K] extends WritableBox<infer _>
-					? never
-					: R[K] extends ReadableBox<infer T>
-						? T
-						: never;
-			},
-			never
-		>
+	RemoveValues<
+		{
+			readonly [K in keyof R]: R[K] extends WritableBox<infer _>
+			? never
+			: R[K] extends ReadableBox<infer T>
+			? T
+			: never;
+		},
+		never
+	>
 > &
 	RemoveValues<
 		{
@@ -156,6 +168,8 @@ type BoxFlatten<R extends Record<string, unknown>> = Expand<
  * const count = box(0)
  * const flat = box.flatten({ count, double: box.with(() => count.value) })
  * // type of flat is { count: number, readonly double: number }
+ * 
+ * @see {@link https://runed.dev/docs/functions/box}
  */
 function boxFlatten<R extends Record<string, unknown>>(boxes: R): BoxFlatten<R> {
 	return Object.entries(boxes).reduce<BoxFlatten<R>>((acc, [key, b]) => {
@@ -191,6 +205,8 @@ function boxFlatten<R extends Record<string, unknown>>(boxes: R): BoxFlatten<R> 
  * @example
  * const count = box(0) // WritableBox<number>
  * const countReadonly = box.readonly(count) // ReadableBox<number>
+ * 
+ * @see {@link https://runed.dev/docs/functions/box}
  */
 function toReadonlyBox<T>(b: ReadableBox<T>): ReadableBox<T> {
 	if (!box.isWritableBox(b)) return b;

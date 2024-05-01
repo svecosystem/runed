@@ -5,12 +5,12 @@ category: Browser
 ---
 
 <script>
-import { UseEventListenerDemo } from '$lib/components/demos';
+import Demo from '$lib/components/demos/use-event-listener.svelte';
 </script>
 
 ## Demo
 
-<UseEventListenerDemo />
+<Demo />
 
 ## Usage
 

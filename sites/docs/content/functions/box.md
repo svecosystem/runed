@@ -4,10 +4,6 @@ description: Box your state and take it anywhere
 category: State
 ---
 
-<script>
-import { UseActiveElementDemo } from '$lib/components/demos';
-</script>
-
 ## Description
 
 Runes for state are primitives. They provide a concise syntax for local reactivity. However, when we

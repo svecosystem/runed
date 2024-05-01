@@ -12,6 +12,8 @@ import type { FunctionArgs, MaybeGetter } from "$lib/internal/types.js";
  * The second parameter is the time to wait before calling the original callback.
  * Alternatively, it can also be a getter function that returns the time to wait.
  *
+ * 
+ * @see {@link https://runed.dev/docs/functions/use-debounce}
  */
 export function useDebounce<Callback extends FunctionArgs>(
 	callback: Callback,

@@ -5,12 +5,12 @@ category: Elements
 ---
 
 <script>
-import { UseActiveElementDemo } from '$lib/components/demos';
+import Demo from '$lib/components/demos/use-active-element.svelte';
 </script>
 
 ## Demo
 
-<UseActiveElementDemo />
+<Demo />
 
 ## Usage
 

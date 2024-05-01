@@ -5,12 +5,12 @@ category: Component
 ---
 
 <script>
-import { UseMountedDemo } from '$lib/components/demos';
+import Demo from '$lib/components/demos/use-mounted.svelte';
 </script>
 
 ## Demo
 
-<UseMountedDemo />
+<Demo />
 
 ## Usage
 
