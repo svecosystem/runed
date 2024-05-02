@@ -1,6 +1,6 @@
-import {  box } from "../box/box.svelte.js";
+import { box } from "../box/box.svelte.js";
 import { watch } from "../watch/watch.svelte.js";
-import type { MaybeBoxOrGetter,BoxOrGetter } from "$lib/internal/types.js";
+import type { MaybeBoxOrGetter, BoxOrGetter } from "$lib/internal/types.js";
 
 type UseStateHistoryOptions = {
 	capacity?: MaybeBoxOrGetter<number>;
@@ -17,7 +17,7 @@ type LogEvent<T> = {
  * @see {@link https://runed.dev/docs/functions/use-state-history}
  */
 export function useStateHistory<T>(_value: BoxOrGetter<T>, options?: UseStateHistoryOptions) {
-	const b = box.from(_value)
+	const b = box.from(_value);
 	const capacity = box.from(options?.capacity);
 
 	const log = box<LogEvent<T>[]>([]);
