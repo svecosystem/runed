@@ -24,18 +24,13 @@ const history = useStateHistory(count);
 history.log[0]; // { snapshot: 0, timestamp: ... }
 ```
 
-You can also use `box.with` to track existing $state.
+You can also pass a getter to track existing $state.
 
 ```ts
 import { box, useStateHistory } from "runed";
 
 let count = $state(0);
-const history = useStateHistory(
-	box.with(
-		() => count,
-		(c) => (count = c)
-	)
-);
+const history = useStateHistory(() => count);
 ```
 
 Besides `log`, the returned object contains `undo` and `redo` functionality.
