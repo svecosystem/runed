@@ -1,5 +1,5 @@
 ---
-"runed": patch
+"runed": minor
 ---
 
 feat: `useStateHistory` & `usePrevious`
