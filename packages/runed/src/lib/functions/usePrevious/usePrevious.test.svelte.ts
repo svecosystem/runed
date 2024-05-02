@@ -1,8 +1,5 @@
 import { describe } from "node:test";
 import { expect, test } from "vitest";
-// import { box } from "../index.js";
-// import { usePrevious } from "./usePrevious.svelte.js";
-// import { testWithEffect } from "$lib/test/util.svelte.js";
 
 // TODO: Find out why tests aren't working, even though the demo works
 describe("usePrevious", () => {

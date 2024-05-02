@@ -1,9 +1,12 @@
-import { it } from "vitest";
+import { test } from "vitest";
 
-export function testWithEffect(name: string, fn: () => void) {
-	it(name, async () => {
-		let promise: Promise<void> | void;
-		const cleanup = $effect.root(() => (promise = fn()));
+export function testWithEffect(name: string, fn: () => void | Promise<void>) {
+	test(name, async () => {
+		let promise: void | Promise<void>;
+		const cleanup = $effect.root(() => {
+			promise = fn();
+		});
+
 		try {
 			await promise!;
 		} finally {
