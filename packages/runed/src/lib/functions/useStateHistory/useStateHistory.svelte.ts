@@ -1,6 +1,6 @@
 import { box } from "../box/box.svelte.js";
 import { watch } from "../watch/watch.svelte.js";
-import type { MaybeBoxOrGetter, BoxOrGetter } from "$lib/internal/types.js";
+import type { BoxOrGetter, MaybeBoxOrGetter } from "$lib/internal/types.js";
 
 type UseStateHistoryOptions = {
 	capacity?: MaybeBoxOrGetter<number>;
