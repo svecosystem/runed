@@ -1,5 +1,13 @@
 # runed
 
+## 0.5.0
+
+### Minor Changes
+
+- feat: `useStateHistory` & `usePrevious` ([#33](https://github.com/svecosystem/runed/pull/33))
+
+- feat: `watch` helper ([#34](https://github.com/svecosystem/runed/pull/34))
+
 ## 0.4.1
 
 ### Patch Changes
