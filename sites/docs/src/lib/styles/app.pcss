@@ -14,8 +14,8 @@
 		--popover: 0 0% 98%;
 		--popover-foreground: 320 7% 8%;
 
-		--card: 0 0% 98%;
-		--card-foreground: 320 7% 8%;
+		--card: 320 4.8% 93%;
+		--card-foreground: 320 3.8% 34.1%;
 
 		--border: 320 5.9% 87%;
 		--input: 320 5.9% 90%;
@@ -35,6 +35,7 @@
 		--ring: 320 5.9% 64.9%;
 
 		--brand: 12 84% 44%;
+		--brand-btn: 12 84% 54%;
 
 		--radius: 0.5rem;
 	}
@@ -70,6 +71,7 @@
 		--ring: 240 4% 16%;
 
 		--brand: 12 84% 54%;
+		--brand-btn: 12 84% 44%;
 	}
 }
 
@@ -150,7 +152,7 @@
 	.hero-gradient {
 		background: radial-gradient(
 			circle 50vh at 50% 25%,
-			theme(colors.brand),
+			theme(colors.brand.DEFAULT),
 			theme(colors.background) 60%
 		);
 		filter: blur(180px);
