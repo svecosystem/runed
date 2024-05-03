@@ -64,8 +64,8 @@ function runWatcher<T>(
 				// values instead of `undefined` to allow destructuring.
 				//
 				// watch([a, b], ([a, b], [prevA, prevB]) => { ... });
-				if (previousValues === undefined && Array.isArray(values)) {
-					previousValues = Array(values.length).fill(undefined);
+				if (previousValues === undefined && Array.isArray(sources)) {
+					previousValues = Array(sources.length).fill(undefined);
 				}
 
 				cleanupEffect = untrack(() => effect(values, previousValues));

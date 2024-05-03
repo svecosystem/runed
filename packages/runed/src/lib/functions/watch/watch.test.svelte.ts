@@ -105,4 +105,13 @@ describe("watch", () => {
 
 		expect(runs).toBe(1);
 	});
+
+	testWithEffect("watchers with an array getter returns `undefined` as the previous value", () => {
+		watch(
+			() => [1, 2, 3],
+			(_, previous) => {
+				expect(previous).toBe(undefined);
+			}
+		);
+	});
 });
