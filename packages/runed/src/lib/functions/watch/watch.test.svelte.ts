@@ -5,7 +5,7 @@ import { testWithEffect } from "$lib/test/util.svelte.js";
 import { sleep } from "$lib/internal/utils/sleep.js";
 
 describe("watch", () => {
-	testWithEffect("watchers only tracks their dependencies", async () => {
+	testWithEffect("watchers only track their dependencies", async () => {
 		let count = $state(0);
 		let runs = $state(0);
 
@@ -106,7 +106,7 @@ describe("watch", () => {
 		expect(runs).toBe(1);
 	});
 
-	testWithEffect("watchers with an array getter returns `undefined` as the previous value", () => {
+	testWithEffect("watchers with an array getter pass `undefined` as the previous value", () => {
 		watch(
 			() => [1, 2, 3],
 			(_, previous) => {
