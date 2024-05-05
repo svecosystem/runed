@@ -1,8 +1,8 @@
 <script lang="ts">
-	import { usePrevious } from "runed";
+	import { Previous } from "runed";
 
 	let count = $state(0);
-	const previous = usePrevious(() => count);
+	const previous = new Previous(() => count);
 </script>
 
 <div class="rounded-md bg-card p-8">

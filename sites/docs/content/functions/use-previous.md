@@ -1,5 +1,5 @@
 ---
-title: usePrevious
+title: Previous
 description: Holds the previous value of a box or getter.
 category: State
 ---

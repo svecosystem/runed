@@ -1,5 +1,5 @@
 ---
-title: useStateHistory
+title: StateHistory
 description: Track the change history of a ref, also provides undo and redo functionality
 category: State
 ---
