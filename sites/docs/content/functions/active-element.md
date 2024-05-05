@@ -1,6 +1,6 @@
 ---
-title: useActiveElement
-description: A function that returns the currently active element.
+title: activeElement
+description: A box holding the currently active element.
 category: Elements
 ---
 
@@ -16,9 +16,7 @@ import Demo from '$lib/components/demos/use-active-element.svelte';
 
 ```svelte
 <script lang="ts">
-	import { useActiveElement } from "runed";
-
-	const activeElement = useActiveElement();
+	import { activeElement } from "runed";
 </script>
 
 <p>
