@@ -19,37 +19,35 @@ type StateHistoryOptions = {
  * @see {@link https://runed.dev/docs/functions/use-state-history}
  */
 export class StateHistory<T> {
-	redoStack = $state<LogEvent<T>[]>([])
+	#redoStack = $state<LogEvent<T>[]>([])
 	#ignoreUpdate = false
 	#set: Setter<T>
 	log = $state<LogEvent<T>[]>([])
 	canUndo = $derived(this.log.length > 1)
-	canRedo = $derived(this.redoStack.length > 0)
+	canRedo = $derived(this.#redoStack.length > 0)
 
 	constructor(value: MaybeGetter<T>, set: Setter<T>, options?: StateHistoryOptions) {
-		this.redoStack = []
+		this.#redoStack = []
 		this.#set = set
-		// eslint-disable-next-line ts/no-this-alias
-		const instance = this
 
-		function addEvent(event: LogEvent<T>) {
-			instance.log.push(event)
+		const addEvent = (event: LogEvent<T>) => {
+			this.log.push(event)
 			const capacity$ = get(options?.capacity)
-			if (capacity$ && instance.log.length > capacity$) {
-				instance.log = instance.log.slice(-capacity$)
+			if (capacity$ && this.log.length > capacity$) {
+				this.log = this.log.slice(-capacity$)
 			}
 		}
 
 		watch(
 			() => get(value),
 			(v) => {
-				if (instance.#ignoreUpdate) {
-					instance.#ignoreUpdate = false
+				if (this.#ignoreUpdate) {
+					this.#ignoreUpdate = false
 					return
 				}
 
 				addEvent({ snapshot: v, timestamp: new Date().getTime() })
-				instance.redoStack = []
+				this.#redoStack = []
 			}
 		)
 
@@ -57,7 +55,7 @@ export class StateHistory<T> {
 			() => get(options?.capacity),
 			(c) => {
 				if (!c) return
-				instance.log = instance.log.slice(-c)
+				this.log = this.log.slice(-c)
 			}
 		)
 	}
@@ -66,13 +64,13 @@ export class StateHistory<T> {
 		const [prev, curr] = this.log.slice(-2)
 		if (!curr || !prev) return
 		this.#ignoreUpdate = true
-		this.redoStack.push(curr)
+		this.#redoStack.push(curr)
 		this.log.pop()
 		this.#set(prev.snapshot)
 	}
 
 	redo = () => {
-		const nextEvent = this.redoStack.pop()
+		const nextEvent = this.#redoStack.pop()
 		if (!nextEvent) return
 		this.#ignoreUpdate = true
 		this.log.push(nextEvent)

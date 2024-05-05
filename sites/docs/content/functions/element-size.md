@@ -5,7 +5,7 @@ category: Elements
 ---
 
 <script>
-	import Demo from '$lib/components/demos/use-element-size.svelte';
+	import Demo from '$lib/components/demos/element-size.svelte';
 </script>
 
 ## Demo

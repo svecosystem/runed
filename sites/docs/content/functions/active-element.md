@@ -5,7 +5,7 @@ category: Elements
 ---
 
 <script>
-import Demo from '$lib/components/demos/use-active-element.svelte';
+import Demo from '$lib/components/demos/active-element.svelte';
 </script>
 
 ## Demo

@@ -5,7 +5,7 @@ category: State
 ---
 
 <script>
-import Demo from '$lib/components/demos/use-state-history.svelte';
+import Demo from '$lib/components/demos/state-history.svelte';
 </script>
 
 ## Demo

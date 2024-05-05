@@ -5,7 +5,7 @@ category: State
 ---
 
 <script>
-import Demo from '$lib/components/demos/use-previous.svelte';
+import Demo from '$lib/components/demos/previous.svelte';
 </script>
 
 ## Demo
@@ -16,13 +16,14 @@ import Demo from '$lib/components/demos/use-previous.svelte';
 
 ```svelte
 <script lang="ts">
-	import { usePrevious } from "runed";
+	import { Previous } from "runed";
 
 	let count = $state(0);
-	const previous = usePrevious(() => count);
+	const previous = new Previous(() => count);
 </script>
 
 <button onclick={() => count++}>Count: {count}</button>
-
 <pre>Previous: {`${previous.value}`}</pre>
+
+
 ```
