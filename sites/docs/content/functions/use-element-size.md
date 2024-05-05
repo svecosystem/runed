@@ -1,5 +1,5 @@
 ---
-title: useElementSize
+title: ElementSize
 description: A function that returns the size of an element.
 category: Elements
 ---
@@ -16,14 +16,12 @@ category: Elements
 
 ```svelte
 <script lang="ts">
-	import { useElementSize } from "runed";
+	import { ElementSize } from "runed";
 
 	let el = $state() as HTMLElement;
-	const size = useElementSize(() => el);
+	const size = new ElementSize(() => el);
 </script>
 
-<div>
-	<textarea bind:this={el} />
-	<p>Width: {size.width} Height: {size.height}</p>
-</div>
+<textarea bind:this={el}></textarea>
+<p>Width: {size.width} Height: {size.height}</p>
 ```

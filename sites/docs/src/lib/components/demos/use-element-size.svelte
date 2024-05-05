@@ -1,8 +1,8 @@
 <script lang="ts">
-	import { useElementSize } from "runed";
+	import { ElementSize } from "runed";
 
 	let el = $state() as HTMLElement;
-	const size = useElementSize(() => el);
+	const size = new ElementSize(() => el);
 	const text = $derived(`Width: ${size.width}\nHeight: ${size.height}`);
 </script>
 

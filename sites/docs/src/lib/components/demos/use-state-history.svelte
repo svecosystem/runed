@@ -1,12 +1,10 @@
 <script lang="ts">
-	import { box, useStateHistory } from "runed";
+	import { StateHistory } from "runed";
 
 	let count = $state(0);
-	const history = useStateHistory(
-		box.with(
-			() => count,
-			(c) => (count = c)
-		),
+	const history = new StateHistory(
+		() => count,
+		(c) => (count = c),
 		{ capacity: 10 }
 	);
 
