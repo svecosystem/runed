@@ -14,28 +14,14 @@ import Demo from '$lib/components/demos/state-history.svelte';
 
 ## Usage
 
-`useStateHistory` tracks a [`box's`](/docs/functions/box) value, logging each change into an array.
+`StateHistory` tracks a getter's return value, logging each change into an array. A setter is also required to use the `undo` and `redo` functions.
 
 ```ts
-import { box, useStateHistory } from "runed";
+import { StateHistory } from "runed";
 
-let count = box(0);
-const history = useStateHistory(count);
+let count = $state(0); 
+const history = new StateHistory(() => count, (c) => (count = c));
 history.log[0]; // { snapshot: 0, timestamp: ... }
-```
-
-You can also use `box.with` to track existing $state.
-
-```ts
-import { box, useStateHistory } from "runed";
-
-let count = $state(0);
-const history = useStateHistory(
-	box.with(
-		() => count,
-		(c) => (count = c)
-	)
-);
 ```
 
 Besides `log`, the returned object contains `undo` and `redo` functionality.
@@ -44,21 +30,19 @@ Besides `log`, the returned object contains `undo` and `redo` functionality.
 <script lang="ts">
 	import { box, useStateHistory } from "runed";
 
-	let count = box(0);
-	const history = useStateHistory(count);
+	let count = $state(0); 
+	const history = new StateHistory(() => count, (c) => (count = c));
 
 	function format(ts: number) {
 		return new Date(ts).toLocaleString();
 	}
 </script>
 
-<div>
-	<p>{count.value}</p>
+<p>{count}</p>
 
-	<button onclick={() => count.value++}>Increment</button>
-	<button onclick={() => count.value--}>Decrement</button>
+<button onclick={() => count++}>Increment</button>
+<button onclick={() => count--}>Decrement</button>
 
-	<button disabled={!history.canUndo} onclick={history.undo}>Undo</button>
-	<button disabled={!history.canRedo} onclick={history.redo}>Redo</button>
-</div>
+<button disabled={!history.canUndo} onclick={history.undo}>Undo</button>
+<button disabled={!history.canRedo} onclick={history.redo}>Redo</button>
 ```

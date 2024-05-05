@@ -1,5 +1,5 @@
 ---
-title: useSupported
+title: IsSupported
 description: Determine if a feature is supported by the environment before using it.
 category: Utilities
 ---
@@ -8,9 +8,9 @@ category: Utilities
 
 ```svelte
 <script lang="ts">
-	import { useSupported } from "runed";
+	import { IsSupported } from "runed";
 
-	const isSupported = useSupported(() => navigator && "geolocation" in navigator);
+	const isSupported = new IsSupported(() => navigator && "geolocation" in navigator);
 
 	if (isSupported.value) {
 		// Do something with the geolocation API

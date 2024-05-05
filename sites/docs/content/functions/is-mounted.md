@@ -1,11 +1,11 @@
 ---
-title: useMounted
-description: A function that returns the mounted state of the component it's called in.
+title: IsMounted
+description: A class that returns the mounted state of the component it's called in.
 category: Component
 ---
 
 <script>
-import Demo from '$lib/components/demos/use-mounted.svelte';
+import Demo from '$lib/components/demos/is-mounted.svelte';
 </script>
 
 ## Demo
@@ -16,9 +16,9 @@ import Demo from '$lib/components/demos/use-mounted.svelte';
 
 ```svelte
 <script lang="ts">
-	import { useMounted } from "runed";
+	import { IsMounted } from "runed";
 
-	const isMounted = useMounted();
+	const isMounted = new IsMounted();
 </script>
 ```
 
@@ -26,10 +26,9 @@ Which is a shorthand for one of the following:
 
 ```svelte
 <script lang="ts">
-	import { box } from "runed";
 	import { onMount } from "svelte";
 
-	const isMounted = box(false);
+	const isMounted = $state({value: false});
 
 	onMount(() => {
 		isMounted.value = true;
@@ -44,7 +43,7 @@ or
 	import { box } from "runed";
 	import { untrack } from "svelte";
 
-	const isMounted = box(false);
+	const isMounted = $state({value: false});
 
 	$effect(() => {
 		untrack(() => (isMounted.value = true));
