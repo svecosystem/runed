@@ -51,7 +51,7 @@
 		"@vitest/coverage-v8": "^1.5.1",
 		"jsdom": "^24.0.0",
 		"publint": "^0.1.9",
-		"svelte": "^5.0.0-next.110",
+		"svelte": "^5.0.0-next.123",
 		"svelte-check": "^3.6.0",
 		"tslib": "^2.4.1",
 		"typescript": "^5.0.0",

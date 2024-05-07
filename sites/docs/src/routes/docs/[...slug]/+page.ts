@@ -12,3 +12,5 @@ export const load: PageLoad = async (event) => {
 		...event.data,
 	};
 };
+
+export const ssr = false
