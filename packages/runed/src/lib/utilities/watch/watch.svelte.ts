@@ -33,7 +33,10 @@ export type WatchOptions = {
 
 function runWatcher<T>(
 	sources: Getter<T>,
-	effect: (value: T, previousValue?: T) => void | (() => void),
+	effect: (
+		value: T,
+		previousValue: T extends unknown[] ? T | [] : T | undefined
+	) => void | (() => void),
 	flush: "pre" | "post",
 	options: WatchOptions = {}
 ) {
@@ -42,7 +45,7 @@ function runWatcher<T>(
 	const cleanupRoot = $effect.root(() => {
 		let initialRun = true;
 		let stopEffect = false;
-		let previousValues: T | undefined;
+		let previousValues: T | [] | undefined;
 		runEffect(flush, () => {
 			if (stopEffect) {
 				cleanupRoot();
@@ -58,10 +61,11 @@ function runWatcher<T>(
 				//
 				// watch(() => [a, b], ([a, b], [prevA, prevB]) => { ... });
 				if (previousValues === undefined && Array.isArray(values)) {
-					previousValues = [] as T;
+					previousValues = [];
 				}
 
-				cleanupEffect = untrack(() => effect(values, previousValues));
+				// eslint-disable-next-line ts/no-explicit-any
+				cleanupEffect = untrack(() => effect(values, previousValues as any));
 
 				if (once) {
 					stopEffect = true;
@@ -84,44 +88,24 @@ function runWatcher<T>(
 	});
 }
 
-export function watch<T extends unknown[]>(
-	source: Getter<T>,
-	effect: (value: T, previousValue: T | []) => void | (() => void),
-	options?: WatchOptions
-): void;
-
-export function watch<T>(
-	source: Getter<T>,
-	effect: (value: T, previousValue?: T) => void | (() => void),
-	options?: WatchOptions
-): void;
-
 export function watch<T>(
 	sources: Getter<T>,
-	effect: (value: T, previousValue?: T) => void | (() => void),
+	effect: (
+		value: T,
+		previousValue: T extends unknown[] ? T | [] : T | undefined
+	) => void | (() => void),
 	options?: WatchOptions
 ): void {
 	runWatcher(sources, effect, "post", options);
 }
 
-export function watchPre<T extends unknown[]>(
-	source: Getter<T>,
-	effect: (value: T, previousValue: T | []) => void | (() => void),
-	options?: WatchOptions
-): void;
-
-export function watchPre<T>(
-	source: Getter<T>,
-	effect: (value: T, previousValue?: T) => void | (() => void),
-	options?: WatchOptions
-): void;
-
-export function watchPre<T>(
+watch.pre = function <T>(
 	sources: Getter<T>,
-	effect: (value: T, previousValue?: T) => void | (() => void),
+	effect: (
+		value: T,
+		previousValue: T extends unknown[] ? T | [] : T | undefined
+	) => void | (() => void),
 	options?: WatchOptions
 ): void {
 	runWatcher(sources, effect, "pre", options);
-}
-
-watch.pre = watchPre;
+};
