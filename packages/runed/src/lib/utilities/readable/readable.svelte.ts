@@ -1,21 +1,16 @@
-type MaybeCallback = (() => void) | undefined;
-type StartFn = (update: () => void) => MaybeCallback;
-
+import { tick } from "svelte";
 
 /**
- * A function that returns an object with a reactive `current` property that is equal to the 
- * return value of the first function passed to it. 
+ * A class that contains a reactive `current` property 
  * 
- * Accepts a second `start` function which receives an `update` callback, that should be 
- * called whenever the getter function should be re-evaluated.
- * 
- * Useful to create reactive objects without relying on leaky effects.
+ * Accepts an initial value, and an optional `start` function, which has a `set` function as its first argument, 
+ * which is used to update the value of the `current` property.
  * 
  * @example
  * ```html
  * <script>
- * const now = readable(() => new Date(), (update) => {
- * 	const interval = setInterval(() => update(), 1000);
+ * const now = new Readable(new Date(), (set) => {
+ * 	const interval = setInterval(() => set(new Date()), 1000);
  * 	return () => clearInterval(interval);
  * });
  * </script>
@@ -26,30 +21,54 @@ type StartFn = (update: () => void) => MaybeCallback;
  * @see {@link https://runed.dev/docs/utilities/readable}
  *
  */
-export function readable<ReturnType>(fn: () => ReturnType, start: StartFn) {
-  let version = $state(0);
-  let listeners = 0;
-  let stop: MaybeCallback
+export type StartNotifier<TValue> = (set: (value: TValue) => void) => VoidFunction;
 
-  return {
-    get current() {
-      if ($effect.active()) {
-        $effect(() => {
-          if (listeners++ === 0) {
-            stop = start(() => version++);
-          }
+export class Readable<TValue> {
+  #current = $state() as TValue;
+  #start: StartNotifier<TValue>;
 
-          return () => {
-            if (--listeners === 0) {
-              stop?.();
+  constructor(initialValue: TValue, start: StartNotifier<TValue>) {
+    this.#current = initialValue;
+    this.#start = start;
+  }
+
+  #subscribers = 0;
+  #stop: VoidFunction | null = null;
+
+  get current(): TValue {
+    if ($effect.active()) {
+      $effect(() => {
+        this.#subscribers++;
+        if (this.#subscribers === 1) {
+          this.#subscribe();
+        }
+
+        return () => {
+          tick().then(() => {
+            this.#subscribers--;
+            if (this.#subscribers === 0) {
+              this.#unsubscribe();
             }
-          }
-        });
-      }
-
-      // eslint-disable-next-line no-unused-expressions -- Add this to deps
-      version;
-      return fn();
+          });
+        };
+      });
     }
-  };
+
+    return this.#current;
+  }
+
+  #subscribe() {
+    this.#stop = this.#start((value) => {
+      this.#current = value;
+    });
+  }
+
+  #unsubscribe() {
+    if (this.#stop === null) {
+      return;
+    }
+
+    this.#stop();
+    this.#stop = null;
+  }
 }

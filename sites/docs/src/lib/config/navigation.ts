@@ -23,6 +23,7 @@ export type Navigation = {
 };
 
 const CATEGORIES = [
+	"New",
 	"Reactivity",
 	"State",
 	"Elements",
