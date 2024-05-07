@@ -1,5 +1,5 @@
 ---
-title: Watch
+title: watch
 description: Watch for changes and run a callback
 category: Reactivity
 ---
@@ -25,19 +25,11 @@ tracked.
 Runs a callback whenever one of the sources change.
 
 ```ts
-import { watch, box } from "runed";
+import { watch } from "runed";
 
 let count = $state(0);
-watch(
-	() => count,
-	() => {
-		console.log(count);
-	}
-);
-
-let double = box.with(() => count * 2);
-watch(double, () => {
-	console.log(double.value);
+watch(() => count, () => {
+	console.log(count);
 });
 ```
 
@@ -54,8 +46,8 @@ watch([() => age, () => name], () => {
 The callback receives two arguments: The current value of the sources, and the previous value.
 
 ```ts
-let count = box(0);
-watch(count, (curr, prev) => {
+let count = $state(0);
+watch(() => count, (curr, prev) => {
 	console.log(`count is ${curr}, was ${prev}`);
 });
 ```

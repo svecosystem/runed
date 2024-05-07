@@ -6,7 +6,7 @@ import { testWithEffect } from "$lib/test/util.svelte.js";
 // Skipping because testing is weird
 describe.skip("useActiveElement", () => {
   testWithEffect("initializes with `document.activeElement`", () => {
-    expect(activeElement.value).toBe(document.activeElement);
+    expect(activeElement.current).toBe(document.activeElement);
   });
   testWithEffect("updates accordingly when `document.activeElement` element changes", async () => {
     const input = document.createElement("input");
@@ -15,6 +15,6 @@ describe.skip("useActiveElement", () => {
 
     await tick();
     expect(document.activeElement).toBe(input);
-    expect(activeElement.value).toBe(input);
+    expect(activeElement.current).toBe(input);
   });
 });

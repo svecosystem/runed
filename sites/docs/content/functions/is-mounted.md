@@ -28,10 +28,10 @@ Which is a shorthand for one of the following:
 <script lang="ts">
 	import { onMount } from "svelte";
 
-	const isMounted = $state({value: false});
+	const isMounted = $state({ current: false });
 
 	onMount(() => {
-		isMounted.value = true;
+		isMounted.current = true;
 	});
 </script>
 ```
@@ -40,13 +40,12 @@ or
 
 ```svelte
 <script lang="ts">
-	import { box } from "runed";
 	import { untrack } from "svelte";
 
-	const isMounted = $state({value: false});
+	const isMounted = $state({ current: false });
 
 	$effect(() => {
-		untrack(() => (isMounted.value = true));
+		untrack(() => (isMounted.current = true));
 	});
 </script>
 ```

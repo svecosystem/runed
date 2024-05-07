@@ -14,20 +14,35 @@ import Demo from '$lib/components/demos/use-event-listener.svelte';
 
 ## Usage
 
-```svelte
-<script lang="ts">
-	import { useEventListener } from "runed";
+This is better utilized in elements that you don't have direct control over. Otherwise, use normal
+event listeners.
 
-	let count = $state(0);
-	function increment() {
-		count++;
+For example, if you want to listen to a click event on the body, and can't use `<svelte:body />`, or
+you have an element reference that was passed down.
+
+```ts
+// ClickLogger.ts
+import { useEventListener } from "runed";
+
+export class ClickLogger() {
+	#clicks = $state(0)
+
+	constructor() {
+		useEventListener(document.body, "click", () => count++);
 	}
 
-	let wrapper = $state<HTMLElement>();
-	useEventListener(() => wrapper, "click", increment);
+	get clicks() {
+		return this.#clicks
+	}
+}
+```
+
+```svelte
+<script lang="ts">
+	import { ClickLogger } from "./ClickLogger.ts";
+
+	const logger = new ClickLogger();
 </script>
 
-<div bind:this={wrapper}>
-	<p>You've clicked {count} {count === 1 ? "time" : "times"}</p>
-</div>
+<p>You've clicked the document {logger.clicks} {logger.clicks === 1 ? "time" : "times"}</p>
 ```

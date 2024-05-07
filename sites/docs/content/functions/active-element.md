@@ -1,6 +1,6 @@
 ---
 title: activeElement
-description: A box holding the currently active element.
+description: An object holding the currently active element.
 category: Elements
 ---
 
@@ -21,6 +21,6 @@ import Demo from '$lib/components/demos/active-element.svelte';
 
 <p>
 	Currently active element:
-	{activeElement.value?.localName ?? "No active element found"}
+	{activeElement.current?.localName ?? "No active element found"}
 </p>
 ```

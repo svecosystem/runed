@@ -1,5 +1,4 @@
-import { box } from "../box/box.svelte.js";
-import type { MaybeBoxOrGetter, MaybeGetter } from "$lib/internal/types.js";
+import type { MaybeGetter } from "$lib/internal/types.js";
 import { get } from "$lib/internal/utils/get.js";
 
 export type ElementSizeOptions = {

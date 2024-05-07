@@ -1,5 +1,5 @@
-import { box } from "../box/box.svelte.js";
-import type { MaybeBoxOrGetter } from "$lib/internal/types.js";
+import { extract } from "../extract/extract.js";
+import type { MaybeGetter } from "$lib/internal/types.js";
 import { addEventListener } from "$lib/internal/utils/event.js";
 
 /**
@@ -12,14 +12,14 @@ import { addEventListener } from "$lib/internal/utils/event.js";
  * @see {@link https://runed.dev/docs/functions/use-event-listener}
  */
 export function useEventListener<TEvent extends keyof WindowEventMap>(
-	target: MaybeBoxOrGetter<Window | null | undefined>,
+	target: MaybeGetter<Window | null | undefined>,
 	event: TEvent | TEvent[],
 	handler: (this: Window, event: WindowEventMap[TEvent]) => unknown,
 	options?: boolean | AddEventListenerOptions
 ): void;
 
 export function useEventListener<TEvent extends keyof DocumentEventMap>(
-	target: MaybeBoxOrGetter<Document | null | undefined>,
+	target: MaybeGetter<Document | null | undefined>,
 	event: TEvent | TEvent[],
 	handler: (this: Document, event: DocumentEventMap[TEvent]) => unknown,
 	options?: boolean | AddEventListenerOptions
@@ -38,7 +38,7 @@ export function useEventListener<
 	TElement extends HTMLElement,
 	TEvent extends keyof HTMLElementEventMap,
 >(
-	target: MaybeBoxOrGetter<TElement | null | undefined>,
+	target: MaybeGetter<TElement | null | undefined>,
 	event: TEvent | TEvent[],
 	handler: (this: TElement, event: HTMLElementEventMap[TEvent]) => unknown,
 	options?: boolean | AddEventListenerOptions
@@ -54,22 +54,22 @@ export function useEventListener<
  * @see {@link https://runed.dev/docs/functions/use-event-listener}
  */
 export function useEventListener(
-	target: MaybeBoxOrGetter<EventTarget | null | undefined>,
+	target: MaybeGetter<EventTarget | null | undefined>,
 	event: string | string[],
 	handler: EventListenerOrEventListenerObject,
 	options?: boolean | AddEventListenerOptions
 ): void;
 
 export function useEventListener(
-	_target: MaybeBoxOrGetter<EventTarget | null | undefined>,
+	_target: MaybeGetter<EventTarget | null | undefined>,
 	event: string | string[],
 	handler: EventListenerOrEventListenerObject,
 	options?: boolean | AddEventListenerOptions
 ): void {
-	const target = box.from(_target);
 
 	$effect(() => {
-		if (target.value === undefined || target.value === null) return;
-		return addEventListener(target.value, event, handler, options);
+		const target = extract(_target);
+		if (target === undefined || target === null) return;
+		return addEventListener(target, event, handler, options);
 	});
 }

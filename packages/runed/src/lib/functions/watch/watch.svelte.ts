@@ -1,6 +1,5 @@
 import { untrack } from "svelte";
-import type { ReadableBox } from "../box/box.svelte.js";
-import { unbox } from "../unbox/unbox.js";
+import { extract } from "../extract/extract.js";
 import { isFunction } from "$lib/internal/utils/is.js";
 import type { Getter } from "$lib/internal/types.js";
 
@@ -17,7 +16,6 @@ function runEffect(flush: "pre" | "post", effect: () => void | (() => void)) {
 	}
 }
 
-export type WatchSource<T> = ReadableBox<T> | Getter<T>;
 
 export type WatchOptions = {
 	/**
@@ -36,7 +34,7 @@ export type WatchOptions = {
 };
 
 function runWatcher<T>(
-	sources: WatchSource<T> | WatchSource<T>[],
+	sources: Getter<T> | Getter<T>[],
 	effect: (
 		values: T | Array<T>,
 		previousValues: T | undefined | Array<T | undefined>
@@ -56,7 +54,7 @@ function runWatcher<T>(
 				return;
 			}
 
-			const values = Array.isArray(sources) ? sources.map(unbox) : unbox(sources);
+			const values = Array.isArray(sources) ? sources.map(s => extract(s)) : extract(sources);
 
 			let cleanupEffect: void | (() => void);
 			if (!lazy || !initialRun) {
@@ -92,19 +90,19 @@ function runWatcher<T>(
 }
 
 export function watch<T>(
-	source: WatchSource<T>,
+	source: Getter<T>,
 	effect: (value: T, previousValue: T | undefined) => void | (() => void),
 	options?: WatchOptions
 ): void;
 
 export function watch<T extends unknown[]>(
-	sources: { [K in keyof T]: WatchSource<T[K]> },
+	sources: { [K in keyof T]: Getter<T[K]> },
 	effect: (values: T, previousValues: { [K in keyof T]: T[K] | undefined }) => void | (() => void),
 	options?: WatchOptions
 ): void;
 
 export function watch<T>(
-	sources: WatchSource<T> | Array<WatchSource<T>>,
+	sources: Getter<T> | Array<Getter<T>>,
 	effect: (
 		values: T | Array<T>,
 		previousValues: T | undefined | Array<T | undefined>
@@ -115,19 +113,19 @@ export function watch<T>(
 }
 
 function watchPre<T>(
-	source: WatchSource<T>,
+	source: Getter<T>,
 	effect: (value: T, previousValue: T | undefined) => void | (() => void),
 	options?: WatchOptions
 ): void;
 
 function watchPre<T extends unknown[]>(
-	sources: { [K in keyof T]: WatchSource<T[K]> },
+	sources: { [K in keyof T]: Getter<T[K]> },
 	effect: (values: T, previousValues: { [K in keyof T]: T[K] | undefined }) => void | (() => void),
 	options?: WatchOptions
 ): void;
 
 function watchPre<T>(
-	sources: WatchSource<T> | Array<WatchSource<T>>,
+	sources: Getter<T> | Array<Getter<T>>,
 	effect: (
 		values: T | Array<T>,
 		previousValues: T | undefined | Array<T | undefined>

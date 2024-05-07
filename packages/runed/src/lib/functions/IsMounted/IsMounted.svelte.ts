@@ -1,7 +1,7 @@
 import { untrack } from "svelte";
 
 /**
- * Returns a box with the mounted state of the component
+ * Returns an object with the mounted state of the component
  * that invokes this function.
  *
  * @see {@link https://runed.dev/docs/functions/use-mounted}
@@ -19,7 +19,7 @@ export class IsMounted {
 		})
 	}
 
-	get value() {
+	get current() {
 		return this.#isMounted
 	}
 }

@@ -12,5 +12,5 @@ px-3 py-1.5 text-sm font-medium transition-all hover:bg-brand/25 focus:outline-n
 		onclick={() => count++}>Count: {count}</button
 	>
 
-	<pre class="m-0 mt-4 bg-transparent p-0 font-mono">Previous: {`${previous.value}`}</pre>
+	<pre class="m-0 mt-4 bg-transparent p-0 font-mono">Previous: {`${previous.current}`}</pre>
 </div>

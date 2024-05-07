@@ -1,6 +1,6 @@
 ---
 title: Previous
-description: Holds the previous value of a box or getter.
+description: Holds the previous value of a getter.
 category: State
 ---
 
@@ -22,8 +22,8 @@ import Demo from '$lib/components/demos/previous.svelte';
 	const previous = new Previous(() => count);
 </script>
 
-<button onclick={() => count++}>Count: {count}</button>
-<pre>Previous: {`${previous.value}`}</pre>
-
-
+<div>
+	<button onclick={() => count++}>Count: {count}</button>
+	<pre>Previous: {`${previous.current}`}</pre>
+</div>
 ```

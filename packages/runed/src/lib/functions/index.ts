@@ -1,4 +1,3 @@
-export * from "./box/index.js";
 export * from "./activeElement/index.js";
 export * from "./useDebounce/index.js";
 export * from "./ElementSize/index.js";

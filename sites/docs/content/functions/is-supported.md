@@ -12,7 +12,7 @@ category: Utilities
 
 	const isSupported = new IsSupported(() => navigator && "geolocation" in navigator);
 
-	if (isSupported.value) {
+	if (isSupported.current) {
 		// Do something with the geolocation API
 	}
 </script>

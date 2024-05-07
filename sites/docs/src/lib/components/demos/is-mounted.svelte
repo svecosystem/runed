@@ -5,5 +5,5 @@
 </script>
 
 <div class="rounded-md bg-card p-8">
-	<p>Mounted: <b>{isMounted.value ? "true" : "false"}</b></p>
+	<p>Mounted: <b>{isMounted.current ? "true" : "false"}</b></p>
 </div>

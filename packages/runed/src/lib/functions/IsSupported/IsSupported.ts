@@ -6,15 +6,15 @@
  * @see {@link https://runed.dev/docs/functions/use-supported}
  */
 export class IsSupported {
-	#value = $state(false);
+	#current = $state(false);
 
 	constructor(predicate: () => boolean) {
 		$effect(() => {
-			this.#value = predicate();
+			this.#current = predicate();
 		});
 	}
 
-	get value() {
-		return this.#value;
+	get current() {
+		return this.#current;
 	}
 }
