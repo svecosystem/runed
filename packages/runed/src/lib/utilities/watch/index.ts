@@ -1,1 +1,1 @@
-export { watch, type WatchSource, type WatchOptions } from "./watch.svelte.js";
+export { watch, type WatchOptions } from "./watch.svelte.js";
