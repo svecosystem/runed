@@ -4,7 +4,7 @@ import { testWithEffect } from "$lib/test/util.svelte.js";
 import { sleep } from "$lib/internal/utils/sleep.js";
 
 describe("watch", () => {
-	testWithEffect("watchers only tracks their dependencies", async () => {
+	testWithEffect("watchers only track their dependencies", async () => {
 		let count = $state(0);
 		let runs = $state(0);
 
@@ -20,25 +20,47 @@ describe("watch", () => {
 			expect(runs).toBe(1);
 		});
 
-		count = 1;
+		count++;
 		await vi.waitFor(() => {
 			expect(runs).toBe(2);
 		});
 	});
 
-	testWithEffect("watchers track getters", () => {
-		let count = $state(0);
+	testWithEffect("watchers initially pass `undefined` as the previous value", () => {
+		const count = $state(0);
 
-		watch([() => count], ([count], [prevCount]) => {
-			expect(count).toBe(0);
-			expect(prevCount).toBe(undefined);
-		});
+		watch(
+			() => count,
+			(count, prevCount) => {
+				expect(count).toBe(0);
+				expect(prevCount).toBe(undefined);
+			}
+		);
 	});
 
 	testWithEffect(
-		"lazy watchers correctly pass the initial values as the previous values",
+		"watchers with an array initially pass an empty array as the previous value",
+		() => {
+			const count = $state(1);
+			const doubled = $derived(count * 2);
+
+			watch(
+				() => [count, doubled],
+				([count, doubled], [prevCount, prevDoubled]) => {
+					expect(count).toBe(1);
+					expect(prevCount).toBe(undefined);
+
+					expect(doubled).toBe(2);
+					expect(prevDoubled).toBe(undefined);
+				}
+			);
+		}
+	);
+
+	testWithEffect(
+		"lazy watchers correctly pass the initial value as the previous value",
 		async () => {
-			let count = $state(0);
+			const count = $state(0);
 
 			watch(
 				() => count,
@@ -49,11 +71,10 @@ describe("watch", () => {
 				{ lazy: true }
 			);
 		}
-
 	);
 
 	testWithEffect("watchers with `{ once: true }` only run once", async () => {
-		let count = $state(0)
+		let count = $state(0);
 
 		let runs = 0;
 		watch(

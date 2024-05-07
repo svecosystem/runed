@@ -1,5 +1,4 @@
 import { untrack } from "svelte";
-import { extract } from "../extract/extract.js";
 import { isFunction } from "$lib/internal/utils/is.js";
 import type { Getter } from "$lib/internal/types.js";
 
@@ -15,7 +14,6 @@ function runEffect(flush: "pre" | "post", effect: () => void | (() => void)) {
 		}
 	}
 }
-
 
 export type WatchOptions = {
 	/**
@@ -34,36 +32,33 @@ export type WatchOptions = {
 };
 
 function runWatcher<T>(
-	sources: Getter<T> | Getter<T>[],
-	effect: (
-		values: T | Array<T>,
-		previousValues: T | undefined | Array<T | undefined>
-	) => void | (() => void),
+	sources: Getter<T>,
+	effect: (value: T, previousValue?: T) => void | (() => void),
 	flush: "pre" | "post",
-	options: WatchOptions
+	options: WatchOptions = {}
 ) {
 	const { lazy = false, once = false } = options;
 
 	const cleanupRoot = $effect.root(() => {
 		let initialRun = true;
 		let stopEffect = false;
-		let previousValues: T | undefined | Array<T | undefined>;
+		let previousValues: T | undefined;
 		runEffect(flush, () => {
 			if (stopEffect) {
 				cleanupRoot();
 				return;
 			}
 
-			const values = Array.isArray(sources) ? sources.map(s => extract(s)) : extract(sources);
+			const values = sources();
 
 			let cleanupEffect: void | (() => void);
 			if (!lazy || !initialRun) {
-				// On the first run, if this fn received an array, pass an array of `undefined`
-				// values instead of `undefined` to allow destructuring.
+				// On the first run, if this fn received an array, pass an empty array
+				// instead of `undefined` to allow destructuring.
 				//
-				// watch([a, b], ([a, b], [prevA, prevB]) => { ... });
+				// watch(() => [a, b], ([a, b], [prevA, prevB]) => { ... });
 				if (previousValues === undefined && Array.isArray(values)) {
-					previousValues = Array(values.length).fill(undefined);
+					previousValues = [] as T;
 				}
 
 				cleanupEffect = untrack(() => effect(values, previousValues));
@@ -89,48 +84,42 @@ function runWatcher<T>(
 	});
 }
 
+export function watch<T extends unknown[]>(
+	source: Getter<T>,
+	effect: (value: T, previousValue: T | []) => void | (() => void),
+	options?: WatchOptions
+): void;
+
 export function watch<T>(
 	source: Getter<T>,
-	effect: (value: T, previousValue: T | undefined) => void | (() => void),
-	options?: WatchOptions
-): void;
-
-export function watch<T extends unknown[]>(
-	sources: { [K in keyof T]: Getter<T[K]> },
-	effect: (values: T, previousValues: { [K in keyof T]: T[K] | undefined }) => void | (() => void),
+	effect: (value: T, previousValue?: T) => void | (() => void),
 	options?: WatchOptions
 ): void;
 
 export function watch<T>(
-	sources: Getter<T> | Array<Getter<T>>,
-	effect: (
-		values: T | Array<T>,
-		previousValues: T | undefined | Array<T | undefined>
-	) => void | (() => void),
-	options: WatchOptions = {}
+	sources: Getter<T>,
+	effect: (value: T, previousValue?: T) => void | (() => void),
+	options?: WatchOptions
 ): void {
 	runWatcher(sources, effect, "post", options);
 }
 
-function watchPre<T>(
+export function watchPre<T extends unknown[]>(
 	source: Getter<T>,
-	effect: (value: T, previousValue: T | undefined) => void | (() => void),
+	effect: (value: T, previousValue: T | []) => void | (() => void),
 	options?: WatchOptions
 ): void;
 
-function watchPre<T extends unknown[]>(
-	sources: { [K in keyof T]: Getter<T[K]> },
-	effect: (values: T, previousValues: { [K in keyof T]: T[K] | undefined }) => void | (() => void),
+export function watchPre<T>(
+	source: Getter<T>,
+	effect: (value: T, previousValue?: T) => void | (() => void),
 	options?: WatchOptions
 ): void;
 
-function watchPre<T>(
-	sources: Getter<T> | Array<Getter<T>>,
-	effect: (
-		values: T | Array<T>,
-		previousValues: T | undefined | Array<T | undefined>
-	) => void | (() => void),
-	options: WatchOptions = {}
+export function watchPre<T>(
+	sources: Getter<T>,
+	effect: (value: T, previousValue?: T) => void | (() => void),
+	options?: WatchOptions
 ): void {
 	runWatcher(sources, effect, "pre", options);
 }
