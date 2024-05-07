@@ -16,7 +16,7 @@ type StateHistoryOptions = {
 /**
  * Tracks the change history of a value, providing undo and redo capabilities.
  *
- * @see {@link https://runed.dev/docs/functions/use-state-history}
+ * @see {@link https://runed.dev/docs/utilities/use-state-history}
  */
 export class StateHistory<T> {
 	#redoStack = $state<LogEvent<T>[]>([])

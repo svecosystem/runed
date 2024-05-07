@@ -13,7 +13,7 @@ import type { FunctionArgs, MaybeGetter } from "$lib/internal/types.js";
  * Alternatively, it can also be a getter function that returns the time to wait.
  *
  *
- * @see {@link https://runed.dev/docs/functions/use-debounce}
+ * @see {@link https://runed.dev/docs/utilities/use-debounce}
  */
 export function useDebounce<Callback extends FunctionArgs>(
 	callback: Callback,

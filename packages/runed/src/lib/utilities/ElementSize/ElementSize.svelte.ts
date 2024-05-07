@@ -18,7 +18,7 @@ export type ElementSizeOptions = {
  *
  * @returns an object with `width` and `height` properties.
  *
- * @see {@link https://runed.dev/docs/functions/use-element-size}
+ * @see {@link https://runed.dev/docs/utilities/use-element-size}
  */
 export class ElementSize {
 	#size = $state({

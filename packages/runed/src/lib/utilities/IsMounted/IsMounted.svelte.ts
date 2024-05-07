@@ -4,7 +4,7 @@ import { untrack } from "svelte";
  * Returns an object with the mounted state of the component
  * that invokes this function.
  *
- * @see {@link https://runed.dev/docs/functions/use-mounted}
+ * @see {@link https://runed.dev/docs/utilities/use-mounted}
  */
 export class IsMounted {
 	#isMounted = $state(false)

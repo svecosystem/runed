@@ -23,7 +23,7 @@ type StartFn = (update: () => void) => MaybeCallback;
  * <p>{now.current.toLocaleTimeString()}</p>
  * ```
  * 
- * @see {@link https://runed.dev/docs/functions/readable}
+ * @see {@link https://runed.dev/docs/utilities/readable}
  *
  */
 export function readable<ReturnType>(fn: () => ReturnType, start: StartFn) {

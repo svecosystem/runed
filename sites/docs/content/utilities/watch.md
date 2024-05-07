@@ -16,7 +16,7 @@ _shouldn't_ be tracked, but it doesn't provide a way to say that _only certain v
 tracked.
 
 `watch` does exactly that. It accepts one or more sources, which can be `getters` or
-[`boxes`](http://localhost:5173/docs/functions/box).
+[`boxes`](http://localhost:5173/docs/utilities/box).
 
 ## Usage
 

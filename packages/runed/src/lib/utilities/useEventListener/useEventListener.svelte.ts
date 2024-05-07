@@ -9,7 +9,7 @@ import { addEventListener } from "$lib/internal/utils/event.js";
  * @param handler The function to be called when the event is triggered.
  * @param options An optional object that specifies characteristics about the event listener.
  *
- * @see {@link https://runed.dev/docs/functions/use-event-listener}
+ * @see {@link https://runed.dev/docs/utilities/use-event-listener}
  */
 export function useEventListener<TEvent extends keyof WindowEventMap>(
 	target: MaybeGetter<Window | null | undefined>,
@@ -32,7 +32,7 @@ export function useEventListener<TEvent extends keyof DocumentEventMap>(
  * @param handler The function to be called when the event is triggered.
  * @param options An optional object that specifies characteristics about the event listener.
  *
- * @see {@link https://runed.dev/docs/functions/use-event-listener}
+ * @see {@link https://runed.dev/docs/utilities/use-event-listener}
  */
 export function useEventListener<
 	TElement extends HTMLElement,
@@ -51,7 +51,7 @@ export function useEventListener<
  * @param handler The function to be called when the event is triggered.
  * @param options An optional object that specifies characteristics about the event listener.
  *
- * @see {@link https://runed.dev/docs/functions/use-event-listener}
+ * @see {@link https://runed.dev/docs/utilities/use-event-listener}
  */
 export function useEventListener(
 	target: MaybeGetter<EventTarget | null | undefined>,
