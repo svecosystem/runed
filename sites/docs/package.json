@@ -1,4 +1,21 @@
 {
+	"name": "docs",
+	"description": "Docs for Runed",
+	"version": "0.0.0",
+	"private": true,
+	"scripts": {
+		"dev": "concurrently \"pnpm:dev:content\" \"pnpm:dev:svelte\"",
+		"dev:content": "contentlayer dev",
+		"dev:svelte": "vite dev --host",
+		"build": "contentlayer build && vite build",
+		"build:all": "pnpm -w build",
+		"build:content": "contentlayer build",
+		"build:content-cachebust": "contentlayer build --clearCache",
+		"preview": "vite preview",
+		"check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
+		"sync": "svelte-kit sync"
+	},
+	"license": "MIT",
 	"contributors": [
 		{
 			"name": "Thomas G. Lopes",
@@ -9,16 +26,10 @@
 			"url": "https://github.com/huntabyte"
 		}
 	],
-	"dependencies": {
-		"@melt-ui/svelte": "^0.74.0",
-		"bits-ui": "^0.21.5",
-		"mode-watcher": "^0.3.0",
-		"rehype-slug": "^6.0.0",
-		"runed": "workspace:^",
-		"svelte-sonner": "^0.3.22",
-		"vaul-svelte": "^0.3.0"
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/svecosystem/runed.git"
 	},
-	"description": "Docs for Runed",
 	"devDependencies": {
 		"@sveltejs/adapter-cloudflare": "^4.1.0",
 		"@sveltejs/kit": "^2.5.0",
@@ -51,25 +62,14 @@
 		"vitest": "^1.3.0",
 		"zod": "^3.22.4"
 	},
-	"license": "MIT",
-	"name": "docs",
-	"private": true,
-	"repository": {
-		"type": "git",
-		"url": "https://github.com/svecosystem/runed.git"
-	},
-	"scripts": {
-		"build": "contentlayer build && vite build",
-		"build:all": "pnpm -w build",
-		"build:content": "contentlayer build",
-		"build:content-cachebust": "contentlayer build --clearCache",
-		"check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
-		"dev": "concurrently \"pnpm:dev:content\" \"pnpm:dev:svelte\"",
-		"dev:content": "contentlayer dev",
-		"dev:svelte": "vite dev --host",
-		"preview": "vite preview",
-		"sync": "svelte-kit sync"
-	},
 	"type": "module",
-	"version": "0.0.0"
+	"dependencies": {
+		"@melt-ui/svelte": "^0.74.0",
+		"bits-ui": "^0.21.5",
+		"mode-watcher": "^0.3.0",
+		"rehype-slug": "^6.0.0",
+		"runed": "workspace:^",
+		"svelte-sonner": "^0.3.22",
+		"vaul-svelte": "^0.3.0"
+	}
 }
