@@ -1,5 +1,4 @@
-import { Readable } from "../Readable/readable.svelte.js";
-
+import { Readable } from "../readable/readable.svelte.js";
 
 /**
  * An object holding a reactive value that is equal to `document.activeElement`.
@@ -7,18 +6,15 @@ import { Readable } from "../Readable/readable.svelte.js";
  *
  * @see {@link https://runed.dev/docs/utilities/use-active-element}
  */
-export const activeElement = new Readable(
-	null as Element | null,
-	(set) => {
-		function update() {
-			set(document.activeElement);
-		}
-		document.addEventListener("focusin", update);
-		document.addEventListener("focusout", update);
-
-		return () => {
-			document.removeEventListener("focusin", update);
-			document.removeEventListener("focusout", update);
-		};
+export const activeElement = new Readable<Element | null>(null, (set) => {
+	function update() {
+		set(document.activeElement);
 	}
-);
+	document.addEventListener("focusin", update);
+	document.addEventListener("focusout", update);
+
+	return () => {
+		document.removeEventListener("focusin", update);
+		document.removeEventListener("focusout", update);
+	};
+});
