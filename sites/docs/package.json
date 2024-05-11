@@ -13,7 +13,7 @@
 		"build:content-cachebust": "contentlayer build --clearCache",
 		"preview": "vite preview",
 		"check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
-		"sync": "svelte-kit sync"
+		"sync": "svelte-kit sync && pnpm build:content"
 	},
 	"license": "MIT",
 	"contributors": [
