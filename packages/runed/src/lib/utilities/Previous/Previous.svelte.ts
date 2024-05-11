@@ -11,12 +11,11 @@ export class Previous<T> {
 
 	constructor(getter: Getter<T>) {
 		// eslint-disable-next-line ts/no-explicit-any
-		this.#previous = (Array.isArray(getter()) ? [] : undefined) as any
+		this.#previous = (Array.isArray(getter()) ? [] : undefined) as any;
 		watch(getter, (_, prev) => {
 			this.#previous = prev;
 		});
 	}
-
 
 	get current() {
 		return this.#previous;
