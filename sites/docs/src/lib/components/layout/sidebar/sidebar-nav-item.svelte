@@ -30,7 +30,7 @@
 			</Collapsible.Trigger>
 		{/if}
 		<ul class="space-y-6 border-l border-border lg:space-y-2">
-			<Collapsible.Content class="space-y-6 lg:space-y-2">
+			<Collapsible.Content>
 				{#each navItem.items as item}
 					{@const isActive = item.href
 						? isTitleActive(currentPath, slugFromPathname(item.href))
@@ -39,7 +39,7 @@
 						<a
 							href={item.href}
 							class={cn(
-								"-ml-px block border-l border-border pl-4",
+								"-ml-px block border-l border-border py-1 pl-4",
 								isActive
 									? "border-brand text-brand"
 									: "border-border text-muted-foreground hover:border-primary hover:text-primary"

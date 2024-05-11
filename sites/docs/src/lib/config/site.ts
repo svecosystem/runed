@@ -1,7 +1,7 @@
 export const siteConfig = {
 	name: "Runed",
 	url: "https://runed.dev",
-	description: "Magical functions for Svelte 5.",
+	description: "Magical utilities for Svelte 5.",
 	links: {
 		x: "https://x.com/huntabyte",
 		github: "https://github.com/svecosystem/runed",
