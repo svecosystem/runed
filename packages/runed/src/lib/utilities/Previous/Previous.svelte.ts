@@ -1,4 +1,4 @@
-import { watch } from "../index.js";
+import { type PreviousValue, watch } from "../index.js";
 import type { Getter } from "$lib/internal/types.js";
 
 /**
@@ -7,7 +7,7 @@ import type { Getter } from "$lib/internal/types.js";
  * @see {@link https://runed.dev/docs/utilities/use-previous}
  */
 export class Previous<T> {
-	#previous = $state<T extends Array<infer U> ? Array<U | undefined> : T | undefined>();
+	#previous = $state<PreviousValue<T> | undefined>();
 
 	constructor(getter: Getter<T>) {
 		// eslint-disable-next-line ts/no-explicit-any

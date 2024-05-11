@@ -31,12 +31,11 @@ export type WatchOptions = {
 	once?: boolean;
 };
 
+export type PreviousValue<T> = T extends Array<infer U> ? Array<U | undefined> : T | undefined;
+
 function runWatcher<T>(
 	source: Getter<T>,
-	effect: (
-		value: T,
-		previousValue: T extends Array<infer U> ? Array<U | undefined> : T | undefined
-	) => void | (() => void),
+	effect: (value: T, previousValue: PreviousValue<T>) => void | (() => void),
 	flush: "pre" | "post",
 	options: WatchOptions = {}
 ) {
@@ -90,10 +89,7 @@ function runWatcher<T>(
 
 export function watch<T>(
 	source: Getter<T>,
-	effect: (
-		value: T,
-		previousValue: T extends Array<infer U> ? Array<U | undefined> : T | undefined
-	) => void | (() => void),
+	effect: (value: T, previousValue: PreviousValue<T>) => void | (() => void),
 	options?: WatchOptions
 ): void {
 	runWatcher(source, effect, "post", options);
@@ -101,10 +97,7 @@ export function watch<T>(
 
 watch.pre = function <T>(
 	sources: Getter<T>,
-	effect: (
-		value: T,
-		previousValue: T extends Array<infer U> ? Array<U | undefined> : T | undefined
-	) => void | (() => void),
+	effect: (value: T, previousValue: PreviousValue<T>) => void | (() => void),
 	options?: WatchOptions
 ): void {
 	runWatcher(sources, effect, "pre", options);
