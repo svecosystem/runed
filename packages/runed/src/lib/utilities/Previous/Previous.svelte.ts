@@ -1,5 +1,4 @@
 import { untrack } from "svelte";
-import { watch } from "../index.js";
 import type { Getter } from "$lib/internal/types.js";
 
 /**
