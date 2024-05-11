@@ -32,10 +32,10 @@ export type WatchOptions = {
 };
 
 function runWatcher<T>(
-	sources: Getter<T>,
+	source: Getter<T>,
 	effect: (
 		value: T,
-		previousValue: T extends unknown[] ? T | [] : T | undefined
+		previousValue: T extends Array<infer U> ? Array<U | undefined> : T | undefined
 	) => void | (() => void),
 	flush: "pre" | "post",
 	options: WatchOptions = {}
@@ -52,7 +52,7 @@ function runWatcher<T>(
 				return;
 			}
 
-			const values = sources();
+			const values = source();
 
 			let cleanupEffect: void | (() => void);
 			if (!lazy || !initialRun) {
@@ -89,21 +89,21 @@ function runWatcher<T>(
 }
 
 export function watch<T>(
-	sources: Getter<T>,
+	source: Getter<T>,
 	effect: (
 		value: T,
-		previousValue: T extends unknown[] ? T | [] : T | undefined
+		previousValue: T extends Array<infer U> ? Array<U | undefined> : T | undefined
 	) => void | (() => void),
 	options?: WatchOptions
 ): void {
-	runWatcher(sources, effect, "post", options);
+	runWatcher(source, effect, "post", options);
 }
 
 watch.pre = function <T>(
 	sources: Getter<T>,
 	effect: (
 		value: T,
-		previousValue: T extends unknown[] ? T | [] : T | undefined
+		previousValue: T extends Array<infer U> ? Array<U | undefined> : T | undefined
 	) => void | (() => void),
 	options?: WatchOptions
 ): void {

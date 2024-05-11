@@ -7,13 +7,16 @@ import type { Getter } from "$lib/internal/types.js";
  * @see {@link https://runed.dev/docs/utilities/use-previous}
  */
 export class Previous<T> {
-	#previous = $state<T | undefined>(undefined);
+	#previous = $state<T extends Array<infer U> ? Array<U | undefined> : T | undefined>();
 
 	constructor(getter: Getter<T>) {
+		// eslint-disable-next-line ts/no-explicit-any
+		this.#previous = (Array.isArray(getter()) ? [] : undefined) as any
 		watch(getter, (_, prev) => {
 			this.#previous = prev;
 		});
 	}
+
 
 	get current() {
 		return this.#previous;
