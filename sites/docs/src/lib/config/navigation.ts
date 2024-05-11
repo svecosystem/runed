@@ -1,4 +1,4 @@
-import { allFunctionDocs } from "../../../.contentlayer/generated";
+import { allUtilityDocs } from "../../../.contentlayer/generated";
 
 export type NavItem = {
 	title: string;
@@ -23,6 +23,7 @@ export type Navigation = {
 };
 
 const CATEGORIES = [
+	"New",
 	"Reactivity",
 	"State",
 	"Elements",
@@ -36,9 +37,9 @@ function isCategory(category: string): category is Category {
 	return CATEGORIES.includes(category as Category);
 }
 
-function generateFunctionsNav() {
+function generateUtilitiesNav() {
 	const categories = new Set(
-		allFunctionDocs
+		allUtilityDocs
 			.map((doc) => doc.category)
 			.filter((category): category is Category => isCategory(category))
 	);
@@ -49,13 +50,13 @@ function generateFunctionsNav() {
 	const categoryItemsMap: Record<string, SidebarNavItem["items"]> = {};
 
 	// Populate the map with items for each category
-	for (const doc of allFunctionDocs) {
+	for (const doc of allUtilityDocs) {
 		if (!categoryItemsMap[doc.category]) {
 			categoryItemsMap[doc.category] = [];
 		}
 		categoryItemsMap[doc.category]?.push({
 			title: doc.title,
-			href: `/docs/functions/${doc.slug}`,
+			href: `/docs/utilities/${doc.slug}`,
 			items: [],
 		});
 	}
@@ -110,6 +111,6 @@ export const navigation: Navigation = {
 				},
 			],
 		},
-		...generateFunctionsNav(),
+		...generateUtilitiesNav(),
 	],
 };

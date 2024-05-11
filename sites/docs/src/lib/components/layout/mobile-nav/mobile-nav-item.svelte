@@ -11,12 +11,12 @@
 
 {#if navItem.items.length}
 	<h5 class="mb-6 font-medium">{navItem.title}</h5>
-	<ul class="space-y-6">
+	<ul>
 		{#each navItem.items as item}
 			{@const isActive = isTitleActive(currentPath, item.title)}
-			<li>
+			<li class="group">
 				<MobileNavLink
-					class="-ml-px pl-4 {isActive
+					class="-ml-px block py-4 pl-4 group-first:pt-0 group-last:pb-0 {isActive
 						? 'border-brand text-brand'
 						: 'border-border text-muted-foreground'}
 					"
@@ -30,7 +30,7 @@
 {:else}
 	<MobileNavLink
 		href={navItem.href}
-		class="group mb-4 flex items-center font-semibold lg:text-sm lg:leading-6"
+		class="group mb-4 flex  items-center font-semibold lg:text-sm lg:leading-6"
 	>
 		{navItem.title}
 	</MobileNavLink>

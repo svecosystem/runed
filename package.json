@@ -36,7 +36,8 @@
 		"format": "prettier --write .",
 		"check": "pnpm -r check",
 		"sync": "pnpm -r sync",
-		"postinstall": "pnpm -r sync"
+		"postinstall": "pnpm -r sync",
+		"new": "node ./scripts/add-utility.mjs"
 	},
 	"license": "MIT",
 	"devDependencies": {
@@ -48,6 +49,7 @@
 		"prettier": "^3.2.5",
 		"prettier-plugin-svelte": "^3.2.3",
 		"prettier-plugin-tailwindcss": "^0.5.14",
+		"readline-sync": "^1.4.10",
 		"svelte-eslint-parser": "^0.35.0",
 		"wrangler": "^3.52.0"
 	},
@@ -56,5 +58,9 @@
 		"overrides": {
 			"bits-ui@0.16.0": "^0.21.5"
 		}
+	},
+	"engines": {
+		"pnpm": "^8.7.0",
+		"node": ">=18"
 	}
 }

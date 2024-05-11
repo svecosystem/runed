@@ -1,6 +1,9 @@
 {
 	"name": "runed",
 	"version": "0.5.0",
+	"type": "module",
+	"svelte": "./dist/index.js",
+	"types": "./dist/index.d.ts",
 	"contributors": [
 		{
 			"name": "Thomas G. Lopes",
@@ -51,16 +54,13 @@
 		"@vitest/coverage-v8": "^1.5.1",
 		"jsdom": "^24.0.0",
 		"publint": "^0.1.9",
-		"svelte": "^5.0.0-next.110",
+		"svelte": "^5.0.0-next.130",
 		"svelte-check": "^3.6.0",
 		"tslib": "^2.4.1",
 		"typescript": "^5.0.0",
 		"vite": "^5.0.3",
 		"vitest": "^1.5.1"
 	},
-	"svelte": "./dist/index.js",
-	"types": "./dist/index.d.ts",
-	"type": "module",
 	"dependencies": {
 		"nanoid": "^5.0.4"
 	}

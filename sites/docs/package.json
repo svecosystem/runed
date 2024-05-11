@@ -13,7 +13,7 @@
 		"build:content-cachebust": "contentlayer build --clearCache",
 		"preview": "vite preview",
 		"check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
-		"sync": "svelte-kit sync"
+		"sync": "svelte-kit sync && pnpm build:content"
 	},
 	"license": "MIT",
 	"contributors": [
@@ -48,7 +48,7 @@
 		"rehype-pretty-code": "^0.13.0",
 		"remark-gfm": "^4.0.0",
 		"shiki": "^1.1.3",
-		"svelte": "^5.0.0-next.110",
+		"svelte": "^5.0.0-next.130",
 		"svelte-check": "^3.6.4",
 		"tailwind-merge": "^2.2.1",
 		"tailwind-variants": "^0.2.0",
