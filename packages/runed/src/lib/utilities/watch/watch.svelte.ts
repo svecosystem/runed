@@ -31,7 +31,7 @@ export type WatchOptions = {
 	once?: boolean;
 };
 
-export type PreviousValue<T> = T extends Array<infer U> ? Array<U | undefined> : T | undefined;
+type PreviousValue<T> = T extends Array<infer U> ? Array<U | undefined> : T | undefined;
 
 function runWatcher<T>(
 	source: Getter<T>,

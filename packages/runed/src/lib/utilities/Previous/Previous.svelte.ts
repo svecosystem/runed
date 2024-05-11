@@ -1,4 +1,5 @@
-import { type PreviousValue, watch } from "../index.js";
+import { untrack } from "svelte";
+import { watch } from "../index.js";
 import type { Getter } from "$lib/internal/types.js";
 
 /**
@@ -7,13 +8,13 @@ import type { Getter } from "$lib/internal/types.js";
  * @see {@link https://runed.dev/docs/utilities/use-previous}
  */
 export class Previous<T> {
-	#previous = $state<PreviousValue<T> | undefined>();
+	#previous = $state<T | undefined>(undefined);
+	#curr = $state<T | undefined>(undefined);
 
 	constructor(getter: Getter<T>) {
-		// eslint-disable-next-line ts/no-explicit-any
-		this.#previous = (Array.isArray(getter()) ? [] : undefined) as any;
-		watch(getter, (_, prev) => {
-			this.#previous = prev;
+		$effect(() => {
+			this.#previous = untrack(() => this.#curr);
+			this.#curr = getter();
 		});
 	}
 
