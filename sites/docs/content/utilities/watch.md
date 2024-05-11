@@ -24,13 +24,12 @@ tracked.
 
 Runs a callback whenever one of the sources change.
 
+<!-- prettier-ignore -->
 ```ts
 import { watch } from "runed";
 
 let count = $state(0);
-watch(
-	() => count,
-	() => {
+watch(() => count, () => {
 		console.log(count);
 	}
 );
@@ -48,11 +47,10 @@ watch([() => age, () => name], () => {
 
 The callback receives two arguments: The current value of the sources, and the previous value.
 
+<!-- prettier-ignore -->
 ```ts
 let count = $state(0);
-watch(
-	() => count,
-	(curr, prev) => {
+watch(() => count, (curr, prev) => {
 		console.log(`count is ${curr}, was ${prev}`);
 	}
 );
