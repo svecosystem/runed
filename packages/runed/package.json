@@ -1,67 +1,67 @@
 {
-	"name": "runed",
-	"version": "0.5.0",
-	"contributors": [
-		{
-			"name": "Thomas G. Lopes",
-			"url": "https://thomasglopes.com"
-		},
-		{
-			"name": "Hunter Johnston",
-			"url": "https://x.com/huntabyte"
-		}
-	],
-	"repository": {
-		"type": "git",
-		"url": "https://github.com/svecosystem/runed",
-		"directory": "packages/runed"
-	},
-	"funding": [
-		"https://github.com/sponsors/huntabyte",
-		"https://github.com/sponsors/tglide"
-	],
-	"scripts": {
-		"dev": "pnpm sync && pnpm watch",
-		"build": "pnpm package",
-		"package": "svelte-kit sync && svelte-package && publint",
-		"test": "vitest --run",
-		"test:watch": "vitest --watch",
-		"check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
-		"watch": "svelte-kit sync && svelte-package --watch"
-	},
-	"exports": {
-		".": {
-			"types": "./dist/index.d.ts",
-			"svelte": "./dist/index.js"
-		}
-	},
-	"files": [
-		"dist",
-		"!dist/**/*.test.*",
-		"!dist/**/*.spec.*"
-	],
-	"peerDependencies": {
-		"svelte": "^5.0.0"
-	},
-	"devDependencies": {
-		"@sveltejs/kit": "^2.5.3",
-		"@sveltejs/package": "^2.3.0",
-		"@sveltejs/vite-plugin-svelte": "^3.0.0",
-		"@types/node": "^20.10.6",
-		"@vitest/coverage-v8": "^1.5.1",
-		"jsdom": "^24.0.0",
-		"publint": "^0.1.9",
-		"svelte": "^5.0.0-next.123",
-		"svelte-check": "^3.6.0",
-		"tslib": "^2.4.1",
-		"typescript": "^5.0.0",
-		"vite": "^5.0.3",
-		"vitest": "^1.5.1"
-	},
-	"svelte": "./dist/index.js",
-	"types": "./dist/index.d.ts",
-	"type": "module",
-	"dependencies": {
-		"nanoid": "^5.0.4"
-	}
+    "contributors": [
+        {
+            "name": "Thomas G. Lopes",
+            "url": "https://thomasglopes.com"
+        },
+        {
+            "name": "Hunter Johnston",
+            "url": "https://x.com/huntabyte"
+        }
+    ],
+    "dependencies": {
+        "nanoid": "^5.0.4"
+    },
+    "devDependencies": {
+        "@sveltejs/kit": "^2.5.3",
+        "@sveltejs/package": "^2.3.0",
+        "@sveltejs/vite-plugin-svelte": "^3.0.0",
+        "@types/node": "^20.10.6",
+        "@vitest/coverage-v8": "^1.5.1",
+        "jsdom": "^24.0.0",
+        "publint": "^0.1.9",
+        "svelte": "^5.0.0-next.130",
+        "svelte-check": "^3.6.0",
+        "tslib": "^2.4.1",
+        "typescript": "^5.0.0",
+        "vite": "^5.0.3",
+        "vitest": "^1.5.1"
+    },
+    "exports": {
+        ".": {
+            "svelte": "./dist/index.js",
+            "types": "./dist/index.d.ts"
+        }
+    },
+    "files": [
+        "dist",
+        "!dist/**/*.test.*",
+        "!dist/**/*.spec.*"
+    ],
+    "funding": [
+        "https://github.com/sponsors/huntabyte",
+        "https://github.com/sponsors/tglide"
+    ],
+    "name": "runed",
+    "peerDependencies": {
+        "svelte": "^5.0.0"
+    },
+    "repository": {
+        "directory": "packages/runed",
+        "type": "git",
+        "url": "https://github.com/svecosystem/runed"
+    },
+    "scripts": {
+        "build": "pnpm package",
+        "check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
+        "dev": "pnpm sync && pnpm watch",
+        "package": "svelte-kit sync && svelte-package && publint",
+        "test": "vitest --run",
+        "test:watch": "vitest --watch",
+        "watch": "svelte-kit sync && svelte-package --watch"
+    },
+    "svelte": "./dist/index.js",
+    "type": "module",
+    "types": "./dist/index.d.ts",
+    "version": "0.5.0"
 }
