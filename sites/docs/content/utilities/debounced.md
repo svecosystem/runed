@@ -1,7 +1,7 @@
 ---
 title: Debounced
 description: A wrapper over `useDebounce` that returns a debounced state.
-category: New
+category: State
 ---
 
 <script>
