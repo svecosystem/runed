@@ -7,5 +7,5 @@ export * from "./IsSupported/index.js";
 export * from "./StateHistory/index.js";
 export * from "./Previous/index.js";
 export * from "./watch/index.js";
-export * from './Readable/index.js'
-export * from './Debounced/index.js'
+export * from "./Readable/index.js";
+export * from "./Debounced/index.js";

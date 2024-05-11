@@ -10,19 +10,21 @@ import type { Getter, MaybeGetter } from "$lib/internal/types.js";
  * @typedef {Debounced}
  */
 export class Debounced<T> {
-  #current = $state();
+	#current = $state();
 
-  constructor(getter: Getter<T>, wait: MaybeGetter<number> = 250) {
-    this.#current = getter(); // immediately set the initial value
+	constructor(getter: Getter<T>, wait: MaybeGetter<number> = 250) {
+		this.#current = getter(); // immediately set the initial value
 
-    const callback = useDebounce(() => {
-      this.#current = getter();
-    }, wait)
+		const callback = useDebounce(() => {
+			this.#current = getter();
+		}, wait);
 
-    watch(getter, () => { callback() });
-  }
+		watch(getter, () => {
+			callback();
+		});
+	}
 
-  get current() {
-    return this.#current
-  }
+	get current() {
+		return this.#current;
+	}
 }

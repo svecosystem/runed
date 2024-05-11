@@ -2,12 +2,10 @@ import { watch } from "../watch/watch.svelte.js";
 import type { MaybeGetter, Setter } from "$lib/internal/types.js";
 import { get } from "$lib/internal/utils/get.js";
 
-
 type LogEvent<T> = {
 	snapshot: T;
 	timestamp: number;
 };
-
 
 type StateHistoryOptions = {
 	capacity?: MaybeGetter<number>;
@@ -19,61 +17,61 @@ type StateHistoryOptions = {
  * @see {@link https://runed.dev/docs/utilities/use-state-history}
  */
 export class StateHistory<T> {
-	#redoStack = $state<LogEvent<T>[]>([])
-	#ignoreUpdate = false
-	#set: Setter<T>
-	log = $state<LogEvent<T>[]>([])
-	canUndo = $derived(this.log.length > 1)
-	canRedo = $derived(this.#redoStack.length > 0)
+	#redoStack = $state<LogEvent<T>[]>([]);
+	#ignoreUpdate = false;
+	#set: Setter<T>;
+	log = $state<LogEvent<T>[]>([]);
+	canUndo = $derived(this.log.length > 1);
+	canRedo = $derived(this.#redoStack.length > 0);
 
 	constructor(value: MaybeGetter<T>, set: Setter<T>, options?: StateHistoryOptions) {
-		this.#redoStack = []
-		this.#set = set
+		this.#redoStack = [];
+		this.#set = set;
 
 		const addEvent = (event: LogEvent<T>) => {
-			this.log.push(event)
-			const capacity$ = get(options?.capacity)
+			this.log.push(event);
+			const capacity$ = get(options?.capacity);
 			if (capacity$ && this.log.length > capacity$) {
-				this.log = this.log.slice(-capacity$)
+				this.log = this.log.slice(-capacity$);
 			}
-		}
+		};
 
 		watch(
 			() => get(value),
 			(v) => {
 				if (this.#ignoreUpdate) {
-					this.#ignoreUpdate = false
-					return
+					this.#ignoreUpdate = false;
+					return;
 				}
 
-				addEvent({ snapshot: v, timestamp: new Date().getTime() })
-				this.#redoStack = []
+				addEvent({ snapshot: v, timestamp: new Date().getTime() });
+				this.#redoStack = [];
 			}
-		)
+		);
 
 		watch(
 			() => get(options?.capacity),
 			(c) => {
-				if (!c) return
-				this.log = this.log.slice(-c)
+				if (!c) return;
+				this.log = this.log.slice(-c);
 			}
-		)
+		);
 	}
 
 	undo = () => {
-		const [prev, curr] = this.log.slice(-2)
-		if (!curr || !prev) return
-		this.#ignoreUpdate = true
-		this.#redoStack.push(curr)
-		this.log.pop()
-		this.#set(prev.snapshot)
-	}
+		const [prev, curr] = this.log.slice(-2);
+		if (!curr || !prev) return;
+		this.#ignoreUpdate = true;
+		this.#redoStack.push(curr);
+		this.log.pop();
+		this.#set(prev.snapshot);
+	};
 
 	redo = () => {
-		const nextEvent = this.#redoStack.pop()
-		if (!nextEvent) return
-		this.#ignoreUpdate = true
-		this.log.push(nextEvent)
-		this.#set(nextEvent.snapshot)
-	}
+		const nextEvent = this.#redoStack.pop();
+		if (!nextEvent) return;
+		this.#ignoreUpdate = true;
+		this.log.push(nextEvent);
+		this.#set(nextEvent.snapshot);
+	};
 }

@@ -24,21 +24,25 @@ export class ElementSize {
 	#size = $state({
 		width: 0,
 		height: 0,
-	})
+	});
 
-	constructor(node: MaybeGetter<HTMLElement | undefined>, options: ElementSizeOptions = { box: "border-box" }) {
+	constructor(
+		node: MaybeGetter<HTMLElement | undefined>,
+		options: ElementSizeOptions = { box: "border-box" }
+	) {
 		this.#size = {
 			width: options.initialSize?.width ?? 0,
 			height: options.initialSize?.height ?? 0,
-		}
+		};
 
 		$effect(() => {
-			const node$ = get(node)
+			const node$ = get(node);
 			if (!node$) return;
 
 			const observer = new ResizeObserver((entries) => {
 				for (const entry of entries) {
-					const boxSize = options.box === "content-box" ? entry.contentBoxSize : entry.borderBoxSize;
+					const boxSize =
+						options.box === "content-box" ? entry.contentBoxSize : entry.borderBoxSize;
 					const boxSizeArr = Array.isArray(boxSize) ? boxSize : [boxSize];
 					this.#size.width = boxSizeArr.reduce((acc, size) => Math.max(acc, size.inlineSize), 0);
 					this.#size.height = boxSizeArr.reduce((acc, size) => Math.max(acc, size.blockSize), 0);
@@ -49,14 +53,14 @@ export class ElementSize {
 			return () => {
 				observer.disconnect();
 			};
-		})
+		});
 	}
 
 	get width() {
-		return this.#size.width
+		return this.#size.width;
 	}
 
 	get height() {
-		return this.#size.height
+		return this.#size.height;
 	}
 }

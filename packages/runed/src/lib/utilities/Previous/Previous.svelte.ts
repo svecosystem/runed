@@ -7,15 +7,15 @@ import type { Getter } from "$lib/internal/types.js";
  * @see {@link https://runed.dev/docs/utilities/use-previous}
  */
 export class Previous<T> {
-	#previous = $state<T | undefined>(undefined)
+	#previous = $state<T | undefined>(undefined);
 
 	constructor(getter: Getter<T>) {
 		watch(getter, (_, prev) => {
-			this.#previous = prev
-		})
+			this.#previous = prev;
+		});
 	}
 
 	get current() {
-		return this.#previous
+		return this.#previous;
 	}
 }

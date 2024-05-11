@@ -7,19 +7,19 @@ import { untrack } from "svelte";
  * @see {@link https://runed.dev/docs/utilities/use-mounted}
  */
 export class IsMounted {
-	#isMounted = $state(false)
+	#isMounted = $state(false);
 
 	constructor() {
 		$effect(() => {
-			untrack(() => (this.#isMounted = true))
+			untrack(() => (this.#isMounted = true));
 
 			return () => {
 				this.#isMounted = false;
 			};
-		})
+		});
 	}
 
 	get current() {
-		return this.#isMounted
+		return this.#isMounted;
 	}
 }

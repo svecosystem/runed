@@ -22,6 +22,5 @@ category: Elements
 	const size = new ElementSize(() => el);
 </script>
 
-<textarea bind:this={el}></textarea>
-<p>Width: {size.width} Height: {size.height}</p>
+<textarea bind:this={el}></textarea><p>Width: {size.width} Height: {size.height}</p>
 ```

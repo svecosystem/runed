@@ -28,9 +28,12 @@ Runs a callback whenever one of the sources change.
 import { watch } from "runed";
 
 let count = $state(0);
-watch(() => count, () => {
-	console.log(count);
-});
+watch(
+	() => count,
+	() => {
+		console.log(count);
+	}
+);
 ```
 
 It also accepts an array of sources.
@@ -47,9 +50,12 @@ The callback receives two arguments: The current value of the sources, and the p
 
 ```ts
 let count = $state(0);
-watch(() => count, (curr, prev) => {
-	console.log(`count is ${curr}, was ${prev}`);
-});
+watch(
+	() => count,
+	(curr, prev) => {
+		console.log(`count is ${curr}, was ${prev}`);
+	}
+);
 ```
 
 `watch` also accepts an `options` object.

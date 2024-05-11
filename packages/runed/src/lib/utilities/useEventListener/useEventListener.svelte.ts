@@ -66,7 +66,6 @@ export function useEventListener(
 	handler: EventListenerOrEventListenerObject,
 	options?: boolean | AddEventListenerOptions
 ): void {
-
 	$effect(() => {
 		const target = extract(_target);
 		if (target === undefined || target === null) return;

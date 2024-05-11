@@ -1,1 +1,1 @@
-export { Readable } from './readable.svelte.js'
+export { Readable } from "./readable.svelte.js";
