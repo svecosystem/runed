@@ -1,4 +1,4 @@
-import { Readable } from "../readable/readable.svelte.js";
+import { Readable } from "../Readable/readable.svelte.js";
 
 /**
  * An object holding a reactive value that is equal to `document.activeElement`.
