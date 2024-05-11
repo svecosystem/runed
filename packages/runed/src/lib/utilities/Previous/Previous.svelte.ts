@@ -1,4 +1,3 @@
-import { untrack } from "svelte";
 import type { Getter } from "$lib/internal/types.js";
 
 /**
@@ -8,11 +7,11 @@ import type { Getter } from "$lib/internal/types.js";
  */
 export class Previous<T> {
 	#previous = $state<T | undefined>(undefined);
-	#curr = $state<T | undefined>(undefined);
+	#curr?: T;
 
 	constructor(getter: Getter<T>) {
 		$effect(() => {
-			this.#previous = untrack(() => this.#curr);
+			this.#previous = this.#curr;
 			this.#curr = getter();
 		});
 	}
