@@ -10,9 +10,9 @@
 	<button
 		class="inline-flex items-center justify-center rounded-md border bg-brand/50
 px-3 py-1.5 text-sm font-medium transition-all hover:bg-brand/25 focus:outline-none active:bg-brand/15"
-		onclick={() => runeStore.current++}>boxed.current++</button
+		onclick={() => runeStore.current++}>runeStore.current++</button
 	>
-	<pre class="my-4 bg-transparent p-0 font-mono">boxed.current: {`${runeStore.current}`}</pre>
+	<pre class="my-4 bg-transparent p-0 font-mono">runeStore.current: {`${runeStore.current}`}</pre>
 	<button
 		class="inline-flex items-center justify-center rounded-md border bg-brand/50
 px-3 py-1.5 text-sm font-medium transition-all hover:bg-brand/25 focus:outline-none active:bg-brand/15"
