@@ -1,5 +1,27 @@
 # runed
 
+## 0.6.0
+
+### Minor Changes
+
+- add Debounced utility ([#48](https://github.com/svecosystem/runed/pull/48))
+
+- BREAKING: Remove box ([#48](https://github.com/svecosystem/runed/pull/48))
+
+### Patch Changes
+
+- Change useMounted to IsMounted ([#48](https://github.com/svecosystem/runed/pull/48))
+
+- change useSupported to IsSupported ([#48](https://github.com/svecosystem/runed/pull/48))
+
+- change useElementSize to ElementSize ([#48](https://github.com/svecosystem/runed/pull/48))
+
+- change useActiveElement to activeElement ([#48](https://github.com/svecosystem/runed/pull/48))
+
+- change useStateHistory to StateHistory ([#48](https://github.com/svecosystem/runed/pull/48))
+
+- change usePrevious to Previous ([#48](https://github.com/svecosystem/runed/pull/48))
+
 ## 0.5.0
 
 ### Minor Changes
