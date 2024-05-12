@@ -1,6 +1,6 @@
 import { test } from "vitest";
 
-export function testWithEffect(name: string, fn: () => void | Promise<void>) {
+export function testWithEffect(name: string, fn: () => void | Promise<void>): void {
 	test(name, async () => {
 		let promise: void | Promise<void>;
 		const cleanup = $effect.root(() => {
