@@ -1,5 +1,3 @@
-import { untrack } from "svelte";
-
 /**
  * Returns an object with the mounted state of the component
  * that invokes this function.
@@ -7,11 +5,11 @@ import { untrack } from "svelte";
  * @see {@link https://runed.dev/docs/utilities/use-mounted}
  */
 export class IsMounted {
-	#isMounted = $state(false);
+	#isMounted: boolean = $state(false);
 
 	constructor() {
 		$effect(() => {
-			untrack(() => (this.#isMounted = true));
+			this.#isMounted = true;
 
 			return () => {
 				this.#isMounted = false;
@@ -19,7 +17,7 @@ export class IsMounted {
 		});
 	}
 
-	get current() {
+	get current(): boolean {
 		return this.#isMounted;
 	}
 }
