@@ -1,13 +1,13 @@
 import { watch } from "../watch/watch.svelte.js";
-import type { MaybeGetter, Setter } from "$lib/internal/types.js";
+import type { Getter, MaybeGetter, Setter } from "$lib/internal/types.js";
 import { get } from "$lib/internal/utils/get.js";
 
-type LogEvent<T> = {
+export type LogEvent<T> = {
 	snapshot: T;
 	timestamp: number;
 };
 
-type StateHistoryOptions = {
+export type StateHistoryOptions = {
 	capacity?: MaybeGetter<number>;
 };
 
@@ -17,37 +17,26 @@ type StateHistoryOptions = {
  * @see {@link https://runed.dev/docs/utilities/use-state-history}
  */
 export class StateHistory<T> {
-	#redoStack = $state<LogEvent<T>[]>([]);
-	#ignoreUpdate = false;
-	#set: Setter<T>;
-	log = $state<LogEvent<T>[]>([]);
-	canUndo = $derived(this.log.length > 1);
-	canRedo = $derived(this.#redoStack.length > 0);
+	readonly #set: Setter<T>;
+	#redoStack: LogEvent<T>[] = $state([]);
+	#ignoreUpdate: boolean = false;
+	log: LogEvent<T>[] = $state([]);
 
-	constructor(value: MaybeGetter<T>, set: Setter<T>, options?: StateHistoryOptions) {
-		this.#redoStack = [];
+	readonly canUndo: boolean = $derived(this.log.length > 1);
+	readonly canRedo: boolean = $derived(this.#redoStack.length > 0);
+
+	constructor(getter: Getter<T>, set: Setter<T>, options: StateHistoryOptions = {}) {
 		this.#set = set;
 
-		const addEvent = (event: LogEvent<T>) => {
-			this.log.push(event);
-			const capacity$ = get(options?.capacity);
-			if (capacity$ && this.log.length > capacity$) {
-				this.log = this.log.slice(-capacity$);
+		watch(getter, (v) => {
+			if (this.#ignoreUpdate) {
+				this.#ignoreUpdate = false;
+				return;
 			}
-		};
 
-		watch(
-			() => get(value),
-			(v) => {
-				if (this.#ignoreUpdate) {
-					this.#ignoreUpdate = false;
-					return;
-				}
-
-				addEvent({ snapshot: v, timestamp: new Date().getTime() });
-				this.#redoStack = [];
-			}
-		);
+			this.#addEvent({ snapshot: v, timestamp: new Date().getTime() }, options);
+			this.#redoStack = [];
+		});
 
 		watch(
 			() => get(options?.capacity),
@@ -58,7 +47,15 @@ export class StateHistory<T> {
 		);
 	}
 
-	undo = () => {
+	#addEvent(event: LogEvent<T>, options: StateHistoryOptions): void {
+		this.log.push(event);
+		const capacity$ = get(options.capacity);
+		if (capacity$ && this.log.length > capacity$) {
+			this.log = this.log.slice(-capacity$);
+		}
+	}
+
+	readonly undo = () => {
 		const [prev, curr] = this.log.slice(-2);
 		if (!curr || !prev) return;
 		this.#ignoreUpdate = true;
@@ -67,7 +64,7 @@ export class StateHistory<T> {
 		this.#set(prev.snapshot);
 	};
 
-	redo = () => {
+	readonly redo = () => {
 		const nextEvent = this.#redoStack.pop();
 		if (!nextEvent) return;
 		this.#ignoreUpdate = true;
