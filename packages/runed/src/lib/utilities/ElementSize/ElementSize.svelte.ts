@@ -21,19 +21,14 @@ export type ElementSizeOptions = {
  * @see {@link https://runed.dev/docs/utilities/use-element-size}
  */
 export class ElementSize {
-	#size = $state({
-		width: 0,
-		height: 0,
-	});
+	#width: number = $state(0);
+	#height: number = $state(0);
 
-	constructor(
-		node: MaybeGetter<HTMLElement | undefined>,
-		options: ElementSizeOptions = { box: "border-box" }
-	) {
-		this.#size = {
-			width: options.initialSize?.width ?? 0,
-			height: options.initialSize?.height ?? 0,
-		};
+	constructor(node: MaybeGetter<Element | undefined>, options: ElementSizeOptions = {}) {
+		const { initialSize, box = "border-box" } = options;
+
+		this.#width = initialSize?.width ?? 0;
+		this.#height = initialSize?.height ?? 0;
 
 		$effect(() => {
 			const node$ = get(node);
@@ -41,11 +36,10 @@ export class ElementSize {
 
 			const observer = new ResizeObserver((entries) => {
 				for (const entry of entries) {
-					const boxSize =
-						options.box === "content-box" ? entry.contentBoxSize : entry.borderBoxSize;
+					const boxSize = box === "content-box" ? entry.contentBoxSize : entry.borderBoxSize;
 					const boxSizeArr = Array.isArray(boxSize) ? boxSize : [boxSize];
-					this.#size.width = boxSizeArr.reduce((acc, size) => Math.max(acc, size.inlineSize), 0);
-					this.#size.height = boxSizeArr.reduce((acc, size) => Math.max(acc, size.blockSize), 0);
+					this.#width = boxSizeArr.reduce((acc, size) => Math.max(acc, size.inlineSize), 0);
+					this.#height = boxSizeArr.reduce((acc, size) => Math.max(acc, size.blockSize), 0);
 				}
 			});
 			observer.observe(node$);
@@ -56,11 +50,11 @@ export class ElementSize {
 		});
 	}
 
-	get width() {
-		return this.#size.width;
+	get width(): number {
+		return this.#width;
 	}
 
-	get height() {
-		return this.#size.height;
+	get height(): number {
+		return this.#height;
 	}
 }
