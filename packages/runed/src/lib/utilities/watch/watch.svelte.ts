@@ -96,9 +96,9 @@ export function watch<T>(
 }
 
 watch.pre = function <T>(
-	sources: Getter<T>,
+	source: Getter<T>,
 	effect: (value: T, previousValue: PreviousValue<T>) => void | (() => void),
 	options?: WatchOptions
 ): void {
-	runWatcher(sources, effect, "pre", options);
+	runWatcher(source, effect, "pre", options);
 };
