@@ -1,4 +1,6 @@
-import type { FunctionArgs, MaybeGetter } from "$lib/internal/types.js";
+import { extract } from "../extract/extract.js";
+import type { MaybeGetter } from "$lib/internal/types.js";
+import { type Deferred, defer } from "$lib/internal/utils/defer.js";
 
 /**
  * Function that takes a callback, and returns a debounced version of it.
@@ -15,40 +17,34 @@ import type { FunctionArgs, MaybeGetter } from "$lib/internal/types.js";
  *
  * @see {@link https://runed.dev/docs/utilities/use-debounce}
  */
-export function useDebounce<Callback extends FunctionArgs>(
-	callback: Callback,
+export function useDebounce<Args extends unknown[], Return>(
+	callback: (...args: Args) => Return,
 	wait: MaybeGetter<number> = 250
-) {
+): (this: unknown, ...args: Args) => Promise<Return> {
 	let timeout: ReturnType<typeof setTimeout> | undefined;
-	let resolve: (value: ReturnType<Callback>) => void;
-	let reject: (reason: unknown) => void;
-	let promise: Promise<ReturnType<Callback>> | undefined;
+	let deferred: Deferred<Return> | undefined;
 
-	return function debounced(this: unknown, ...args: Parameters<Callback>) {
-		if (timeout) {
+	return function debounced(...args) {
+		if (timeout !== undefined) {
 			clearTimeout(timeout);
 		}
 
-		if (!promise) {
-			promise = new Promise<ReturnType<Callback>>((res, rej) => {
-				resolve = res;
-				reject = rej;
-			});
+		if (deferred === undefined) {
+			deferred = defer();
 		}
 
-		timeout = setTimeout(
-			async () => {
-				try {
-					resolve((await callback.apply(this, args)) as ReturnType<Callback>);
-				} catch (error) {
-					reject(error);
-				} finally {
-					timeout = undefined;
-					promise = undefined;
-				}
-			},
-			typeof wait === "function" ? wait() : wait
-		);
+		const { promise, resolve, reject } = deferred;
+
+		timeout = setTimeout(async () => {
+			try {
+				resolve(await callback.apply(this, args));
+			} catch (error) {
+				reject(error);
+			} finally {
+				timeout = undefined;
+				deferred = undefined;
+			}
+		}, extract(wait));
 
 		return promise;
 	};
