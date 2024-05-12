@@ -1,9 +1,7 @@
 /**
- * Get nth item of Array. Negative for backward
+ * Get the nth item of an array. Negative for backward.
  */
-export function at(array: readonly [], index: number): undefined;
-export function at<T>(array: readonly T[], index: number): T;
-export function at<T>(array: readonly T[] | [], index: number): T | undefined {
+export function at<T>(array: readonly T[], index: number): T | undefined {
 	const len = array.length;
 	if (!len) return undefined;
 
@@ -12,6 +10,9 @@ export function at<T>(array: readonly T[] | [], index: number): T | undefined {
 	return array[index];
 }
 
+/**
+ * Get the last item of an array.
+ */
 export function last<T>(array: readonly T[]): T | undefined {
 	return array[array.length - 1];
 }
