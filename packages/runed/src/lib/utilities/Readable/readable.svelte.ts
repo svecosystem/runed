@@ -1,6 +1,7 @@
 import { tick } from "svelte";
+import type { Setter } from "$lib/internal/types.js";
 
-export type StartNotifier<TValue> = (set: (value: TValue) => void) => VoidFunction;
+export type StartNotifier<T> = (set: Setter<T>) => VoidFunction;
 
 /**
  * A class that contains a reactive `current` property
@@ -23,31 +24,34 @@ export type StartNotifier<TValue> = (set: (value: TValue) => void) => VoidFuncti
  * @see {@link https://runed.dev/docs/utilities/readable}
  *
  */
-export class Readable<TValue> {
-	#current = $state() as TValue;
-	#start: StartNotifier<TValue>;
+export class Readable<T> {
+	#current = $state() as T;
+	#start: StartNotifier<T>;
 
-	constructor(initialValue: TValue, start: StartNotifier<TValue>) {
+	constructor(initialValue: T, start: StartNotifier<T>) {
 		this.#current = initialValue;
 		this.#start = start;
 	}
 
-	#subscribers = 0;
+	#subscribers: number = 0;
 	#stop: VoidFunction | null = null;
 
-	get current(): TValue {
+	get current(): T {
 		if ($effect.active()) {
 			$effect(() => {
 				this.#subscribers++;
 				if (this.#subscribers === 1) {
-					this.#subscribe();
+					this.#stop = this.#start((value) => {
+						this.#current = value;
+					});
 				}
 
 				return () => {
 					tick().then(() => {
 						this.#subscribers--;
-						if (this.#subscribers === 0) {
-							this.#unsubscribe();
+						if (this.#subscribers === 0 && this.#stop !== null) {
+							this.#stop();
+							this.#stop = null;
 						}
 					});
 				};
@@ -55,20 +59,5 @@ export class Readable<TValue> {
 		}
 
 		return this.#current;
-	}
-
-	#subscribe() {
-		this.#stop = this.#start((value) => {
-			this.#current = value;
-		});
-	}
-
-	#unsubscribe() {
-		if (this.#stop === null) {
-			return;
-		}
-
-		this.#stop();
-		this.#stop = null;
 	}
 }
