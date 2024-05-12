@@ -5,19 +5,19 @@
  * @see {@link https://runed.dev/docs/utilities/use-mounted}
  */
 export class IsMounted {
-	#isMounted: boolean = $state(false);
+	#current: boolean = $state(false);
 
 	constructor() {
 		$effect(() => {
-			this.#isMounted = true;
+			this.#current = true;
 
 			return () => {
-				this.#isMounted = false;
+				this.#current = false;
 			};
 		});
 	}
 
 	get current(): boolean {
-		return this.#isMounted;
+		return this.#current;
 	}
 }
