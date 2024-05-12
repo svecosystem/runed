@@ -6,7 +6,7 @@
  * @see {@link https://runed.dev/docs/utilities/use-supported}
  */
 export class IsSupported {
-	#current = $state(false);
+	#current: boolean = $state(false);
 
 	constructor(predicate: () => boolean) {
 		$effect(() => {
@@ -14,7 +14,7 @@ export class IsSupported {
 		});
 	}
 
-	get current() {
+	get current(): boolean {
 		return this.#current;
 	}
 }
