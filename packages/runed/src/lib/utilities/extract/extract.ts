@@ -1,15 +1,20 @@
-import type { Getter, MaybeGetter } from "$lib/internal/types.js";
-import { isFunction } from "$lib/internal/utils/is.js";
+import type { MaybeGetter } from "$lib/internal/types.js";
+import { get } from "$lib/internal/utils/get.js";
 
 /**
  * Extracts the value from a getter or a value.
- * Optionally, a default value can be provided.
  */
-export function extract<T>(value: MaybeGetter<T>, defaultValue?: T): T {
-	if (isFunction(value)) {
-		const getter = value as Getter<T>;
-		return getter() ?? defaultValue ?? getter();
-	}
+export function extract<T>(value: MaybeGetter<T>): T;
 
-	return value ?? defaultValue ?? value;
+/**
+ * Extracts the value from a getter or a value, replacing `undefined` with the default value.
+ */
+export function extract<T>(value: MaybeGetter<T | undefined>, defaultValue: T): T;
+
+export function extract<T>(value: MaybeGetter<T>, defaultValue?: T): T | undefined {
+	const result = get(value);
+	if (result === undefined) {
+		return defaultValue;
+	}
+	return result;
 }
