@@ -17,7 +17,7 @@ import { type Deferred, defer } from "$lib/internal/utils/defer.js";
  *
  * @see {@link https://runed.dev/docs/utilities/use-debounce}
  */
-export function useDebounce<Args extends unknown[], Return>(
+export function useDebounce<Args extends unknown[], Return = void>(
 	callback: (...args: Args) => Return,
 	wait: MaybeGetter<number> = 250
 ): (this: unknown, ...args: Args) => Promise<Return> {
