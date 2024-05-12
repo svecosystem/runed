@@ -1,6 +1,6 @@
-import { extract } from "../extract/extract.js";
 import type { MaybeGetter } from "$lib/internal/types.js";
 import { addEventListener } from "$lib/internal/utils/event.js";
+import { get } from "$lib/internal/utils/get.js";
 
 /**
  * Adds an event listener to the specified target element for the given event(s), and returns a function to remove it.
@@ -61,14 +61,14 @@ export function useEventListener(
 ): void;
 
 export function useEventListener(
-	_target: MaybeGetter<EventTarget | null | undefined>,
+	target: MaybeGetter<EventTarget | null | undefined>,
 	event: string | string[],
 	handler: EventListenerOrEventListenerObject,
 	options?: boolean | AddEventListenerOptions
 ): void {
 	$effect(() => {
-		const target = extract(_target);
-		if (target === undefined || target === null) return;
-		return addEventListener(target, event, handler, options);
+		const target$ = get(target);
+		if (target$ === undefined || target$ === null) return;
+		return addEventListener(target$, event, handler, options);
 	});
 }

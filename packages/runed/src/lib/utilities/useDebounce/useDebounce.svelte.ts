@@ -1,6 +1,6 @@
-import { extract } from "../extract/extract.js";
 import type { MaybeGetter } from "$lib/internal/types.js";
 import { type Deferred, defer } from "$lib/internal/utils/defer.js";
+import { get } from "$lib/internal/utils/get.js";
 
 /**
  * Function that takes a callback, and returns a debounced version of it.
@@ -44,7 +44,7 @@ export function useDebounce<Args extends unknown[], Return = void>(
 				timeout = undefined;
 				deferred = undefined;
 			}
-		}, extract(wait));
+		}, get(wait));
 
 		return promise;
 	};
