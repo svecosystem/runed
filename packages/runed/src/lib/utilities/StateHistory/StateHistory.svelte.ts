@@ -1,6 +1,6 @@
 import { watch } from "../watch/watch.svelte.js";
 import type { Getter, MaybeGetter, Setter } from "$lib/internal/types.js";
-import { get } from "$lib/internal/utils/get.js";
+import { extract } from "$lib/internal/utils/extract.js";
 
 export type LogEvent<T> = {
 	snapshot: T;
@@ -39,7 +39,7 @@ export class StateHistory<T> {
 		});
 
 		watch(
-			() => get(options?.capacity),
+			() => extract(options?.capacity),
 			(c) => {
 				if (!c) return;
 				this.log = this.log.slice(-c);
@@ -49,7 +49,7 @@ export class StateHistory<T> {
 
 	#addEvent(event: LogEvent<T>, options: StateHistoryOptions): void {
 		this.log.push(event);
-		const capacity$ = get(options.capacity);
+		const capacity$ = extract(options.capacity);
 		if (capacity$ && this.log.length > capacity$) {
 			this.log = this.log.slice(-capacity$);
 		}
