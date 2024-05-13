@@ -11,7 +11,7 @@ export function extract<T>(value: MaybeGetter<T>): T;
  */
 export function extract<T>(value: MaybeGetter<T | undefined>, defaultValue: T): T;
 
-export function extract<T>(value: MaybeGetter<T>, defaultValue?: T): T | undefined {
+export function extract<T>(value: MaybeGetter<T | undefined>, defaultValue?: T): T | undefined {
 	const result = isFunction(value) ? value() : value;
 	if (result === undefined) {
 		return defaultValue;
