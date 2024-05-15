@@ -52,6 +52,10 @@ export class Readable<TValue> {
 					});
 				};
 			});
+		} else if (this.#subscribers === 0) {
+			this.#start((value) => {
+				this.#current = value;
+			})();
 		}
 
 		return this.#current;

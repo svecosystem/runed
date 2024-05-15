@@ -12,6 +12,7 @@ export const activeElement = new Readable<Element | null>(null, (set) => {
 	}
 	document.addEventListener("focusin", update);
 	document.addEventListener("focusout", update);
+	update();
 
 	return () => {
 		document.removeEventListener("focusin", update);
