@@ -1,6 +1,10 @@
 import { tick } from "svelte";
+import { noop } from "$lib/internal/utils/function.js";
 
-export type StartNotifier<TValue> = (set: (value: TValue) => void) => VoidFunction;
+export type StartNotifier<TValue> = (
+	set: (value: TValue) => void,
+	insideEffect: boolean
+) => void | VoidFunction;
 
 /**
  * A class that contains a reactive `current` property
@@ -40,7 +44,7 @@ export class Readable<TValue> {
 			$effect(() => {
 				this.#subscribers++;
 				if (this.#subscribers === 1) {
-					this.#subscribe();
+					this.#subscribe(true);
 				}
 
 				return () => {
@@ -52,21 +56,23 @@ export class Readable<TValue> {
 					});
 				};
 			});
+		} else if (this.#subscribers === 0) {
+			this.#subscribe(false);
+			this.#unsubscribe();
 		}
 
 		return this.#current;
 	}
 
-	#subscribe() {
-		this.#stop = this.#start((value) => {
-			this.#current = value;
-		});
+	#subscribe(inEffect: boolean) {
+		this.#stop =
+			this.#start((value) => {
+				this.#current = value;
+			}, inEffect) ?? null;
 	}
 
 	#unsubscribe() {
-		if (this.#stop === null) {
-			return;
-		}
+		if (this.#stop === null) return;
 
 		this.#stop();
 		this.#stop = null;

@@ -6,10 +6,15 @@ import { Readable } from "../Readable/readable.svelte.js";
  *
  * @see {@link https://runed.dev/docs/utilities/use-active-element}
  */
-export const activeElement = new Readable<Element | null>(null, (set) => {
+export const activeElement = new Readable<Element | null>(null, (set, insideEffect) => {
 	function update() {
 		set(document.activeElement);
 	}
+
+	update();
+
+	if (!insideEffect) return;
+
 	document.addEventListener("focusin", update);
 	document.addEventListener("focusout", update);
 
