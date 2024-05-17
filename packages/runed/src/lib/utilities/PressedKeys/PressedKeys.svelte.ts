@@ -9,14 +9,17 @@ export class PressedKeys {
 
 			callbacks.push(
 				addEventListener(window, "keydown", (e) => {
-					if (this.#pressedKeys.includes(e.key)) return;
-					this.#pressedKeys.push(e.key);
+					const key = e.key.toLowerCase();
+					if (!this.#pressedKeys.includes(key)) {
+						this.#pressedKeys.push(key);
+					}
 				})
 			);
 
 			callbacks.push(
 				addEventListener(window, "keyup", (e) => {
-					this.#pressedKeys = this.#pressedKeys.filter((k) => k !== e.key);
+					const key = e.key.toLowerCase();
+					this.#pressedKeys = this.#pressedKeys.filter((k) => k !== key);
 				})
 			);
 
@@ -25,6 +28,11 @@ export class PressedKeys {
 	}
 
 	pressed(...keys: string[]) {
-		return keys.every((k) => this.#pressedKeys.includes(k));
+		const normalizedKeys = keys.map((key) => key.toLowerCase());
+		return normalizedKeys.every((key) => this.#pressedKeys.includes(key));
+	}
+
+	get all() {
+		return this.#pressedKeys;
 	}
 }
