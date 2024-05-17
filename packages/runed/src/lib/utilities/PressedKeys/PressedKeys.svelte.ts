@@ -1,5 +1,10 @@
 import { addEventListener } from "$lib/internal/utils/event.js";
 
+/**
+ * Tracks which keys are currently pressed.
+ *
+ * @see {@link https://runed.dev/docs/utilities/pressed-keys}
+ */
 export class PressedKeys {
 	#pressedKeys = $state<Array<string>>([]);
 
