@@ -19,8 +19,8 @@ With an instance of `PressedKeys`, you can use the `pressed` method.
 ```ts
 const keys = new PressedKeys();
 
-const isArrowDownPressed = $derived(keys.pressed('ArrowDown'));
-const isCtrlAPressed = $derived(keys.pressed('Control', 'a'));
+const isArrowDownPressed = $derived(keys.pressed("ArrowDown"));
+const isCtrlAPressed = $derived(keys.pressed("Control", "a"));
 ```
 
 Or get all of the currently pressed keys:
@@ -29,4 +29,3 @@ Or get all of the currently pressed keys:
 const pressedKeys = keys.pressed();
 console.log(pressedKeys.all);
 ```
-

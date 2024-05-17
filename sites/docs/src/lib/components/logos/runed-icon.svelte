@@ -4,7 +4,14 @@
 	let { ...restProps }: SVGAttributes<SVGElement> = $props();
 </script>
 
-<svg width="122" height="122" viewBox="0 0 122 122" fill="none" xmlns="http://www.w3.org/2000/svg" {...restProps}>
+<svg
+	width="122"
+	height="122"
+	viewBox="0 0 122 122"
+	fill="none"
+	xmlns="http://www.w3.org/2000/svg"
+	{...restProps}
+>
 	<mask
 		id="mask0_1_13"
 		style="mask-type:luminance"
