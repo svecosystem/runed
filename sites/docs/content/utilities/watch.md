@@ -15,7 +15,7 @@ callback. Svelte provides an `untrack` function, allowing you to specify that a 
 _shouldn't_ be tracked, but it doesn't provide a way to say that _only certain values_ should be
 tracked.
 
-`watch` does exactly that. It accepts one or more sources, which can be `getters`.
+`watch` does exactly that. It accepts a getter function, which returns the dependencies of the effect callback.
 
 ## Usage
 
