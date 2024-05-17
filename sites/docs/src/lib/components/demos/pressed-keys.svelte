@@ -18,7 +18,10 @@
 </script>
 
 <div class="rounded-md bg-card p-8">
-	<div class="relative mx-auto flex w-min items-center justify-center gap-2">
+	<div
+		class="relative mx-auto flex w-min items-center justify-center gap-2 transition-all duration-300
+		{allPressed ? 'translate-x-[1.625rem]' : ''}"
+	>
 		{#if allPressed}
 			<div
 				transition:scale={{ start: 0.75, duration: 300 }}
