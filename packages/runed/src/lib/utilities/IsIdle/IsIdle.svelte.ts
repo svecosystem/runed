@@ -1,5 +1,3 @@
-import { isBrowser } from "$lib/internal/utils/browser.js";
-
 const DEFAULT_EVENTS = [
 	"keypress",
 	"mousemove",
