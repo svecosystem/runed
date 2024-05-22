@@ -1,11 +1,11 @@
 <script lang="ts">
-	import { PressedKeys } from "runed";
+	import { PressedKeys, watch } from "runed";
 	import { fade, scale } from "svelte/transition";
 	import RunedIcon from "$lib/components/logos/runed-icon.svelte";
 
 	const keys = new PressedKeys();
 	const toPress = "Runed".split("");
-	const allPressed = $derived(keys.pressed(...toPress));
+	const allPressed = $derived(keys.has(...toPress));
 
 	let guessedCorrectly = $state(false);
 	$effect(() => {
@@ -15,9 +15,13 @@
 	});
 
 	let triedInputting = $state(false);
+
+	watch(() => keys.all, () => {
+		triedInputting = false;
+	});
 </script>
 
-<div class="rounded-md bg-card p-8">
+<div class="relative rounded-md bg-card p-8">
 	<div
 		class="relative mx-auto flex w-min items-center justify-center gap-2 transition-all duration-300
 		{allPressed ? 'translate-x-[1.625rem]' : ''}"
@@ -37,7 +41,7 @@
 				{allPressed ? 'border-brand' : 'border-border'} bg-background"
 				onclick={() => (triedInputting = true)}
 			>
-				{#if keys.pressed(key)}
+				{#if keys.has(key)}
 					<span
 						class="duration-250 text-xl font-bold text-foreground transition-all"
 						transition:fade={{ duration: 100 }}
@@ -51,6 +55,11 @@
 	<p class="text-center">{guessedCorrectly ? "You did it! 🎉" : "Try and guess the password 👀"}</p>
 
 	{#if !guessedCorrectly && triedInputting}
-		<p class="text-center text-foreground/50">Press any key to start, no need to select anything</p>
+		<p
+			transition:fade={{ duration: 300 }}
+			class="absolute bottom-2 right-2 mb-0 text-center text-sm text-foreground/50"
+		>
+			Press any key to start, no need to select anything
+		</p>
 	{/if}
 </div>

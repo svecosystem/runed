@@ -14,18 +14,18 @@ import Demo from '$lib/components/demos/pressed-keys.svelte';
 
 ## Usage
 
-With an instance of `PressedKeys`, you can use the `pressed` method.
+With an instance of `PressedKeys`, you can use the `has` method.
 
 ```ts
 const keys = new PressedKeys();
 
-const isArrowDownPressed = $derived(keys.pressed("ArrowDown"));
-const isCtrlAPressed = $derived(keys.pressed("Control", "a"));
+const isArrowDownPressed = $derived(keys.has("ArrowDown"));
+const isCtrlAPressed = $derived(keys.has("Control", "a"));
 ```
 
 Or get all of the currently pressed keys:
 
 ```ts
-const pressedKeys = keys.pressed();
-console.log(pressedKeys.all);
+const keys = new PressedKeys();
+console.log(keys.all());
 ```

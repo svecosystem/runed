@@ -32,7 +32,7 @@ export class PressedKeys {
 		});
 	}
 
-	pressed(...keys: string[]) {
+	has(...keys: string[]) {
 		const normalizedKeys = keys.map((key) => key.toLowerCase());
 		return normalizedKeys.every((key) => this.#pressedKeys.includes(key));
 	}
