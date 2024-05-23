@@ -16,9 +16,12 @@
 
 	let triedInputting = $state(false);
 
-	watch(() => keys.all, () => {
-		triedInputting = false;
-	});
+	watch(
+		() => keys.all,
+		() => {
+			triedInputting = false;
+		}
+	);
 </script>
 
 <div class="relative rounded-md bg-card p-8">
