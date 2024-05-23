@@ -1,5 +1,17 @@
 # runed
 
+## 0.7.0
+
+### Minor Changes
+
+- add PressedKeys utility ([#58](https://github.com/svecosystem/runed/pull/58))
+
+### Patch Changes
+
+- fix active element erroring on SSR ([#60](https://github.com/svecosystem/runed/pull/60))
+
+- fix active element not being up to date outside effects ([#55](https://github.com/svecosystem/runed/pull/55))
+
 ## 0.6.0
 
 ### Minor Changes
