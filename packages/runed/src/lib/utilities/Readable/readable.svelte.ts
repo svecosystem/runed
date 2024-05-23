@@ -1,5 +1,4 @@
 import { tick } from "svelte";
-import { noop } from "$lib/internal/utils/function.js";
 
 export type StartNotifier<TValue> = (
 	set: (value: TValue) => void,
