@@ -34,17 +34,21 @@ import type { MaybeGetter } from "$lib/internal/types.js";
  * ```
  */
 export class MediaQuery {
-	match: boolean | undefined = $state();
+	#match: boolean | undefined = $state();
 
 	constructor(query: MaybeGetter<string>) {
 		$effect(() => {
 			const result = window.matchMedia(extract(query));
 
-			this.match = result.matches;
+			this.#match = result.matches;
 
 			useEventListener(result, "change", (changed) => {
-				this.match = changed.matches;
+				this.#match = changed.matches;
 			});
 		});
+	}
+
+	get match(): boolean | undefined {
+		return this.#match;
 	}
 }
