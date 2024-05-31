@@ -7,10 +7,9 @@ import type { Getter, MaybeGetter } from "$lib/internal/types.js";
  *
  * @export
  * @class Debounced
- * @typedef {Debounced}
  */
 export class Debounced<T> {
-	#current = $state();
+	#current: T = $state()!;
 
 	constructor(getter: Getter<T>, wait: MaybeGetter<number> = 250) {
 		this.#current = getter(); // immediately set the initial value
@@ -24,7 +23,7 @@ export class Debounced<T> {
 		});
 	}
 
-	get current() {
+	get current(): T {
 		return this.#current;
 	}
 }
