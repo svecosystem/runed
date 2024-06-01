@@ -23,6 +23,6 @@ describe("Store", () => {
 		const count = new Store(readable(0));
 		expect(count.current).toBe(0);
 		// @ts-expect-error -- we're testing that the setter is not run
-		expect(() => (count.current = 'abc')).toThrow();
+		expect(() => (count.current = "abc")).toThrow();
 	});
 });
