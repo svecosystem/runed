@@ -15,8 +15,8 @@ callback. Svelte provides an `untrack` function, allowing you to specify that a 
 _shouldn't_ be tracked, but it doesn't provide a way to say that _only certain values_ should be
 tracked.
 
-`watch` does exactly that. It accepts one or more sources, which can be `getters` or
-[`boxes`](http://localhost:5173/docs/utilities/box).
+`watch` does exactly that. It accepts a getter function, which returns the dependencies of the
+effect callback.
 
 ## Usage
 
@@ -33,16 +33,6 @@ watch(() => count, () => {
 		console.log(count);
 	}
 );
-```
-
-It also accepts an array of sources.
-
-```ts
-let age = $state(24);
-let name = $state("Thomas");
-watch([() => age, () => name], () => {
-	console.log(`${name} is ${age} years old`);
-});
 ```
 
 The callback receives two arguments: The current value of the sources, and the previous value.

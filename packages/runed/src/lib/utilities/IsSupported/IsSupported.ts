@@ -3,10 +3,10 @@
  *
  * Useful for checking if a browser API is supported before attempting to use it.
  *
- * @see {@link https://runed.dev/docs/utilities/use-supported}
+ * @see {@link https://runed.dev/docs/utilities/supported}
  */
 export class IsSupported {
-	#current = $state(false);
+	#current: boolean = $state(false);
 
 	constructor(predicate: () => boolean) {
 		$effect(() => {
@@ -14,7 +14,7 @@ export class IsSupported {
 		});
 	}
 
-	get current() {
+	get current(): boolean {
 		return this.#current;
 	}
 }

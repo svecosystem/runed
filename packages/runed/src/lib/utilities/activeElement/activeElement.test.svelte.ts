@@ -4,7 +4,7 @@ import { activeElement } from "./index.js";
 import { testWithEffect } from "$lib/test/util.svelte.js";
 
 // Skipping because testing is weird
-describe.skip("useActiveElement", () => {
+describe("useActiveElement", () => {
 	testWithEffect("initializes with `document.activeElement`", () => {
 		expect(activeElement.current).toBe(document.activeElement);
 	});

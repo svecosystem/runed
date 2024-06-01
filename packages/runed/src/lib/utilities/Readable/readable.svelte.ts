@@ -1,6 +1,9 @@
 import { tick } from "svelte";
 
-export type StartNotifier<TValue> = (set: (value: TValue) => void) => VoidFunction;
+export type StartNotifier<T> = (
+	set: (value: T) => void,
+	insideEffect: boolean
+) => void | VoidFunction;
 
 /**
  * A class that contains a reactive `current` property
@@ -23,11 +26,11 @@ export type StartNotifier<TValue> = (set: (value: TValue) => void) => VoidFuncti
  * @see {@link https://runed.dev/docs/utilities/readable}
  *
  */
-export class Readable<TValue> {
-	#current = $state() as TValue;
-	#start: StartNotifier<TValue>;
+export class Readable<T> {
+	#current: T = $state()!;
+	#start: StartNotifier<T>;
 
-	constructor(initialValue: TValue, start: StartNotifier<TValue>) {
+	constructor(initialValue: T, start: StartNotifier<T>) {
 		this.#current = initialValue;
 		this.#start = start;
 	}
@@ -35,12 +38,12 @@ export class Readable<TValue> {
 	#subscribers = 0;
 	#stop: VoidFunction | null = null;
 
-	get current(): TValue {
+	get current(): T {
 		if ($effect.active()) {
 			$effect(() => {
 				this.#subscribers++;
 				if (this.#subscribers === 1) {
-					this.#subscribe();
+					this.#subscribe(true);
 				}
 
 				return () => {
@@ -52,21 +55,23 @@ export class Readable<TValue> {
 					});
 				};
 			});
+		} else if (this.#subscribers === 0) {
+			this.#subscribe(false);
+			this.#unsubscribe();
 		}
 
 		return this.#current;
 	}
 
-	#subscribe() {
-		this.#stop = this.#start((value) => {
-			this.#current = value;
-		});
+	#subscribe(inEffect: boolean): void {
+		this.#stop =
+			this.#start((value) => {
+				this.#current = value;
+			}, inEffect) ?? null;
 	}
 
-	#unsubscribe() {
-		if (this.#stop === null) {
-			return;
-		}
+	#unsubscribe(): void {
+		if (this.#stop === null) return;
 
 		this.#stop();
 		this.#stop = null;
