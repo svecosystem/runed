@@ -1,4 +1,4 @@
-import { type Readable, type Writable, get, readable } from "svelte/store";
+import { type Readable, type Writable, get } from "svelte/store";
 
 type ReadableValue<T> = T extends Readable<infer U> ? U : never
 
@@ -13,7 +13,7 @@ export class Store<T extends Readable<unknown>> {
 	constructor(store: T) {
 		this.#current = get(store) as ReadableValue<T>
 
-		$effect(() => {
+		$effect.pre(() => {
 			return store.subscribe(v => {
 				this.#current = v as ReadableValue<T>
 			})
@@ -21,9 +21,8 @@ export class Store<T extends Readable<unknown>> {
 		this.#store = store
 	}
 
-	get current() {
-		// eslint-disable-next-line ts/no-explicit-any
-		return this.#current as any
+	get current(): ReadableValue<T> {
+		return this.#current
 	}
 
 
