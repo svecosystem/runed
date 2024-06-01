@@ -17,18 +17,18 @@ type StateHistoryOptions = {
  * @see {@link https://runed.dev/docs/utilities/state-history}
  */
 export class StateHistory<T> {
-	#redoStack = $state<LogEvent<T>[]>([]);
-	#ignoreUpdate = false;
+	#redoStack: LogEvent<T>[] = $state([]);
+	#ignoreUpdate: boolean = false;
 	#set: Setter<T>;
-	log = $state<LogEvent<T>[]>([]);
-	canUndo = $derived(this.log.length > 1);
-	canRedo = $derived(this.#redoStack.length > 0);
+	log: LogEvent<T>[] = $state([]);
+	readonly canUndo = $derived(this.log.length > 1);
+	readonly canRedo = $derived(this.#redoStack.length > 0);
 
 	constructor(value: MaybeGetter<T>, set: Setter<T>, options?: StateHistoryOptions) {
 		this.#redoStack = [];
 		this.#set = set;
 
-		const addEvent = (event: LogEvent<T>) => {
+		const addEvent = (event: LogEvent<T>): void => {
 			this.log.push(event);
 			const capacity$ = get(options?.capacity);
 			if (capacity$ && this.log.length > capacity$) {
@@ -58,7 +58,7 @@ export class StateHistory<T> {
 		);
 	}
 
-	undo = () => {
+	readonly undo = (): void => {
 		const [prev, curr] = this.log.slice(-2);
 		if (!curr || !prev) return;
 		this.#ignoreUpdate = true;
@@ -67,7 +67,7 @@ export class StateHistory<T> {
 		this.#set(prev.snapshot);
 	};
 
-	redo = () => {
+	readonly redo = (): void => {
 		const nextEvent = this.#redoStack.pop();
 		if (!nextEvent) return;
 		this.#ignoreUpdate = true;

@@ -1,4 +1,4 @@
-import type { FunctionArgs, MaybeGetter } from "$lib/internal/types.js";
+import type { MaybeGetter } from "$lib/internal/types.js";
 
 /**
  * Function that takes a callback, and returns a debounced version of it.
@@ -15,22 +15,22 @@ import type { FunctionArgs, MaybeGetter } from "$lib/internal/types.js";
  *
  * @see {@link https://runed.dev/docs/utilities/use-debounce}
  */
-export function useDebounce<Callback extends FunctionArgs>(
-	callback: Callback,
+export function useDebounce<Args extends unknown[], Return>(
+	callback: (...args: Args) => Return,
 	wait: MaybeGetter<number> = 250
-) {
+): (this: unknown, ...args: Args) => Promise<Return> {
 	let timeout: ReturnType<typeof setTimeout> | undefined;
-	let resolve: (value: ReturnType<Callback>) => void;
+	let resolve: (value: Return) => void;
 	let reject: (reason: unknown) => void;
-	let promise: Promise<ReturnType<Callback>> | undefined;
+	let promise: Promise<Return> | undefined;
 
-	return function debounced(this: unknown, ...args: Parameters<Callback>) {
+	return function debounced(...args) {
 		if (timeout) {
 			clearTimeout(timeout);
 		}
 
 		if (!promise) {
-			promise = new Promise<ReturnType<Callback>>((res, rej) => {
+			promise = new Promise((res, rej) => {
 				resolve = res;
 				reject = rej;
 			});
@@ -39,7 +39,7 @@ export function useDebounce<Callback extends FunctionArgs>(
 		timeout = setTimeout(
 			async () => {
 				try {
-					resolve((await callback.apply(this, args)) as ReturnType<Callback>);
+					resolve(await callback.apply(this, args));
 				} catch (error) {
 					reject(error);
 				} finally {
