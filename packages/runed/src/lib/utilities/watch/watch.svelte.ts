@@ -2,7 +2,7 @@ import { untrack } from "svelte";
 import { isFunction } from "$lib/internal/utils/is.js";
 import type { Getter } from "$lib/internal/types.js";
 
-function runEffect(flush: "pre" | "post", effect: () => void | (() => void)) {
+function runEffect(flush: "pre" | "post", effect: () => void | VoidFunction): void {
 	switch (flush) {
 		case "pre": {
 			$effect.pre(effect);
@@ -35,10 +35,10 @@ type PreviousValue<T> = T extends Array<infer U> ? Array<U | undefined> : T | un
 
 function runWatcher<T>(
 	source: Getter<T>,
-	effect: (value: T, previousValue: PreviousValue<T>) => void | (() => void),
+	effect: (value: T, previousValue: PreviousValue<T>) => void | VoidFunction,
 	flush: "pre" | "post",
 	options: WatchOptions = {}
-) {
+): void {
 	const { lazy = false, once = false } = options;
 
 	const cleanupRoot = $effect.root(() => {
@@ -53,7 +53,7 @@ function runWatcher<T>(
 
 			const values = source();
 
-			let cleanupEffect: void | (() => void);
+			let cleanupEffect: void | VoidFunction;
 			if (!lazy || !initialRun) {
 				// On the first run, if this fn received an array, pass an empty array
 				// instead of `undefined` to allow destructuring.
@@ -89,7 +89,7 @@ function runWatcher<T>(
 
 export function watch<T>(
 	source: Getter<T>,
-	effect: (value: T, previousValue: PreviousValue<T>) => void | (() => void),
+	effect: (value: T, previousValue: PreviousValue<T>) => void | VoidFunction,
 	options?: WatchOptions
 ): void {
 	runWatcher(source, effect, "post", options);
@@ -97,7 +97,7 @@ export function watch<T>(
 
 watch.pre = function <T>(
 	sources: Getter<T>,
-	effect: (value: T, previousValue: PreviousValue<T>) => void | (() => void),
+	effect: (value: T, previousValue: PreviousValue<T>) => void | VoidFunction,
 	options?: WatchOptions
 ): void {
 	runWatcher(sources, effect, "pre", options);
