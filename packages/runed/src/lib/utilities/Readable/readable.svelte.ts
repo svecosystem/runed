@@ -1,7 +1,7 @@
 import { tick } from "svelte";
 
-export type StartNotifier<TValue> = (
-	set: (value: TValue) => void,
+export type StartNotifier<T> = (
+	set: (value: T) => void,
 	insideEffect: boolean
 ) => void | VoidFunction;
 
@@ -26,11 +26,11 @@ export type StartNotifier<TValue> = (
  * @see {@link https://runed.dev/docs/utilities/readable}
  *
  */
-export class Readable<TValue> {
-	#current = $state() as TValue;
-	#start: StartNotifier<TValue>;
+export class Readable<T> {
+	#current: T = $state()!;
+	#start: StartNotifier<T>;
 
-	constructor(initialValue: TValue, start: StartNotifier<TValue>) {
+	constructor(initialValue: T, start: StartNotifier<T>) {
 		this.#current = initialValue;
 		this.#start = start;
 	}
@@ -38,7 +38,7 @@ export class Readable<TValue> {
 	#subscribers = 0;
 	#stop: VoidFunction | null = null;
 
-	get current(): TValue {
+	get current(): T {
 		if ($effect.active()) {
 			$effect(() => {
 				this.#subscribers++;
@@ -63,14 +63,14 @@ export class Readable<TValue> {
 		return this.#current;
 	}
 
-	#subscribe(inEffect: boolean) {
+	#subscribe(inEffect: boolean): void {
 		this.#stop =
 			this.#start((value) => {
 				this.#current = value;
 			}, inEffect) ?? null;
 	}
 
-	#unsubscribe() {
+	#unsubscribe(): void {
 		if (this.#stop === null) return;
 
 		this.#stop();

@@ -6,7 +6,7 @@ import { addEventListener } from "$lib/internal/utils/event.js";
  * @see {@link https://runed.dev/docs/utilities/pressed-keys}
  */
 export class PressedKeys {
-	#pressedKeys = $state<Array<string>>([]);
+	#pressedKeys: string[] = $state([]);
 
 	constructor() {
 		$effect(() => {
@@ -32,12 +32,12 @@ export class PressedKeys {
 		});
 	}
 
-	has(...keys: string[]) {
+	has(...keys: string[]): boolean {
 		const normalizedKeys = keys.map((key) => key.toLowerCase());
 		return normalizedKeys.every((key) => this.#pressedKeys.includes(key));
 	}
 
-	get all() {
+	get all(): string[] {
 		return this.#pressedKeys;
 	}
 }
