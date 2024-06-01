@@ -1,5 +1,15 @@
 # runed
 
+## 0.8.0
+
+### Minor Changes
+
+- feat: add MediaQuery utility ([#63](https://github.com/svecosystem/runed/pull/63))
+
+### Patch Changes
+
+- Add Explicit Return Types ([#65](https://github.com/svecosystem/runed/pull/65))
+
 ## 0.7.0
 
 ### Minor Changes
