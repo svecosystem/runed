@@ -32,8 +32,7 @@ The simplest way of using this utility is just by passing a string with a valid 
 {/if}
 ```
 
-but if you need you can also pass a function that returns a string and use state values for the
-media query
+You can also pass a getter that returns a string.
 
 ```svelte
 <script lang="ts">
