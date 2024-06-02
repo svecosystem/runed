@@ -1,7 +1,6 @@
 import { extract } from "../extract/extract.js";
 import { useMutationObserver } from "../useMutationObserver/useMutationObserver.svelte.js";
 import { useResizeObserver } from "../useResizeObserver/useResizeObserver.svelte.js";
-import { watch } from "../watch/watch.svelte.js";
 import type { MaybeGetter } from "$lib/internal/types.js";
 
 type Rect = Omit<DOMRect, "toJSON">;
@@ -22,7 +21,7 @@ export type ElementRectOptions = {
  * @see {@link https://runed.dev/docs/utilities/element-size}
  */
 export class ElementRect {
-	#rect: Rect = $state({
+	#rect: Rect = $state.frozen({
 		x: 0,
 		y: 0,
 		width: 0,
@@ -62,7 +61,7 @@ export class ElementRect {
 		};
 
 		useResizeObserver(() => el, update);
-		watch(() => el, update);
+		$effect(update);
 		useMutationObserver(() => el, update, { attributeFilter: ["style", "class"] });
 	}
 

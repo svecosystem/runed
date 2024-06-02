@@ -1,8 +1,5 @@
-import { IsSupported } from "../IsSupported/IsSupported.svelte.js";
 import { extract } from "../extract/extract.js";
-import { watch } from "../watch/watch.svelte.js";
 import type { MaybeGetter } from "$lib/internal/types.js";
-import { safelyCleanup } from "$lib/internal/utils/effect.svelte.js";
 
 export interface UseMutationObserverOptions extends MutationObserverInit {}
 
@@ -18,48 +15,34 @@ export function useMutationObserver(
 	options: UseMutationObserverOptions = {}
 ) {
 	let observer: MutationObserver | undefined;
-	const isSupported = new IsSupported(() => window && "MutationObserver" in window);
-
-	const cleanup = () => {
-		if (!observer) return;
-		observer.disconnect();
-		observer = undefined;
-	};
 
 	const targets = $derived.by(() => {
 		const value = extract(target);
-		const items =
-			value === null || value === undefined ? [] : Array.isArray(value) ? value : [value];
-		return new Set(items);
+		return new Set(value ? (Array.isArray(value) ? value : [value]) : []);
 	});
 
-	const stopWatch = watch(
-		() => targets,
-		(targets) => {
-			cleanup();
+	const stop = $effect.root(() => {
+		$effect(() => {
+			if (!targets.size) return;
+			observer = new MutationObserver(callback);
+			for (const el of targets) observer.observe(el, options);
 
-			if (isSupported.current && targets.size) {
-				observer = new MutationObserver(callback);
-				targets.forEach((el) => observer!.observe(el, options));
-			}
-		}
-	);
+			return () => {
+				observer?.disconnect();
+				observer = undefined;
+			};
+		});
+	});
 
-	const takeRecords = () => {
-		return observer?.takeRecords();
-	};
-
-	const stop = () => {
-		cleanup();
-		stopWatch();
-	};
-
-	safelyCleanup(stop);
+	$effect(() => {
+		return stop;
+	});
 
 	return {
-		isSupported,
 		stop,
-		takeRecords,
+		takeRecords() {
+			return observer?.takeRecords();
+		},
 	};
 }
 

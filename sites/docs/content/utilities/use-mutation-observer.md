@@ -56,3 +56,10 @@ element.
 	{/each}
 </div>
 ```
+
+You can stop the mutation observer at any point by calling the `stop` method.
+
+```ts
+const { stop } = useMutationObserver(/* ... */);
+stop();
+```

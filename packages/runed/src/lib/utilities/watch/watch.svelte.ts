@@ -1,7 +1,6 @@
 import { untrack } from "svelte";
 import { isFunction } from "$lib/internal/utils/is.js";
 import type { Getter } from "$lib/internal/types.js";
-import { safelyCleanup } from "$lib/internal/utils/effect.svelte.js";
 
 function runEffect(flush: "pre" | "post", effect: () => void | VoidFunction): void {
 	switch (flush) {
@@ -39,7 +38,7 @@ function runWatcher<T>(
 	effect: (value: T, previousValue: PreviousValue<T>) => void | VoidFunction,
 	flush: "pre" | "post",
 	options: WatchOptions = {}
-): () => void {
+): void {
 	const { lazy = false, once = false } = options;
 
 	const cleanupRoot = $effect.root(() => {
@@ -83,23 +82,23 @@ function runWatcher<T>(
 		});
 	});
 
-	safelyCleanup(cleanupRoot);
-
-	return cleanupRoot;
+	$effect(() => {
+		return cleanupRoot;
+	});
 }
 
 export function watch<T>(
 	source: Getter<T>,
 	effect: (value: T, previousValue: PreviousValue<T>) => void | VoidFunction,
 	options?: WatchOptions
-): () => void {
-	return runWatcher(source, effect, "post", options);
+): void {
+	runWatcher(source, effect, "post", options);
 }
 
 watch.pre = function <T>(
 	sources: Getter<T>,
 	effect: (value: T, previousValue: PreviousValue<T>) => void | VoidFunction,
 	options?: WatchOptions
-): () => void {
-	return runWatcher(sources, effect, "pre", options);
+): void {
+	runWatcher(sources, effect, "pre", options);
 };

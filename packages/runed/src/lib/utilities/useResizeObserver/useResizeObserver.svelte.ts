@@ -1,7 +1,4 @@
-import { IsSupported } from "../IsSupported/IsSupported.svelte.js";
 import { extract } from "../extract/extract.js";
-import { watch } from "../watch/watch.svelte.js";
-import { safelyCleanup } from "$lib/internal/utils/effect.svelte.js";
 import type { MaybeGetter } from "$lib/internal/types.js";
 
 export interface ResizeObserverSize {
@@ -50,42 +47,30 @@ export function useResizeObserver(
 	options: UseResizeObserverOptions = {}
 ) {
 	let observer: ResizeObserver | undefined;
-	const isSupported = new IsSupported(() => window && "ResizeObserver" in window);
-
-	const cleanup = () => {
-		if (observer) {
-			observer.disconnect();
-			observer = undefined;
-		}
-	};
 
 	const targets = $derived.by(() => {
 		const value = extract(target);
-		const items =
-			value === null || value === undefined ? [] : Array.isArray(value) ? value : [value];
-		return new Set(items);
+		return new Set(value ? (Array.isArray(value) ? value : [value]) : []);
 	});
 
-	const stopWatch = watch(
-		() => targets,
-		(els) => {
-			cleanup();
-			if (isSupported.current && window) {
-				observer = new ResizeObserver(callback);
-				for (const _el of els) _el && observer!.observe(_el, options);
-			}
-		}
-	);
+	const stop = $effect.root(() => {
+		$effect(() => {
+			if (!targets.size) return;
+			observer = new ResizeObserver(callback);
+			for (const el of targets) observer.observe(el, options);
 
-	const stop = () => {
-		cleanup();
-		stopWatch();
-	};
+			return () => {
+				observer?.disconnect();
+				observer = undefined;
+			};
+		});
+	});
 
-	safelyCleanup(stop);
+	$effect(() => {
+		return stop;
+	});
 
 	return {
-		isSupported,
 		stop,
 	};
 }
