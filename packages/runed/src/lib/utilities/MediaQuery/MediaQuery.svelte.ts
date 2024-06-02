@@ -1,4 +1,3 @@
-import { extract } from "../extract/extract.js";
 import { useEventListener } from "../useEventListener/useEventListener.svelte.js";
 import type { Getter, MaybeGetter } from "$lib/internal/types.js";
 
