@@ -1,1 +1,1 @@
-export * from "./IsSupported.js";
+export * from "./IsSupported.svelte.js";
