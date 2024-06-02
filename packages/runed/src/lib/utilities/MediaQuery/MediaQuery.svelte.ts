@@ -1,6 +1,6 @@
 import { extract } from "../extract/extract.js";
 import { useEventListener } from "../useEventListener/useEventListener.svelte.js";
-import type { MaybeGetter } from "$lib/internal/types.js";
+import type { Getter, MaybeGetter } from "$lib/internal/types.js";
 
 /**
  * Take a media query (or a function that returns one if you want reactivity)
@@ -35,20 +35,40 @@ import type { MaybeGetter } from "$lib/internal/types.js";
  */
 export class MediaQuery {
 	#match: boolean | undefined = $state();
+	#effectRegistered = false;
+	#query_fn: Getter<string | void> = () => {};
+	// this will be initialized in the constructor
+	#query = $derived(this.#query_fn?.()) as string;
 
 	constructor(query: MaybeGetter<string>) {
-		$effect(() => {
-			const result = window.matchMedia(extract(query));
+		this.#query_fn = typeof query === "function" ? query : () => query;
+	}
 
-			this.#match = result.matches;
-
-			useEventListener(result, "change", (changed) => {
-				this.#match = changed.matches;
-			});
-		});
+	#matchMedia() {
+		const result = window.matchMedia(this.#query);
+		this.#match = result.matches;
+		return result;
 	}
 
 	get match(): boolean | undefined {
+		// if we are in an effect and this effect has not been registered yet
+		// we match the current value, register the listener and return match
+		if ($effect.active() && !this.#effectRegistered) {
+			$effect(() => {
+				const result = this.#matchMedia();
+				this.#effectRegistered = true;
+				useEventListener(result, "change", (changed) => {
+					this.#match = changed.matches;
+				});
+				return () => {
+					this.#effectRegistered = false;
+				};
+			});
+		} else if (!$effect.active()) {
+			// otherwise if we are not in an effect and the effect has not
+			//been registered we just match media to get the current value
+			this.#matchMedia();
+		}
 		return this.#match;
 	}
 }
