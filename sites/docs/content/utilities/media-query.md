@@ -3,7 +3,7 @@ title: MediaQuery
 description:
   Take a media query (or a function that returns one if you want reactivity) as input and you can
   check if it currently matches doing `instance.match`
-category: New
+category: Browser
 ---
 
 <script>
@@ -25,15 +25,14 @@ The simplest way of using this utility is just by passing a string with a valid 
 	const screen = new MediaQuery("(min-width: 640px)");
 </script>
 
-{#if screen.match}
+{#if screen.matches}
 	Your screen is less than 640px
 {:else}
 	Your screen is more than 640px
 {/if}
 ```
 
-but if you need you can also pass a function that returns a string and use state values for the
-media query
+You can also pass a getter that returns a string.
 
 ```svelte
 <script lang="ts">
@@ -43,7 +42,7 @@ media query
 	const query = new MediaQuery(() => media);
 </script>
 
-Media query {media} is currently {screen.match}
+Media query {media} is currently {screen.matches}
 
 <select bind:value={media}>
 	<option value="(min-width: 640px)">640px</option>
