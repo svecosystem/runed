@@ -58,7 +58,7 @@ export class MediaQuery {
 				const result = this.#matchMedia();
 				this.#effectRegistered = true;
 				useEventListener(result, "change", (changed) => {
-					this.#match = changed.matches;
+					this.#matches = changed.matches;
 				});
 				return () => {
 					this.#effectRegistered = false;
