@@ -1,5 +1,23 @@
 # runed
 
+## 0.9.0
+
+### Minor Changes
+
+- add ElementRect ([#67](https://github.com/svecosystem/runed/pull/67))
+
+- feat: `useStore` ([#50](https://github.com/svecosystem/runed/pull/50))
+
+- add useMutationObserver ([#67](https://github.com/svecosystem/runed/pull/67))
+
+- add useResizeObserver ([#67](https://github.com/svecosystem/runed/pull/67))
+
+- return cleanup from watch ([#67](https://github.com/svecosystem/runed/pull/67))
+
+### Patch Changes
+
+- rename match to matches in MediaQuery ([#67](https://github.com/svecosystem/runed/pull/67))
+
 ## 0.8.0
 
 ### Minor Changes

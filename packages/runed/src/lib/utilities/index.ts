@@ -12,3 +12,6 @@ export * from "./Debounced/index.js";
 export * from "./Store/index.js";
 export * from "./PressedKeys/index.js";
 export * from "./MediaQuery/index.js";
+export * from "./ElementRect/index.js";
+export * from "./useMutationObserver/index.js";
+export { useResizeObserver } from "./useResizeObserver/index.js";
