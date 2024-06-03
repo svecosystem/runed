@@ -34,7 +34,7 @@ import { isBrowser } from "$lib/internal/utils/browser.js";
  * ```
  */
 export class MediaQuery {
-	#match: boolean | undefined = $state();
+	#matches: boolean | undefined = $state();
 	#effectRegistered = false;
 	#query_fn: Getter<string | void> = () => {};
 	// this will be initialized in the constructor
@@ -46,11 +46,11 @@ export class MediaQuery {
 
 	#matchMedia() {
 		const result = window.matchMedia(this.#query);
-		this.#match = result.matches;
+		this.#matches = result.matches;
 		return result;
 	}
 
-	get match(): boolean | undefined {
+	get matches(): boolean | undefined {
 		// if we are in an effect and this effect has not been registered yet
 		// we match the current value, register the listener and return match
 		if ($effect.active() && !this.#effectRegistered) {
@@ -71,6 +71,6 @@ export class MediaQuery {
 				this.#matchMedia();
 			}
 		}
-		return this.#match;
+		return this.#matches;
 	}
 }
