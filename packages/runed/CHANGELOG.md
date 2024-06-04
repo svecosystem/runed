@@ -1,5 +1,11 @@
 # runed
 
+## 0.9.1
+
+### Patch Changes
+
+- rename match to matches in MediaQuery ([#69](https://github.com/svecosystem/runed/pull/69))
+
 ## 0.9.0
 
 ### Minor Changes
