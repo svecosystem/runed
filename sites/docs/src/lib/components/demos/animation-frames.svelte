@@ -2,7 +2,7 @@
 	import { AnimationFrames } from "runed";
 
 	let frames = $state(0);
-	let fpsLimit = $state(60);
+	let fpsLimit = $state(10);
 	let delta = $state(0);
 	const animation = new AnimationFrames(
 		(args) => {
@@ -11,9 +11,27 @@
 		},
 		{ fpsLimit: () => fpsLimit }
 	);
+
+	const sprites = 10;
+	const sheetCols = 3;
+	const sheetRows = Math.ceil(sprites / sheetCols);
+	const currentSprite = $derived(sprites - 1 - (frames % sprites));
+	const currentCol = $derived(currentSprite % sheetCols);
+	const currentRow = $derived(Math.floor(currentSprite / sheetCols));
+	const spriteSize = 64;
 </script>
 
 <div class="rounded-md bg-card p-8">
+	<div
+		style="
+		width: {spriteSize}px;
+		height: {spriteSize}px;
+		background: url('/bunny_sprite.png');
+		background-size: {64 * sheetCols}px {64 * sheetRows}px;
+		background-position-x: {-currentCol * 64}px;
+		background-position-y: {-currentRow * 64}px;
+	"
+	></div>
 	<p>Frames: {frames}</p>
 	<p>FPS: {animation.fps.toFixed(0)}</p>
 	<p>Delta: {delta.toFixed(0)}</p>
