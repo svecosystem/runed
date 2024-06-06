@@ -24,6 +24,7 @@ fs.writeFileSync(utilIndexFile, `export * from "./${utilName}.svelte.js";`);
 fs.writeFileSync(utilMainFile, "");
 fs.appendFileSync(utilsBarrelFile, `export * from "./${utilName}/index.js";`);
 
+// Write the boilerplate code for the docs content file
 fs.writeFileSync(
 	contentFile,
 	`---
@@ -44,6 +45,7 @@ import Demo from '$lib/components/demos/${toKebabCase(utilName)}.svelte';
 `
 );
 
+// Write the boilerplate code for the demo file
 fs.writeFileSync(
 	demoFile,
 	`
@@ -53,7 +55,7 @@ fs.writeFileSync(
 </script>
 
 <DemoContainer>
-	<! -- Add your demo here -->
+	<!-- Add your demo here -->
 </DemoContainer>
 `
 );
