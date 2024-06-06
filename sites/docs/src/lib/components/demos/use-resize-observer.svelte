@@ -1,8 +1,9 @@
 <script lang="ts">
 	import { useResizeObserver } from "runed";
+	import Textarea from "../ui/textarea/textarea.svelte";
 	import DemoContainer from "$lib/components/demo-container.svelte";
 
-	let el = $state<HTMLElement | null>(null);
+	let el = $state<HTMLElement | undefined>();
 	let text = $state("");
 
 	useResizeObserver(
@@ -18,10 +19,10 @@
 </script>
 
 <DemoContainer>
-	<textarea
-		class="h-[200px] min-h-[100px] w-[300px] min-w-[200px] resize rounded-md bg-muted p-4"
-		bind:this={el}
+	<Textarea
 		readonly
 		value={text}
-	></textarea>
+		bind:el
+		class="h-[200px] min-h-[100px] w-[300px] min-w-[200px] resize text-base"
+	/>
 </DemoContainer>
