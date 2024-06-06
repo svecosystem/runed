@@ -23,9 +23,11 @@
 			triedInputting = false;
 		}
 	);
+
+	$inspect(guessedCorrectly);
 </script>
 
-<DemoContainer>
+<DemoContainer class="flex flex-col gap-4">
 	<div
 		class="relative mx-auto flex w-min items-center justify-center gap-2 transition-all duration-300
 		{allPressed ? 'translate-x-[1.625rem]' : ''}"
