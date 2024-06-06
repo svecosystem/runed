@@ -10,7 +10,7 @@
 <DropdownMenu.Root>
 	<DropdownMenu.Trigger
 		aria-label="Change theme"
-		class={buttonVariants({ variant: "subtle", size: "icon" })}
+		class={buttonVariants({ variant: "ghost", size: "icon" })}
 	>
 		<MoonStars class="size-6" />
 	</DropdownMenu.Trigger>

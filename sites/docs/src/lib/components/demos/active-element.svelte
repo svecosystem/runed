@@ -1,12 +1,13 @@
 <script lang="ts">
 	import { activeElement } from "runed";
+	import DemoContainer from "$lib/components/demo-container.svelte";
 </script>
 
-<div class="rounded-md bg-card p-8">
+<DemoContainer>
 	<p>
 		Currently active element:
-		<span class="font-bold">
+		<span class="font-bold text-brand">
 			{activeElement.current?.localName ?? "No active element found"}
 		</span>
 	</p>
-</div>
+</DemoContainer>

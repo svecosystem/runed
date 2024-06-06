@@ -2,6 +2,7 @@
 	import { PressedKeys, watch } from "runed";
 	import { fade, scale } from "svelte/transition";
 	import RunedIcon from "$lib/components/logos/runed-icon.svelte";
+	import DemoContainer from "$lib/components/demo-container.svelte";
 
 	const keys = new PressedKeys();
 	const toPress = "Runed".split("");
@@ -22,9 +23,11 @@
 			triedInputting = false;
 		}
 	);
+
+	$inspect(guessedCorrectly);
 </script>
 
-<div class="relative rounded-md bg-card p-8">
+<DemoContainer class="flex flex-col gap-4">
 	<div
 		class="relative mx-auto flex w-min items-center justify-center gap-2 transition-all duration-300
 		{allPressed ? 'translate-x-[1.625rem]' : ''}"
@@ -65,4 +68,4 @@
 			Press any key to start, no need to select anything
 		</p>
 	{/if}
-</div>
+</DemoContainer>
