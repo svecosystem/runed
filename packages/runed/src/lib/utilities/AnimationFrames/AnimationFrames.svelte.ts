@@ -82,6 +82,6 @@ export class AnimationFrames {
 	}
 
 	get fps() {
-		return this.#fps;
+		return !this.running ? 0 : this.#fps;
 	}
 }
