@@ -20,9 +20,9 @@ const contentFile = `${contentDir}/${toKebabCase(utilName)}.md`;
 const demoFile = `${demosDir}/${toKebabCase(utilName)}.svelte`;
 
 fs.mkdirSync(utilDir, { recursive: true });
-fs.writeFileSync(utilIndexFile, `export { ${utilName} } from "./${utilName}.svelte.js";`);
+fs.writeFileSync(utilIndexFile, `export * from "./${utilName}.svelte.js";`);
 fs.writeFileSync(utilMainFile, "");
-fs.appendFileSync(utilsBarrelFile, `export { ${utilName} } from "./${utilName}/index.js";`);
+fs.appendFileSync(utilsBarrelFile, `export * from "./${utilName}/index.js";`);
 
 fs.writeFileSync(
 	contentFile,

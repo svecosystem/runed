@@ -14,5 +14,5 @@ export * from "./PressedKeys/index.js";
 export * from "./MediaQuery/index.js";
 export * from "./ElementRect/index.js";
 export * from "./useMutationObserver/index.js";
-export { useResizeObserver } from "./useResizeObserver/index.js";
-export { useIntersectionObserver } from "./useIntersectionObserver/index.js";
+export * from "./useResizeObserver/index.js";
+export * from "./useIntersectionObserver/index.js";

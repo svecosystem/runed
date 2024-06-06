@@ -1,1 +1,1 @@
-export { useIntersectionObserver } from "./useIntersectionObserver.svelte.js";
+export * from "./useIntersectionObserver.svelte.js";
