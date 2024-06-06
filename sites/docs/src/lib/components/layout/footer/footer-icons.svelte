@@ -1,6 +1,6 @@
 <script lang="ts">
 	import MobileNav from "../mobile-nav/mobile-nav.svelte";
-	import { GitHubIcon, XComIcon } from "$lib/icons/index.js";
+	import { GitHubIcon } from "$lib/icons/index.js";
 	import { Button } from "$lib/components/ui/button";
 	import { siteConfig } from "$lib/config";
 </script>
@@ -11,19 +11,9 @@
 		target="_blank"
 		aria-label="view this project on github"
 		size="icon"
-		variant="subtle"
+		variant="ghost"
 	>
 		<GitHubIcon class="size-5" />
-	</Button>
-	<Button
-		href={siteConfig.links.x}
-		target="_blank"
-		aria-label="follow on X (formerly known as Twitter)"
-		size="icon"
-		variant="subtle"
-		class="inline-flex items-center"
-	>
-		<XComIcon class="size-4" />
 	</Button>
 	<MobileNav />
 </div>

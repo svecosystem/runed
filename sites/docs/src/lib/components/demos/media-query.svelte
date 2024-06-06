@@ -1,11 +1,12 @@
 <script lang="ts">
 	import { MediaQuery } from "runed";
+	import DemoContainer from "$lib/components/demo-container.svelte";
 
 	let media = $state("(min-width: 640px)");
 	const query = new MediaQuery(() => media);
 </script>
 
-<div class="relative rounded-md bg-card p-8">
+<DemoContainer class="flex flex-col gap-4">
 	<label>
 		Current media query:
 		<select bind:value={media}>
@@ -17,6 +18,7 @@
 		</select>
 	</label>
 	<p class="mb-0">
-		The result of the media query <code>{media}</code> is <code>{query.matches}</code>
+		The result of the media query <code class="text-brand">{media}</code> is
+		<code class="text-brand">{query.matches}</code>
 	</p>
-</div>
+</DemoContainer>
