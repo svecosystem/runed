@@ -1,5 +1,15 @@
 # runed
 
+## 0.10.0
+
+### Minor Changes
+
+- feat: useIntersectionObserver ([#73](https://github.com/svecosystem/runed/pull/73))
+
+### Patch Changes
+
+- fix: ensure "add" utility exports types as well ([#74](https://github.com/svecosystem/runed/pull/74))
+
 ## 0.9.1
 
 ### Patch Changes
