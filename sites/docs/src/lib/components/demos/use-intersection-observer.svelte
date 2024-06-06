@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { useIntersectionObserver } from "runed";
+	import DemoContainer from "$lib/components/demo-container.svelte";
 
 	let root = $state<HTMLElement | undefined>(undefined);
 	let target = $state<HTMLElement | undefined>(undefined);
@@ -21,7 +22,7 @@
 	);
 </script>
 
-<div class="flex flex-col gap-4 rounded-xl bg-card p-8 text-center">
+<DemoContainer class="flex flex-col gap-4 text-center">
 	<label for="enabled">
 		<input
 			type="checkbox"
@@ -54,4 +55,4 @@
 		</span>
 		the viewport
 	</div>
-</div>
+</DemoContainer>

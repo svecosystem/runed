@@ -44,4 +44,16 @@ import Demo from '$lib/components/demos/${toKebabCase(utilName)}.svelte';
 `
 );
 
-fs.writeFileSync(demoFile, "");
+fs.writeFileSync(
+	demoFile,
+	`
+<script lang="ts">
+	import { ${utilName} } from 'runed'; 
+	import DemoContainer from '$lib/components/demo-container.svelte';
+</script>
+
+<DemoContainer>
+	<! -- Add your demo here -->
+</DemoContainer>
+`
+);

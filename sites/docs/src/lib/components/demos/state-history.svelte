@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { StateHistory } from "runed";
+	import DemoContainer from "$lib/components/demo-container.svelte";
 
 	let count = $state(0);
 	const history = new StateHistory(
@@ -13,7 +14,7 @@
 	}
 </script>
 
-<div class="rounded-md bg-card p-8">
+<DemoContainer>
 	<p class="mt-0">{count}</p>
 	<div class="flex items-center gap-2">
 		<button
@@ -52,4 +53,4 @@
 			{/each}
 		</div>
 	</div>
-</div>
+</DemoContainer>
