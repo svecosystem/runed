@@ -1,7 +1,6 @@
 import { extract } from "../extract/extract.js";
 import type { MaybeGetter } from "$lib/internal/types.js";
 import { get } from "$lib/internal/utils/get.js";
-import { noop } from "$lib/internal/utils/function.js";
 
 export interface UseIntersectionObserverOptions extends Omit<IntersectionObserverInit, "root"> {
 	/**

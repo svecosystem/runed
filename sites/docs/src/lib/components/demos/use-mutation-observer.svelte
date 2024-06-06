@@ -27,7 +27,7 @@
 	}, 1500);
 </script>
 
-<div class="rounded-lg bg-card p-8">
+<div class="rounded-md bg-card p-8">
 	<div bind:this={el} class={className} {style}>
 		{#each messages as text}
 			<div>
