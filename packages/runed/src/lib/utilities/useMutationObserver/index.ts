@@ -1,1 +1,1 @@
-export { useMutationObserver } from "./useMutationObserver.svelte.js";
+export * from "./useMutationObserver.svelte.js";
