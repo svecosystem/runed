@@ -5,7 +5,8 @@ import { noop } from "$lib/internal/utils/function.js";
 
 export interface UseIntersectionObserverOptions extends Omit<IntersectionObserverInit, "root"> {
 	/**
-	 * Whether to start the observer immediately upon creation.
+	 * Whether to start the observer immediately upon creation. If set to `false`, the observer
+	 * will only start observing when `resume()` is called.
 	 *
 	 * @defaultValue true
 	 */
@@ -30,16 +31,13 @@ export function useIntersectionObserver(
 ) {
 	const { root, rootMargin = "0px", threshold = 0.1, immediate = true } = options;
 
+	let isActive = $state(immediate);
 	let observer: IntersectionObserver | undefined;
-
-	let cleanup = noop;
 
 	const targets = $derived.by(() => {
 		const value = extract(target);
 		return new Set(value ? (Array.isArray(value) ? value : [value]) : []);
 	});
-
-	let isActive = $state(immediate);
 
 	const stop = $effect.root(() => {
 		$effect(() => {
@@ -47,13 +45,9 @@ export function useIntersectionObserver(
 			observer = new IntersectionObserver(callback, { rootMargin, root: get(root), threshold });
 			for (const el of targets) observer.observe(el);
 
-			cleanup = () => {
+			return () => {
 				observer?.disconnect();
-				cleanup = noop;
-				observer = undefined;
 			};
-
-			return cleanup;
 		});
 	});
 
@@ -67,7 +61,6 @@ export function useIntersectionObserver(
 		},
 		stop,
 		pause() {
-			cleanup();
 			isActive = false;
 		},
 		resume() {
