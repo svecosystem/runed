@@ -47,6 +47,9 @@ importers:
 
   packages/runed:
     dependencies:
+      esm-env:
+        specifier: ^1.0.0
+        version: 1.0.0
       nanoid:
         specifier: ^5.0.4
         version: 5.0.7
@@ -733,10 +736,6 @@ packages:
     peerDependencies:
       '@effect-ts/otel-node': '*'
     peerDependenciesMeta:
-      '@effect-ts/core':
-        optional: true
-      '@effect-ts/otel':
-        optional: true
       '@effect-ts/otel-node':
         optional: true
     dependencies:
