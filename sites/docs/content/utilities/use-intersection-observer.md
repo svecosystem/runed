@@ -54,9 +54,9 @@ intersection changes of the target element.
 You can pause the intersection observer at any point by calling the `pause` method.
 
 ```ts
-const observer = useIntersectionObserver(/* ... */)
+const observer = useIntersectionObserver(/* ... */);
 
-observer.pause()
+observer.pause();
 ```
 
 ### Resume
@@ -64,9 +64,9 @@ observer.pause()
 You can resume the intersection observer at any point by calling the `resume` method.
 
 ```ts
-const observer = useIntersectionObserver(/* ... */)
+const observer = useIntersectionObserver(/* ... */);
 
-observer.resume()
+observer.resume();
 ```
 
 ### Stop
@@ -74,9 +74,9 @@ observer.resume()
 You can stop the intersection observer at any point by calling the `stop` method.
 
 ```ts
-const observer = useIntersectionObserver(/* ... */)
+const observer = useIntersectionObserver(/* ... */);
 
-observer.stop()
+observer.stop();
 ```
 
 ### isActive
@@ -91,7 +91,7 @@ observer.
 </Callout>
 
 ```ts
-const observer = useIntersectionObserver(/* ... */)
+const observer = useIntersectionObserver(/* ... */);
 
 if (observer.isActive) {
 	// do something
