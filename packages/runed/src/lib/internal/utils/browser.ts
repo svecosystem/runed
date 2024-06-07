@@ -1,3 +1,1 @@
-export function isBrowser(): boolean {
-	return typeof document !== "undefined";
-}
+export { BROWSER as browser } from "esm-env";

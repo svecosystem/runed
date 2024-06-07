@@ -47,6 +47,9 @@ importers:
 
   packages/runed:
     dependencies:
+      esm-env:
+        specifier: ^1.0.0
+        version: 1.0.0
       nanoid:
         specifier: ^5.0.4
         version: 5.0.7
