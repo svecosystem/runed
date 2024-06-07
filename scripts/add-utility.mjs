@@ -10,7 +10,7 @@ const utilsDir = "./packages/runed/src/lib/utilities";
 const contentDir = "./sites/docs/content/utilities";
 const demosDir = "./sites/docs/src/lib/components/demos";
 
-const utilName = await readlineSync.question("What is the name of the utility? ");
+const utilName = readlineSync.question("What is the name of the utility? ");
 
 const utilDir = `${utilsDir}/${utilName}`;
 const utilIndexFile = `${utilDir}/index.ts`;
@@ -20,10 +20,11 @@ const contentFile = `${contentDir}/${toKebabCase(utilName)}.md`;
 const demoFile = `${demosDir}/${toKebabCase(utilName)}.svelte`;
 
 fs.mkdirSync(utilDir, { recursive: true });
-fs.writeFileSync(utilIndexFile, `export { ${utilName} } from "./${utilName}.svelte.ts";`);
+fs.writeFileSync(utilIndexFile, `export * from "./${utilName}.svelte.js";`);
 fs.writeFileSync(utilMainFile, "");
-fs.appendFileSync(utilsBarrelFile, `export { ${utilName} } from "./${utilName}/index.js";`);
+fs.appendFileSync(utilsBarrelFile, `export * from "./${utilName}/index.js";`);
 
+// Write the boilerplate code for the docs content file
 fs.writeFileSync(
 	contentFile,
 	`---
@@ -44,4 +45,17 @@ import Demo from '$lib/components/demos/${toKebabCase(utilName)}.svelte';
 `
 );
 
-fs.writeFileSync(demoFile, "");
+// Write the boilerplate code for the demo file
+fs.writeFileSync(
+	demoFile,
+	`
+<script lang="ts">
+	import { ${utilName} } from 'runed'; 
+	import DemoContainer from '$lib/components/demo-container.svelte';
+</script>
+
+<DemoContainer>
+	<!-- Add your demo here -->
+</DemoContainer>
+`
+);

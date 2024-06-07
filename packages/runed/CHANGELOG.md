@@ -1,5 +1,49 @@
 # runed
 
+## 0.10.0
+
+### Minor Changes
+
+- feat: useIntersectionObserver ([#73](https://github.com/svecosystem/runed/pull/73))
+
+### Patch Changes
+
+- fix: ensure "add" utility exports types as well ([#74](https://github.com/svecosystem/runed/pull/74))
+
+## 0.9.1
+
+### Patch Changes
+
+- rename match to matches in MediaQuery ([#69](https://github.com/svecosystem/runed/pull/69))
+
+## 0.9.0
+
+### Minor Changes
+
+- add ElementRect ([#67](https://github.com/svecosystem/runed/pull/67))
+
+- feat: `useStore` ([#50](https://github.com/svecosystem/runed/pull/50))
+
+- add useMutationObserver ([#67](https://github.com/svecosystem/runed/pull/67))
+
+- add useResizeObserver ([#67](https://github.com/svecosystem/runed/pull/67))
+
+- return cleanup from watch ([#67](https://github.com/svecosystem/runed/pull/67))
+
+### Patch Changes
+
+- rename match to matches in MediaQuery ([#67](https://github.com/svecosystem/runed/pull/67))
+
+## 0.8.0
+
+### Minor Changes
+
+- feat: add MediaQuery utility ([#63](https://github.com/svecosystem/runed/pull/63))
+
+### Patch Changes
+
+- Add Explicit Return Types ([#65](https://github.com/svecosystem/runed/pull/65))
+
 ## 0.7.0
 
 ### Minor Changes

@@ -7,7 +7,7 @@ import { untrack } from "svelte";
  * @see {@link https://runed.dev/docs/utilities/is-mounted}
  */
 export class IsMounted {
-	#isMounted = $state(false);
+	#isMounted: boolean = $state(false);
 
 	constructor() {
 		$effect(() => {
@@ -19,7 +19,7 @@ export class IsMounted {
 		});
 	}
 
-	get current() {
+	get current(): boolean {
 		return this.#isMounted;
 	}
 }

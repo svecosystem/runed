@@ -1,9 +1,10 @@
 <script lang="ts">
 	import { IsMounted } from "runed";
+	import DemoContainer from "$lib/components/demo-container.svelte";
 
 	const isMounted = new IsMounted();
 </script>
 
-<div class="rounded-md bg-card p-8">
+<DemoContainer>
 	<p>Mounted: <b>{isMounted.current ? "true" : "false"}</b></p>
-</div>
+</DemoContainer>
