@@ -1,10 +1,11 @@
 import { useEventListener } from "../useEventListener/useEventListener.svelte.js";
-import type { Getter, MaybeGetter } from "$lib/internal/types.js";
+import { extract } from "../extract/extract.js";
+import type { MaybeGetter } from "$lib/internal/types.js";
 import { browser } from "$lib/internal/utils/browser.js";
 
 /**
- * Take a media query (or a function that returns one if you want reactivity)
- * as input and you can check if it currently matches doing `instance.match`
+ * Takes a media query as an input and listsens for changes to it,
+ * holding a reactive property with its current state.
  *
  * @see {@link https://runed.dev/docs/utilities/media-query}
  *
@@ -13,7 +14,7 @@ import { browser } from "$lib/internal/utils/browser.js";
  * const screen = new MediaQuery("(min-width: 640px)");
  *
  * $effect(() => {
- * 	if (screen.match) {
+ * 	if (screen.matches) {
  * 		console.log("The screen is less than 640px");
  * 	}
  * });
@@ -22,10 +23,10 @@ import { browser } from "$lib/internal/utils/browser.js";
  * @example
  * ```ts
  * let media = $state("(min-width: 640px)");
- * const screen = new MediaQuery(()=> media);
+ * const screen = new MediaQuery(() => media);
  *
  * $effect(() => {
- * 	if (screen.match) {
+ * 	if (screen.matches) {
  * 		console.log(`Media query ${media} is ${screen.match}`);
  * 	}
  * });
@@ -34,43 +35,38 @@ import { browser } from "$lib/internal/utils/browser.js";
  * ```
  */
 export class MediaQuery {
-	#matches: boolean | undefined = $state();
+	#propQuery: MaybeGetter<string>;
+	#query = $derived.by(() => extract(this.#propQuery));
+	#mediaQueryList: MediaQueryList = $derived(window.matchMedia(this.#query));
 	#effectRegistered = false;
-	#query_fn: Getter<string | void> = () => {};
-	// this will be initialized in the constructor
-	#query = $derived(this.#query_fn?.()) as string;
+	#matches: boolean | undefined = $state();
 
 	constructor(query: MaybeGetter<string>) {
-		this.#query_fn = typeof query === "function" ? query : () => query;
-	}
-
-	#matchMedia() {
-		const result = window.matchMedia(this.#query);
-		this.#matches = result.matches;
-		return result;
+		this.#propQuery = query;
 	}
 
 	get matches(): boolean | undefined {
-		// if we are in an effect and this effect has not been registered yet
-		// we match the current value, register the listener and return match
 		if ($effect.active() && !this.#effectRegistered) {
+			this.#matches = this.#mediaQueryList.matches;
+
+			// If we are in an effect and this effect has not been registered yet
+			// we match the current value, register the listener and return match
 			$effect(() => {
-				const result = this.#matchMedia();
 				this.#effectRegistered = true;
-				useEventListener(result, "change", (changed) => {
-					this.#matches = changed.matches;
-				});
-				return () => {
-					this.#effectRegistered = false;
-				};
+
+				useEventListener(
+					() => this.#mediaQueryList,
+					"change",
+					(changed) => (this.#matches = changed.matches)
+				);
+
+				return () => (this.#effectRegistered = false);
 			});
-		} else if (!$effect.active()) {
-			// otherwise if we are not in an effect and the effect has not
-			//been registered we just match media to get the current value
-			if (browser) {
-				this.#matchMedia();
-			}
+		} else if (!$effect.active() && browser) {
+			// Otherwise, just match media to get the current value
+			this.#matches = this.#mediaQueryList.matches;
 		}
+
 		return this.#matches;
 	}
 }
