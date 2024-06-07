@@ -1,6 +1,6 @@
 import { useEventListener } from "../useEventListener/useEventListener.svelte.js";
 import type { Getter, MaybeGetter } from "$lib/internal/types.js";
-import { isBrowser } from "$lib/internal/utils/browser.js";
+import { browser } from "$lib/internal/utils/browser.js";
 
 /**
  * Take a media query (or a function that returns one if you want reactivity)
@@ -67,7 +67,7 @@ export class MediaQuery {
 		} else if (!$effect.active()) {
 			// otherwise if we are not in an effect and the effect has not
 			//been registered we just match media to get the current value
-			if (isBrowser()) {
+			if (browser) {
 				this.#matchMedia();
 			}
 		}

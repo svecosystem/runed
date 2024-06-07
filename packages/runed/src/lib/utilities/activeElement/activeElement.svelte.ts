@@ -1,5 +1,5 @@
 import { Readable } from "../Readable/readable.svelte.js";
-import { isBrowser } from "$lib/internal/utils/browser.js";
+import { browser } from "$lib/internal/utils/browser.js";
 
 /**
  * An object holding a reactive value that is equal to `document.activeElement`.
@@ -9,7 +9,7 @@ import { isBrowser } from "$lib/internal/utils/browser.js";
  */
 export const activeElement = new Readable<Element | null>(null, (set, insideEffect) => {
 	function update() {
-		if (!isBrowser()) return;
+		if (!browser) return;
 		set(document.activeElement);
 	}
 
