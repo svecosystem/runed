@@ -7,4 +7,7 @@ export default defineConfig({
 		include: ["src/**/*.{test,test.svelte,spec}.{js,ts}"],
 		environment: "jsdom",
 	},
+	resolve: {
+		conditions: ["browser"],
+	},
 });

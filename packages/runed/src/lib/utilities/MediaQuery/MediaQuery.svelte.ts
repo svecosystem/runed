@@ -1,7 +1,7 @@
 import { useEventListener } from "../useEventListener/useEventListener.svelte.js";
 import { extract } from "../extract/extract.js";
-import type { Getter, MaybeGetter } from "$lib/internal/types.js";
-import { isBrowser } from "$lib/internal/utils/browser.js";
+import type { MaybeGetter } from "$lib/internal/types.js";
+import { browser } from "$lib/internal/utils/browser.js";
 
 /**
  * Takes a media query as an input and listsens for changes to it,
@@ -62,7 +62,7 @@ export class MediaQuery {
 
 				return () => (this.#effectRegistered = false);
 			});
-		} else if (!$effect.active() && isBrowser()) {
+		} else if (!$effect.active() && browser) {
 			// Otherwise, just match media to get the current value
 			this.#matches = this.#mediaQueryList.matches;
 		}
