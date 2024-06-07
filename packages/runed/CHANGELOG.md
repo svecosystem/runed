@@ -1,5 +1,15 @@
 # runed
 
+## 0.11.0
+
+### Minor Changes
+
+- feat: allow media query to be initialized in a module ([#68](https://github.com/svecosystem/runed/pull/68))
+
+### Patch Changes
+
+- chore: use esm-env For Browser Checks ([#79](https://github.com/svecosystem/runed/pull/79))
+
 ## 0.10.0
 
 ### Minor Changes
