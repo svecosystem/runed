@@ -2,6 +2,7 @@ import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
 import { IsIdle } from "./IsIdle.svelte.js";
 import { testWithEffect } from "$lib/test/util.svelte.js";
 
+// ? should this go in the test utils file? Any other tests that would need this?
 function vitestSetTimeoutWrapper(fn: () => void, timeout: number) {
 	setTimeout(async () => {
 		fn();
