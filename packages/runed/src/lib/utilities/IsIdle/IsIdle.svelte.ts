@@ -22,9 +22,11 @@ export class IsIdle {
 	#events: (keyof WindowEventMap)[];
 
 	constructor(timeout = 500, options: Partial<typeof DEFAULT_OPTIONS> = DEFAULT_OPTIONS) {
-		this.#events = options?.events || ["keypress", "mousemove", "touchmove", "click", "scroll"];
-		this.#idle = options?.initialState ?? false;
 		this.#timeout = timeout;
+		this.#idle = options?.initialState ?? false;
+		this.#events = Array.isArray(options.events)
+			? options.events
+			: ["keypress", "mousemove", "touchmove", "click", "scroll"];
 
 		$effect(() => {
 			this.#events.forEach((event) => document.addEventListener(event, this.reset));
@@ -36,7 +38,7 @@ export class IsIdle {
 		});
 	}
 
-  // allow consumer to manually reset state
+	// allow consumer to manually reset state
 	reset() {
 		this.#idle = false;
 
