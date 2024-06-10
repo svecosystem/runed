@@ -56,8 +56,9 @@ describe("IsIdle", () => {
 				expect(idleState.current).toBe(true);
 			}, 300);
 		});
-		test.todo("Default args don't get overwritten when other args are passed in");
-		test.todo("Initial state option get overwritten when passed in");
-		test.todo("Initial state option get overwritten when passed in");
+		describe("Default args don't get overwritten when other args are passed in", () => {
+			test.todo("Initial state option get overwritten when passed in");
+			test.todo("Initial state option get overwritten when passed in");
+		});
 	});
 });
