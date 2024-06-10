@@ -21,7 +21,7 @@ export class IsIdle {
 	#timeout = $state<number>();
 	#events: (keyof WindowEventMap)[];
 
-	constructor(timeout: number = 500, options: Partial<typeof DEFAULT_OPTIONS> = DEFAULT_OPTIONS) {
+	constructor(timeout = 500, options: Partial<typeof DEFAULT_OPTIONS> = DEFAULT_OPTIONS) {
 		this.#events = options?.events || ["keypress", "mousemove", "touchmove", "click", "scroll"];
 		this.#idle = options?.initialState ?? false;
 		this.#timeout = timeout;
