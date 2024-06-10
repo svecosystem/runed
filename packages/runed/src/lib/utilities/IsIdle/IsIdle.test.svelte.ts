@@ -58,7 +58,14 @@ describe("IsIdle", () => {
 			}, 300);
 		});
 		describe("Default args don't get overwritten when other args are passed in", () => {
-			test.todo("Initial state option get overwritten when passed in");
+			testWithEffect("Initial state option gets overwritten when passed in", async () => {
+				const idleState = new IsIdle(undefined, { initialState: true });
+				expect(idleState.current).toBe(true);
+			});
+			test.todo("Events args work gets overwritten when passed in", async () => {
+				const idleState = new IsIdle(undefined, { events: ['keypress'] });
+				expect(idleState.current).toBe(false);
+			});
 			test.todo("Initial state option get overwritten when passed in");
 		});
 	});
