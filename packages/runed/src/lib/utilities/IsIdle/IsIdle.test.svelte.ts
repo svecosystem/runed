@@ -57,16 +57,20 @@ describe("IsIdle", () => {
 				expect(idleState.current).toBe(true);
 			}, 300);
 		});
-		describe("Default args don't get overwritten when other args are passed in", () => {
-			testWithEffect("Initial state option gets overwritten when passed in", async () => {
-				const idleState = new IsIdle(undefined, { initialState: true });
+		testWithEffect("Initial state option gets overwritten when passed in", async () => {
+			const idleState = new IsIdle(undefined, { initialState: true });
+			expect(idleState.current).toBe(true);
+		});
+		test.todo("Events args work gets overwritten when passed in", async () => {
+			const idleState = new IsIdle(undefined, { events: ["keypress"] });
+
+			vitestSetTimeoutWrapper(() => {
+				const input = document.createElement("input");
+				document.body.appendChild(input);
+				input.click();
 				expect(idleState.current).toBe(true);
-			});
-			test.todo("Events args work gets overwritten when passed in", async () => {
-				const idleState = new IsIdle(undefined, { events: ['keypress'] });
-				expect(idleState.current).toBe(false);
-			});
-			test.todo("Initial state option get overwritten when passed in");
+				// TODO: add jest-dom to handle events
+			}, DEFAULT_IDLE_TIME);
 		});
 	});
 });
