@@ -57,7 +57,7 @@ describe("watch", () => {
 		}
 	);
 
-	testWithEffect("lazy watchers correctly pass the initial value as the previous value", () => {
+	testWithEffect("lazy watchers pass the initial value as the previous value", () => {
 		return new Promise((resolve) => {
 			let count = $state(0);
 
@@ -99,5 +99,25 @@ describe("watch", () => {
 		count++;
 		await sleep(0);
 		expect(runs).toBe(1);
+	});
+
+	testWithEffect("once watchers pass the initial value as the previous value", () => {
+		return new Promise((resolve) => {
+			let count = $state(0);
+
+			watchOnce(
+				() => count,
+				(count, prevCount) => {
+					expect(count).toBe(1);
+					expect(prevCount).toBe(0);
+					resolve();
+				}
+			);
+
+			// Wait for the watcher's initial run to determine its dependencies.
+			sleep(0).then(() => {
+				count = 1;
+			});
+		});
 	});
 });
