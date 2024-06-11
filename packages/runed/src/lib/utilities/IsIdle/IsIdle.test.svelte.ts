@@ -19,6 +19,7 @@ describe("IsIdle", () => {
 		vi.clearAllTimers();
 	});
 
+	const DEFAULT_IDLE_TIME = 500;
 	describe("Default behaviors", () => {
 		testWithEffect("Initially set to false", async () => {
 			const idleState = new IsIdle();
@@ -26,7 +27,6 @@ describe("IsIdle", () => {
 		});
 
 		testWithEffect("IsIdle is set to true when no activity occurs", async () => {
-			const DEFAULT_IDLE_TIME = 500;
 			const idleState = new IsIdle();
 
 			vitestSetTimeoutWrapper(() => {
