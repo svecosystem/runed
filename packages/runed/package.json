@@ -29,6 +29,7 @@
 		"package": "svelte-kit sync && svelte-package && publint",
 		"test": "vitest --run",
 		"test:watch": "vitest --watch",
+		"test:ui": "vitest --watch --ui",
 		"check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
 		"watch": "svelte-kit sync && svelte-package --watch"
 	},
@@ -52,6 +53,7 @@
 		"@sveltejs/vite-plugin-svelte": "^3.0.0",
 		"@types/node": "^20.10.6",
 		"@vitest/coverage-v8": "^1.5.1",
+		"@vitest/ui": "^1.6.0",
 		"jsdom": "^24.0.0",
 		"publint": "^0.1.9",
 		"svelte": "^5.0.0-next.130",
