@@ -1,16 +1,16 @@
 <script lang="ts">
 	import { Previous } from "runed";
+	import Button from "$lib/components/ui/button/button.svelte";
+	import DemoContainer from "$lib/components/demo-container.svelte";
 
 	let count = $state(0);
 	const previous = new Previous(() => count);
 </script>
 
-<div class="rounded-md bg-card p-8">
-	<button
-		class="inline-flex items-center justify-center rounded-md border bg-brand/50
-px-3 py-1.5 text-sm font-medium transition-all hover:bg-brand/25 focus:outline-none active:bg-brand/15"
-		onclick={() => count++}>Count: {count}</button
-	>
+<DemoContainer>
+	<Button variant="brand" onclick={() => count++}>
+		Count: {count}
+	</Button>
 
 	<pre class="m-0 mt-4 bg-transparent p-0 font-mono">Previous: {`${previous.current}`}</pre>
-</div>
+</DemoContainer>

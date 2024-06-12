@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { useMutationObserver } from "runed";
+	import DemoContainer from "$lib/components/demo-container.svelte";
 
 	let el = $state<HTMLElement | null>(null);
 	const messages = $state<string[]>([]);
@@ -27,7 +28,7 @@
 	}, 1500);
 </script>
 
-<div class="rounded-md bg-card p-8">
+<DemoContainer>
 	<div bind:this={el} class={className} {style}>
 		{#each messages as text}
 			<div>
@@ -37,4 +38,4 @@
 			<div>No mutations yet</div>
 		{/each}
 	</div>
-</div>
+</DemoContainer>
