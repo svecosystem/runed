@@ -25,10 +25,6 @@
 	const stats = $derived(
 		`Frames: ${frames}\nFPS: ${animation.fps.toFixed(0)}\nDelta: ${delta.toFixed(0)}ms`
 	);
-
-	function toggle() {
-		animation.running = !animation.running;
-	}
 </script>
 
 <div class="relative flex flex-col items-center gap-4 rounded-md bg-card p-8">
@@ -45,9 +41,9 @@
 		aria-label="spinning ghost mouse"
 	></div>
 	<button
-		class="inline-flex gap-1 items-center justify-center rounded-md border bg-brand/50
+		class="inline-flex items-center justify-center gap-1 rounded-md border bg-brand/50
 		px-3 py-1.5 text-sm font-medium transition-all hover:bg-brand/25 focus:outline-none active:bg-brand/15"
-		onclick={toggle}
+		onclick={animation.toggle}
 	>
 		{#if animation.running}
 			<Pause size={16} weight="fill" />
@@ -56,10 +52,14 @@
 		{/if}
 		{animation.running ? "Stop" : "Start"}
 	</button>
-	<p class="m-0 text-center text-sm">FPS limit: <b>{fpsLimit}</b></p>
+	<p class="m-0 text-center text-sm">
+		FPS limit: <b>{fpsLimit}</b><i>{fpsLimit === 0 ? " (not limited)" : ""}</i>
+	</p>
 	<Slider
 		class="w-[300px]"
 		value={[fpsLimit]}
 		onValueChange={(value) => (fpsLimit = value[0] ?? 0)}
+		min={0}
+		max={144}
 	/>
 </div>
