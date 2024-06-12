@@ -1,4 +1,4 @@
-import { onMount } from "svelte";
+import { onMount, untrack } from "svelte";
 import { extract } from "../extract/index.js";
 import type { MaybeGetter } from "$lib/internal/types.js";
 
@@ -46,15 +46,16 @@ export class AnimationFrames {
 	constructor(callback: (params: RafCallbackParams) => void, options: AnimationFramesOptions = {}) {
 		this.#fpsLimitOption = options.fpsLimit;
 		this.#callback = callback;
-		this.#running = options.immediate ?? true;
 
-		onMount(() => {
-			if (this.#running) {
-				this.start();
+		$effect(() => {
+			if (options.immediate ?? true) {
+				untrack(this.start);
 			}
+
 			return this.stop;
 		});
 	}
+
 	#loop = (timestamp: DOMHighResTimeStamp) => {
 		if (!this.#running) return;
 
@@ -76,16 +77,16 @@ export class AnimationFrames {
 	};
 
 	start = () => {
+		this.#running = true;
 		this.#previousTimestamp = 0;
 		this.#frame = requestAnimationFrame(this.#loop);
-		this.#running = true;
 	};
 
 	stop = () => {
 		if (!this.#frame) return;
+		this.#running = false;
 		cancelAnimationFrame(this.#frame);
 		this.#frame = null;
-		this.#running = false;
 	};
 
 	toggle = () => {
