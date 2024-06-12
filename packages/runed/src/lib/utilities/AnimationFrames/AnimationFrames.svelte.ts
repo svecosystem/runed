@@ -35,7 +35,7 @@ export type AnimationFramesOptions = {
  */
 export class AnimationFrames {
 	#fps = $state(0);
-	#previousTimestamp = 0;
+	#previousTimestamp: number | null = null;
 	#frame: number | null = null;
 	running = $state(false);
 
@@ -46,7 +46,7 @@ export class AnimationFrames {
 		const loop = (timestamp: DOMHighResTimeStamp) => {
 			if (!this.running) return;
 
-			if (!this.#previousTimestamp) {
+			if (this.#previousTimestamp === null) {
 				this.#previousTimestamp = timestamp;
 			}
 
@@ -56,8 +56,8 @@ export class AnimationFrames {
 				this.#frame = requestAnimationFrame(loop);
 				return;
 			}
-			this.#fps = fps;
 
+			this.#fps = fps;
 			this.#previousTimestamp = timestamp;
 			callback({ delta, timestamp });
 			this.#frame = requestAnimationFrame(loop);
@@ -67,6 +67,7 @@ export class AnimationFrames {
 			this.#previousTimestamp = 0;
 			this.#frame = requestAnimationFrame(loop);
 		};
+
 		const stop = () => {
 			this.#frame && cancelAnimationFrame(this.#frame);
 			this.#frame = null;
