@@ -17,6 +17,8 @@ Runed provides utilities to power your applications using the magic of
 npm install runed
 ```
 
+Check out the [documentation](https://runed.dev) for more information.
+
 ## Sponsors
 
 This project is supported by the following beautiful people/organizations:
