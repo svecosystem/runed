@@ -1,5 +1,11 @@
 # runed
 
+## 0.12.0
+
+### Minor Changes
+
+- add `AnimationFrames` ([#78](https://github.com/svecosystem/runed/pull/78))
+
 ## 0.11.0
 
 ### Minor Changes
