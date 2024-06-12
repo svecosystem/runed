@@ -1,5 +1,11 @@
 # runed
 
+## 0.12.1
+
+### Patch Changes
+
+- fix animationFrames ([#89](https://github.com/svecosystem/runed/pull/89))
+
 ## 0.12.0
 
 ### Minor Changes
