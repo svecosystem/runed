@@ -1,4 +1,4 @@
-import { onMount, untrack } from "svelte";
+import { untrack } from "svelte";
 import { extract } from "../extract/index.js";
 import type { MaybeGetter } from "$lib/internal/types.js";
 
