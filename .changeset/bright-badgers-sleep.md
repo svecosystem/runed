@@ -1,5 +1,0 @@
----
-"runed": patch
----
-
-fix animationFrames
