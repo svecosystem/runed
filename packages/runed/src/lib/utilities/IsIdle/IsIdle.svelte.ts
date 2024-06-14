@@ -32,12 +32,11 @@ export class IsIdle {
 			: ["keypress", "mousemove", "touchmove", "click", "scroll"];
 
 		if (browser) {
-			useEventListener(document.body, this.#events, this.reset);
+			useEventListener(document.body, this.#events, this.#reset);
 		}
 	}
 
-	// allow consumer to manually reset state
-	reset = () => {
+	#reset = () => {
 		if (!browser) return;
 		this.#idle = false;
 
