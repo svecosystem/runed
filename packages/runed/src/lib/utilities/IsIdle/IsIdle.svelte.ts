@@ -1,3 +1,6 @@
+import { browser } from "$lib/internal/utils/browser.js";
+import { useEventListener } from "$lib/utilities/useEventListener/useEventListener.svelte.js";
+
 const DEFAULT_EVENTS = [
 	"keypress",
 	"mousemove",
@@ -28,18 +31,14 @@ export class IsIdle {
 			? options.events
 			: ["keypress", "mousemove", "touchmove", "click", "scroll"];
 
-		$effect(() => {
-			this.#events.forEach((event) => document.addEventListener(event, this.reset));
-
-			// remove event listeners onUnmount
-			return () => {
-				this.#events.forEach((event) => document.removeEventListener(event, this.reset));
-			};
-		});
+		if (browser) {
+			useEventListener(document.body, this.#events, this.reset);
+		}
 	}
 
 	// allow consumer to manually reset state
-	reset() {
+	reset = () => {
+		if (!browser) return;
 		this.#idle = false;
 
 		if (this.#timer) {
@@ -49,7 +48,7 @@ export class IsIdle {
 		this.#timer = window.setTimeout(() => {
 			this.#idle = true;
 		}, this.#timeout);
-	}
+	};
 
 	get current() {
 		return this.#idle;
