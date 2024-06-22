@@ -1,5 +1,5 @@
-import { describe, expect, vi } from "vitest";
-import { watch } from "./watch.svelte.js";
+import { describe, expect } from "vitest";
+import { watch, watchOnce } from "./watch.svelte.js";
 import { testWithEffect } from "$lib/test/util.svelte.js";
 import { sleep } from "$lib/internal/utils/sleep.js";
 
@@ -16,84 +16,108 @@ describe("watch", () => {
 		);
 
 		// Watchers run immediately by default
-		await vi.waitFor(() => {
-			expect(runs).toBe(1);
-		});
+		await sleep(0);
+		expect(runs).toBe(1);
 
 		count++;
-		await vi.waitFor(() => {
-			expect(runs).toBe(2);
-		});
+		await sleep(0);
+		expect(runs).toBe(2);
 	});
 
 	testWithEffect("watchers initially pass `undefined` as the previous value", () => {
-		const count = $state(0);
+		return new Promise<void>((resolve) => {
+			const count = $state(0);
 
-		watch(
-			() => count,
-			(count, prevCount) => {
-				expect(count).toBe(0);
-				expect(prevCount).toBe(undefined);
-			}
-		);
+			watch(
+				() => count,
+				(count, prevCount) => {
+					expect(count).toBe(0);
+					expect(prevCount).toBe(undefined);
+					resolve();
+				}
+			);
+		});
 	});
 
 	testWithEffect(
-		"watchers with an array initially pass an empty array as the previous value",
+		"watchers with an array of sources initially pass an empty array as the previous value",
 		() => {
-			const count = $state(1);
-			const doubled = $derived(count * 2);
+			return new Promise<void>((resolve) => {
+				const count = $state(1);
+				const doubled = $derived(count * 2);
 
-			watch(
-				() => [count, doubled],
-				([count, doubled], [prevCount, prevDoubled]) => {
+				watch([() => count, () => doubled], ([count, doubled], [prevCount, prevDoubled]) => {
 					expect(count).toBe(1);
 					expect(prevCount).toBe(undefined);
-
 					expect(doubled).toBe(2);
 					expect(prevDoubled).toBe(undefined);
-				}
-			);
+					resolve();
+				});
+			});
 		}
 	);
 
-	testWithEffect(
-		"lazy watchers correctly pass the initial value as the previous value",
-		async () => {
-			const count = $state(0);
+	testWithEffect("lazy watchers pass the initial value as the previous value", () => {
+		return new Promise((resolve) => {
+			let count = $state(0);
 
 			watch(
 				() => count,
 				(count, prevCount) => {
 					expect(count).toBe(1);
 					expect(prevCount).toBe(0);
+					resolve();
 				},
 				{ lazy: true }
 			);
-		}
-	);
 
-	testWithEffect("watchers with `{ once: true }` only run once", async () => {
+			// Wait for the watcher's initial run to determine its dependencies.
+			sleep(0).then(() => {
+				count = 1;
+			});
+		});
+	});
+
+	testWithEffect("once watchers only run once", async () => {
 		let count = $state(0);
-
 		let runs = 0;
-		watch(
+
+		watchOnce(
 			() => count,
 			() => {
 				runs++;
-			},
-			{ once: true }
+			}
 		);
 
-		await vi.waitFor(() => {
-			expect(runs).toBe(1);
-		});
-
-		count++;
-
-		// Give the watcher a chance to rerun.
+		// Wait for the watcher's initial run to determine its dependencies.
 		await sleep(0);
 
+		count++;
+		await sleep(0);
 		expect(runs).toBe(1);
+
+		count++;
+		await sleep(0);
+		expect(runs).toBe(1);
+	});
+
+	testWithEffect("once watchers pass the initial value as the previous value", () => {
+		return new Promise((resolve) => {
+			let count = $state(0);
+
+			watchOnce(
+				() => count,
+				(count, prevCount) => {
+					expect(count).toBe(1);
+					expect(prevCount).toBe(0);
+					resolve();
+				}
+			);
+
+			// Wait for the watcher's initial run to determine its dependencies.
+			sleep(0).then(() => {
+				count = 1;
+			});
+		});
 	});
 });
