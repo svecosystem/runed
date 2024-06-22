@@ -16,20 +16,16 @@ import Demo from '$lib/components/demos/is-idle.svelte';
 
 ```svelte
 <script lang="ts">
- import { IsIdle } from "runed";
- import { cn } from "$lib/utils";
+	import { IsIdle } from "runed";
+	import { cn } from "$lib/utils";
 
- const isIdle = new IsIdle();
+	const isIdle = new IsIdle();
 </script>
 
-<div class="rounded-md bg-card p-8">
- <p>
-  <span>
-    Idle: 
-  </span>
-  <b class={cn(isIdle.current ? "text-green-600" : "text-red-500")}>
-    {isIdle.current}
-  </b>
- </p>
-</div>
+<p>
+	Idle:
+	<span style:color={isIdle.current ? "green" : "red"}>
+		{isIdle.current}
+	</span>
+</p>
 ```

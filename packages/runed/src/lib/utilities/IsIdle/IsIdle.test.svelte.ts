@@ -1,15 +1,6 @@
-import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { IsIdle } from "./IsIdle.svelte.js";
-import { testWithEffect } from "$lib/test/util.svelte.js";
-
-// ? should this go in the test utils file? Any other tests that would need this?
-function vitestSetTimeoutWrapper(fn: () => void, timeout: number) {
-	setTimeout(async () => {
-		fn();
-	}, timeout + 1);
-
-	vi.advanceTimersByTime(timeout);
-}
+import { testWithEffect, vitestSetTimeoutWrapper } from "$lib/test/util.svelte.js";
 
 describe("IsIdle", () => {
 	beforeEach(() => {
@@ -61,7 +52,7 @@ describe("IsIdle", () => {
 			const idleState = new IsIdle(undefined, { initialState: true });
 			expect(idleState.current).toBe(true);
 		});
-		test.todo("Events args work gets overwritten when passed in", async () => {
+		it.only("Events args work gets overwritten when passed in", async () => {
 			const idleState = new IsIdle(undefined, { events: ["keypress"] });
 
 			vitestSetTimeoutWrapper(() => {
