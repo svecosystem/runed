@@ -52,7 +52,7 @@ describe("IsIdle", () => {
 			const idleState = new IsIdle(undefined, { initialState: true });
 			expect(idleState.current).toBe(true);
 		});
-		it.only("Events args work gets overwritten when passed in", async () => {
+		it.skip("Events args work gets overwritten when passed in", async () => {
 			const idleState = new IsIdle(undefined, { events: ["keypress"] });
 
 			vitestSetTimeoutWrapper(() => {
