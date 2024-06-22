@@ -1,4 +1,4 @@
-import { test } from "vitest";
+import { test, vi } from "vitest";
 
 export function testWithEffect(name: string, fn: () => void | Promise<void>) {
 	test(name, async () => {
@@ -13,4 +13,12 @@ export function testWithEffect(name: string, fn: () => void | Promise<void>) {
 			cleanup();
 		}
 	});
+}
+
+export function vitestSetTimeoutWrapper(fn: () => void, timeout: number) {
+	setTimeout(async () => {
+		fn();
+	}, timeout + 1);
+
+	vi.advanceTimersByTime(timeout);
 }
