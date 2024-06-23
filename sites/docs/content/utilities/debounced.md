@@ -30,3 +30,19 @@ returns a debounced state.
 	<p>You searched for: <b>{debounced.current}</b></p>
 </div>
 ```
+
+You may cancel the pending update, or set a new value immediately. Setting immediately also cancels any pending updates.
+
+```ts
+let count = $state(0);
+const debounced = new Debounced(() => count, 500);
+count = 1;
+debounced.cancel();
+// after a while...
+console.log(debounced.current); // Still 0!
+
+count = 2;
+console.log(debounced.current); // Still 0!
+debounced.setImmediately(count);
+console.log(debounced.current); // 2
+```

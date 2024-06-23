@@ -12,6 +12,9 @@ const CUSTOM_IGNORES = [
 export default config({
 	svelte: true,
 	ignores: [...DEFAULT_IGNORES, ...CUSTOM_IGNORES],
+	rules: {
+	"no-new": "off",
+	}
 }).override("antfu/typescript/rules", {
 	rules: {
 		"ts/consistent-type-definitions": "off",

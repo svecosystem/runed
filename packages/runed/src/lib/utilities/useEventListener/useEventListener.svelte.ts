@@ -13,7 +13,7 @@ import { addEventListener } from "$lib/internal/utils/event.js";
  */
 export function useEventListener<TEvent extends keyof WindowEventMap>(
 	target: MaybeGetter<Window | null | undefined>,
-	event: TEvent | TEvent[],
+	event: MaybeGetter<TEvent | TEvent[]>,
 	handler: (this: Window, event: WindowEventMap[TEvent]) => unknown,
 	options?: boolean | AddEventListenerOptions
 ): void;
@@ -29,7 +29,7 @@ export function useEventListener<TEvent extends keyof WindowEventMap>(
  */
 export function useEventListener<TEvent extends keyof DocumentEventMap>(
 	target: MaybeGetter<Document | null | undefined>,
-	event: TEvent | TEvent[],
+	event: MaybeGetter<TEvent | TEvent[]>,
 	handler: (this: Document, event: DocumentEventMap[TEvent]) => unknown,
 	options?: boolean | AddEventListenerOptions
 ): void;
@@ -48,7 +48,7 @@ export function useEventListener<
 	TEvent extends keyof HTMLElementEventMap,
 >(
 	target: MaybeGetter<TElement | null | undefined>,
-	event: TEvent | TEvent[],
+	event: MaybeGetter<TEvent | TEvent[]>,
 	handler: (this: TElement, event: HTMLElementEventMap[TEvent]) => unknown,
 	options?: boolean | AddEventListenerOptions
 ): void;
@@ -64,7 +64,7 @@ export function useEventListener<
  */
 export function useEventListener<TEvent extends keyof MediaQueryListEventMap>(
 	target: MaybeGetter<MediaQueryList | null | undefined>,
-	event: TEvent | TEvent[],
+	event: MaybeGetter<TEvent | TEvent[]>,
 	handler: (this: MediaQueryList, event: MediaQueryListEventMap[TEvent]) => unknown,
 	options?: boolean | AddEventListenerOptions
 ): void;
@@ -80,20 +80,21 @@ export function useEventListener<TEvent extends keyof MediaQueryListEventMap>(
  */
 export function useEventListener(
 	target: MaybeGetter<EventTarget | null | undefined>,
-	event: string | string[],
+	event: MaybeGetter<string | string[]>,
 	handler: EventListenerOrEventListenerObject,
 	options?: boolean | AddEventListenerOptions
 ): void;
 
 export function useEventListener(
 	_target: MaybeGetter<EventTarget | null | undefined>,
-	event: string | string[],
+	_events: MaybeGetter<string | string[]>,
 	handler: EventListenerOrEventListenerObject,
 	options?: boolean | AddEventListenerOptions
 ): void {
 	$effect(() => {
 		const target = extract(_target);
+		const events = extract(_events);
 		if (target === undefined || target === null) return;
-		return addEventListener(target, event, handler, options);
+		return addEventListener(target, events, handler, options);
 	});
 }

@@ -1,5 +1,13 @@
 import type { MaybeGetter } from "$lib/internal/types.js";
 
+type UseDebounceReturn<Args extends unknown[], Return> = ((
+	this: unknown,
+	...args: Args
+) => Promise<Return>) & {
+	cancel: () => void;
+	pending: boolean;
+};
+
 /**
  * Function that takes a callback, and returns a debounced version of it.
  * When calling the debounced function, it will wait for the specified time
@@ -18,13 +26,20 @@ import type { MaybeGetter } from "$lib/internal/types.js";
 export function useDebounce<Args extends unknown[], Return>(
 	callback: (...args: Args) => Return,
 	wait: MaybeGetter<number> = 250
-): (this: unknown, ...args: Args) => Promise<Return> {
-	let timeout: ReturnType<typeof setTimeout> | undefined;
-	let resolve: (value: Return) => void;
-	let reject: (reason: unknown) => void;
-	let promise: Promise<Return> | undefined;
+): UseDebounceReturn<Args, Return> {
+	let timeout = $state<ReturnType<typeof setTimeout>>();
+	let resolve: null | ((value: Return) => void) = null;
+	let reject: null | ((reason: unknown) => void) = null;
+	let promise: Promise<Return> | null = null;
 
-	return function debounced(...args) {
+	function reset() {
+		timeout = undefined;
+		promise = null;
+		resolve = null;
+		reject = null;
+	}
+
+	function debounced(this: unknown, ...args: Args) {
 		if (timeout) {
 			clearTimeout(timeout);
 		}
@@ -39,17 +54,37 @@ export function useDebounce<Args extends unknown[], Return>(
 		timeout = setTimeout(
 			async () => {
 				try {
-					resolve(await callback.apply(this, args));
+					resolve?.(await callback.apply(this, args));
 				} catch (error) {
-					reject(error);
+					reject?.(error);
 				} finally {
-					timeout = undefined;
-					promise = undefined;
+					reset();
 				}
 			},
 			typeof wait === "function" ? wait() : wait
 		);
 
 		return promise;
+	}
+
+	debounced.cancel = async () => {
+		if (timeout === undefined) {
+			// Wait one event loop to see if something triggered the debounced function
+			await new Promise((resolve) => setTimeout(resolve, 0));
+			if (timeout === undefined) return;
+		}
+
+		clearTimeout(timeout);
+		reject?.("Cancelled");
+		reset();
 	};
+
+	Object.defineProperty(debounced, "pending", {
+		enumerable: true,
+		get() {
+			return !!timeout;
+		},
+	});
+
+	return debounced as unknown as UseDebounceReturn<Args, Return>;
 }

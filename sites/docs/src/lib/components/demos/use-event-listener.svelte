@@ -3,7 +3,7 @@
 	import DemoContainer from "$lib/components/demo-container.svelte";
 
 	let count = $state(0);
-	useEventListener(document.body, "click", () => count++);
+	useEventListener(() => document.body, "click", () => count++);
 </script>
 
 <DemoContainer class="select-none">
