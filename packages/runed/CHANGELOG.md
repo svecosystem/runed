@@ -1,5 +1,25 @@
 # runed
 
+## 0.13.0
+
+### Minor Changes
+
+- allow setting immediately and cancelling Debounced update ([#96](https://github.com/svecosystem/runed/pull/96))
+
+- feat: `IsIdle` ([#94](https://github.com/svecosystem/runed/pull/94))
+
+- allow passing multiple events to useEventListener ([#96](https://github.com/svecosystem/runed/pull/96))
+
+- allow cancelling debounce fn ([#96](https://github.com/svecosystem/runed/pull/96))
+
+- update `watch` utility ([#83](https://github.com/svecosystem/runed/pull/83))
+
+### Patch Changes
+
+- fix animationFrames ([#91](https://github.com/svecosystem/runed/pull/91))
+
+- Fix isIdle errors ([#96](https://github.com/svecosystem/runed/pull/96))
+
 ## 0.12.1
 
 ### Patch Changes
