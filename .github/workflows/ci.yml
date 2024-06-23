@@ -11,7 +11,7 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  Check:
+  check:
     name: Run svelte-check
     runs-on: ubuntu-latest
     steps:
@@ -34,7 +34,7 @@ jobs:
       - name: Run svelte-check
         run: pnpm check
 
-  Test:
+  test:
     runs-on: ubuntu-latest
     name: Test
     steps:
@@ -50,7 +50,7 @@ jobs:
 
       - run: pnpm test
     
-  Lint:
+  lint:
     runs-on: ubuntu-latest
     name: Lint
     steps:
