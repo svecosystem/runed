@@ -1,4 +1,4 @@
-import { describe, expect, vi } from "vitest";
+import { describe, expect } from "vitest";
 import { Debounced } from "./Debounced.svelte.js";
 import { testWithEffect } from "$lib/test/util.svelte.js";
 
@@ -8,7 +8,7 @@ describe("Debounced", () => {
 		const debounced = new Debounced(() => value, 100);
 
 		expect(debounced.current).toBe(0);
-		value = 1
+		value = 1;
 		expect(debounced.current).toBe(0);
 		await new Promise((resolve) => setTimeout(resolve, 200));
 		expect(debounced.current).toBe(1);
@@ -19,7 +19,7 @@ describe("Debounced", () => {
 		const debounced = new Debounced(() => value, 100);
 
 		expect(debounced.current).toBe(0);
-		value = 1
+		value = 1;
 		expect(debounced.current).toBe(0);
 		debounced.cancel();
 		await new Promise((resolve) => setTimeout(resolve, 200));
@@ -31,7 +31,7 @@ describe("Debounced", () => {
 		const debounced = new Debounced(() => value, 100);
 
 		expect(debounced.current).toBe(0);
-		value = 1
+		value = 1;
 		expect(debounced.current).toBe(0);
 		await new Promise((resolve) => setTimeout(resolve, 200));
 		expect(debounced.current).toBe(1);

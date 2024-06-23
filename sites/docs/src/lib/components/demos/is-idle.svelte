@@ -5,6 +5,7 @@
 
 	const idle = new IsIdle({ timeout: 1000 });
 	let now = $state(Date.now());
+	// eslint-disable-next-line no-new
 	new AnimationFrames(() => {
 		now = Date.now();
 	});
@@ -18,9 +19,7 @@
 		Last active: <b>{secondsElapsed}s ago</b>
 	</p>
 </DemoContainer>
-<p class="text-right text-xs opacity-50 mb-0" >
+<p class="mb-0 text-right text-xs opacity-50">
 	By default, the time of inactivity before marking the user as idle is 1 minute.
 </p>
-<p class="text-right text-xs opacity-50 mt-1.5">
-	In this demo, it's 1 second.
-</p>
+<p class="mt-1.5 text-right text-xs opacity-50">In this demo, it's 1 second.</p>

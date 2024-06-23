@@ -25,6 +25,8 @@
 
 <DemoContainer>
 	<Button variant="brand" size="sm" onclick={ding}>DING DING DING</Button>
-	<Button variant="subtle" size="sm" onclick={logCount.cancel} disabled={!logCount.pending}>Cancel message</Button>
+	<Button variant="subtle" size="sm" onclick={logCount.cancel} disabled={!logCount.pending}
+		>Cancel message</Button
+	>
 	<p>{logged || "Press the button!"}</p>
 </DemoContainer>

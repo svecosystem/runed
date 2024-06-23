@@ -31,7 +31,8 @@ returns a debounced state.
 </div>
 ```
 
-You may cancel the pending update, or set a new value immediately. Setting immediately also cancels any pending updates.
+You may cancel the pending update, or set a new value immediately. Setting immediately also cancels
+any pending updates.
 
 ```ts
 let count = $state(0);

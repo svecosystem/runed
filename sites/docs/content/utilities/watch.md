@@ -61,9 +61,9 @@ watch([() => age, () => name], ([age, name], [prevAge, prevName]) => {
 
 ```ts
 watch(sources, callback, {
-    // First run will only happen after sources change when set to true.
-    // By default, its false.
-	lazy: true,
+	// First run will only happen after sources change when set to true.
+	// By default, its false.
+	lazy: true
 });
 ```
 
@@ -74,5 +74,6 @@ watch(sources, callback, {
 
 ### `watchOnce`
 
-In case you want to run the callback only once, you can use `watchOnce` and `watchOnce.pre`. It functions identically to the `watch` and `watch.pre` otherwise, but it does not accept any options object.
-
+In case you want to run the callback only once, you can use `watchOnce` and `watchOnce.pre`. It
+functions identically to the `watch` and `watch.pre` otherwise, but it does not accept any options
+object.

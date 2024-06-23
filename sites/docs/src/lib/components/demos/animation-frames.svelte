@@ -64,6 +64,10 @@
 		max={144}
 	/>
 </DemoContainer>
-<p class="text-xs opacity-50 text-right">
-    Mouse sprite extracted from <a class="hover:opacity-75" target="_blank" href="https://www.animalwell.net/">Animal Well</a>
+<p class="text-right text-xs opacity-50">
+	Mouse sprite extracted from <a
+		class="hover:opacity-75"
+		target="_blank"
+		href="https://www.animalwell.net/">Animal Well</a
+	>
 </p>

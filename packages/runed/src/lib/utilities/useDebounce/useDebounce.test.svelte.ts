@@ -27,5 +27,5 @@ describe("useDebounce", () => {
 		expect(debounced.pending).toBe(false);
 		await new Promise((resolve) => setTimeout(resolve, 200));
 		expect(fn).not.toHaveBeenCalled();
-	})
+	});
 });
