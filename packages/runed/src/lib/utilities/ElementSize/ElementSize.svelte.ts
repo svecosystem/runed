@@ -1,5 +1,5 @@
+import { extract } from "../extract/extract.js";
 import type { MaybeGetter } from "$lib/internal/types.js";
-import { get } from "$lib/internal/utils/get.js";
 
 export type ElementSizeOptions = {
 	initialSize?: {
@@ -36,7 +36,7 @@ export class ElementSize {
 		};
 
 		$effect(() => {
-			const node$ = get(node);
+			const node$ = extract(node);
 			if (!node$) return;
 
 			const observer = new ResizeObserver((entries) => {

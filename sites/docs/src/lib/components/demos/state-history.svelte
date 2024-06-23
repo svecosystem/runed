@@ -1,43 +1,49 @@
-<script lang="ts">
-	import { StateHistory } from "runed";
-	import Button from "$lib/components/ui/button/button.svelte";
-	import DemoContainer from "$lib/components/demo-container.svelte";
+<script>
+	import {StateHistory} from "runed"
 
-	let count = $state(0);
-	const history = new StateHistory(
-		() => count,
-		(c) => (count = c),
-		{ capacity: 10 }
-	);
+	// I'm doing everything here cause I can't rename files for some reason
+	let states = $state([])
+	const history = new StateHistory(() => states, (s) => states = s)
 
-	function format(ts: number) {
-		return new Date(ts).toLocaleString();
+	class Undoable {
+		#idx
+
+		constructor(initial) {
+			states.push(initial)
+			this.#idx = states.length - 1
+
+			$effect(() => {
+				console.log(states[this.#idx])
+				states = states
+			})
+
+
+			$effect(() => {
+				return () => {
+					states.splice(this.#idx, 1)
+				}
+			})
+		}
+
+		get current() {
+			return states[this.#idx]
+		}
+
+		set current(val) {
+			states[this.#idx] = val
+		}
 	}
+
+	// App logic starts here
+	let count1 = new Undoable(0)
+
 </script>
 
-<DemoContainer class="flex flex-col gap-4">
-	<p class="mt-0">{count}</p>
-	<div class="flex items-center gap-2">
-		<Button size="sm" variant="brand" onclick={() => count++}>Increment</Button>
-		<Button size="sm" variant="brand" onclick={() => count--}>Decrement</Button>
-		<span class="px-2"> / </span>
-		<Button size="sm" variant="subtle" disabled={!history.canUndo} onclick={history.undo}>
-			Undo
-		</Button>
-		<Button size="sm" variant="subtle" disabled={!history.canRedo} onclick={history.redo}>
-			Redo
-		</Button>
-	</div>
+<button onclick={() => count1.current++}>
+	clicks: {count1.current}
+</button>
 
-	<div class="mt-4">
-		<p class="m-0 opacity-75">History (limited to 10 records for demo)</p>
-		<div class="mt-2 rounded-md border bg-background p-2">
-			{#each history.log.toReversed() as event}
-				<div class="flex items-center gap-4">
-					<span class="font-mono opacity-50">{format(event.timestamp)}</span>
-					<span>{`{ value: ${event.snapshot} }`}</span>
-				</div>
-			{/each}
-		</div>
-	</div>
-</DemoContainer>
+<br />
+
+<button disabled={!history.canUndo} onclick={history.undo}>Undo</button>
+<button disabled={!history.canRedo} onclick={history.redo}>Redo</button>

@@ -1,6 +1,5 @@
 import { extract } from "../extract/extract.js";
 import type { MaybeGetter } from "$lib/internal/types.js";
-import { get } from "$lib/internal/utils/get.js";
 
 export interface UseIntersectionObserverOptions extends Omit<IntersectionObserverInit, "root"> {
 	/**
@@ -41,7 +40,7 @@ export function useIntersectionObserver(
 	const stop = $effect.root(() => {
 		$effect(() => {
 			if (!targets.size || !isActive) return;
-			observer = new IntersectionObserver(callback, { rootMargin, root: get(root), threshold });
+			observer = new IntersectionObserver(callback, { rootMargin, root: extract(root), threshold });
 			for (const el of targets) observer.observe(el);
 
 			return () => {
