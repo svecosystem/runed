@@ -28,7 +28,7 @@ export class ClickLogger() {
 	#clicks = $state(0)
 
 	constructor() {
-		useEventListener(document.body, "click", () => this.#clicks++);
+		useEventListener(() => document.body, "click", () => this.#clicks++);
 	}
 
 	get clicks() {

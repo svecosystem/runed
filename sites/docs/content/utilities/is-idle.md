@@ -1,6 +1,6 @@
 ---
 title: IsIdle
-description: Determine if a user is active.
+description: Determine if a user is idle, and when was the last time they were active.
 category: Utilities
 ---
 
@@ -16,16 +16,13 @@ import Demo from '$lib/components/demos/is-idle.svelte';
 
 ```svelte
 <script lang="ts">
-	import { IsIdle } from "runed";
-	import { cn } from "$lib/utils";
+	import { AnimationFrames, IsIdle } from "runed";
 
-	const isIdle = new IsIdle();
+	const idle = new IsIdle({ timeout: 1000 });
 </script>
 
+<p>Idle: {idle.current}</p>
 <p>
-	Idle:
-	<span style:color={isIdle.current ? "green" : "red"}>
-		{isIdle.current}
-	</span>
+	Last active: {new Date(idle.lastActive).toLocaleTimeString()}
 </p>
 ```

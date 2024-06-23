@@ -2,6 +2,7 @@
 	import { AnimationFrames } from "runed";
 	import { Pause, Play } from "phosphor-svelte";
 	import { Slider } from "../ui/slider";
+	import DemoContainer from "../demo-container.svelte";
 
 	let frames = $state(0);
 	let fpsLimit = $state(10);
@@ -27,7 +28,7 @@
 	);
 </script>
 
-<div class="relative flex flex-col items-center gap-4 rounded-md bg-card p-8">
+<DemoContainer class="relative flex flex-col items-center gap-4 rounded-md bg-card p-8">
 	<pre class="text-mono absolute left-2 top-2 m-0 p-2 text-xs">{stats}</pre>
 	<div
 		style="
@@ -62,4 +63,11 @@
 		min={0}
 		max={144}
 	/>
-</div>
+</DemoContainer>
+<p class="text-right text-xs opacity-50">
+	Mouse sprite extracted from <a
+		class="hover:opacity-75"
+		target="_blank"
+		href="https://www.animalwell.net/">Animal Well</a
+	>
+</p>

@@ -1,6 +1,6 @@
 ---
 title: StateHistory
-description: Track the change history of a ref, also provides undo and redo functionality
+description: Track the change history of a value, providing undo and redo functionality
 category: State
 ---
 

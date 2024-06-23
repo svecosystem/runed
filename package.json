@@ -33,6 +33,7 @@
 		"build:content": "pnpm -F \"./sites/**\" --parallel build:content",
 		"ci:publish": "pnpm build:packages && changeset publish",
 		"lint": "prettier --check . && eslint .",
+		"lint:fix": "prettier --write . && eslint . --fix",
 		"format": "prettier --write .",
 		"check": "pnpm -r check",
 		"sync": "pnpm -r sync",

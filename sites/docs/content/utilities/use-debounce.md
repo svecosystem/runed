@@ -38,8 +38,7 @@ category: Utilities
 	}
 </script>
 
-<div>
-	<button onclick={ding}>DING DING DING</button>
-	<p>{logged || "Press the button!"}</p>
-</div>
+<button onclick={ding}>DING DING DING</button>
+<button onclick={logCount.cancel} disabled={!logCount.pending}>Cancel message</button>
+<p>{logged || "Press the button!"}</p>
 ```

@@ -13,9 +13,6 @@ import Demo from '$lib/components/demos/animation-frames.svelte';
 ## Demo
 
 <Demo />
-<p class="text-xs opacity-50 text-right">
-    Mouse sprite extracted from <a target="_blank" href="https://www.animalwell.net/">Animal Well</a>
-</p>
 
 ## Description
 

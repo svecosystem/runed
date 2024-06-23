@@ -26,7 +26,7 @@ describe("IsIdle", () => {
 		});
 
 		testWithEffect("IsIdle is set to false on click event", async () => {
-			const idleState = new IsIdle(300);
+			const idleState = new IsIdle();
 
 			vitestSetTimeoutWrapper(() => {
 				expect(idleState.current).toBe(true);
@@ -34,26 +34,28 @@ describe("IsIdle", () => {
 				document.body.appendChild(input);
 				input.click();
 				expect(idleState.current).toBe(false);
-			}, 300);
+			}, DEFAULT_IDLE_TIME);
 		});
 	});
 
 	describe("Args", () => {
 		testWithEffect("IsIdle timer arg", async () => {
-			const idleState = new IsIdle(300);
+			const idleState = new IsIdle({ timeout: 300 });
 			vitestSetTimeoutWrapper(() => {
 				expect(idleState.current).toBe(false);
-			}, 250);
+			}, 200);
 			vitestSetTimeoutWrapper(() => {
 				expect(idleState.current).toBe(true);
 			}, 300);
 		});
+
 		testWithEffect("Initial state option gets overwritten when passed in", async () => {
-			const idleState = new IsIdle(undefined, { initialState: true });
+			const idleState = new IsIdle({ initialState: true });
 			expect(idleState.current).toBe(true);
 		});
+
 		it.skip("Events args work gets overwritten when passed in", async () => {
-			const idleState = new IsIdle(undefined, { events: ["keypress"] });
+			const idleState = new IsIdle({ events: ["keypress"] });
 
 			vitestSetTimeoutWrapper(() => {
 				const input = document.createElement("input");
