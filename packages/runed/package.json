@@ -56,7 +56,7 @@
 		"@vitest/ui": "^1.6.0",
 		"jsdom": "^24.0.0",
 		"publint": "^0.1.9",
-		"svelte": "^5.0.0-next.130",
+		"svelte": "^5.0.0-next.164",
 		"svelte-check": "^3.6.0",
 		"tslib": "^2.4.1",
 		"typescript": "^5.0.0",
