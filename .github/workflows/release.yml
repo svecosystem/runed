@@ -40,3 +40,19 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      - name: Build site
+        if: steps.changesets.outputs.published == 'true'
+        run: pnpm -F docs build
+
+      - name: Deploy to Cloudflare Pages
+        if: steps.changesets.outputs.published == 'true'
+        uses: AdrianGonz97/refined-cf-pages-action@v1
+        with:
+          apiToken: ${{ secrets.CF_API_TOKEN }}
+          accountId: ${{ secrets.CF_ACCOUNT_ID }}
+          githubToken: ${{ secrets.GITHUB_TOKEN }}
+          projectName: runed
+          directory: ./.svelte-kit/cloudflare
+          workingDirectory: sites/docs
+          deploymentName: Production
