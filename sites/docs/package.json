@@ -1,7 +1,7 @@
 {
 	"name": "docs",
 	"description": "Docs for Runed",
-	"version": "0.0.0",
+	"version": "0.0.1",
 	"private": true,
 	"scripts": {
 		"dev": "concurrently \"pnpm:dev:content\" \"pnpm:dev:svelte\"",
