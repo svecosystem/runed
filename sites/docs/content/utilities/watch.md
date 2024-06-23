@@ -46,12 +46,24 @@ watch(() => count, (curr, prev) => {
 );
 ```
 
+You can also send in an array of sources:
+
+<!-- prettier-ignore -->
+```ts
+let age = $state(20);
+let name = $state("bob");
+watch([() => age, () => name], ([age, name], [prevAge, prevName]) => {
+  // ...
+}
+```
+
 `watch` also accepts an `options` object.
 
 ```ts
 watch(sources, callback, {
-	lazy: true, // First run will only happen after sources change
-	once: true // Will only run once
+    // First run will only happen after sources change when set to true.
+    // By default, its false.
+	lazy: true,
 });
 ```
 
@@ -59,3 +71,8 @@ watch(sources, callback, {
 
 `watch.pre` is similar to `watch`, but it uses
 [`$effect.pre`](https://svelte-5-preview.vercel.app/docs/runes#$effect-pre) under the hood.
+
+### `watchOnce`
+
+In case you want to run the callback only once, you can use `watchOnce` and `watchOnce.pre`. It functions identically to the `watch` and `watch.pre` otherwise, but it does not accept any options object.
+
