@@ -18,3 +18,4 @@ export * from "./useMutationObserver/index.js";
 export * from "./useResizeObserver/index.js";
 export * from "./AnimationFrames/index.js";
 export * from "./useIntersectionObserver/index.js";
+export * from "./SearchParams/index.js";
