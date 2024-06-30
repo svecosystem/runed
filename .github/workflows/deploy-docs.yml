@@ -1,0 +1,46 @@
+name: Deploy Docs
+
+on:
+  workflow_dispatch:
+
+concurrency: ${{ github.workflow }}-${{ github.ref }}
+
+jobs:
+  deploy:
+    permissions:
+      contents: write # to create release (changesets/action)
+      pull-requests: write # to create pull request (changesets/action)
+      deployments: write
+    name: Deploy
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          # This makes Actions fetch all Git history so that Changesets can generate changelogs with the correct commits
+          fetch-depth: 0
+
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install
+
+      - name: Build site
+        if: steps.changesets.outputs.published == 'true'
+        run: pnpm -F docs build
+
+      - name: Deploy to Cloudflare Pages
+        if: steps.changesets.outputs.published == 'true'
+        uses: AdrianGonz97/refined-cf-pages-action@v1
+        with:
+          apiToken: ${{ secrets.CF_API_TOKEN }}
+          accountId: ${{ secrets.CF_ACCOUNT_ID }}
+          githubToken: ${{ secrets.GITHUB_TOKEN }}
+          projectName: runed
+          directory: ./.svelte-kit/cloudflare
+          workingDirectory: sites/docs
+          deploymentName: Production
