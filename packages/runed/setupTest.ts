@@ -1,14 +1,11 @@
 import "@testing-library/svelte/vitest";
 import "@testing-library/jest-dom/vitest";
-import * as matchers from "@testing-library/jest-dom/matchers";
-import { expect, vi } from "vitest";
+import { vi } from "vitest";
 import type { Navigation, Page } from "@sveltejs/kit";
 import { readable } from "svelte/store";
 import type * as environment from "$app/environment";
 import type * as navigation from "$app/navigation";
 import type * as stores from "$app/stores";
-
-expect.extend(matchers);
 
 // Mock SvelteKit runtime module $app/environment
 vi.mock("$app/environment", (): typeof environment => ({
