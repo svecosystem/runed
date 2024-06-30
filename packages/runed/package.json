@@ -45,7 +45,7 @@
 		"!dist/**/*.spec.*"
 	],
 	"peerDependencies": {
-		"svelte": "^5.0.0"
+		"svelte": "^5.0.0-next.1"
 	},
 	"devDependencies": {
 		"@sveltejs/kit": "^2.5.3",
