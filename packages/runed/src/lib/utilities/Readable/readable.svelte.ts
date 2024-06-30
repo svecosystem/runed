@@ -39,7 +39,7 @@ export class Readable<T> {
 	#stop: VoidFunction | null = null;
 
 	get current(): T {
-		if ($effect.active()) {
+		if ($effect.tracking()) {
 			$effect(() => {
 				this.#subscribers++;
 				if (this.#subscribers === 1) {

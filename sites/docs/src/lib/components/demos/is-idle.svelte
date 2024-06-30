@@ -1,7 +1,6 @@
 <script lang="ts">
 	import { AnimationFrames, IsIdle } from "runed";
 	import DemoContainer from "../demo-container.svelte";
-	import { cn } from "$lib/utils";
 
 	const idle = new IsIdle({ timeout: 1000 });
 	let now = $state(Date.now());
@@ -14,7 +13,9 @@
 </script>
 
 <DemoContainer>
-	<p>Idle: <b class={cn(idle.current ? "text-green-600" : "text-red-300")}>{idle.current}</b></p>
+	<p>
+		Idle: <b class={idle.current ? "text-success" : "text-destructive"}>{idle.current}</b>
+	</p>
 	<p>
 		Last active: <b>{secondsElapsed}s ago</b>
 	</p>
