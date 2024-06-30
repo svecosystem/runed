@@ -3,8 +3,6 @@ name: Deploy Docs
 on:
   workflow_dispatch:
 
-concurrency: ${{ github.workflow }}-${{ github.ref }}
-
 jobs:
   deploy:
     permissions:
