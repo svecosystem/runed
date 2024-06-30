@@ -22,7 +22,7 @@ jobs:
       - name: Install dependencies
         run: pnpm install
 
-      - name: Build site
+      - name: Build package & site
         run: pnpm build
 
       - name: Deploy to Cloudflare Pages
