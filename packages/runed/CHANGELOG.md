@@ -1,5 +1,11 @@
 # runed
 
+## 0.14.0
+
+### Minor Changes
+
+- feat: `IsFocusWithin` ([#103](https://github.com/svecosystem/runed/pull/103))
+
 ## 0.13.0
 
 ### Minor Changes
