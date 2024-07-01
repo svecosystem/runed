@@ -46,7 +46,7 @@ export class MediaQuery {
 	}
 
 	get matches(): boolean | undefined {
-		if ($effect.active() && !this.#effectRegistered) {
+		if ($effect.tracking() && !this.#effectRegistered) {
 			this.#matches = this.#mediaQueryList.matches;
 
 			// If we are in an effect and this effect has not been registered yet
@@ -62,7 +62,7 @@ export class MediaQuery {
 
 				return () => (this.#effectRegistered = false);
 			});
-		} else if (!$effect.active() && browser) {
+		} else if (!$effect.tracking() && browser) {
 			// Otherwise, just match media to get the current value
 			this.#matches = this.#mediaQueryList.matches;
 		}

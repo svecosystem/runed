@@ -27,6 +27,7 @@ const config = {
 					DEFAULT: "hsl(var(--brand) / <alpha-value>)",
 					hover: "hsl(var(--brand-hover) / <alpha-value>)",
 				},
+				success: "hsl(var(--success) / <alpha-value>)",
 				primary: {
 					DEFAULT: "hsl(var(--primary) / <alpha-value>)",
 					foreground: "hsl(var(--primary-foreground) / <alpha-value>)",
