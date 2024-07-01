@@ -21,7 +21,7 @@ of the element.
 <script lang="ts">
 	import { ElementRect } from "runed";
 
-	let el = $state() as HTMLElement;
+	let el = $state<HTMLElement>();
 	const rect = new ElementRect(() => el);
 </script>
 

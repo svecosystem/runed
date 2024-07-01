@@ -65,7 +65,7 @@
 	"type": "module",
 	"dependencies": {
 		"@melt-ui/svelte": "^0.74.0",
-		"bits-ui": "^0.21.5",
+		"bits-ui": "^0.21.11",
 		"mode-watcher": "^0.3.0",
 		"rehype-slug": "^6.0.0",
 		"runed": "workspace:^",

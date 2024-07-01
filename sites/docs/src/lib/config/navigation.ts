@@ -67,6 +67,9 @@ function generateUtilitiesNav() {
 	// Create the navItems array based on the sorted categories
 	for (const category of sortedCategories) {
 		const items = categoryItemsMap[category] ?? [];
+		// Sort the items based on the title
+		items.sort((a, b) => a.title.localeCompare(b.title));
+		// Add the category to the navItems array
 		navItems.push({
 			title: category,
 			items,
