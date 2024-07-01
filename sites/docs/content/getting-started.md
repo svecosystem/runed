@@ -37,8 +37,8 @@ import { activeElement } from "runed";
 
 function logActiveElement() {
 	$effect(() => {
-		console.log('Active element is ', activeElement.current)
-	})
+		console.log("Active element is ", activeElement.current);
+	});
 }
 
 logActiveElement();
