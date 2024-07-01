@@ -23,7 +23,10 @@ const config = {
 				ring: "hsl(var(--ring) / <alpha-value>)",
 				background: "hsl(var(--background) / <alpha-value>)",
 				foreground: "hsl(var(--foreground) / <alpha-value>)",
-				brand: "hsl(var(--brand) / <alpha-value>)",
+				brand: {
+					DEFAULT: "hsl(var(--brand) / <alpha-value>)",
+					hover: "hsl(var(--brand-hover) / <alpha-value>)",
+				},
 				success: "hsl(var(--success) / <alpha-value>)",
 				primary: {
 					DEFAULT: "hsl(var(--primary) / <alpha-value>)",
@@ -37,6 +40,7 @@ const config = {
 					DEFAULT: "hsl(var(--destructive) / <alpha-value>)",
 					foreground: "hsl(var(--destructive-foreground) / <alpha-value>)",
 				},
+				success: "hsl(var(--success) / <alpha-value>)",
 				muted: {
 					DEFAULT: "hsl(var(--muted) / <alpha-value>)",
 					foreground: "hsl(var(--muted-foreground) / <alpha-value>)",

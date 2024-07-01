@@ -112,14 +112,14 @@ importers:
   sites/docs:
     dependencies:
       '@melt-ui/svelte':
-        specifier: ^0.74.0
-        version: 0.74.4(svelte@5.0.0-next.168)
+        specifier: ^0.83.0
+        version: 0.83.0(svelte@5.0.0-next.168)
       bits-ui:
         specifier: ^0.21.11
         version: 0.21.11(svelte@5.0.0-next.168)
       mode-watcher:
-        specifier: ^0.3.0
-        version: 0.3.0(svelte@5.0.0-next.168)
+        specifier: ^0.3.1
+        version: 0.3.1(svelte@5.0.0-next.168)
       rehype-slug:
         specifier: ^6.0.0
         version: 6.0.0
@@ -127,11 +127,11 @@ importers:
         specifier: workspace:^
         version: link:../../packages/runed
       svelte-sonner:
-        specifier: ^0.3.22
-        version: 0.3.22(svelte@5.0.0-next.168)
+        specifier: ^0.3.24
+        version: 0.3.24(svelte@5.0.0-next.168)
       vaul-svelte:
-        specifier: ^0.3.0
-        version: 0.3.0(svelte@5.0.0-next.168)
+        specifier: ^0.3.2
+        version: 0.3.2(svelte@5.0.0-next.168)
     devDependencies:
       '@sveltejs/adapter-cloudflare':
         specifier: ^4.1.0
@@ -164,8 +164,8 @@ importers:
         specifier: ^0.3.4
         version: 0.3.4(esbuild@0.20.2)
       mdsx:
-        specifier: ^0.0.5
-        version: 0.0.5(svelte@5.0.0-next.168)
+        specifier: ^0.0.6
+        version: 0.0.6(svelte@5.0.0-next.168)
       phosphor-svelte:
         specifier: ^1.4.2
         version: 1.4.2(svelte@5.0.0-next.168)
@@ -218,8 +218,8 @@ importers:
         specifier: ^5.1.3
         version: 5.2.10(@types/node@20.12.7)
       vitest:
-        specifier: ^1.3.0
-        version: 1.5.2(@types/node@20.12.7)(@vitest/ui@1.6.0)(jsdom@24.0.0)
+        specifier: ^1.6.0
+        version: 1.6.0
       zod:
         specifier: ^3.22.4
         version: 3.23.4
@@ -1605,8 +1605,8 @@ packages:
       - supports-color
     dev: true
 
-  /@melt-ui/svelte@0.74.4(svelte@5.0.0-next.168):
-    resolution: {integrity: sha512-EeDP3C1grK+bPTezJQXKid2k4RRGZakyHTghD/zg//fM6Gqe4JykVtV0Yih4QJs+yGTgJq/EaNQMQ6JkTnvHxg==}
+  /@melt-ui/svelte@0.76.2(svelte@5.0.0-next.168):
+    resolution: {integrity: sha512-7SbOa11tXUS95T3fReL+dwDs5FyJtCEqrqG3inRziDws346SYLsxOQ6HmX+4BkIsQh1R8U3XNa+EMmdMt38lMA==}
     peerDependencies:
       svelte: '>=3 <5'
     dependencies:
@@ -1619,10 +1619,10 @@ packages:
       svelte: 5.0.0-next.168
     dev: false
 
-  /@melt-ui/svelte@0.76.2(svelte@5.0.0-next.168):
-    resolution: {integrity: sha512-7SbOa11tXUS95T3fReL+dwDs5FyJtCEqrqG3inRziDws346SYLsxOQ6HmX+4BkIsQh1R8U3XNa+EMmdMt38lMA==}
+  /@melt-ui/svelte@0.83.0(svelte@5.0.0-next.168):
+    resolution: {integrity: sha512-E7QT+8YSftz+Hdk1W0hNR3f+cnaF2COMWkStn+2u4vk0RO1I9mXRJl+bJD6uhYaH146oxEB+5elu/ABbv6rpsA==}
     peerDependencies:
-      svelte: '>=3 <5'
+      svelte: ^3.0.0 || ^4.0.0 || ^5.0.0-next.118
     dependencies:
       '@floating-ui/core': 1.6.0
       '@floating-ui/dom': 1.6.3
@@ -2668,10 +2668,26 @@ packages:
       chai: 4.4.1
     dev: true
 
+  /@vitest/expect@1.6.0:
+    resolution: {integrity: sha512-ixEvFVQjycy/oNgHjqsL6AZCDduC+tflRluaHIzKIsdbzkLn2U/iBnVeJwB6HsIjQBdfMR8Z0tRxKUsvFJEeWQ==}
+    dependencies:
+      '@vitest/spy': 1.6.0
+      '@vitest/utils': 1.6.0
+      chai: 4.4.1
+    dev: true
+
   /@vitest/runner@1.5.2:
     resolution: {integrity: sha512-7IJ7sJhMZrqx7HIEpv3WrMYcq8ZNz9L6alo81Y6f8hV5mIE6yVZsFoivLZmr0D777klm1ReqonE9LyChdcmw6g==}
     dependencies:
       '@vitest/utils': 1.5.2
+      p-limit: 5.0.0
+      pathe: 1.1.2
+    dev: true
+
+  /@vitest/runner@1.6.0:
+    resolution: {integrity: sha512-P4xgwPjwesuBiHisAVz/LSSZtDjOTPYZVmNAnpHHSR6ONrf8eCJOFRvUwdHn30F5M1fxhqtl7QZQUk2dprIXAg==}
+    dependencies:
+      '@vitest/utils': 1.6.0
       p-limit: 5.0.0
       pathe: 1.1.2
     dev: true
@@ -2684,8 +2700,22 @@ packages:
       pretty-format: 29.7.0
     dev: true
 
+  /@vitest/snapshot@1.6.0:
+    resolution: {integrity: sha512-+Hx43f8Chus+DCmygqqfetcAZrDJwvTj0ymqjQq4CvmpKFSTVteEOBzCusu1x2tt4OJcvBflyHUE0DZSLgEMtQ==}
+    dependencies:
+      magic-string: 0.30.10
+      pathe: 1.1.2
+      pretty-format: 29.7.0
+    dev: true
+
   /@vitest/spy@1.5.2:
     resolution: {integrity: sha512-xCcPvI8JpCtgikT9nLpHPL1/81AYqZy1GCy4+MCHBE7xi8jgsYkULpW5hrx5PGLgOQjUpb6fd15lqcriJ40tfQ==}
+    dependencies:
+      tinyspy: 2.2.1
+    dev: true
+
+  /@vitest/spy@1.6.0:
+    resolution: {integrity: sha512-leUTap6B/cqi/bQkXUu6bQV5TZPx7pmMBKBQiI0rJA8c3pB56ZsaTbREnF7CJfmvAS4V2cXIBAh/3rVwrrCYgw==}
     dependencies:
       tinyspy: 2.2.1
     dev: true
@@ -6129,10 +6159,10 @@ packages:
       '@types/mdast': 4.0.3
     dev: true
 
-  /mdsx@0.0.5(svelte@5.0.0-next.168):
-    resolution: {integrity: sha512-crYbZC0L5kQjaRABvHIXj9H2O1qikIw9KKqS3bo2En4XVgvHH7TO5bJ2X86PxJK7H6QEBAubjUma9+qpbsPC5A==}
+  /mdsx@0.0.6(svelte@5.0.0-next.168):
+    resolution: {integrity: sha512-hfIlNzOlT153M37ZzbjuGSN8ZFNqlyEWaPnGr9L92Ty/dkZdIfgyDeFrsJDuQ77oY1bf3jeNCycR19ocD/BpfA==}
     peerDependencies:
-      svelte: ^4.0.0
+      svelte: ^4.0.0 || ^5.0.0-next.1
     dependencies:
       esrap: 1.2.2
       hast-util-to-html: 9.0.1
@@ -6856,10 +6886,10 @@ packages:
       ufo: 1.5.3
     dev: true
 
-  /mode-watcher@0.3.0(svelte@5.0.0-next.168):
-    resolution: {integrity: sha512-k8jjuTx94HaaRKWO6JDf8wL761hFatrTIHJKl+E+3JWcnv+GnMBH062zcLsy0lbCI3n7RZxxHaWi66auFnUO4g==}
+  /mode-watcher@0.3.1(svelte@5.0.0-next.168):
+    resolution: {integrity: sha512-inghSVSXpEENV0SHM98+AvjDmTOjh9EJIrJXMScK42GNkDm5QJL7a/nZQ8M8i8RK7loFHqsQKBKdlXfw5e5C4w==}
     peerDependencies:
-      svelte: ^4.0.0
+      svelte: ^4.0.0 || ^5.0.0-next.1
     dependencies:
       svelte: 5.0.0-next.168
     dev: false
@@ -8559,8 +8589,8 @@ packages:
       typescript: 5.4.5
     dev: true
 
-  /svelte-sonner@0.3.22(svelte@5.0.0-next.168):
-    resolution: {integrity: sha512-1AEBl7rTP4oeMAmBmkcvoHNOwB8gPzz73RYApcY8pyDwbjBewU8ATnXV8N42omV1sQvtSX/X0o5A1nfkN3T6cg==}
+  /svelte-sonner@0.3.24(svelte@5.0.0-next.168):
+    resolution: {integrity: sha512-txuL0JBUs0v6qGrr0PGCsbXmKHuthdrAkfISYi8umuveF7+gINb6EXl6VmKY9aHhyxCqvVgqd6yophQNrnor4w==}
     peerDependencies:
       svelte: '>=3 <5'
     dependencies:
@@ -9121,10 +9151,10 @@ packages:
       spdx-expression-parse: 3.0.1
     dev: true
 
-  /vaul-svelte@0.3.0(svelte@5.0.0-next.168):
-    resolution: {integrity: sha512-+PBfKDWl+xfloe8Tm1G8x3TqbCiUWoyUedU2WC5iE3v6LOYPKo8FyEtzNC5ZqFVVnUKSKNg+4Fi73nuzMkT7JA==}
+  /vaul-svelte@0.3.2(svelte@5.0.0-next.168):
+    resolution: {integrity: sha512-X4OGWttSTVUl417qGDsSFgOvIx24DoiMRY/jaP9z0v9FL8LQQJ0RQ1ZM0QpdyQPRlNd24ewjNQHh5EgYDtfNpw==}
     peerDependencies:
-      svelte: ^4.0.0
+      svelte: ^4.0.0 || ^5.0.0-next.1
     dependencies:
       bits-ui: 0.21.11(svelte@5.0.0-next.168)
       svelte: 5.0.0-next.168
@@ -9177,6 +9207,27 @@ packages:
 
   /vite-node@1.5.2(@types/node@20.12.7):
     resolution: {integrity: sha512-Y8p91kz9zU+bWtF7HGt6DVw2JbhyuB2RlZix3FPYAYmUyZ3n7iTp8eSyLyY6sxtPegvxQtmlTMhfPhUfCUF93A==}
+    engines: {node: ^18.0.0 || >=20.0.0}
+    hasBin: true
+    dependencies:
+      cac: 6.7.14
+      debug: 4.3.4
+      pathe: 1.1.2
+      picocolors: 1.0.0
+      vite: 5.2.10(@types/node@20.12.7)
+    transitivePeerDependencies:
+      - '@types/node'
+      - less
+      - lightningcss
+      - sass
+      - stylus
+      - sugarss
+      - supports-color
+      - terser
+    dev: true
+
+  /vite-node@1.6.0:
+    resolution: {integrity: sha512-de6HJgzC+TFzOu0NTC4RAIsyf/DY/ibWDYQUcuEA84EMHhcefTUGkjFHKKEJhQN4A+6I0u++kr3l36ZF2d7XRw==}
     engines: {node: ^18.0.0 || >=20.0.0}
     hasBin: true
     dependencies:
@@ -9290,6 +9341,61 @@ packages:
       tinypool: 0.8.4
       vite: 5.2.10(@types/node@20.12.7)
       vite-node: 1.5.2(@types/node@20.12.7)
+      why-is-node-running: 2.2.2
+    transitivePeerDependencies:
+      - less
+      - lightningcss
+      - sass
+      - stylus
+      - sugarss
+      - supports-color
+      - terser
+    dev: true
+
+  /vitest@1.6.0:
+    resolution: {integrity: sha512-H5r/dN06swuFnzNFhq/dnz37bPXnq8xB2xB5JOVk8K09rUtoeNN+LHWkoQ0A/i3hvbUKKcCei9KpbxqHMLhLLA==}
+    engines: {node: ^18.0.0 || >=20.0.0}
+    hasBin: true
+    peerDependencies:
+      '@edge-runtime/vm': '*'
+      '@types/node': ^18.0.0 || >=20.0.0
+      '@vitest/browser': 1.6.0
+      '@vitest/ui': 1.6.0
+      happy-dom: '*'
+      jsdom: '*'
+    peerDependenciesMeta:
+      '@edge-runtime/vm':
+        optional: true
+      '@types/node':
+        optional: true
+      '@vitest/browser':
+        optional: true
+      '@vitest/ui':
+        optional: true
+      happy-dom:
+        optional: true
+      jsdom:
+        optional: true
+    dependencies:
+      '@vitest/expect': 1.6.0
+      '@vitest/runner': 1.6.0
+      '@vitest/snapshot': 1.6.0
+      '@vitest/spy': 1.6.0
+      '@vitest/utils': 1.6.0
+      acorn-walk: 8.3.2
+      chai: 4.4.1
+      debug: 4.3.4
+      execa: 8.0.1
+      local-pkg: 0.5.0
+      magic-string: 0.30.10
+      pathe: 1.1.2
+      picocolors: 1.0.0
+      std-env: 3.7.0
+      strip-literal: 2.1.0
+      tinybench: 2.8.0
+      tinypool: 0.8.4
+      vite: 5.2.10(@types/node@20.12.7)
+      vite-node: 1.6.0
       why-is-node-running: 2.2.2
     transitivePeerDependencies:
       - less

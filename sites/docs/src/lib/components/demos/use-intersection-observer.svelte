@@ -46,7 +46,7 @@
 	</div>
 	<div class="text-center">
 		Element
-		<span class="font-medium text-brand">
+		<span class="font-medium {isVisible ? 'text-success' : 'text-destructive'}">
 			{isVisible ? "inside" : "outside"}
 		</span>
 		the viewport

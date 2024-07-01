@@ -13,7 +13,7 @@ const buttonVariants = tv({
 			ghost: "hover:bg-accent hover:text-accent-foreground",
 			link: "text-primary underline-offset-4 hover:underline",
 			subtle: "bg-muted text-muted-foreground hover:text-foreground",
-			brand: "bg-brand font-semibold text-background hover:bg-brand/90",
+			brand: "bg-brand font-semibold text-background hover:bg-brand-hover",
 		},
 		size: {
 			default: "h-10 px-4 py-2",

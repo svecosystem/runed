@@ -24,9 +24,11 @@
 </script>
 
 <DemoContainer>
-	<Button variant="brand" size="sm" onclick={ding}>DING DING DING</Button>
-	<Button variant="subtle" size="sm" onclick={logCount.cancel} disabled={!logCount.pending}
-		>Cancel message</Button
-	>
-	<p>{logged || "Press the button!"}</p>
+	<div class="flex items-center gap-4">
+		<Button variant="brand" size="sm" onclick={ding}>DING DING DING</Button>
+		<Button variant="subtle" size="sm" onclick={logCount.cancel} disabled={!logCount.pending}
+			>Cancel message</Button
+		>
+	</div>
+	<p class="mt-4">{logged || "Press the button!"}</p>
 </DemoContainer>

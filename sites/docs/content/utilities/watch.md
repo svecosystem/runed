@@ -20,7 +20,7 @@ effect callback.
 
 ## Usage
 
-### `watch`
+### watch
 
 Runs a callback whenever one of the sources change.
 
@@ -67,12 +67,12 @@ watch(sources, callback, {
 });
 ```
 
-### `watch.pre`
+### watch.pre
 
 `watch.pre` is similar to `watch`, but it uses
 [`$effect.pre`](https://svelte-5-preview.vercel.app/docs/runes#$effect-pre) under the hood.
 
-### `watchOnce`
+### watchOnce
 
 In case you want to run the callback only once, you can use `watchOnce` and `watchOnce.pre`. It
 functions identically to the `watch` and `watch.pre` otherwise, but it does not accept any options

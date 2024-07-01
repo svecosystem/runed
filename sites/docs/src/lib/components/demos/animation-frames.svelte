@@ -1,8 +1,9 @@
 <script lang="ts">
 	import { AnimationFrames } from "runed";
-	import { Pause, Play } from "phosphor-svelte";
-	import { Slider } from "../ui/slider";
 	import DemoContainer from "../demo-container.svelte";
+	import { Slider } from "$lib/components/ui/slider/index.js";
+	import { Pause, Play } from "$lib/icons/index.js";
+	import { Button } from "$lib/components/ui/button/index.js";
 
 	let frames = $state(0);
 	let fpsLimit = $state(10);
@@ -41,18 +42,15 @@
 	"
 		aria-label="spinning ghost mouse"
 	></div>
-	<button
-		class="inline-flex items-center justify-center gap-1 rounded-md border bg-brand/50
-		px-3 py-1.5 text-sm font-medium transition-all hover:bg-brand/25 focus:outline-none active:bg-brand/15"
-		onclick={animation.toggle}
-	>
+	<Button variant="brand" class="gap-2" onclick={animation.toggle}>
 		{#if animation.running}
 			<Pause size={16} weight="fill" />
 		{:else}
 			<Play size={16} weight="fill" />
 		{/if}
 		{animation.running ? "Stop" : "Start"}
-	</button>
+	</Button>
+
 	<p class="m-0 text-center text-sm">
 		FPS limit: <b>{fpsLimit}</b><i>{fpsLimit === 0 ? " (not limited)" : ""}</i>
 	</p>

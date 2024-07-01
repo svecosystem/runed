@@ -33,9 +33,11 @@
 		--destructive-foreground: 0 0% 98%;
 
 		--success: 142 75.3% 36.5%;
+
 		--ring: 320 5.9% 64.9%;
 
-		--brand: 12 84% 44%;
+		--brand: 9.95 100% 63.3%;
+		--brand-hover: 10.2 72.7% 55.5%;
 
 		--radius: 0.5rem;
 	}
@@ -69,9 +71,11 @@
 		--destructive-foreground: 0 85.7% 97.3%;
 
 		--success: 142 75.3% 36.5%;
+
 		--ring: 240 4% 16%;
 
-		--brand: 12 84% 54%;
+		--brand: 9.95 100% 63.3%;
+		--brand-hover: 10.2 72.7% 55.5%;
 	}
 }
 
@@ -152,7 +156,7 @@
 	.hero-gradient {
 		background: radial-gradient(
 			circle 50vh at 50% 25%,
-			theme(colors.brand),
+			theme(colors.brand.DEFAULT),
 			theme(colors.background) 60%
 		);
 		filter: blur(180px);

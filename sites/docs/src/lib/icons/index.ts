@@ -31,3 +31,5 @@ export { default as Plus } from "phosphor-svelte/lib/Plus";
 export { default as SpinnerGap } from "phosphor-svelte/lib/SpinnerGap";
 export { default as DotsSixVertical } from "phosphor-svelte/lib/DotsSixVertical";
 export { default as Pentagram } from "phosphor-svelte/lib/Pentagram";
+export { default as Pause } from "phosphor-svelte/lib/Pause";
+export { default as Play } from "phosphor-svelte/lib/Play";

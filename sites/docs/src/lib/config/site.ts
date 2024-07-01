@@ -9,7 +9,7 @@ export const siteConfig = {
 	},
 	author: "Huntabyte & Thomas G. Lopes",
 	keywords:
-		"Svelte runes utilities,svelte runes,svelte utilities,runed,svelte helpers,svelte utils,svelte functions",
+		"Svelte runes utilities,svelte runes,svelte utilities,runed,svelte helpers,svelte utils,svelte functions,runed dev,svelte 5 runed,runed svelte,svelte 5 helpers,svelte 5 utilities,",
 	ogImage: {
 		url: "https://runed.dev/og.png",
 		width: "1200",
