@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { IsFocusWithin } from "./IsFocusWithin.svelte.js";
-	let formElement = $state<HTMLElement | undefined>();
+	let formElement = $state<HTMLElement>();
 	const focusWithinForm = new IsFocusWithin(() => formElement);
 </script>
 

@@ -6,8 +6,7 @@ import type { Plugin } from "vite";
 
 const vitestBrowserConditionPlugin: Plugin = {
 	name: "vite-plugin-vitest-browser-condition",
-	// @ts-expect-error - idk but it works.
-	config({ resolve }: { resolve: { conditions: string[] } }) {
+	configResolved({ resolve }: { resolve: { conditions: string[] } }) {
 		if (process.env.VITEST) {
 			resolve.conditions.unshift("browser");
 		}

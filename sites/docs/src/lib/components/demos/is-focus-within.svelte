@@ -5,7 +5,7 @@
 	import { Button } from "$lib/components/ui/button/index.js";
 	import DemoContainer from "$lib/components/demo-container.svelte";
 
-	let formElement = $state<HTMLFormElement | undefined>();
+	let formElement = $state<HTMLFormElement>();
 	const formFocused = new IsFocusWithin(() => formElement);
 </script>
 
