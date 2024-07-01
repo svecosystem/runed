@@ -41,7 +41,8 @@
 			</div>
 		{/if}
 		{#each toPress as key}
-			<!-- svelte-ignore a11y_no_static_element_interactions a11y_click_events_have_key_events -->
+			<!-- svelte-ignore a11y_click_events_have_key_events -->
+			<!-- svelte-ignore a11y_no_static_element_interactions -->
 			<div
 				class="grid size-12 place-items-center rounded-lg border transition-all duration-200
 				{allPressed ? 'border-brand' : 'border-border'} bg-background"
