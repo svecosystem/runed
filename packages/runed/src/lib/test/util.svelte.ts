@@ -1,4 +1,4 @@
-import { tick } from "svelte";
+import { flushSync } from "svelte";
 import { test, vi } from "vitest";
 
 export function testWithEffect(name: string, fn: () => void | Promise<void>) {
@@ -24,9 +24,8 @@ export function vitestSetTimeoutWrapper(fn: () => void, timeout: number) {
 	vi.advanceTimersByTime(timeout);
 }
 
-export async function focus(node: HTMLElement | null | undefined) {
+export function focus(node: HTMLElement | null | undefined) {
 	if (node) {
-		node.focus();
-		await tick();
+		flushSync(() => node.focus());
 	}
 }

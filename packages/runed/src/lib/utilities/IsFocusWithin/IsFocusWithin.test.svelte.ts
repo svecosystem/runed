@@ -33,7 +33,7 @@ describe("IsFocusWithin", () => {
 		expect(current).toHaveTextContent("false");
 		await user.click(input);
 		expect(current).toHaveTextContent("true");
-		await focus(submit);
+		focus(submit);
 		expect(submit).toHaveFocus();
 		expect(current).toHaveTextContent("true");
 	});
@@ -42,7 +42,7 @@ describe("IsFocusWithin", () => {
 		const { user, input, current, outside } = setup();
 		await user.click(input);
 		expect(current).toHaveTextContent("true");
-		await focus(outside);
+		focus(outside);
 		expect(outside).toHaveFocus();
 		expect(current).toHaveTextContent("false");
 	});
