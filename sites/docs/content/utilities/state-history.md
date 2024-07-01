@@ -31,7 +31,7 @@ Besides `log`, the returned object contains `undo` and `redo` functionality.
 <!-- prettier-ignore -->
 ```svelte
 <script lang="ts">
-	import { box, useStateHistory } from "runed";
+	import { useStateHistory } from "runed";
 
 	let count = $state(0);
 	const history = new StateHistory(() => count, (c) => (count = c));
