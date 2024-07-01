@@ -23,7 +23,6 @@
 		"./src/**/*.svelte",
 		"./vite.config.ts",
 		"./svelte.config.js",
-		"./setupTest.ts",
-		"./playwright.config.ts"
+		"./setupTest.ts"
 	]
 }
