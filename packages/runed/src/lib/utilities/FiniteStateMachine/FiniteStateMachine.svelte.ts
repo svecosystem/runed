@@ -105,7 +105,6 @@ export class FiniteStateMachine<StatesT extends string, EventsT extends string> 
 		if (this.#timeout[event]) {
 			clearTimeout(this.#timeout[event]);
 		}
-		// await new Promise((resolve) => (timeout[event] = setTimeout(resolve, wait)));
 		return new Promise((resolve) => {
 			this.#timeout[event] = setTimeout(() => {
 				delete this.#timeout[event];
