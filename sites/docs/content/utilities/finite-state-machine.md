@@ -35,10 +35,10 @@ const f = new FiniteStateMachine<MyStates, MyEvents>("disabled", {
 
 ## Usage
 
-Finite state machines are useful for tracking and manipulating something that could be in one of
-many different states. It centralizes the definition of every possible _state_ and the _events_ that
-might trigger a transition from one state to another. Here is a state machine describing a simple
-toggle switch:
+Finite state machines (often abbreviated as "FSMs") are useful for tracking and manipulating
+something that could be in one of many different states. It centralizes the definition of every
+possible _state_ and the _events_ that might trigger a transition from one state to another. Here is
+a state machine describing a simple toggle switch:
 
 ```ts
 import { FiniteStateMachine } from "runed";
@@ -62,15 +62,16 @@ state, and which state that event should lead to.
 In the above example of a simple switch, there are two states (`on` and `off`). The `toggle` event
 in either state leads to the other state.
 
-You send events to the fsm using `f.send`. To send the `toggle` event, invoke `f.send('toggle')`.
+You send events to the FSM using `f.send`. To send the `toggle` event, invoke `f.send('toggle')`.
 
 ### Actions
 
 Maybe you want fancier logic for an event handler, or you want to conditionally transition into
-another state.
+another state. Instead of strings, you can use _actions_.
 
-You can prevent state transitions by returning nothing. You can also use actions to dynamically
-choose which state should be returned.
+An action is a function that returns a state. An action can receive parameters, and it can use those
+parameters to dynamically choose which state should come next. It can also prevent a state
+transition by returning nothing.
 
 ```ts
 type MyStates = "on" | "off" | "cooldown";
