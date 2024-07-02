@@ -10,24 +10,24 @@ export class FiniteStateMachine<StatesT extends string, EventsT extends string> 
 		this.#dispatch("_enter", { from: null, to: initial, event: null, args: [] });
 	}
 
-	#transition(newState: StatesT, event: EventsT, args: any[]) {
+	#transition(newState: StatesT, event: EventsT, args: unknown[]) {
 		const metadata = { from: this.#current, to: newState, event, args };
 		this.#dispatch("_exit", metadata);
 		this.#current = newState;
 		this.#dispatch("_enter", metadata);
 	}
 
-	#dispatch(event: EventsT | FSMLifecycle, ...args: any[]): StatesT | void {
+	#dispatch(event: EventsT | FSMLifecycle, ...args: unknown[]): StatesT | void {
 		const action = this.states[this.#current]?.[event] ?? this.states["*"]?.[event];
 		if (action instanceof Function) {
 			if (event === "_enter" || event === "_exit") {
-				if (isLifecycleFnMeta(args[0])) {
+				if (isLifecycleFnMeta<StatesT, EventsT>(args[0])) {
 					(action as FSMLifecycleFn<StatesT, EventsT>)(args[0]);
 				} else {
 					console.warn("Invalid metadata passed to lifecycle function of the FSM.");
 				}
 			} else {
-				return (action as (...args: any[]) => void | StatesT)(...args);
+				return (action as (...args: unknown[]) => void | StatesT)(...args);
 			}
 		} else if (typeof action === "string") {
 			return action as StatesT;
@@ -38,7 +38,7 @@ export class FiniteStateMachine<StatesT extends string, EventsT extends string> 
 		}
 	}
 
-	send(event: EventsT, ...args: any[]) {
+	send(event: EventsT, ...args: unknown[]) {
 		const newState = this.#dispatch(event, ...args);
 		if (newState && newState !== this.#current) {
 			this.#transition(newState as StatesT, event, args);
@@ -46,7 +46,7 @@ export class FiniteStateMachine<StatesT extends string, EventsT extends string> 
 		return this.#current;
 	}
 
-	async debounce(wait: number = 500, event: EventsT, ...args: any[]): Promise<StatesT> {
+	async debounce(wait: number = 500, event: EventsT, ...args: unknown[]): Promise<StatesT> {
 		if (this.#timeout[event]) {
 			clearTimeout(this.#timeout[event]);
 		}
@@ -72,10 +72,12 @@ export type LifecycleFnMeta<StatesT extends string, EventsT extends string> = {
 	from: StatesT | null;
 	to: StatesT;
 	event: EventsT | null;
-	args: any;
+	args: unknown;
 };
 
-export function isLifecycleFnMeta(meta: unknown): meta is LifecycleFnMeta<any, any> {
+export function isLifecycleFnMeta<StatesT extends string, EventsT extends string>(
+	meta: unknown
+): meta is LifecycleFnMeta<StatesT, EventsT> {
 	return (
 		!!meta &&
 		typeof meta === "object" &&
@@ -90,7 +92,7 @@ export type FSMLifecycle = "_enter" | "_exit";
 
 // Actions are either a StateT (string)
 // or a function that optionally returns a StateT
-export type Action<StatesT> = StatesT | ((...args: any[]) => StatesT | void);
+export type Action<StatesT> = StatesT | ((...args: unknown[]) => StatesT | void);
 
 // State handlers are objects that map events to actions
 // or lifecycle functions to handlers
