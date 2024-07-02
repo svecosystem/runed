@@ -13,9 +13,9 @@ category: State
 <Demo />
 
 ```ts
-type myStates = "disabled" | "idle" | "running";
-type myEvents = "toggleEnabled" | "start" | "stop";
-const f = new FiniteStateMachine<myStates, myEvents>("disabled", {
+type MyStates = "disabled" | "idle" | "running";
+type MyEvents = "toggleEnabled" | "start" | "stop";
+const f = new FiniteStateMachine<MyStates, MyEvents>("disabled", {
 	disabled: {
 		toggleEnabled: "idle"
 	},
@@ -42,10 +42,10 @@ toggle switch:
 
 ```ts
 import { FiniteStateMachine } from "runed";
-type myStates = "on" | "off";
-type myEvents = "toggle";
+type MyStates = "on" | "off";
+type MyEvents = "toggle";
 
-const f = new FiniteStateMachine<myStates, myEvents>("off", {
+const f = new FiniteStateMachine<MyStates, MyEvents>("off", {
 	off: {
 		toggle: "on"
 	},
@@ -73,9 +73,9 @@ You can prevent state transitions by returning nothing. You can also use actions
 choose which state should be returned.
 
 ```ts
-type myStates = "on" | "off" | "cooldown";
+type MyStates = "on" | "off" | "cooldown";
 
-const f = new FiniteStateMachine<myStates, myEvents>("off", {
+const f = new FiniteStateMachine<MyStates, MyEvents>("off", {
 	off: {
 		toggle: () => {
 			if (isTuesday) {
@@ -102,7 +102,7 @@ const f = new FiniteStateMachine<myStates, myEvents>("off", {
 You can define special handlers that are invoked whenever a state is entered or exited:
 
 ```ts
-const f = new FiniteStateMachine<myStates, myEvents>('off', {
+const f = new FiniteStateMachine<MyStates, MyEvents>('off', {
 	off: {
 		toggle: 'on'
 		_enter: (meta) => { console.log('switch is off') }
@@ -134,7 +134,7 @@ to `send()` an event that is not handled by the current state, then it will try 
 for that event on the `*` state before discarding the event:
 
 ```ts
-const f = new FiniteStateMachine<myStates, myEvents>('off', {
+const f = new FiniteStateMachine<MyStates, MyEvents>('off', {
 	off: {
 		toggle: 'on'
 	},
@@ -175,7 +175,7 @@ You can also use `debounce` in both actions and lifecycle methods. In both of th
 examples, the lightswitch will turn itself off five seconds after it was turned on:
 
 ```ts
-const f = new FiniteStateMachine<myStates, myEvents>("off", {
+const f = new FiniteStateMachine<MyStates, MyEvents>("off", {
 	off: {
 		toggle: () => {
 			f.debounce(5000, "toggle");
@@ -189,7 +189,7 @@ const f = new FiniteStateMachine<myStates, myEvents>("off", {
 ```
 
 ```ts
-const f = new FiniteStateMachine<myStates, myEvents>("off", {
+const f = new FiniteStateMachine<MyStates, MyEvents>("off", {
 	off: {
 		toggle: "on"
 	},
