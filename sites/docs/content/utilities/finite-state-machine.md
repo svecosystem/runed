@@ -17,19 +17,19 @@ type myStates = "disabled" | "idle" | "running";
 type myEvents = "toggleEnabled" | "start" | "stop";
 const f = new FiniteStateMachine<myStates, myEvents>("disabled", {
 	disabled: {
-		toggleEnabled: "idle",
+		toggleEnabled: "idle"
 	},
 	idle: {
 		toggleEnabled: "disabled",
-		start: "running",
+		start: "running"
 	},
 	running: {
 		_enter: () => {
 			f.debounce(2000, "stop");
 		},
 		stop: "idle",
-		toggleEnabled: "disabled",
-	},
+		toggleEnabled: "disabled"
+	}
 });
 ```
 
@@ -42,15 +42,15 @@ toggle switch:
 
 ```ts
 import { FiniteStateMachine } from "runed";
-type myStates = 'on' | 'off';
-type myEvents = 'toggle';
+type myStates = "on" | "off";
+type myEvents = "toggle";
 
-const f = new FiniteStateMachine<myStates, myEvents>('off', {
+const f = new FiniteStateMachine<myStates, myEvents>("off", {
 	off: {
-		toggle: 'on'
+		toggle: "on"
 	},
 	on: {
-		toggle: 'off'
+		toggle: "off"
 	}
 });
 ```
@@ -73,14 +73,14 @@ You can prevent state transitions by returning nothing. You can also use actions
 choose which state should be returned.
 
 ```ts
-type myStates = 'on' | 'off' | 'cooldown';
+type myStates = "on" | "off" | "cooldown";
 
-const f = new FiniteStateMachine<myStates, myEvents>('off', {
+const f = new FiniteStateMachine<myStates, myEvents>("off", {
 	off: {
 		toggle: () => {
 			if (isTuesday) {
 				// Switch can only turn on during Tuesdays
-				return 'on'
+				return "on";
 			}
 			// All other days, nothing is returned and state is unchanged.
 		}
@@ -90,8 +90,8 @@ const f = new FiniteStateMachine<myStates, myEvents>('off', {
 			// You can also dynamically return the next state!
 			// Only turn off if switch is depressed for 3 seconds
 			if (heldMillis > 3000) {
-				return 'off'
-			};
+				return "off";
+			}
 		}
 	}
 });
@@ -156,8 +156,8 @@ Frequently, you want to transition to another state after some time has elapsed.
 `debounce` method:
 
 ```ts
-f.send('toggle'); // turn on immediately
-f.debounce(5000, 'toggle'); // turn off in 5000 milliseconds
+f.send("toggle"); // turn on immediately
+f.debounce(5000, "toggle"); // turn off in 5000 milliseconds
 ```
 
 If you re-invoke debounce with the same event, it will cancel the existing timer and start the
@@ -165,9 +165,9 @@ countdown over:
 
 ```ts
 // schedule a toggle in five seconds
-f.debounce(5000, 'toggle');
+f.debounce(5000, "toggle");
 // ... less than 5000ms elapses ...
-f.debounce(5000, 'toggle');
+f.debounce(5000, "toggle");
 // The second call cancels the original timer, and starts a new one
 ```
 
@@ -175,28 +175,28 @@ You can also use `debounce` in both actions and lifecycle methods. In both of th
 examples, the lightswitch will turn itself off five seconds after it was turned on:
 
 ```ts
-const f = new FiniteStateMachine<myStates, myEvents>('off', {
+const f = new FiniteStateMachine<myStates, myEvents>("off", {
 	off: {
 		toggle: () => {
-			f.debounce(5000, 'toggle')
-			return 'on';
+			f.debounce(5000, "toggle");
+			return "on";
 		}
 	},
 	on: {
-		toggle: 'off'
+		toggle: "off"
 	}
 });
 ```
 
 ```ts
-const f = new FiniteStateMachine<myStates, myEvents>('off', {
+const f = new FiniteStateMachine<myStates, myEvents>("off", {
 	off: {
-		toggle: 'on'
+		toggle: "on"
 	},
 	on: {
-		toggle: 'off',
+		toggle: "off",
 		_enter: () => {
-			f.debounce(5000, 'toggle')
+			f.debounce(5000, "toggle");
 		}
 	}
 });
