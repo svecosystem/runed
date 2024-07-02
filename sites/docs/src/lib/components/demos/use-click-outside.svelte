@@ -1,17 +1,19 @@
 <script lang="ts">
-	import { box, useClickOutside } from "runed";
+	import { useClickOutside } from "runed";
 
-	let containerText = "Has not clicked yet";
+	let containerText = $state("Has not clicked yet");
+	let el = $state<HTMLDivElement | undefined>(undefined);
 
-	const container = box<HTMLDivElement | null>(null);
-
-	useClickOutside(container, () => {
-		containerText = "Has clicked outside of container";
-	});
+	useClickOutside(
+		() => el,
+		() => {
+			containerText = "Has clicked outside of container";
+		}
+	);
 </script>
 
 <main>
-	<div bind:this={container.value}>
+	<div bind:this={el}>
 		<p>{containerText}</p>
 
 		<button onclick={() => (containerText = "Has clicked within container")}>

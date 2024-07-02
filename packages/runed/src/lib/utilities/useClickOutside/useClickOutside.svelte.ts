@@ -1,5 +1,6 @@
-import { box, type WritableBox } from "$lib/functions/box/box.svelte.js";
-import { watch } from "$lib/functions/watch/watch.svelte.js";
+import type { MaybeGetter } from "../../internal/types.js";
+import { watch } from "../watch/watch.svelte.js";
+import { extract } from "../extract/extract.js";
 
 type ClickOutside = {
 	start: () => void;
@@ -16,27 +17,28 @@ type ClickOutside = {
  * @see {@link https://runed.dev/docs/functions/use-click-outside}
  */
 export function useClickOutside<T extends Element>(
-	container: WritableBox<T | null>,
-	fn: () => void
+	container: MaybeGetter<T | undefined>,
+	callback: () => void
 ): ClickOutside {
-	const isEnabled = box<boolean>(true);
+	let isEnabled = $state<boolean>(true);
+	const el = $derived<T | undefined>(extract(container));
 
 	function start() {
-		isEnabled.value = true;
+		isEnabled = true;
 	}
 
 	function stop() {
-		isEnabled.value = false;
+		isEnabled = false;
 	}
 
 	function handleClick(event: MouseEvent) {
-		if (event.target && !container.value?.contains(event.target as Node)) {
-			fn();
+		if (event.target && !el?.contains(event.target as Node)) {
+			callback();
 		}
 	}
 
-	watch([container, isEnabled], ([currentContainer, currentIsEnabled]) => {
-		if (currentContainer && currentIsEnabled) {
+	watch([() => el, () => isEnabled], ([currentEl, currentIsEnabled]) => {
+		if (currentEl && currentIsEnabled) {
 			window.addEventListener("click", handleClick);
 		}
 

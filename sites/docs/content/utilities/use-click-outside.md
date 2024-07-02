@@ -3,7 +3,7 @@ title: useClickOutside
 description:
   A function that calls a callback when a click event is triggered outside of a given container
   element.
-category: Elements
+category: Browser
 ---
 
 <script>
@@ -18,17 +18,20 @@ import Demo from '$lib/components/demos/use-click-outside.svelte';
 
 ```svelte
 <script lang="ts">
-	import { box, useClickOutside } from "runed";
+	import { useClickOutside } from "runed";
 
-	const container = box<HTMLDivElement | null>(null);
+	let el = $state<HTMLDivElement | undefined>(undefined);
 
-	useClickOutside(container, () => {
-		console.log("clicked outside of container");
-	});
+	useClickOutside(
+		() => el,
+		() => {
+			console.log("clicked outside of container");
+		}
+	);
 </script>
 
 <main>
-	<div bind:this={container.value}>Container</div>
+	<div bind:this={el}>Container</div>
 	<button>Click Me</button>
 </main>
 ```
@@ -38,18 +41,21 @@ functiosn returned by `useClickOutside`.
 
 ```svelte
 <script lang="ts">
-	import { box, useClickOutside } from "runed";
+	import { useClickOutside } from "runed";
 
-	const container = box<HTMLDivElement | null>(null);
+	let el = $state<HTMLDivElement | undefined>(undefined);
 
-	const outsideClick = useClickOutside(container, () => {
-		console.log("clicked outside of container");
-	});
+	const outsideClick = useClickOutside(
+		() => el,
+		() => {
+			console.log("clicked outside of container");
+		}
+	);
 </script>
 
 <main>
 	<button onclick={outsideClick.stop}>Stop listening for outside clicks</button>
 	<button onclick={outsideClick.start}>Start listening again</button>
-	<div bind:this={container.value}></div>
+	<div bind:this={el}></div>
 </main>
 ```

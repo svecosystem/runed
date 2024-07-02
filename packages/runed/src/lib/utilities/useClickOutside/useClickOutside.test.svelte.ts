@@ -1,8 +1,7 @@
 import { describe, expect, vi } from "vitest";
 import { tick } from "svelte";
-import { testWithEffect } from "$lib/test/util.svelte.js";
-import { box } from "$lib/functions/box/box.svelte.js";
 import { useClickOutside } from "./useClickOutside.svelte.js";
+import { testWithEffect } from "$lib/test/util.svelte.js";
 
 describe("useClickOutside", () => {
 	testWithEffect("calls a given callback on an outside of container click", async () => {
@@ -16,7 +15,7 @@ describe("useClickOutside", () => {
 
 		const callbackFn = vi.fn();
 
-		useClickOutside(box.from(container), callbackFn);
+		useClickOutside(() => container, callbackFn);
 		await tick();
 
 		button.dispatchEvent(new MouseEvent("click", { bubbles: true }));
@@ -38,7 +37,7 @@ describe("useClickOutside", () => {
 
 		const callbackFn = vi.fn();
 
-		const clickOutside = useClickOutside(box.from(container), callbackFn);
+		const clickOutside = useClickOutside(() => container, callbackFn);
 
 		clickOutside.stop();
 		await tick();
