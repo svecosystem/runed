@@ -1,12 +1,12 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { useFSM, type Action } from "./useFSM.svelte.js";
+import { FiniteStateMachine, type Action } from "./FiniteStateMachine.svelte.js";
 
-describe("useFSM", () => {
+describe("FiniteStateMachine", () => {
 	describe("simple toggle switch", () => {
 		type myStates = "on" | "off";
 		type myEvents = "toggle";
 
-		let f: ReturnType<typeof useFSM>;
+		let f: FiniteStateMachine<myStates, myEvents>;
 		const offEnterHandler = vi.fn();
 		const offExitHandler = vi.fn();
 		const onEnterHandler = vi.fn();
@@ -16,7 +16,7 @@ describe("useFSM", () => {
 			offExitHandler.mockClear();
 			onEnterHandler.mockClear();
 			onExitHandler.mockClear();
-			f = useFSM<myStates, myEvents>("off", {
+			f = new FiniteStateMachine<myStates, myEvents>("off", {
 				off: {
 					toggle: "on",
 					_enter: offEnterHandler,
@@ -47,12 +47,13 @@ describe("useFSM", () => {
 
 		it("does nothing for missing events", () => {
 			const warnSpy = vi.spyOn(console, "warn").mockImplementation(() => {});
-			f.send("missing");
+			// @ts-expect-error
+			f.send("NotAnEvent");
 			expect(f.current).toBe("off");
 			expect(warnSpy).toHaveBeenCalledOnce();
 			expect(warnSpy).toHaveBeenCalledWith(
 				"No action defined for event",
-				"missing",
+				"NotAnEvent",
 				"in state",
 				"off"
 			);
@@ -119,7 +120,7 @@ describe("useFSM", () => {
 		type myStates = "on" | "off";
 		type myEvents = "toggle";
 
-		let f: ReturnType<typeof useFSM>;
+		let f: FiniteStateMachine<myStates, myEvents>;
 		const offEnterHandler = vi.fn();
 		const offExitHandler = vi.fn();
 		const onEnterHandler = vi.fn();
@@ -133,7 +134,7 @@ describe("useFSM", () => {
 			onExitHandler.mockClear();
 			toggleOnAction.mockClear();
 			toggleOffAction.mockClear();
-			f = useFSM<myStates, myEvents>("off", {
+			f = new FiniteStateMachine<myStates, myEvents>("off", {
 				off: {
 					toggle: toggleOnAction as Action<myStates>,
 					_enter: offEnterHandler,
@@ -156,6 +157,7 @@ describe("useFSM", () => {
 
 		it("does nothing for missing events", () => {
 			const warnSpy = vi.spyOn(console, "warn").mockImplementation(() => {});
+			// @ts-expect-error
 			f.send("notAnEvent");
 			expect(toggleOnAction).not.toHaveBeenCalled();
 			expect(toggleOffAction).not.toHaveBeenCalled();
@@ -168,7 +170,7 @@ describe("useFSM", () => {
 		type myStates = "on" | "off";
 		type myEvents = "toggle" | "foo";
 
-		let f: ReturnType<typeof useFSM>;
+		let f: FiniteStateMachine<myStates, myEvents>;
 		const offEnterHandler = vi.fn();
 		const offExitHandler = vi.fn();
 		const onEnterHandler = vi.fn();
@@ -180,7 +182,7 @@ describe("useFSM", () => {
 			onEnterHandler.mockClear();
 			onExitHandler.mockClear();
 			wildcardHandler.mockClear();
-			f = useFSM<myStates, myEvents>("off", {
+			f = new FiniteStateMachine<myStates, myEvents>("off", {
 				off: {
 					toggle: "on",
 					_enter: offEnterHandler,
@@ -216,7 +218,7 @@ describe("useFSM", () => {
 		type myStates = "on" | "off";
 		type myEvents = "toggle";
 
-		let f: ReturnType<typeof useFSM>;
+		let f: FiniteStateMachine<myStates, myEvents>;
 		const toggleOnAction = vi.fn(() => "on");
 		const toggleOffAction = vi.fn(() => "off");
 		const offEnterHandler = vi.fn();
@@ -230,7 +232,7 @@ describe("useFSM", () => {
 			offExitHandler.mockClear();
 			onEnterHandler.mockClear();
 			onExitHandler.mockClear();
-			f = useFSM<myStates, myEvents>("off", {
+			f = new FiniteStateMachine<myStates, myEvents>("off", {
 				off: {
 					toggle: toggleOnAction as Action<myStates>,
 					_enter: offEnterHandler,
@@ -271,7 +273,7 @@ describe("useFSM", () => {
 		type myStates = "on" | "off";
 		type myEvents = "toggle";
 
-		let f: ReturnType<typeof useFSM>;
+		let f: FiniteStateMachine<myStates, myEvents>;
 		const toggleOnBounceback = vi.fn(() => {
 			f.debounce(100, "toggle");
 			return "on";
@@ -300,7 +302,7 @@ describe("useFSM", () => {
 		});
 
 		it("handles debounce in an action", async () => {
-			f = useFSM<myStates, myEvents>("off", {
+			f = new FiniteStateMachine<myStates, myEvents>("off", {
 				off: {
 					toggle: toggleOnBounceback as Action<myStates>,
 					_enter: offEnterHandler,
@@ -329,7 +331,7 @@ describe("useFSM", () => {
 		});
 
 		it("permits debounce in lifecycle methods", async () => {
-			f = useFSM<myStates, myEvents>("off", {
+			f = new FiniteStateMachine<myStates, myEvents>("off", {
 				off: {
 					toggle: toggleOnAction as Action<myStates>,
 					_enter: offEnterHandler,

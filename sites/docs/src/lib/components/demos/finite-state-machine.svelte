@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { useFSM } from "runed";
+	import { FiniteStateMachine } from "runed";
 	import DemoContainer from "$lib/components/demo-container.svelte";
 	import { Button } from "$lib/components/ui/button";
 	import { Switch } from "$lib/components/ui/switch";
@@ -7,7 +7,7 @@
 
 	type myStates = "disabled" | "idle" | "running";
 	type myEvents = "toggleEnabled" | "start" | "stop";
-	const f = useFSM<myStates, myEvents>("disabled", {
+	const f = new FiniteStateMachine<myStates, myEvents>("disabled", {
 		disabled: {
 			toggleEnabled: "idle",
 		},

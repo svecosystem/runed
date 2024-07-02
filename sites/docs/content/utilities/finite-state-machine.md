@@ -1,11 +1,11 @@
 ---
-title: useFSM
+title: FiniteStateMachine
 description: Defines a strongly-typed finite state machine.
 category: State
 ---
 
 <script>
-	import Demo from '$lib/components/demos/use-fsm.svelte';
+	import Demo from '$lib/components/demos/finite-state-machine.svelte';
 </script>
 
 ## Demo
@@ -15,7 +15,7 @@ category: State
 ```ts
 type myStates = "disabled" | "idle" | "running";
 type myEvents = "toggleEnabled" | "start" | "stop";
-const f = useFSM<myStates, myEvents>("disabled", {
+const f = new FiniteStateMachine<myStates, myEvents>("disabled", {
 	disabled: {
 		toggleEnabled: "idle",
 	},
@@ -41,11 +41,11 @@ might trigger a transition from one state to another. Here is a state machine de
 toggle switch:
 
 ```ts
-import { useFSM } from "runed";
+import { FiniteStateMachine } from "runed";
 type myStates = 'on' | 'off';
 type myEvents = 'toggle';
 
-const f = useFSM<myStates, myEvents>('off', {
+const f = new FiniteStateMachine<myStates, myEvents>('off', {
 	off: {
 		toggle: 'on'
 	},
@@ -55,9 +55,9 @@ const f = useFSM<myStates, myEvents>('off', {
 });
 ```
 
-The first argument to `useFSM` is the initial state. The second argument is an object with one key
-for each state. Each state then describes which events are valid for that state, and which state
-that event should lead to.
+The first argument to the `FiniteStateMachine` constructor is the initial state. The second argument
+is an object with one key for each state. Each state then describes which events are valid for that
+state, and which state that event should lead to.
 
 In the above example of a simple switch, there are two states (`on` and `off`). The `toggle` event
 in either state leads to the other state.
@@ -75,7 +75,7 @@ choose which state should be returned.
 ```ts
 type myStates = 'on' | 'off' | 'cooldown';
 
-const f = useFSM<myStates, myEvents>('off', {
+const f = new FiniteStateMachine<myStates, myEvents>('off', {
 	off: {
 		toggle: () => {
 			if (isTuesday) {
@@ -102,7 +102,7 @@ const f = useFSM<myStates, myEvents>('off', {
 You can define special handlers that are invoked whenever a state is entered or exited:
 
 ```ts
-const f = useFSM<myStates, myEvents>('off', {
+const f = new FiniteStateMachine<myStates, myEvents>('off', {
 	off: {
 		toggle: 'on'
 		_enter: (meta) => { console.log('switch is off') }
@@ -134,7 +134,7 @@ to `send()` an event that is not handled by the current state, then it will try 
 for that event on the `*` state before discarding the event:
 
 ```ts
-const f = useFSM<myStates, myEvents>('off', {
+const f = new FiniteStateMachine<myStates, myEvents>('off', {
 	off: {
 		toggle: 'on'
 	},
@@ -175,7 +175,7 @@ You can also use `debounce` in both actions and lifecycle methods. In both of th
 examples, the lightswitch will turn itself off five seconds after it was turned on:
 
 ```ts
-const f = useFSM<myStates, myEvents>('off', {
+const f = new FiniteStateMachine<myStates, myEvents>('off', {
 	off: {
 		toggle: () => {
 			f.debounce(5000, 'toggle')
@@ -189,7 +189,7 @@ const f = useFSM<myStates, myEvents>('off', {
 ```
 
 ```ts
-const f = useFSM<myStates, myEvents>('off', {
+const f = new FiniteStateMachine<myStates, myEvents>('off', {
 	off: {
 		toggle: 'on'
 	},
@@ -204,9 +204,10 @@ const f = useFSM<myStates, myEvents>('off', {
 
 ## Notes
 
-`useFSM` is a loving rewrite of [kenkunz/svelte-fsm](https://github.com/kenkunz/svelte-fsm).
+`FiniteStateMachine` is a loving rewrite of
+[kenkunz/svelte-fsm](https://github.com/kenkunz/svelte-fsm).
 
-FSMs are ideal for representing many different kinds of systems and interaction patterns. `useFSM`
-is an intentionally minimalistic implementation. If you're looking for a more powerful FSM library,
-[statelyai/xstate](https://github.com/statelyai/xstate) is an excellent library with more
-features&thinsp;—&thinsp;and a steeper learning curve.
+FSMs are ideal for representing many different kinds of systems and interaction patterns.
+`FiniteStateMachine` is an intentionally minimalistic implementation. If you're looking for a more
+powerful FSM library, [statelyai/xstate](https://github.com/statelyai/xstate) is an excellent
+library with more features&thinsp;—&thinsp;and a steeper learning curve.
