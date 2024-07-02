@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { FiniteStateMachine, type Action } from "./FiniteStateMachine.svelte.js";
+import { type Action, FiniteStateMachine } from "./FiniteStateMachine.svelte.js";
 
 describe("FiniteStateMachine", () => {
 	describe("simple toggle switch", () => {
@@ -47,7 +47,7 @@ describe("FiniteStateMachine", () => {
 
 		it("does nothing for missing events", () => {
 			const warnSpy = vi.spyOn(console, "warn").mockImplementation(() => {});
-			// @ts-expect-error
+			// @ts-expect-error testing missing event
 			f.send("NotAnEvent");
 			expect(f.current).toBe("off");
 			expect(warnSpy).toHaveBeenCalledOnce();
@@ -157,7 +157,7 @@ describe("FiniteStateMachine", () => {
 
 		it("does nothing for missing events", () => {
 			const warnSpy = vi.spyOn(console, "warn").mockImplementation(() => {});
-			// @ts-expect-error
+			// @ts-expect-error testing missing event
 			f.send("notAnEvent");
 			expect(toggleOnAction).not.toHaveBeenCalled();
 			expect(toggleOffAction).not.toHaveBeenCalled();
@@ -278,7 +278,7 @@ describe("FiniteStateMachine", () => {
 			f.debounce(100, "toggle");
 			return "on";
 		});
-		const onEnterBounceback = vi.fn((meta) => {
+		const onEnterBounceback = vi.fn(() => {
 			f.debounce(50, "toggle");
 		});
 		const toggleOnAction = vi.fn(() => "on");

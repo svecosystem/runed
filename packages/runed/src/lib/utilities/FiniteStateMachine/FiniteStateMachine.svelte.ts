@@ -23,7 +23,6 @@ export class FiniteStateMachine<StatesT extends string, EventsT extends string> 
 			if (event === "_enter" || event === "_exit") {
 				if (isLifecycleFnMeta(args[0])) {
 					(action as FSMLifecycleFn<StatesT, EventsT>)(args[0]);
-					return;
 				} else {
 					console.warn("Invalid metadata passed to lifecycle function of the FSM.");
 				}
