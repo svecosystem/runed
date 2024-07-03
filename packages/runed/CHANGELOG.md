@@ -1,5 +1,11 @@
 # runed
 
+## 0.15.0
+
+### Minor Changes
+
+- feat: Add `FiniteStateMachine` ([#111](https://github.com/svecosystem/runed/pull/111))
+
 ## 0.14.0
 
 ### Minor Changes
