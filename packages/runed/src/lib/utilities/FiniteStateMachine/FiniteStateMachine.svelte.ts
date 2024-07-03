@@ -50,10 +50,9 @@ export type Transition<StatesT extends string, EventsT extends string> = {
 };
 
 /**
- * Finite State Machine
- * @param initial - The initial state of the FSM
- * @param states - The transition object that maps states to events and actions
- * @returns A FiniteStateMachine object
+ * Defines a strongly-typed finite state machine.
+ *
+ * @see {@link https://runed.dev/docs/utilities/finite-state-machine}
  */
 export class FiniteStateMachine<StatesT extends string, EventsT extends string> {
 	#current = $state() as StatesT;
@@ -93,6 +92,7 @@ export class FiniteStateMachine<StatesT extends string, EventsT extends string> 
 		}
 	}
 
+	/** Triggers a new event and returns the new state. */
 	send(event: EventsT, ...args: unknown[]) {
 		const newState = this.#dispatch(event, ...args);
 		if (newState && newState !== this.#current) {
@@ -101,6 +101,7 @@ export class FiniteStateMachine<StatesT extends string, EventsT extends string> 
 		return this.#current;
 	}
 
+	/** Debounces the triggering of an event. */
 	async debounce(wait: number = 500, event: EventsT, ...args: unknown[]): Promise<StatesT> {
 		if (this.#timeout[event]) {
 			clearTimeout(this.#timeout[event]);
@@ -113,6 +114,7 @@ export class FiniteStateMachine<StatesT extends string, EventsT extends string> 
 		});
 	}
 
+	/** The current state. */
 	get current() {
 		return this.#current;
 	}
