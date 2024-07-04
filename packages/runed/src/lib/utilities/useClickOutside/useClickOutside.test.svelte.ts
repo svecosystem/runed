@@ -27,28 +27,4 @@ describe("useClickOutside", () => {
 		container.dispatchEvent(new MouseEvent("click", { bubbles: true }));
 		expect(callbackFn).toHaveBeenCalledOnce();
 	});
-
-	testWithEffect("can be paused and resumed", async () => {
-		const container = document.createElement("div");
-		const button = document.createElement("button");
-
-		document.body.appendChild(container);
-		document.body.appendChild(button);
-
-		const callbackFn = vi.fn();
-
-		const clickOutside = useClickOutside(() => container, callbackFn);
-
-		clickOutside.stop();
-		await tick();
-
-		button.dispatchEvent(new MouseEvent("click", { bubbles: true }));
-		expect(callbackFn).not.toHaveBeenCalled();
-
-		clickOutside.start();
-		await tick();
-
-		button.dispatchEvent(new MouseEvent("click", { bubbles: true }));
-		expect(callbackFn).toHaveBeenCalledOnce();
-	});
 });

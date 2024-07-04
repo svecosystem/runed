@@ -2,7 +2,7 @@
 	import { useClickOutside } from "runed";
 
 	let containerText = $state("Has not clicked yet");
-	let el = $state<HTMLDivElement | undefined>(undefined);
+	let el = $state<HTMLDialogElement | undefined>(undefined);
 
 	useClickOutside(
 		() => el,
@@ -13,13 +13,13 @@
 </script>
 
 <main>
-	<div bind:this={el}>
+	<dialog open bind:this={el}>
 		<p>{containerText}</p>
 
 		<button onclick={() => (containerText = "Has clicked within container")}>
 			Button within container
 		</button>
-	</div>
+	</dialog>
 	<button>Button outside container</button>
 </main>
 
