@@ -42,7 +42,7 @@ initial value for the state.
 	storage: 'session', // Specifies whether to use local or session storage. Default is 'local'.
 	syncTabs: false,   // Indicates if changes should sync across tabs. Default is true.
 	serializer: {
-		serialize: superjson.serialize,   // Custom serialization function. Default is JSON.stringify.
+		serialize: superjson.stringify,   // Custom serialization function. Default is JSON.stringify.
 		deserialize: superjson.parse      // Custom deserialization function. Default is JSON.parse.
 	}
 }
