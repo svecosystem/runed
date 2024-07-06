@@ -110,11 +110,16 @@ export class PersistedState<T> {
 			serializer: this.#serializer,
 		});
 
-		if (valueFromStorage.found) {
-			this.#current = valueFromStorage.value;
-		} else {
-			this.current = initialValue;
-		}
+		this.#current = valueFromStorage.found ? valueFromStorage.value : initialValue;
+
+		$effect.pre(() => {
+			setValueToStorage({
+				key: this.#key,
+				value: this.#current,
+				storage: this.#storage,
+				serializer: this.#serializer,
+			});
+		});
 
 		$effect(() => {
 			return addEventListener(window, "storage", this.#handleStorageEvent.bind(this));
@@ -143,12 +148,5 @@ export class PersistedState<T> {
 
 	set current(newValue: T) {
 		this.#current = newValue;
-
-		setValueToStorage({
-			key: this.#key,
-			value: this.#current,
-			storage: this.#storage,
-			serializer: this.#serializer,
-		});
 	}
 }
