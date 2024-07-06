@@ -125,7 +125,7 @@ export class PersistedState<T> {
 
 		this.#current = valueFromStorage.found ? valueFromStorage.value : initialValue;
 
-		$effect.pre(() => {
+		$effect(() => {
 			setValueToStorage({
 				key: this.#key,
 				value: this.#current,
