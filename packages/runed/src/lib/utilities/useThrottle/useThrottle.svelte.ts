@@ -1,3 +1,5 @@
+import { untrack } from "svelte";
+
 import type { MaybeGetter } from "$lib/internal/types.js";
 
 type UseThrottleReturn<Args extends unknown[], Return> = ((
@@ -26,61 +28,65 @@ export function useThrottle<Args extends unknown[], Return>(
 	}
 
 	function throttled(this: unknown, ...args: Args): Promise<Return> {
-		console.log("Throttled called", { lastCall, timeout });
-		const now = Date.now();
-		const intervalValue = typeof interval === "function" ? interval() : interval;
-		const nextAllowedTime = lastCall + intervalValue;
+		return untrack(() => {
+			const now = Date.now();
+			const intervalValue = typeof interval === "function" ? interval() : interval;
+			const nextAllowedTime = lastCall + intervalValue;
 
-		if (!promise) {
-			promise = new Promise<Return>((res, rej) => {
-				resolve = res;
-				reject = rej;
-			});
-		}
-
-		if (now < nextAllowedTime) {
-			if (!timeout) {
-				timeout = setTimeout(async () => {
-					try {
-						const result = await callback.apply(this, args);
-						resolve?.(result);
-					} catch (error) {
-						reject?.(error);
-					} finally {
-						clearTimeout(timeout);
-						timeout = undefined;
-						lastCall = Date.now();
-						reset();
-					}
-				}, nextAllowedTime - now);
+			if (!promise) {
+				promise = new Promise<Return>((res, rej) => {
+					resolve = res;
+					reject = rej;
+				});
 			}
+
+			if (now < nextAllowedTime) {
+				if (!timeout) {
+					timeout = setTimeout(async () => {
+						try {
+							const result = await callback.apply(this, args);
+							resolve?.(result);
+						} catch (error) {
+							reject?.(error);
+						} finally {
+							clearTimeout(timeout);
+							reset();
+							lastCall = Date.now();
+						}
+					}, nextAllowedTime - now);
+				}
+
+				return promise;
+			}
+
+			if (timeout) {
+				clearTimeout(timeout);
+				timeout = undefined;
+			}
+			lastCall = now;
+			try {
+				const result = callback.apply(this, args);
+				resolve?.(result);
+			} catch (error) {
+				reject?.(error);
+			} finally {
+				reset();
+			}
+
 			return promise;
-		}
-
-		if (timeout) {
-			clearTimeout(timeout);
-			timeout = undefined;
-		}
-
-		lastCall = now;
-
-		try {
-			const result = callback.apply(this, args);
-			resolve?.(result);
-		} catch (error) {
-			reject?.(error);
-		} finally {
-			reset();
-		}
-
-		return promise;
+		});
 	}
 
-	throttled.cancel = () => {
+	throttled.cancel = async () => {
 		if (timeout) {
+			if (timeout === undefined) {
+				// Wait one event loop to see if something triggered the throttled function
+				await new Promise((resolve) => setTimeout(resolve, 0));
+				if (timeout === undefined) return;
+			}
+
 			clearTimeout(timeout);
-			timeout = undefined;
-			reject?.(new Error("Cancelled"));
+			reject?.("Cancelled");
 			reset();
 		}
 	};
