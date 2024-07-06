@@ -28,8 +28,10 @@ initial value for the state.
 </script>
 
 <div>
-	<p>Count: {count.current}</p>
 	<button onclick={() => count.current++}>Increment</button>
+	<button onclick={() => count.current--}>Decrement</button>
+	<button onclick={() => (count.current = 0)}>Reset</button>
+	<p>Count: {count.current}</p>
 </div>
 ```
 
