@@ -23,7 +23,6 @@
 		<Label for="search">Search</Label>
 		<Input bind:value={search} placeholder="Search the best utilities for Svelte 5" />
 	</div>
-	<p>Search value: {search}</p>
 
 	<p>
 		{#if throttledSearch.current}
