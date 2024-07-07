@@ -9,7 +9,7 @@
 	let throttledSearch = $state("");
 	let durationMs = $state(1000);
 
-	const something = useThrottle(
+	const setThrottledSearch = useThrottle(
 		() => {
 			throttledSearch = search;
 		},
@@ -19,7 +19,7 @@
 	$effect(() => {
 		// eslint-disable-next-line no-unused-expressions
 		search;
-		something();
+		setThrottledSearch();
 	});
 </script>
 
