@@ -5,7 +5,7 @@
 	import DemoContainer from "$lib/components/demo-container.svelte";
 	import Input from "$lib/components/ui/input/input.svelte";
 
-	let search = $state("prefilled");
+	let search = $state("");
 	let durationMs = $state(1000);
 	const throttledSearch = new Throttled(
 		() => search,
