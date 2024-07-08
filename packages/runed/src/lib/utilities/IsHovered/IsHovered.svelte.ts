@@ -3,6 +3,10 @@ import { extract } from "../extract/extract.js";
 import type { MaybeGetter } from "$lib/internal/types.js";
 import { addEventListener } from "$lib/internal/utils/event.js";
 
+/**
+ * Tracks whether the user is hovering over the target element.
+ * @see {@link https://runed.dev/docs/utilities/is-hovered}
+ */
 export class IsHovered<T extends HTMLElement | undefined> {
 	#node: MaybeGetter<T>;
 	#target = $derived.by(() => extract(this.#node));
