@@ -6,4 +6,6 @@
 	const isHovered = new IsHovered(() => el);
 </script>
 
-<div data-testid="hover-target">{isHovered.current ? "true" : "false"}</div>
+<div data-testid="hover-target" bind:this={el}>
+	{isHovered.current ? "true" : "false"}
+</div>
