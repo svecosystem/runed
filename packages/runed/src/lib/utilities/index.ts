@@ -20,3 +20,4 @@ export * from "./AnimationFrames/index.js";
 export * from "./useIntersectionObserver/index.js";
 export * from "./IsFocusWithin/index.js";
 export * from "./FiniteStateMachine/index.js";
+export * from "./useNetworkStatus/index.js";
