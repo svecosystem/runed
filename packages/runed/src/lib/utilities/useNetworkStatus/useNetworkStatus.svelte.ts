@@ -1,6 +1,6 @@
+import { browser } from "$lib/internal/utils/browser.js";
 import { addEventListener } from "$lib/internal/utils/event.js";
 import { Previous } from "$lib/utilities/index.js";
-import { browser } from "$app/environment";
 
 /**
  * @desc The `NetworkInformation` interface of the Network Information API
@@ -86,6 +86,7 @@ interface NetworkStatus {
  * @returns null if the function is not run in the browser
  */
 export function useNetworkStatus() {
+	console.log("browser", browser);
 	if (!browser) {
 		return {
 			get current() {
@@ -119,18 +120,18 @@ export function useNetworkStatus() {
 	};
 
 	$effect(() => {
+		const callbacks: VoidFunction[] = [];
+
 		// The connection event handler also manages online and offline states.
 		if (connection) {
-			addEventListener(connection, "change", handleStatusChange, { passive: true });
+			callbacks.push(addEventListener(connection, "change", handleStatusChange, { passive: true }));
 		} else {
-			addEventListener(window, "online", handleStatusChange, { passive: true });
-			addEventListener(window, "offline", handleStatusChange, { passive: true });
+			callbacks.push(addEventListener(window, "online", handleStatusChange, { passive: true }));
+			callbacks.push(addEventListener(window, "offline", handleStatusChange, { passive: true }));
 		}
 
 		return () => {
-			window.removeEventListener("online", handleStatusChange);
-			window.removeEventListener("online", handleStatusChange);
-			connection?.removeEventListener("change", handleStatusChange);
+			callbacks.forEach((c) => c());
 		};
 	});
 
