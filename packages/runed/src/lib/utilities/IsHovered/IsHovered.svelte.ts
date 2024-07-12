@@ -3,6 +3,20 @@ import { extract } from "../extract/extract.js";
 import type { MaybeGetter } from "$lib/internal/types.js";
 import { addEventListener } from "$lib/internal/utils/event.js";
 
+// Whether the primary input device supports hover
+function isHoverSupported() {
+	return window.matchMedia("(hover: hover)").matches;
+}
+
+// Whether the primary input device supports fine pointer accuracy
+function hasFinePointer() {
+	return window.matchMedia("(pointer: fine)").matches;
+}
+
+function canHover() {
+	return isHoverSupported() && hasFinePointer();
+}
+
 /**
  * Tracks whether the user is hovering over the target element.
  * @see {@link https://runed.dev/docs/utilities/is-hovered}
@@ -23,7 +37,7 @@ export class IsHovered<T extends HTMLElement | undefined> {
 		};
 
 		$effect(() => {
-			if (!this.#target) {
+			if (!this.#target || !canHover()) {
 				return;
 			}
 
