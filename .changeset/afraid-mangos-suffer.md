@@ -2,4 +2,4 @@
 "runed": minor
 ---
 
-Add `useThrottle` and `Throttled`
+New Utilities: `useThrottle` and `Throttled`
