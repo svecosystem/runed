@@ -1,6 +1,6 @@
 import { describe, expect } from "vitest";
 
-import { Persisted } from "./index.js";
+import { Persisted, WebStorageAdapter } from "./index.js";
 import { testWithEffect } from "$lib/test/util.svelte.js";
 
 const key = "test-key";
@@ -65,10 +65,21 @@ describe("PersistedState", () => {
 			const date = new Date(isoDate);
 
 			const serializer = {
-				serialize: (value: Date) => value.toISOString(),
-				deserialize: (value: string) => new Date(value),
+				serialize: (value: Date) => {
+					return value.toISOString();
+				},
+				deserialize: (value: string) => {
+					return new Date(value);
+				},
 			};
-			const persistedState = new Persisted(key, date, { serializer });
+			const persistedState = new Persisted(key, date, {
+				storage: new WebStorageAdapter({
+					storage: localStorage,
+					serializer,
+				}),
+			});
+			// persistedState.current = date;
+			// await new Promise((resolve) => setTimeout(resolve, 50));
 			expect(persistedState.current).toBe(date);
 			await new Promise((resolve) => setTimeout(resolve, 0));
 
@@ -91,7 +102,7 @@ describe("PersistedState", () => {
 		testWithEffect(
 			"does not update persisted value when local storage changes independently if syncTabs is false",
 			async () => {
-				const persistedState = new Persisted(key, initialValue, { syncTabs: false });
+				const persistedState = new Persisted(key, initialValue, { syncChanges: false });
 				localStorage.setItem(key, JSON.stringify("new-value"));
 				await new Promise((resolve) => setTimeout(resolve, 0));
 				expect(persistedState.current).toBe(initialValue);

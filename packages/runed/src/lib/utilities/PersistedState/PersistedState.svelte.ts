@@ -115,8 +115,10 @@ type StorageType = "local" | "session";
 type PersistedStateOptions<T> = {
 	/** The storage type to use. Defaults to `local`. */
 	storage?: StorageType | StorageAdapter<T>;
-	/** Whether to sync with the state changes from other tabs. Defaults to `true`. */
-	syncTabs?: boolean;
+	/**
+	 * Whether to synchronize the state with changes detected via the `subscribe` callback. This allows the state to be updated in response to changes originating from various sources, including other browser tabs or sessions when using web storage like localStorage or sessionStorage. Defaults to `true`.
+	 */
+	syncChanges?: boolean;
 };
 
 /**
@@ -135,7 +137,7 @@ export class Persisted<T> {
 	#storageAdapter: StorageAdapter<T> | null;
 
 	constructor(key: string, initialValue: T, options: PersistedStateOptions<T> = {}) {
-		const { storage = "local", syncTabs = true } = options;
+		const { storage = "local", syncChanges = true } = options;
 
 		this.#key = key;
 		this.#initialValue = initialValue;
@@ -154,7 +156,7 @@ export class Persisted<T> {
 			});
 		});
 
-		if (syncTabs) {
+		if (syncChanges) {
 			$effect(() => {
 				return untrack(() => {
 					if (!this.#storageAdapter?.subscribe) {
@@ -185,11 +187,8 @@ export class Persisted<T> {
 		}
 
 		const valueFromStorage = await this.#storageAdapter.getItem(this.#key);
-		if (!valueFromStorage.found) {
-			return;
-		}
 
-		this.#current = valueFromStorage.value;
+		this.#current = valueFromStorage.found ? valueFromStorage.value : this.#initialValue;
 		this.#isInitialized = true;
 	}
 
