@@ -6,34 +6,64 @@ type Serializer<T> = {
 	deserialize: (value: string) => T;
 };
 
-interface StorageAdapter {
-	getItem: (key: string) => Promise<string | null>;
-	setItem: (key: string, value: string) => Promise<void>;
-	subscribe?: (callback: (key: string, newValue: string | null) => void) => () => void;
+type GetItemResult<T> =
+	| {
+			found: false;
+			value: null;
+	  }
+	| {
+			found: true;
+			value: T;
+	  };
+
+interface StorageAdapter<T> {
+	getItem: (key: string) => Promise<GetItemResult<T>>;
+	setItem: (key: string, value: T) => Promise<void>;
+	subscribe?: (callback: (key: string, newValue: GetItemResult<T>) => void) => () => void;
 }
 
-class BrowserStorageAdapter implements StorageAdapter {
+export class WebStorageAdapter<T> implements StorageAdapter<T> {
 	#storage: Storage;
+	#serializer: Serializer<T>;
 
-	constructor(storage: Storage) {
+	constructor({
+		storage,
+		serializer = {
+			serialize: JSON.stringify,
+			deserialize: JSON.parse,
+		},
+	}: {
+		storage: Storage;
+		serializer?: Serializer<T>;
+	}) {
 		this.#storage = storage;
+		this.#serializer = serializer;
 	}
 
-	async getItem(key: string): Promise<string | null> {
-		return this.#storage.getItem(key);
+	async getItem(key: string): Promise<GetItemResult<T>> {
+		const value = this.#storage.getItem(key);
+		return value !== null
+			? { found: true, value: this.#serializer.deserialize(value) }
+			: { found: false, value: null };
 	}
 
-	async setItem(key: string, value: string): Promise<void> {
-		this.#storage.setItem(key, value);
+	async setItem(key: string, value: T): Promise<void> {
+		const serializedValue = this.#serializer.serialize(value);
+		this.#storage.setItem(key, serializedValue);
 	}
 
-	subscribe(callback: (key: string, newValue: string | null) => void): () => void {
+	subscribe(callback: (key: string, newValue: GetItemResult<T>) => void): () => void {
 		const listener = (event: StorageEvent) => {
 			if (event.key === null) {
 				return;
 			}
 
-			callback(event.key, event.newValue);
+			const result: GetItemResult<T> =
+				event.newValue !== null
+					? { found: true, value: this.#serializer.deserialize(event.newValue) }
+					: { found: false, value: null };
+
+			callback(event.key, result);
 		};
 
 		const unsubscribe = addEventListener(window, "storage", listener.bind(this));
@@ -44,65 +74,21 @@ class BrowserStorageAdapter implements StorageAdapter {
 	}
 }
 
-type GetValueFromStorageResult<T> =
-	| {
-			found: true;
-			value: T;
-	  }
-	| {
-			found: false;
-			value: null;
-	  };
-
-async function getValueFromStorage<T>({
-	key,
-	storage,
-	serializer,
-}: {
-	key: string;
-	storage: StorageAdapter;
-	serializer: Serializer<T>;
-}): Promise<GetValueFromStorageResult<T>> {
-	if (!storage) {
-		return { found: false, value: null };
-	}
-
-	const value = await storage.getItem(key);
-	if (value === null) {
-		return { found: false, value: null };
-	}
-
-	try {
-		return {
-			found: true,
-			value: serializer.deserialize(value),
-		};
-	} catch (e) {
-		console.error(`Error when parsing ${value} from persisted store "${key}"`, e);
-		return {
-			found: false,
-			value: null,
-		};
-	}
-}
-
 async function setValueToStorage<T>({
 	key,
 	value,
 	storage,
-	serializer,
 }: {
 	key: string;
 	value: T;
-	storage: StorageAdapter | null;
-	serializer: Serializer<T>;
+	storage: StorageAdapter<T> | null;
 }) {
 	if (!storage) {
 		return;
 	}
 
 	try {
-		await storage.setItem(key, serializer.serialize(value));
+		await storage.setItem(key, value);
 	} catch (e) {
 		console.error(
 			`Error when writing value from persisted store "${key}" to ${storage.constructor.name}`,
@@ -111,126 +97,24 @@ async function setValueToStorage<T>({
 	}
 }
 
-// type StorageType = "local" | "session";
-
-// function getStorage(storageType: StorageType): Storage | null {
-// 	if (typeof window === "undefined") {
-// 		return null;
-// 	}
-
-// 	const storageByStorageType = {
-// 		local: localStorage,
-// 		session: sessionStorage,
-// 	} satisfies Record<StorageType, Storage>;
-
-// 	return storageByStorageType[storageType];
-// }
-
-// type PersistedStateOptions<T> = {
-// 	/** The storage type to use. Defaults to `local`. */
-// 	storage?: StorageType;
-// 	/** The serializer to use. Defaults to `JSON.stringify` and `JSON.parse`. */
-// 	serializer?: Serializer<T>;
-// 	/** Whether to sync with the state changes from other tabs. Defaults to `true`. */
-// 	syncTabs?: boolean;
-// };
-
-// /**
-//  * Creates reactive state that is persisted and synchronized across browser sessions and tabs using Web Storage.
-//  * @param key The unique key used to store the state in the storage.
-//  * @param initialValue The initial value of the state if not already present in the storage.
-//  * @param options Configuration options including storage type, serializer for complex data types, and whether to sync state changes across tabs.
-//  *
-//  * @see {@link https://runed.dev/docs/utilities/persisted-state}
-//  */
-// export class Persisted<T> {
-// 	#current = $state() as T;
-// 	#key: string;
-// 	#storage: Storage | null;
-// 	#serializer: Serializer<T>;
-
-// 	constructor(key: string, initialValue: T, options: PersistedStateOptions<T> = {}) {
-// 		const {
-// 			storage: storageType = "local",
-// 			serializer = { serialize: JSON.stringify, deserialize: JSON.parse },
-// 			syncTabs = true,
-// 		} = options;
-
-// 		this.#key = key;
-// 		this.#storage = getStorage(storageType);
-// 		this.#serializer = serializer;
-
-// 		const valueFromStorage = getValueFromStorage({
-// 			key: this.#key,
-// 			storage: this.#storage,
-// 			serializer: this.#serializer,
-// 		});
-
-// 		this.#current = valueFromStorage.found ? valueFromStorage.value : initialValue;
-
-// 		$effect(() => {
-// 			setValueToStorage({
-// 				key: this.#key,
-// 				value: this.#current,
-// 				storage: this.#storage,
-// 				serializer: this.#serializer,
-// 			});
-// 		});
-
-// 		$effect(() => {
-// 			if (!syncTabs) {
-// 				return;
-// 			}
-
-// 			return addEventListener(window, "storage", this.#handleStorageEvent.bind(this));
-// 		});
-// 	}
-
-// 	#handleStorageEvent(event: StorageEvent) {
-// 		if (event.key !== this.#key || !this.#storage) {
-// 			return;
-// 		}
-
-// 		const valueFromStorage = getValueFromStorage({
-// 			key: this.#key,
-// 			storage: this.#storage,
-// 			serializer: this.#serializer,
-// 		});
-
-// 		if (valueFromStorage.found) {
-// 			this.#current = valueFromStorage.value;
-// 		}
-// 	}
-
-// 	get current(): T {
-// 		return this.#current;
-// 	}
-
-// 	set current(newValue: T) {
-// 		this.#current = newValue;
-// 	}
-// }
-
-function getStorageAdapterForStorageType(storageType: StorageType): StorageAdapter | null {
+function getWebStorageAdapterForStorageType<T>(storageType: StorageType): StorageAdapter<T> | null {
 	if (typeof window === "undefined") {
 		return null;
 	}
 
-	const storageAdapterByStorageType = {
-		local: new BrowserStorageAdapter(localStorage),
-		session: new BrowserStorageAdapter(sessionStorage),
+	const webStorageAdapterByStorageType = {
+		local: new WebStorageAdapter<T>({ storage: localStorage }),
+		session: new WebStorageAdapter<T>({ storage: sessionStorage }),
 	};
 
-	return storageAdapterByStorageType[storageType];
+	return webStorageAdapterByStorageType[storageType];
 }
 
 type StorageType = "local" | "session";
 
 type PersistedStateOptions<T> = {
 	/** The storage type to use. Defaults to `local`. */
-	storage?: StorageType | StorageAdapter;
-	/** The serializer to use. Defaults to `JSON.stringify` and `JSON.parse`. */
-	serializer?: Serializer<T>;
+	storage?: StorageType | StorageAdapter<T>;
 	/** Whether to sync with the state changes from other tabs. Defaults to `true`. */
 	syncTabs?: boolean;
 };
@@ -248,21 +132,15 @@ export class Persisted<T> {
 	#isInitialized = $state(false);
 	#initialValue: T;
 	#key: string;
-	#storageAdapter: StorageAdapter | null;
-	#serializer: Serializer<T>;
+	#storageAdapter: StorageAdapter<T> | null;
 
 	constructor(key: string, initialValue: T, options: PersistedStateOptions<T> = {}) {
-		const {
-			storage = "local",
-			serializer = { serialize: JSON.stringify, deserialize: JSON.parse },
-			syncTabs = true,
-		} = options;
+		const { storage = "local", syncTabs = true } = options;
 
 		this.#key = key;
 		this.#initialValue = initialValue;
 		this.#storageAdapter =
-			typeof storage === "string" ? getStorageAdapterForStorageType(storage) : storage;
-		this.#serializer = serializer;
+			typeof storage === "string" ? getWebStorageAdapterForStorageType(storage) : storage;
 
 		$effect(() => {
 			if (!this.#isInitialized) {
@@ -273,7 +151,6 @@ export class Persisted<T> {
 				key: this.#key,
 				value: this.#current,
 				storage: this.#storageAdapter,
-				serializer: this.#serializer,
 			});
 		});
 
@@ -286,9 +163,11 @@ export class Persisted<T> {
 
 					const unsubscribe = this.#storageAdapter
 						.subscribe(async (key, newValue) => {
-							if (key === this.#key && newValue !== null) {
-								this.#current = this.#serializer.deserialize(newValue);
+							if (key !== this.#key || !newValue.found) {
+								return;
 							}
+
+							this.#current = newValue.value;
 						})
 						.bind(this);
 
@@ -305,11 +184,7 @@ export class Persisted<T> {
 			return;
 		}
 
-		const valueFromStorage = await getValueFromStorage({
-			key: this.#key,
-			storage: this.#storageAdapter,
-			serializer: this.#serializer,
-		});
+		const valueFromStorage = await this.#storageAdapter.getItem(this.#key);
 		if (!valueFromStorage.found) {
 			return;
 		}
