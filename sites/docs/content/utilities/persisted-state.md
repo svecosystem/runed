@@ -1,5 +1,5 @@
 ---
-title: PersistedState
+title: Persisted
 description:
   Create reactive state that is persisted and synchronized across browser sessions and tabs using
   Web Storage.
@@ -16,15 +16,15 @@ import Demo from '$lib/components/demos/persisted-state.svelte';
 
 ## Usage
 
-`PersistedState` allows for syncing and persisting state across browser sessions using
-`localStorage` or `sessionStorage`. Initialize `PersistedState` by providing a unique key and an
-initial value for the state.
+`Persisted` allows for syncing and persisting state across browser sessions using `localStorage` or
+`sessionStorage`. Initialize `Persisted` by providing a unique key and an initial value for the
+state.
 
 ```svelte
 <script lang="ts">
-	import { PersistedState } from "runed";
+	import { Persisted } from "runed";
 
-	const count = new PersistedState("count", 0);
+	const count = new Persisted("count", 0);
 </script>
 
 <div>
@@ -35,7 +35,7 @@ initial value for the state.
 </div>
 ```
 
-`PersistedState` also includes an `options` object.
+`Persisted` also includes an `options` object.
 
 ```ts
 {

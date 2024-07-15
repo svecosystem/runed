@@ -1,6 +1,6 @@
 import { describe, expect } from "vitest";
 
-import { PersistedState } from "./index.js";
+import { Persisted } from "./index.js";
 import { testWithEffect } from "$lib/test/util.svelte.js";
 
 const key = "test-key";
@@ -15,19 +15,19 @@ describe("PersistedState", () => {
 
 	describe("localStorage", () => {
 		testWithEffect("uses initial value if no persisted value is found", () => {
-			const persistedState = new PersistedState(key, initialValue);
+			const persistedState = new Persisted(key, initialValue);
 			expect(persistedState.current).toBe(initialValue);
 		});
 
 		testWithEffect("uses persisted value if it is found", async () => {
 			localStorage.setItem(key, JSON.stringify(existingValue));
-			const persistedState = new PersistedState(key, initialValue);
+			const persistedState = new Persisted(key, initialValue);
 			await new Promise((resolve) => setTimeout(resolve, 0));
 			expect(persistedState.current).toBe(existingValue);
 		});
 
 		testWithEffect("updates localStorage when current value changes", async () => {
-			const persistedState = new PersistedState(key, initialValue);
+			const persistedState = new Persisted(key, initialValue);
 			expect(persistedState.current).toBe(initialValue);
 			persistedState.current = "new-value";
 			expect(persistedState.current).toBe("new-value");
@@ -38,19 +38,19 @@ describe("PersistedState", () => {
 
 	describe("sessionStorage", () => {
 		testWithEffect("uses initial value if no persisted value is found", () => {
-			const persistedState = new PersistedState(key, initialValue, { storage: "session" });
+			const persistedState = new Persisted(key, initialValue, { storage: "session" });
 			expect(persistedState.current).toBe(initialValue);
 		});
 
 		testWithEffect("uses persisted value if it is found", async () => {
 			sessionStorage.setItem(key, JSON.stringify(existingValue));
-			const persistedState = new PersistedState(key, initialValue, { storage: "session" });
+			const persistedState = new Persisted(key, initialValue, { storage: "session" });
 			await new Promise((resolve) => setTimeout(resolve, 0));
 			expect(persistedState.current).toBe(existingValue);
 		});
 
 		testWithEffect("updates sessionStorage when current value changes", async () => {
-			const persistedState = new PersistedState(key, initialValue, { storage: "session" });
+			const persistedState = new Persisted(key, initialValue, { storage: "session" });
 			expect(persistedState.current).toBe(initialValue);
 			persistedState.current = "new-value";
 			expect(persistedState.current).toBe("new-value");
@@ -68,7 +68,7 @@ describe("PersistedState", () => {
 				serialize: (value: Date) => value.toISOString(),
 				deserialize: (value: string) => new Date(value),
 			};
-			const persistedState = new PersistedState(key, date, { serializer });
+			const persistedState = new Persisted(key, date, { serializer });
 			expect(persistedState.current).toBe(date);
 			await new Promise((resolve) => setTimeout(resolve, 0));
 
@@ -91,7 +91,7 @@ describe("PersistedState", () => {
 		testWithEffect(
 			"does not update persisted value when local storage changes independently if syncTabs is false",
 			async () => {
-				const persistedState = new PersistedState(key, initialValue, { syncTabs: false });
+				const persistedState = new Persisted(key, initialValue, { syncTabs: false });
 				localStorage.setItem(key, JSON.stringify("new-value"));
 				await new Promise((resolve) => setTimeout(resolve, 0));
 				expect(persistedState.current).toBe(initialValue);
