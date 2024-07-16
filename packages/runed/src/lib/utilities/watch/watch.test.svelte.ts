@@ -129,9 +129,12 @@ describe("watch", () => {
 			condition.name = condition.name === "Bob" ? "John" : "Bob";
 		}
 
-		watch([() => condition], () => {
-			runs++;
-		});
+		watch(
+			() => condition,
+			() => {
+				runs++;
+			}
+		);
 
 		// Watch should run initially
 		await sleep(0);
