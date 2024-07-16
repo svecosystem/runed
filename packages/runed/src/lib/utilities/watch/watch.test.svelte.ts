@@ -120,4 +120,26 @@ describe("watch", () => {
 			});
 		});
 	});
+
+	testWithEffect("watch is triggered when nested object properties are mutated", async () => {
+		let condition = $state({ name: "Bob" });
+		let runs = 0;
+
+		function toggleName() {
+			condition.name = condition.name === "Bob" ? "John" : "Bob";
+		}
+
+		watch([() => condition], () => {
+			runs++;
+		});
+
+		// Watch should run initially
+		await sleep(0);
+		expect(runs).toBe(1);
+
+		// Toggle name and check if watcher runs
+		toggleName();
+		await sleep(0);
+		expect(runs).toBe(2);
+	});
 });

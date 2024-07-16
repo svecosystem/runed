@@ -44,7 +44,10 @@ function runWatcher<T>(
 		: undefined;
 
 	runEffect(flush, () => {
-		const values = Array.isArray(sources) ? sources.map((source) => source()) : sources();
+		const sourcesSnapshot = $state.snapshot(sources);
+		const values = Array.isArray(sourcesSnapshot)
+			? sourcesSnapshot.map((source) => $state.snapshot(source()))
+			: sourcesSnapshot();
 
 		if (!active) {
 			active = true;
