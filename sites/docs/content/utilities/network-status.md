@@ -74,7 +74,6 @@ const networkStatus = new NetworkStatus();
 if (networkStatus.isSupported) {
 	// do something with the network status
 }
-
 ```
 
 ### Previous
