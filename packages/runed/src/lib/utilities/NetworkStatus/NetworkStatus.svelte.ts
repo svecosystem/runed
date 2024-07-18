@@ -1,4 +1,4 @@
-import { untrack } from "svelte";
+import { onMount, untrack } from "svelte";
 import { browser } from "$lib/internal/utils/browser.js";
 import { addEventListener } from "$lib/internal/utils/event.js";
 import { IsSupported } from "$lib/utilities/index.js";
@@ -30,17 +30,14 @@ type NavigatorWithConnection = Navigator & { connection: NetworkInformation };
  * Tracks the state of browser's network connection.
  */
 export class NetworkStatus {
-	#isNetworkStatusSupported = new IsSupported(() => browser && "navigator" in window);
-	#navigator?: Navigator = $derived(
-		this.#isNetworkStatusSupported.current ? window.navigator : undefined
-	);
+	#isSupported = new IsSupported(() => browser && "navigator" in window);
+	#navigator?: Navigator = $derived(this.#isSupported.current ? window.navigator : undefined);
 	#connection?: NetworkInformation = $derived(
 		this.#navigator && "connection" in this.#navigator
 			? (this.#navigator as NavigatorWithConnection).connection
 			: undefined
 	);
 
-	#isSupported = $derived(this.#isNetworkStatusSupported.current);
 	#online: boolean = $state(false);
 	#updatedAt: Date = $state(new Date());
 	#downlink?: NetworkInformation["downlink"] = $state();
@@ -51,14 +48,10 @@ export class NetworkStatus {
 	#type?: NetworkInformation["type"] = $state();
 
 	constructor() {
-		$effect(() => {
-			untrack(() => {
-				this.#updateStatus();
-			});
-
+		onMount(() => {
+			this.#updateStatus();
 			const callbacks: VoidFunction[] = [];
 
-			// The connection event handler also manages online and offline states.
 			if (this.#connection) {
 				callbacks.push(
 					addEventListener(this.#connection, "change", this.#updateStatus, { passive: true })
@@ -75,25 +68,24 @@ export class NetworkStatus {
 	}
 
 	#updateStatus = () => {
-		if (this.#navigator) {
-			this.#online = this.#navigator.onLine;
-			this.#updatedAt = new Date();
-			if (this.#connection) {
-				this.#downlink = this.#connection.downlink;
-				this.#downlinkMax = this.#connection.downlinkMax;
-				this.#effectiveType = this.#connection.effectiveType;
-				this.#rtt = this.#connection.rtt;
-				this.#saveData = this.#connection.saveData;
-				this.#type = this.#connection.type;
-			}
-		}
+		if (!this.#navigator) return;
+		this.#online = this.#navigator.onLine;
+		this.#updatedAt = new Date();
+		if (!this.#connection) return;
+
+		this.#downlink = this.#connection.downlink;
+		this.#downlinkMax = this.#connection.downlinkMax;
+		this.#effectiveType = this.#connection.effectiveType;
+		this.#rtt = this.#connection.rtt;
+		this.#saveData = this.#connection.saveData;
+		this.#type = this.#connection.type;
 	};
 
 	/**
-	 * @returns {boolean} Whether the network status API is supported on this device.
+	 * @desc Whether the network status API is supported on this device.
 	 */
 	get isSupported() {
-		return this.#isSupported;
+		return this.#isSupported.current;
 	}
 
 	/**
