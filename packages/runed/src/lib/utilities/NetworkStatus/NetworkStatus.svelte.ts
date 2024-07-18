@@ -1,4 +1,4 @@
-import { onMount, untrack } from "svelte";
+import { onMount } from "svelte";
 import { browser } from "$lib/internal/utils/browser.js";
 import { addEventListener } from "$lib/internal/utils/event.js";
 import { IsSupported } from "$lib/utilities/index.js";
@@ -28,6 +28,8 @@ type NavigatorWithConnection = Navigator & { connection: NetworkInformation };
 
 /**
  * Tracks the state of browser's network connection.
+ *
+ * @see {@link https://runed.dev/docs/utilities/network-status}
  */
 export class NetworkStatus {
 	#isSupported = new IsSupported(() => browser && "navigator" in window);
@@ -37,7 +39,6 @@ export class NetworkStatus {
 			? (this.#navigator as NavigatorWithConnection).connection
 			: undefined
 	);
-
 	#online: boolean = $state(false);
 	#updatedAt: Date = $state(new Date());
 	#downlink?: NetworkInformation["downlink"] = $state();
