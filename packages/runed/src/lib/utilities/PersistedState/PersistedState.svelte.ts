@@ -1,4 +1,5 @@
 import { untrack } from "svelte";
+import { BROWSER, DEV } from "esm-env";
 import { addEventListener } from "$lib/internal/utils/event.js";
 
 type Serializer<T> = {
@@ -54,9 +55,7 @@ export class WebStorageAdapter<T> implements StorageAdapter<T> {
 
 	subscribe(callback: (key: string, newValue: GetItemResult<T>) => void): () => void {
 		const listener = (event: StorageEvent) => {
-			if (event.key === null) {
-				return;
-			}
+			if (event.key === null) return;
 
 			const result: GetItemResult<T> =
 				event.newValue !== null
@@ -83,13 +82,12 @@ async function setValueToStorage<T>({
 	value: T;
 	storage: StorageAdapter<T> | null;
 }) {
-	if (!storage) {
-		return;
-	}
+	if (!storage) return;
 
 	try {
 		await storage.setItem(key, value);
 	} catch (e) {
+		if (!DEV) return;
 		console.error(
 			`Error when writing value from persisted store "${key}" to ${storage.constructor.name}`,
 			e
@@ -98,9 +96,7 @@ async function setValueToStorage<T>({
 }
 
 function getWebStorageAdapterForStorageType<T>(storageType: StorageType): StorageAdapter<T> | null {
-	if (typeof window === "undefined") {
-		return null;
-	}
+	if (!BROWSER) return null;
 
 	const webStorageAdapterByStorageType = {
 		local: new WebStorageAdapter<T>({ storage: localStorage }),
@@ -113,10 +109,18 @@ function getWebStorageAdapterForStorageType<T>(storageType: StorageType): Storag
 type StorageType = "local" | "session";
 
 type PersistedStateOptions<T> = {
-	/** The storage type to use. Defaults to `local`. */
+	/**
+	 * The storage type to use.
+	 * @defaultValue `local`
+	 */
 	storage?: StorageType | StorageAdapter<T>;
 	/**
-	 * Whether to synchronize the state with changes detected via the `subscribe` callback. This allows the state to be updated in response to changes originating from various sources, including other browser tabs or sessions when using web storage like localStorage or sessionStorage. Defaults to `true`.
+	 * Whether to synchronize the state with changes detected via the `subscribe` callback.
+	 * This allows the state to be updated in response to changes originating from various sources,
+	 * including other browser tabs or sessions when using web storage like localStorage or
+	 * sessionStorage.
+	 *
+	 * @defaultValue `true`
 	 */
 	syncChanges?: boolean;
 };
@@ -145,9 +149,7 @@ export class Persisted<T> {
 			typeof storage === "string" ? getWebStorageAdapterForStorageType(storage) : storage;
 
 		$effect(() => {
-			if (!this.#isInitialized) {
-				return;
-			}
+			if (!this.#isInitialized) return;
 
 			setValueToStorage({
 				key: this.#key,
@@ -159,16 +161,11 @@ export class Persisted<T> {
 		if (syncChanges) {
 			$effect(() => {
 				return untrack(() => {
-					if (!this.#storageAdapter?.subscribe) {
-						return;
-					}
+					if (!this.#storageAdapter?.subscribe) return;
 
 					const unsubscribe = this.#storageAdapter
 						.subscribe(async (key, newValue) => {
-							if (key !== this.#key || !newValue.found) {
-								return;
-							}
-
+							if (key !== this.#key || !newValue.found) return;
 							this.#current = newValue.value;
 						})
 						.bind(this);
@@ -182,9 +179,7 @@ export class Persisted<T> {
 	}
 
 	async init() {
-		if (!this.#storageAdapter) {
-			return;
-		}
+		if (!this.#storageAdapter) return;
 
 		const valueFromStorage = await this.#storageAdapter.getItem(this.#key);
 
