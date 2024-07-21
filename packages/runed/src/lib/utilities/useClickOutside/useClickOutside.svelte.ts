@@ -16,9 +16,20 @@ export function useClickOutside<T extends Element>(
 	const el = $derived(extract(container));
 
 	function handleClick(event: MouseEvent) {
-		if (!event.target || el?.contains(event.target as Node)) return;
+		if (!event.target || !el) {
+			return;
+		}
 
-		callback();
+		const rect = el.getBoundingClientRect();
+		const clickedInside =
+			rect.top <= event.clientY &&
+			event.clientY <= rect.top + rect.height &&
+			rect.left <= event.clientX &&
+			event.clientX <= rect.left + rect.width;
+
+		if (!clickedInside) {
+			callback();
+		}
 	}
 
 	useEventListener(() => document, "click", handleClick);
