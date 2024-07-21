@@ -64,7 +64,7 @@ check if the API is supported on the current environment/device.
 {/if}
 ```
 
-### isSupported
+### `isSupported`
 
 It's important to check if the API is supported on the current environment/device before using it.
 
@@ -76,7 +76,7 @@ if (networkStatus.isSupported) {
 }
 ```
 
-### Previous
+### Getting the previous status
 
 It's often useful to get the previous status of the network connection. You can use the
 [Previous](https://runed.dev/docs/utilities/previous) utility to track the previous state.

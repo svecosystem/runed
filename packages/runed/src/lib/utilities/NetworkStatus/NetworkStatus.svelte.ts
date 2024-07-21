@@ -7,7 +7,7 @@ import { IsSupported } from "$lib/utilities/index.js";
  * @desc The `NetworkInformation` interface of the Network Information API
  * @see https://developer.mozilla.org/en-US/docs/Web/API/NetworkInformation
  */
-type NetworkInformation = {
+export type NetworkInformation = {
 	readonly downlink: number;
 	readonly downlinkMax: number;
 	readonly effectiveType: "slow-2g" | "2g" | "3g" | "4g";
