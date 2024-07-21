@@ -1,7 +1,6 @@
 import { onMount } from "svelte";
 import { browser } from "$lib/internal/utils/browser.js";
-import { addEventListener } from "$lib/internal/utils/event.js";
-import { IsSupported } from "$lib/utilities/index.js";
+import { IsSupported, useEventListener } from "$lib/utilities/index.js";
 
 /**
  * @desc The `NetworkInformation` interface of the Network Information API
@@ -51,20 +50,13 @@ export class NetworkStatus {
 	constructor() {
 		onMount(() => {
 			this.#updateStatus();
-			const callbacks: VoidFunction[] = [];
 
 			if (this.#connection) {
-				callbacks.push(
-					addEventListener(this.#connection, "change", this.#updateStatus, { passive: true })
-				);
+				useEventListener(this.#connection, "change", this.#updateStatus, { passive: true });
 			} else {
-				callbacks.push(addEventListener(window, "online", this.#updateStatus, { passive: true }));
-				callbacks.push(addEventListener(window, "offline", this.#updateStatus, { passive: true }));
+				useEventListener(window, "online", this.#updateStatus, { passive: true });
+				useEventListener(window, "offline", this.#updateStatus, { passive: true });
 			}
-
-			return () => {
-				callbacks.forEach((c) => c());
-			};
 		});
 	}
 
