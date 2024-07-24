@@ -1,7 +1,6 @@
-import { useEventListener } from "../useEventListener/useEventListener.svelte.js";
 import { extract } from "../extract/extract.js";
+import { useEventListener } from "../useEventListener/useEventListener.svelte.js";
 import type { MaybeGetter } from "$lib/internal/types.js";
-import { browser } from "$lib/internal/utils/browser.js";
 
 /**
  * Takes a media query as an input and listsens for changes to it,
@@ -47,8 +46,6 @@ export class MediaQuery {
 
 	get matches(): boolean | undefined {
 		if ($effect.tracking() && !this.#effectRegistered) {
-			this.#matches = this.#mediaQueryList.matches;
-
 			// If we are in an effect and this effect has not been registered yet
 			// we match the current value, register the listener and return match
 			$effect(() => {
@@ -62,11 +59,8 @@ export class MediaQuery {
 
 				return () => (this.#effectRegistered = false);
 			});
-		} else if (!$effect.tracking() && browser) {
-			// Otherwise, just match media to get the current value
-			this.#matches = this.#mediaQueryList.matches;
 		}
 
-		return this.#matches;
+		return this.#matches ?? this.#mediaQueryList.matches;
 	}
 }
