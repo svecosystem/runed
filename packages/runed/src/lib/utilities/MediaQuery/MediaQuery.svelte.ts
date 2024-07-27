@@ -1,7 +1,6 @@
-import { useEventListener } from "../useEventListener/useEventListener.svelte.js";
 import { extract } from "../extract/extract.js";
+import { useEventListener } from "../useEventListener/useEventListener.svelte.js";
 import type { MaybeGetter } from "$lib/internal/types.js";
-import { browser } from "$lib/internal/utils/browser.js";
 
 /**
  * Takes a media query as an input and listsens for changes to it,
@@ -38,7 +37,7 @@ export class MediaQuery {
 	#propQuery: MaybeGetter<string>;
 	#query = $derived.by(() => extract(this.#propQuery));
 	#mediaQueryList: MediaQueryList = $derived(window.matchMedia(this.#query));
-	#effectRegistered = false;
+	#effectRegistered = 0;
 	#matches: boolean | undefined = $state();
 
 	constructor(query: MaybeGetter<string>) {
@@ -46,13 +45,11 @@ export class MediaQuery {
 	}
 
 	get matches(): boolean | undefined {
-		if ($effect.tracking() && !this.#effectRegistered) {
-			this.#matches = this.#mediaQueryList.matches;
-
+		if ($effect.tracking() && this.#effectRegistered === 0) {
 			// If we are in an effect and this effect has not been registered yet
 			// we match the current value, register the listener and return match
 			$effect(() => {
-				this.#effectRegistered = true;
+				this.#effectRegistered++;
 
 				useEventListener(
 					() => this.#mediaQueryList,
@@ -60,13 +57,15 @@ export class MediaQuery {
 					(changed) => (this.#matches = changed.matches)
 				);
 
-				return () => (this.#effectRegistered = false);
+				return () => {
+					this.#effectRegistered--;
+					// if we deregister the event it means it's not used in any component
+					// and we want to go back to use the value from `this.#mediaQueryList.matches`
+					this.#matches = undefined;
+				};
 			});
-		} else if (!$effect.tracking() && browser) {
-			// Otherwise, just match media to get the current value
-			this.#matches = this.#mediaQueryList.matches;
 		}
 
-		return this.#matches;
+		return this.#matches ?? this.#mediaQueryList.matches;
 	}
 }
