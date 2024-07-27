@@ -12,9 +12,8 @@
 				<a
 					{href}
 					class={cn(
-						"text-sm text-muted-foreground hover:text-brand",
+						"text-muted-foreground hover:text-brand text-sm",
 						external ? "flex items-center gap-0.5" : "",
-						// eslint-disable-next-line svelte/valid-compile
 						$page.url.pathname === href ? "text-brand" : ""
 					)}
 					target={external ? "_blank" : undefined}

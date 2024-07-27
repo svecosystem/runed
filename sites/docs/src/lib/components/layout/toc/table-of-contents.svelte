@@ -27,7 +27,7 @@
 			class="fixed z-30 hidden h-[calc(100vh-130px)] w-[220px] shrink-0 overflow-y-auto text-sm xl:block"
 		>
 			<div class="overflow-y-auto rounded-lg pt-8">
-				<div class="mb-4 text-sm font-medium leading-6 text-muted-foreground">On this page</div>
+				<div class="text-muted-foreground mb-4 text-sm font-medium leading-6">On this page</div>
 				<nav>
 					{#key $headingsTree}
 						<Tree tree={$headingsTree} activeHeadingIdxs={$activeHeadingIdxs} {item} {isActive} />

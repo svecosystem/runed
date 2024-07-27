@@ -61,8 +61,8 @@
 		</Button>
 
 		{#if f.current === "running"}
-			<div class="relative h-6 w-40 overflow-clip rounded-md bg-muted">
-				<div class="progress absolute h-full w-full bg-brand"></div>
+			<div class="bg-muted relative h-6 w-40 overflow-clip rounded-md">
+				<div class="progress bg-brand absolute h-full w-full"></div>
 			</div>
 		{/if}
 	</div>

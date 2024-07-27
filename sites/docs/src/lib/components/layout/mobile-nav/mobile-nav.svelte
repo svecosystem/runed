@@ -19,10 +19,10 @@
 	<Drawer.Portal>
 		<Drawer.Overlay class="fixed inset-0 z-[60] bg-black/40" />
 		<Drawer.Content
-			class="fixed bottom-0 left-0 right-0 z-[70] mt-24 flex max-h-[96%] flex-col rounded-t-[10px] bg-background"
+			class="bg-background fixed bottom-0 left-0 right-0 z-[70] mt-24 flex max-h-[96%] flex-col rounded-t-[10px]"
 		>
-			<div class="max-h-[96%] flex-1 overflow-y-auto rounded-t-[10px] bg-card p-4">
-				<div class="mx-auto mb-8 h-1.5 w-12 flex-shrink-0 rounded-full bg-primary/20"></div>
+			<div class="bg-card max-h-[96%] flex-1 overflow-y-auto rounded-t-[10px] p-4">
+				<div class="bg-primary/20 mx-auto mb-8 h-1.5 w-12 flex-shrink-0 rounded-full"></div>
 				<div class="mx-auto max-w-md">
 					<Drawer.Title class="sr-only mb-4 font-medium">Navigation</Drawer.Title>
 					<nav>
@@ -46,10 +46,10 @@
 					</nav>
 				</div>
 			</div>
-			<div class="mt-auto border-t border-border bg-primary/5 p-4">
+			<div class="border-border bg-primary/5 mt-auto border-t p-4">
 				<div class="mx-auto flex max-w-md justify-end gap-6">
 					<MobileNavLink
-						class="text-xs text-muted-foreground"
+						class="text-muted-foreground text-xs"
 						href={siteConfig.links.github}
 						external
 					>

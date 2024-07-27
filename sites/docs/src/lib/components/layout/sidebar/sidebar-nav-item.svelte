@@ -8,7 +8,6 @@
 
 	export let navItem: SidebarNavItem;
 
-	// eslint-disable-next-line svelte/valid-compile
 	$: currentPath = slugFromPathname($page.url.pathname).toLowerCase();
 
 	let open = true;
@@ -29,7 +28,7 @@
 				<CaretRight class={cn("size-4 transition-transform ", open && "rotate-90")} />
 			</Collapsible.Trigger>
 		{/if}
-		<ul class="space-y-6 border-l border-border lg:space-y-2">
+		<ul class="border-border space-y-6 border-l lg:space-y-2">
 			<Collapsible.Content>
 				{#each navItem.items as item}
 					{@const isActive = item.href
@@ -39,7 +38,7 @@
 						<a
 							href={item.href}
 							class={cn(
-								"-ml-px block border-l border-border py-1 pl-4",
+								"border-border -ml-px block border-l py-1 pl-4",
 								isActive
 									? "border-brand text-brand"
 									: "border-border text-muted-foreground hover:border-primary hover:text-primary"

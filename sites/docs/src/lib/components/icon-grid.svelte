@@ -10,7 +10,7 @@
 
 <div class="grid grid-cols-5 gap-4">
 	{#each iconKeys as icon}
-		<div class="flex flex-col justify-between gap-3 rounded-lg border border-border p-4">
+		<div class="border-border flex flex-col justify-between gap-3 rounded-lg border p-4">
 			<div class="flex items-center justify-center">
 				<svelte:component this={getIcon(icon)} class="size-6" />
 			</div>
