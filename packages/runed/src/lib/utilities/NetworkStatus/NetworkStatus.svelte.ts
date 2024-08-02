@@ -40,12 +40,6 @@ export class NetworkStatus {
 	);
 	#online: boolean = $state(false);
 	#updatedAt: Date = $state(new Date());
-	#downlink?: NetworkInformation["downlink"] = $state();
-	#downlinkMax?: NetworkInformation["downlinkMax"] = $state();
-	#effectiveType?: NetworkInformation["effectiveType"] = $state();
-	#rtt?: NetworkInformation["rtt"] = $state();
-	#saveData?: NetworkInformation["saveData"] = $state();
-	#type?: NetworkInformation["type"] = $state();
 
 	constructor() {
 		onMount(() => {
@@ -64,14 +58,6 @@ export class NetworkStatus {
 		if (!this.#navigator) return;
 		this.#online = this.#navigator.onLine;
 		this.#updatedAt = new Date();
-		if (!this.#connection) return;
-
-		this.#downlink = this.#connection.downlink;
-		this.#downlinkMax = this.#connection.downlinkMax;
-		this.#effectiveType = this.#connection.effectiveType;
-		this.#rtt = this.#connection.rtt;
-		this.#saveData = this.#connection.saveData;
-		this.#type = this.#connection.type;
 	};
 
 	/**
@@ -102,7 +88,7 @@ export class NetworkStatus {
 	 * @see https://developer.mozilla.org/en-US/docs/Web/API/NetworkInformation/downlink
 	 */
 	get downlink() {
-		return this.#downlink;
+		return this.#connection?.downlink;
 	}
 
 	/**
@@ -111,7 +97,7 @@ export class NetworkStatus {
 	 * @see https://developer.mozilla.org/en-US/docs/Web/API/NetworkInformation/downlinkMax
 	 */
 	get downlinkMax() {
-		return this.#downlinkMax;
+		return this.#connection?.downlinkMax;
 	}
 
 	/**
@@ -121,7 +107,7 @@ export class NetworkStatus {
 	 * @see https://developer.mozilla.org/en-US/docs/Web/API/NetworkInformation/effectiveType
 	 */
 	get effectiveType() {
-		return this.#effectiveType;
+		return this.#connection?.effectiveType;
 	}
 
 	/**
@@ -130,7 +116,7 @@ export class NetworkStatus {
 	 * @see https://developer.mozilla.org/en-US/docs/Web/API/NetworkInformation/rtt
 	 */
 	get rtt() {
-		return this.#rtt;
+		return this.#connection?.rtt;
 	}
 
 	/**
@@ -138,7 +124,7 @@ export class NetworkStatus {
 	 * @see https://developer.mozilla.org/en-US/docs/Web/API/NetworkInformation/saveData
 	 */
 	get saveData() {
-		return this.#saveData;
+		return this.#connection?.saveData;
 	}
 
 	/**
@@ -146,6 +132,6 @@ export class NetworkStatus {
 	 *  @see https://developer.mozilla.org/en-US/docs/Web/API/NetworkInformation/type
 	 */
 	get type() {
-		return this.#type;
+		return this.#connection?.type;
 	}
 }
