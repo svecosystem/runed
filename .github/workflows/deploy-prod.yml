@@ -1,19 +1,24 @@
-name: Deploy Docs
-
+name: Production Deployment
 on:
-  workflow_dispatch:
+  push:
+    branches:
+      - main
+    paths:
+      - sites/docs/**
+      - packages/formsnap/**
 
 jobs:
-  deploy:
-    permissions:
-      deployments: write
-    name: Manual Docs Deployment
+  deploy-production:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      deployments: write
+    name: Deploy Production Site to Cloudflare Pages
     steps:
       - uses: actions/checkout@v4
-
       - uses: pnpm/action-setup@v4
-
+        with:
+          version: 9
       - uses: actions/setup-node@v4
         with:
           node-version: 20
@@ -22,7 +27,7 @@ jobs:
       - name: Install dependencies
         run: pnpm install
 
-      - name: Build package & site
+      - name: Build site
         run: pnpm build
 
       - name: Deploy to Cloudflare Pages
