@@ -1,19 +1,17 @@
 name: Deploy Docs
-
 on:
   workflow_dispatch:
 
 jobs:
-  deploy:
+  deploy-production:
+    runs-on: ubuntu-latest
     permissions:
+      contents: read
       deployments: write
     name: Manual Docs Deployment
-    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-
       - uses: pnpm/action-setup@v4
-
       - uses: actions/setup-node@v4
         with:
           node-version: 20
