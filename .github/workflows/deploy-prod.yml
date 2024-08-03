@@ -5,7 +5,7 @@ on:
       - main
     paths:
       - sites/docs/**
-      - packages/formsnap/**
+      - packages/runed/**
 
 jobs:
   deploy-production:
