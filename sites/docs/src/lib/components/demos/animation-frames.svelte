@@ -29,7 +29,7 @@
 	);
 </script>
 
-<DemoContainer class="relative flex flex-col items-center gap-4 rounded-md bg-card p-8">
+<DemoContainer class="bg-card relative flex flex-col items-center gap-4 rounded-md p-8">
 	<pre class="text-mono absolute left-2 top-2 m-0 p-2 text-xs">{stats}</pre>
 	<div
 		style="

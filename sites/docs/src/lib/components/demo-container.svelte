@@ -6,7 +6,7 @@
 </script>
 
 <div
-	class={cn("not-prose overflow-x-auto rounded-lg border border-border bg-card p-8", className)}
+	class={cn("not-prose border-border bg-card overflow-x-auto rounded-lg border p-8", className)}
 	{...restProps}
 >
 	{@render children?.()}

@@ -1,5 +1,5 @@
 .markdown code:not(pre > code) {
-	@apply relative rounded bg-muted px-[0.3rem] py-[0.2rem] font-mono text-sm;
+	@apply bg-muted relative rounded px-[0.3rem] py-[0.2rem] font-mono text-sm;
 }
 
 .link {
@@ -12,7 +12,7 @@
 }
 
 [data-rehype-pretty-code-figure] [data-line-numbers] > [data-line]::before {
-	@apply text-xs text-muted-foreground;
+	@apply text-muted-foreground text-xs;
 	counter-increment: line;
 	content: counter(line);
 	display: inline-block;
@@ -29,7 +29,7 @@
 	@apply relative;
 
 	& pre {
-		@apply mb-4 mt-6 overflow-x-auto rounded-lg border border-border bg-[#f1f1f1] py-4 text-sm font-medium;
+		@apply border-border mb-4 mt-6 overflow-x-auto rounded-lg border bg-[#f1f1f1] py-4 text-sm font-medium;
 	}
 
 	& code {
@@ -51,7 +51,7 @@
 	}
 
 	& [data-highlighted-line] {
-		@apply z-10 w-full border-l-primary bg-foreground/5;
+		@apply border-l-primary bg-foreground/5 z-10 w-full;
 	}
 
 	& [data-highlighted-line][data-highlighted-line-id="add"] {
@@ -68,7 +68,7 @@
 }
 
 [data-rehype-pretty-code-title] {
-	@apply mt-6 flex rounded-t-lg border-l border-r border-t border-border bg-muted px-4 py-3 text-sm text-muted-foreground;
+	@apply border-border bg-muted text-muted-foreground mt-6 flex rounded-t-lg border-l border-r border-t px-4 py-3 text-sm;
 }
 
 [data-rehype-pretty-code-title] + pre {

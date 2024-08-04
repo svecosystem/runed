@@ -50,7 +50,7 @@
 			>
 				{#if keys.has(key)}
 					<span
-						class="duration-250 text-xl font-bold text-foreground transition-all"
+						class="duration-250 text-foreground text-xl font-bold transition-all"
 						transition:fade={{ duration: 100 }}
 					>
 						{key}
@@ -64,7 +64,7 @@
 	{#if !guessedCorrectly && triedInputting}
 		<p
 			transition:fade={{ duration: 300 }}
-			class="absolute bottom-2 right-2 mb-0 text-center text-sm text-foreground/50"
+			class="text-foreground/50 absolute bottom-2 right-2 mb-0 text-center text-sm"
 		>
 			Press any key to start, no need to select anything
 		</p>
