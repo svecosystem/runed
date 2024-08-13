@@ -21,7 +21,7 @@ export type ElementRectOptions = {
  * @see {@link https://runed.dev/docs/utilities/element-size}
  */
 export class ElementRect {
-	#rect: Rect = $state.frozen({
+	#rect: Rect = $state.raw({
 		x: 0,
 		y: 0,
 		width: 0,
