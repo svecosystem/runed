@@ -1,5 +1,13 @@
 # runed
 
+## 0.15.1
+
+### Patch Changes
+
+- fix: avoid writing to state in media-query getter ([#122](https://github.com/svecosystem/runed/pull/122))
+
+- Replace $state.frozen with $state.raw ([#130](https://github.com/svecosystem/runed/pull/130))
+
 ## 0.15.0
 
 ### Minor Changes
