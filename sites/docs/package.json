@@ -6,7 +6,7 @@
 	"scripts": {
 		"dev": "concurrently \"pnpm:dev:content\" \"pnpm:dev:svelte\"",
 		"dev:content": "contentlayer dev",
-		"dev:svelte": "vite dev --host",
+		"dev:svelte": "vite dev",
 		"build": "contentlayer build && vite build",
 		"build:all": "pnpm -w build",
 		"build:content": "contentlayer build",
