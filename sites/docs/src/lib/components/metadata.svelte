@@ -3,7 +3,6 @@
 	import { siteConfig } from "$lib/config/site";
 
 	const title = $derived(
-		// eslint-disable-next-line svelte/valid-compile
 		$page.data?.title ? `${$page.data.title} - ${siteConfig.name}` : siteConfig.name
 	);
 	const description = $derived($page.data?.description ?? siteConfig.description);

@@ -4,6 +4,6 @@
 	export { className as class };
 </script>
 
-<p class={cn("mb-4 text-sm/6 font-medium capitalize text-accent-foreground", className)}>
+<p class={cn("text-accent-foreground mb-4 text-sm/6 font-medium capitalize", className)}>
 	<slot />
 </p>

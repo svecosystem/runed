@@ -6,7 +6,7 @@
 
 <header
 	class={cn(
-		"prose relative mb-4 max-w-3xl border-b border-border pb-8 dark:prose-invert",
+		"prose border-border dark:prose-invert relative mb-4 max-w-3xl border-b pb-8",
 		className
 	)}
 >

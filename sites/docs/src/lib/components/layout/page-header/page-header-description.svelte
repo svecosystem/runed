@@ -4,6 +4,6 @@
 	export { className as class };
 </script>
 
-<p class={cn("mt-2 text-balance text-lg text-muted-foreground", className)}>
+<p class={cn("text-muted-foreground mt-2 text-balance text-lg", className)}>
 	<slot />
 </p>

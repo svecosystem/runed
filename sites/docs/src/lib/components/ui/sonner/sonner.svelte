@@ -4,7 +4,6 @@
 
 	let { ...rest }: SonnerProps = $props();
 
-	// eslint-disable-next-line svelte/valid-compile
 	const theme = $derived($mode);
 </script>
 
