@@ -25,7 +25,7 @@ it:
 
 <input bind:this={inputElement} />
 
-{#if activeElement.current}
+{#if activeElement.current === inputElement}
 	The input element is active!
 {/if}
 ```
