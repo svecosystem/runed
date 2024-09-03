@@ -1,5 +1,11 @@
 # runed
 
+## 0.15.2
+
+### Patch Changes
+
+- update svelte dep ([`1aba37642783caff0a4ad327e129ce41e98b2d92`](https://github.com/svecosystem/runed/commit/1aba37642783caff0a4ad327e129ce41e98b2d92))
+
 ## 0.15.1
 
 ### Patch Changes
