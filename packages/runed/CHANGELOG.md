@@ -1,5 +1,11 @@
 # runed
 
+## 0.15.3
+
+### Patch Changes
+
+- fix: add a browser check in `MediaQuery` ([#137](https://github.com/svecosystem/runed/pull/137))
+
 ## 0.15.2
 
 ### Patch Changes
