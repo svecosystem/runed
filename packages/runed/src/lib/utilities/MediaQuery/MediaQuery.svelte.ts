@@ -1,9 +1,11 @@
 import { extract } from "../extract/extract.svelte.js";
 import { useEventListener } from "../useEventListener/useEventListener.svelte.js";
+import { IsSupported } from "../IsSupported/IsSupported.svelte.js";
 import type { MaybeGetter } from "$lib/internal/types.js";
+import { browser } from "$lib/internal/utils/browser.js";
 
 /**
- * Takes a media query as an input and listsens for changes to it,
+ * Takes a media query as an input and listens for changes to it,
  * holding a reactive property with its current state.
  *
  * @see {@link https://runed.dev/docs/utilities/media-query}
@@ -36,7 +38,10 @@ import type { MaybeGetter } from "$lib/internal/types.js";
 export class MediaQuery {
 	#propQuery: MaybeGetter<string>;
 	#query = $derived.by(() => extract(this.#propQuery));
-	#mediaQueryList: MediaQueryList = $derived(window.matchMedia(this.#query));
+	#mediaQueryList = $derived.by(() => {
+		if (!browser) return null;
+		return window.matchMedia(this.#query);
+	});
 	#effectRegistered = 0;
 	#matches: boolean | undefined = $state();
 
@@ -66,6 +71,6 @@ export class MediaQuery {
 			});
 		}
 
-		return this.#matches ?? this.#mediaQueryList.matches;
+		return this.#matches ?? this.#mediaQueryList?.matches;
 	}
 }
