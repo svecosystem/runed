@@ -1,6 +1,5 @@
 import { extract } from "../extract/extract.svelte.js";
 import { useEventListener } from "../useEventListener/useEventListener.svelte.js";
-import { IsSupported } from "../IsSupported/IsSupported.svelte.js";
 import type { MaybeGetter } from "$lib/internal/types.js";
 import { browser } from "$lib/internal/utils/browser.js";
 
