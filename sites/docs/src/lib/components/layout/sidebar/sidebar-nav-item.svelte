@@ -8,7 +8,6 @@
 
 	export let navItem: SidebarNavItem;
 
-	// eslint-disable-next-line svelte/valid-compile
 	$: currentPath = slugFromPathname($page.url.pathname).toLowerCase();
 
 	let open = true;
