@@ -38,10 +38,7 @@ import { browser } from "$lib/internal/utils/browser.js";
 export class MediaQuery {
 	#propQuery: MaybeGetter<string>;
 	#query = $derived.by(() => extract(this.#propQuery));
-	#mediaQueryList = $derived.by(() => {
-		if (!browser) return null;
-		return window.matchMedia(this.#query);
-	});
+	#mediaQueryList = $derived(browser ? window.matchMedia(this.#query) : null);
 	#effectRegistered = 0;
 	#matches: boolean | undefined = $state();
 
