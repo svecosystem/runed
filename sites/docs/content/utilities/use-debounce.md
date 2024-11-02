@@ -44,6 +44,7 @@ category: Utilities
 
 <input type="number" bind:value={debounceDuration} />
 <button onclick={ding}>DING DING DING</button>
+<button onclick={logCount.runScheduledNow} disabled={!logCount.pending}>Run now</button>
 <button onclick={logCount.cancel} disabled={!logCount.pending}>Cancel message</button>
 <p>{logged || "Press the button!"}</p>
 ```

@@ -33,6 +33,10 @@ export class Debounced<T> {
 		this.#debounceFn.cancel();
 	}
 
+	updateImmediately() {
+		return this.#debounceFn.runScheduledNow();
+	}
+
 	setImmediately(v: T) {
 		this.cancel();
 		this.#current = v;
