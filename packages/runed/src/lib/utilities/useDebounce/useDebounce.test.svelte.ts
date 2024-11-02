@@ -28,4 +28,31 @@ describe("useDebounce", () => {
 		await new Promise((resolve) => setTimeout(resolve, 200));
 		expect(fn).not.toHaveBeenCalled();
 	});
+
+	testWithEffect("No race contion with running callback", async () => {
+		let calledNTimes = 0;
+
+		const slowFunction = async () => {
+			calledNTimes++;
+
+			await new Promise((resolve) => setTimeout(resolve, 100));
+		};
+		const debounced = useDebounce(slowFunction, 100);
+
+		expect(calledNTimes).toBe(0);
+		debounced();
+		expect(calledNTimes).toBe(0);
+		expect(debounced.pending).toBe(true);
+
+		await new Promise((resolve) => setTimeout(resolve, 110));
+		expect(calledNTimes).toBe(1);
+		expect(debounced.pending).toBe(false);
+		debounced();
+		expect(calledNTimes).toBe(1);
+		expect(debounced.pending).toBe(true);
+
+		await new Promise((resolve) => setTimeout(resolve, 110));
+		expect(debounced.pending).toBe(false);
+		expect(calledNTimes).toBe(2);
+	});
 });
