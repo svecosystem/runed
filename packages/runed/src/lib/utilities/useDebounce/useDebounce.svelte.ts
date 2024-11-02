@@ -88,8 +88,8 @@ export function useDebounce<Args extends unknown[], Return>(
 		}
 
 		clearTimeout(context.timeout);
-		context.timeout = undefined;
 		context.reject("Cancelled");
+		context = null;
 	};
 
 	Object.defineProperty(debounced, "pending", {
