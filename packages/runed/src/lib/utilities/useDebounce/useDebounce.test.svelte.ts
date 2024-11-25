@@ -28,4 +28,54 @@ describe("useDebounce", () => {
 		await new Promise((resolve) => setTimeout(resolve, 200));
 		expect(fn).not.toHaveBeenCalled();
 	});
+
+	testWithEffect("Doesn't reuse promise after cancel", async () => {
+		// Same as above
+		const fn = vi.fn();
+		const debounced = useDebounce(fn, 100);
+
+		expect(fn).not.toHaveBeenCalled();
+		debounced().catch(() => {});
+		expect(fn).not.toHaveBeenCalled();
+		expect(debounced.pending).toBe(true);
+		debounced.cancel();
+		expect(debounced.pending).toBe(false);
+		await new Promise((resolve) => setTimeout(resolve, 200));
+		expect(fn).not.toHaveBeenCalled();
+
+		// New test
+		let wasCatchCalled = false;
+		debounced().catch(() => (wasCatchCalled = true));
+		expect(wasCatchCalled).toBe(false);
+		await new Promise((resolve) => setTimeout(resolve, 110));
+		expect(wasCatchCalled).toBe(false);
+		expect(fn).toHaveBeenCalledTimes(1);
+	});
+
+	testWithEffect("No race condition with running callback", async () => {
+		let calledNTimes = 0;
+
+		const slowFunction = async () => {
+			calledNTimes++;
+
+			await new Promise((resolve) => setTimeout(resolve, 100));
+		};
+		const debounced = useDebounce(slowFunction, 100);
+
+		expect(calledNTimes).toBe(0);
+		debounced();
+		expect(calledNTimes).toBe(0);
+		expect(debounced.pending).toBe(true);
+
+		await new Promise((resolve) => setTimeout(resolve, 110));
+		expect(calledNTimes).toBe(1);
+		expect(debounced.pending).toBe(false);
+		debounced();
+		expect(calledNTimes).toBe(1);
+		expect(debounced.pending).toBe(true);
+
+		await new Promise((resolve) => setTimeout(resolve, 110));
+		expect(debounced.pending).toBe(false);
+		expect(calledNTimes).toBe(2);
+	});
 });
