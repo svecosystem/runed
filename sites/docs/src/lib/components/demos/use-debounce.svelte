@@ -36,6 +36,12 @@
 	</div>
 	<div class="flex items-center gap-4">
 		<Button variant="brand" size="sm" onclick={ding}>DING DING DING</Button>
+		<Button
+			variant="subtle"
+			size="sm"
+			onclick={logCount.runScheduledNow}
+			disabled={!logCount.pending}>Run now</Button
+		>
 		<Button variant="subtle" size="sm" onclick={logCount.cancel} disabled={!logCount.pending}
 			>Cancel message</Button
 		>

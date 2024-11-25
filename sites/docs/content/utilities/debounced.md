@@ -31,8 +31,8 @@ returns a debounced state.
 </div>
 ```
 
-You may cancel the pending update, or set a new value immediately. Setting immediately also cancels
-any pending updates.
+You may cancel the pending update, run it immediately, or set a new value. Setting a new value
+immediately also cancels any pending updates.
 
 ```ts
 let count = $state(0);
@@ -46,4 +46,9 @@ count = 2;
 console.log(debounced.current); // Still 0!
 debounced.setImmediately(count);
 console.log(debounced.current); // 2
+
+count = 3;
+console.log(debounced.current); // 2
+await debounced.updateImmediately();
+console.log(debounced.current); // 3
 ```

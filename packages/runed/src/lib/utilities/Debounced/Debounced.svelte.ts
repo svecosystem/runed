@@ -61,6 +61,13 @@ export class Debounced<T> {
 	}
 
 	/**
+	 * Run the debounced function immediately.
+	 */
+	updateImmediately() {
+		return this.#debounceFn.runScheduledNow();
+	}
+
+	/**
 	 * Set the `current` value without waiting.
 	 */
 	setImmediately(v: T) {
