@@ -10,8 +10,8 @@ type UseDebounceReturn<Args extends unknown[], Return> = ((
 };
 
 type DebounceContext<Return> = {
-	timeout: ReturnType<typeof setTimeout> | undefined;
-	runner: (() => Promise<void>) | undefined;
+	timeout: ReturnType<typeof setTimeout> | null;
+	runner: (() => Promise<void>) | null;
 	resolve: (value: Return) => void;
 	reject: (reason: unknown) => void;
 	promise: Promise<Return>;
@@ -29,8 +29,10 @@ type DebounceContext<Return> = {
  * The second parameter is the time to wait before calling the original callback.
  * Alternatively, it can also be a getter function that returns the time to wait.
  *
- *
  * @see {@link https://runed.dev/docs/utilities/use-debounce}
+ *
+ * @param callback The callback to call when the time has passed.
+ * @param wait The length of time to wait in ms, defaults to 250.
  */
 export function useDebounce<Args extends unknown[], Return>(
 	callback: (...args: Args) => Return,
@@ -55,8 +57,8 @@ export function useDebounce<Args extends unknown[], Return>(
 			});
 
 			context = {
-				timeout: undefined,
-				runner: undefined,
+				timeout: null,
+				runner: null,
 				promise,
 				resolve: resolve!,
 				reject: reject!,
@@ -83,10 +85,10 @@ export function useDebounce<Args extends unknown[], Return>(
 	}
 
 	debounced.cancel = async () => {
-		if (!context || !context.timeout) {
+		if (!context || context.timeout === null) {
 			// Wait one event loop to see if something triggered the debounced function
 			await new Promise((resolve) => setTimeout(resolve, 0));
-			if (!context || !context.timeout) return;
+			if (!context || context.timeout === null) return;
 		}
 
 		clearTimeout(context.timeout);
@@ -102,7 +104,7 @@ export function useDebounce<Args extends unknown[], Return>(
 		}
 
 		clearTimeout(context.timeout);
-		context.timeout = undefined;
+		context.timeout = null;
 
 		await context.runner?.();
 	};
