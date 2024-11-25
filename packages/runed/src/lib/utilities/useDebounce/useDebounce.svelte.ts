@@ -9,7 +9,7 @@ type UseDebounceReturn<Args extends unknown[], Return> = ((
 };
 
 type DebounceContext<Return> = {
-	timeout: ReturnType<typeof setTimeout> | undefined;
+	timeout: ReturnType<typeof setTimeout> | null;
 	resolve: (value: Return) => void;
 	reject: (reason: unknown) => void;
 	promise: Promise<Return>;
@@ -53,7 +53,7 @@ export function useDebounce<Args extends unknown[], Return>(
 			});
 
 			context = {
-				timeout: undefined,
+				timeout: null,
 				promise,
 				resolve: resolve!,
 				reject: reject!,
@@ -81,10 +81,10 @@ export function useDebounce<Args extends unknown[], Return>(
 	}
 
 	debounced.cancel = async () => {
-		if (!context || !context.timeout) {
+		if (!context || context.timeout === null) {
 			// Wait one event loop to see if something triggered the debounced function
 			await new Promise((resolve) => setTimeout(resolve, 0));
-			if (!context || !context.timeout) return;
+			if (!context || context.timeout === null) return;
 		}
 
 		clearTimeout(context.timeout);

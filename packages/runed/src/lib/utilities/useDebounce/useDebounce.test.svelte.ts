@@ -52,7 +52,7 @@ describe("useDebounce", () => {
 		expect(fn).toHaveBeenCalledTimes(1);
 	});
 
-	testWithEffect("No race contion with running callback", async () => {
+	testWithEffect("No race condition with running callback", async () => {
 		let calledNTimes = 0;
 
 		const slowFunction = async () => {
