@@ -20,8 +20,10 @@ type UseDebounceReturn<Args extends unknown[], Return> = ((
  * The second parameter is the time to wait before calling the original callback.
  * Alternatively, it can also be a getter function that returns the time to wait.
  *
- *
  * @see {@link https://runed.dev/docs/utilities/use-debounce}
+ *
+ * @param callback The callback to call when the time has passed.
+ * @param wait The length of time to wait in ms, defaults to 250.
  */
 export function useDebounce<Args extends unknown[], Return>(
 	callback: (...args: Args) => Return,
