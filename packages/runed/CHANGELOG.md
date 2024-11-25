@@ -1,5 +1,13 @@
 # runed
 
+## 0.15.4
+
+### Patch Changes
+
+- docs: add jsdoc comments to the Debounced state util ([#140](https://github.com/svecosystem/runed/pull/140))
+
+- fix: useDebounce race condition (#139) ([#146](https://github.com/svecosystem/runed/pull/146))
+
 ## 0.15.3
 
 ### Patch Changes
