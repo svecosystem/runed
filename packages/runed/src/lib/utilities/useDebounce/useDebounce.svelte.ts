@@ -5,11 +5,13 @@ type UseDebounceReturn<Args extends unknown[], Return> = ((
 	...args: Args
 ) => Promise<Return>) & {
 	cancel: () => void;
+	runScheduledNow: () => Promise<void>;
 	pending: boolean;
 };
 
 type DebounceContext<Return> = {
 	timeout: ReturnType<typeof setTimeout> | null;
+	runner: (() => Promise<void>) | null;
 	resolve: (value: Return) => void;
 	reject: (reason: unknown) => void;
 	promise: Promise<Return>;
@@ -56,28 +58,28 @@ export function useDebounce<Args extends unknown[], Return>(
 
 			context = {
 				timeout: null,
+				runner: null,
 				promise,
 				resolve: resolve!,
 				reject: reject!,
 			};
 		}
 
-		context.timeout = setTimeout(
-			async () => {
-				// Grab the context and reset it
-				// -> new debounced calls will create a new context
-				if (!context) return;
-				const ctx = context;
-				context = null;
+		context.runner = async () => {
+			// Grab the context and reset it
+			// -> new debounced calls will create a new context
+			if (!context) return;
+			const ctx = context;
+			context = null;
 
-				try {
-					ctx.resolve(await callback.apply(this, args));
-				} catch (error) {
-					ctx.reject(error);
-				}
-			},
-			typeof wait === "function" ? wait() : wait
-		);
+			try {
+				ctx.resolve(await callback.apply(this, args));
+			} catch (error) {
+				ctx.reject(error);
+			}
+		};
+
+		context.timeout = setTimeout(context.runner, typeof wait === "function" ? wait() : wait);
 
 		return context.promise;
 	}
@@ -92,6 +94,19 @@ export function useDebounce<Args extends unknown[], Return>(
 		clearTimeout(context.timeout);
 		context.reject("Cancelled");
 		context = null;
+	};
+
+	debounced.runScheduledNow = async () => {
+		if (!context || !context.timeout) {
+			// Wait one event loop to see if something triggered the debounced function
+			await new Promise((resolve) => setTimeout(resolve, 0));
+			if (!context || !context.timeout) return;
+		}
+
+		clearTimeout(context.timeout);
+		context.timeout = null;
+
+		await context.runner?.();
 	};
 
 	Object.defineProperty(debounced, "pending", {
