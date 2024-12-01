@@ -7,20 +7,20 @@ export class Lazy<T> {
 		this.#init = init;
 	}
 
-	#current: T | undefined = $state();
+	#current: T = $state()!;
 	#initialized = false;
 
-	get current(): T {
+	get current() {
 		if (!this.#initialized) {
 			untrack(() => {
 				this.#current = this.#init();
 				this.#initialized = true;
 			});
 		}
-		return this.#current as T;
+		return this.#current;
 	}
 
-	set current(value: T) {
+	set current(value) {
 		this.#current = value;
 		this.#initialized = true;
 	}
