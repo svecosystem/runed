@@ -1,5 +1,11 @@
 # runed
 
+## 0.16.0
+
+### Minor Changes
+
+- Add `PersistedState` ([#113](https://github.com/svecosystem/runed/pull/113))
+
 ## 0.15.4
 
 ### Patch Changes
