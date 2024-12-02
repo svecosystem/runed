@@ -11,6 +11,11 @@ import Demo from '$lib/components/demos/active-element.svelte';
 `activeElement` provides reactive access to the currently focused DOM element in your application,
 similar to `document.activeElement` but with reactive updates.
 
+- Updates synchronously with DOM focus changes
+- Returns `null` when no element is focused
+- Safe to use with SSR (Server-Side Rendering)
+- Lightweight alternative to manual focus tracking
+
 ## Demo
 
 <Demo />
@@ -27,13 +32,6 @@ similar to `document.activeElement` but with reactive updates.
 	{activeElement.current?.localName ?? "No active element found"}
 </p>
 ```
-
-## Notes
-
-- Updates synchronously with DOM focus changes
-- Returns `null` when no element is focused
-- Safe to use with SSR (Server-Side Rendering)
-- Lightweight alternative to manual focus tracking
 
 ## Type Definition
 

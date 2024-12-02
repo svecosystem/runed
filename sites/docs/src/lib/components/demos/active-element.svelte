@@ -6,8 +6,8 @@
 <DemoContainer>
 	<p>
 		Currently active element:
-		<span class="text-brand font-bold">
+		<code class="font-bold">
 			{activeElement.current?.localName ?? "No active element found"}
-		</span>
+		</code>
 	</p>
 </DemoContainer>
