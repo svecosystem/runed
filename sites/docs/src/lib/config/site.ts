@@ -8,7 +8,20 @@ export const siteConfig = defineSiteConfig({
 		github: "https://github.com/svecosystem/runed",
 	},
 	author: "Huntabyte & Thomas G. Lopes",
-	keywords: ["svelte runes", "svelte runes utilities", "svelte utilities", "runed", "svelte helpers", "svelte utils", "svelte functions", "runed dev", "svelte 5 runed", "runed svelte", "svelte 5 helpers", "svelte 5 utilities"],
+	keywords: [
+		"svelte runes",
+		"svelte runes utilities",
+		"svelte utilities",
+		"runed",
+		"svelte helpers",
+		"svelte utils",
+		"svelte functions",
+		"runed dev",
+		"svelte 5 runed",
+		"runed svelte",
+		"svelte 5 helpers",
+		"svelte 5 utilities",
+	],
 	ogImage: {
 		url: "https://runed.dev/og.png",
 		width: "1200",
@@ -18,6 +31,4 @@ export const siteConfig = defineSiteConfig({
 		name: "MIT",
 		url: "https://github.com/svecosystem/runed/blob/main/LICENSE",
 	},
-})
-
-
+});
