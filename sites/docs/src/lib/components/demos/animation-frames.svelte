@@ -1,9 +1,8 @@
 <script lang="ts">
 	import { AnimationFrames } from "runed";
-	import DemoContainer from "../demo-container.svelte";
-	import { Slider } from "$lib/components/ui/slider/index.js";
-	import { Pause, Play } from "$lib/icons/index.js";
-	import { Button } from "$lib/components/ui/button/index.js";
+	import { DemoContainer, Slider, Button } from "@svecodocs/kit";
+	import Pause from "phosphor-svelte/lib/Pause";
+	import Play from "phosphor-svelte/lib/Play";
 
 	let frames = $state(0);
 	let fpsLimit = $state(10);
@@ -29,7 +28,7 @@
 	);
 </script>
 
-<DemoContainer class="relative flex flex-col items-center gap-4 rounded-md bg-card p-8">
+<DemoContainer class="relative flex flex-col items-center gap-4">
 	<pre class="text-mono absolute left-2 top-2 m-0 p-2 text-xs">{stats}</pre>
 	<div
 		style="

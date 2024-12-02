@@ -1,10 +1,9 @@
 <script lang="ts">
 	import { AnimationFrames, IsIdle } from "runed";
-	import DemoContainer from "../demo-container.svelte";
+	import { DemoContainer } from "@svecodocs/kit";
 
 	const idle = new IsIdle({ timeout: 1000 });
 	let now = $state(Date.now());
-	// eslint-disable-next-line no-new
 	new AnimationFrames(() => {
 		now = Date.now();
 	});

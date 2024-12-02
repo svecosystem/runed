@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { useEventListener } from "runed";
-	import DemoContainer from "$lib/components/demo-container.svelte";
+	import { DemoContainer } from "@svecodocs/kit";
 
 	let count = $state(0);
 	useEventListener(
