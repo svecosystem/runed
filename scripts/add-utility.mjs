@@ -7,7 +7,7 @@ function toKebabCase(str) {
 }
 
 const utilsDir = "./packages/runed/src/lib/utilities";
-const contentDir = "./sites/docs/content/utilities";
+const contentDir = "./sites/docs/src/content/utilities";
 const demosDir = "./sites/docs/src/lib/components/demos";
 
 const utilName = readlineSync.question("What is the name of the utility? ");
@@ -50,8 +50,8 @@ fs.writeFileSync(
 	demoFile,
 	`
 <script lang="ts">
-	import { ${utilName} } from 'runed'; 
-	import DemoContainer from '$lib/components/demo-container.svelte';
+	import { ${utilName} } from 'runed';
+	import { DemoContainer } from '@svecodocs/ui';
 </script>
 
 <DemoContainer>
