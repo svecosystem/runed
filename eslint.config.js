@@ -36,6 +36,7 @@ export default tseslint.config(
 				},
 			],
 			"@typescript-eslint/no-unused-expressions": "off",
+			"@typescript-eslint/no-empty-object-type": "off",
 		},
 	},
 	{
@@ -46,8 +47,8 @@ export default tseslint.config(
 			".svelte-kit/**/*",
 			"sites/docs/.svelte-kit/**/*",
 			".svelte-kit",
-			"playgrounds/**/*",
-			"packages/cli/dist/**/*",
+			"packages/runed/dist/**/*",
+			"packages/runed/.svelte-kit/**/*",
 		],
 	}
 );
