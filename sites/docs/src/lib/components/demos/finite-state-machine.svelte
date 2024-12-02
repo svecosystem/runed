@@ -1,9 +1,8 @@
 <script lang="ts">
 	import { FiniteStateMachine } from "runed";
-	import DemoContainer from "$lib/components/demo-container.svelte";
-	import { Button } from "$lib/components/ui/button";
-	import { Switch } from "$lib/components/ui/switch";
-	import { Pause, Play } from "$lib/icons";
+	import { DemoContainer, Button, Switch } from "@svecodocs/kit";
+	import Play from "phosphor-svelte/lib/Play";
+	import Pause from "phosphor-svelte/lib/Pause";
 
 	type myStates = "disabled" | "idle" | "running";
 	type myEvents = "toggleEnabled" | "start" | "stop";
@@ -61,8 +60,8 @@
 		</Button>
 
 		{#if f.current === "running"}
-			<div class="relative h-6 w-40 overflow-clip rounded-md bg-muted">
-				<div class="progress absolute h-full w-full bg-brand"></div>
+			<div class="bg-muted relative h-6 w-40 overflow-clip rounded-md">
+				<div class="progress bg-brand absolute h-full w-full"></div>
 			</div>
 		{/if}
 	</div>

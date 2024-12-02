@@ -1,22 +1,54 @@
-import config, { DEFAULT_IGNORES } from "@huntabyte/eslint-config";
+import eslint from "@eslint/js";
+import prettier from "eslint-config-prettier";
+import svelte from "eslint-plugin-svelte";
+import globals from "globals";
+import tseslint from "typescript-eslint";
 
-const CUSTOM_IGNORES = [
-	"**/.github/**",
-	"CHANGELOG.md",
-	"**/.contentlayer",
-	"**/node_modules/**",
-	"**/.svelte-kit/**",
-	".svelte-kit/**/*",
-];
-
-export default config({
-	svelte: true,
-	ignores: [...DEFAULT_IGNORES, ...CUSTOM_IGNORES],
-	//	rules: {
-	//	"no-new": "off", // TODO: re-enabled once hunter updates his pkg
-	//},
-}).override("antfu/typescript/rules", {
-	rules: {
-		"ts/consistent-type-definitions": "off",
+export default tseslint.config(
+	eslint.configs.recommended,
+	...tseslint.configs.recommended,
+	...svelte.configs["flat/recommended"],
+	prettier,
+	...svelte.configs["flat/prettier"],
+	{
+		languageOptions: {
+			globals: {
+				...globals.browser,
+				...globals.node,
+			},
+		},
 	},
-});
+	{
+		files: ["**/*.svelte"],
+		languageOptions: {
+			parserOptions: {
+				parser: tseslint.parser,
+			},
+		},
+	},
+	{
+		rules: {
+			"@typescript-eslint/no-unused-vars": [
+				"error",
+				{
+					argsIgnorePattern: "^_",
+					varsIgnorePattern: "^_",
+				},
+			],
+			"@typescript-eslint/no-unused-expressions": "off",
+			"@typescript-eslint/no-empty-object-type": "off",
+		},
+	},
+	{
+		ignores: [
+			"build/",
+			".svelte-kit/",
+			"dist/",
+			".svelte-kit/**/*",
+			"sites/docs/.svelte-kit/**/*",
+			".svelte-kit",
+			"packages/runed/dist/**/*",
+			"packages/runed/.svelte-kit/**/*",
+		],
+	}
+);

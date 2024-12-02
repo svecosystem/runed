@@ -49,7 +49,7 @@ export function useDebounce<Args extends unknown[], Return>(
 			// No old context, create a new one
 			let resolve: (value: Return) => void;
 			let reject: (reason: unknown) => void;
-			let promise = new Promise<Return>((res, rej) => {
+			const promise = new Promise<Return>((res, rej) => {
 				resolve = res;
 				reject = rej;
 			});

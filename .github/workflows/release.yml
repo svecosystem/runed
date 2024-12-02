@@ -14,7 +14,7 @@ jobs:
       pull-requests: write # to create pull request (changesets/action)
       deployments: write
     name: Release
-    runs-on: ubuntu-latest
+    runs-on: macos-latest
     steps:
       - uses: actions/checkout@v4
         with:
@@ -22,7 +22,7 @@ jobs:
           fetch-depth: 0
 
       - uses: pnpm/action-setup@v4
-      
+
       - uses: actions/setup-node@v4
         with:
           node-version: 20
