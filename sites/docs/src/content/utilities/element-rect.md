@@ -1,6 +1,6 @@
 ---
 title: ElementRect
-description: A function that returns the size of an element.
+description: Track element dimensions and position reactively
 category: Elements
 ---
 
@@ -8,14 +8,14 @@ category: Elements
 	import Demo from '$lib/components/demos/element-rect.svelte';
 </script>
 
+`ElementRect` provides reactive access to an element's dimensions and position information,
+automatically updating when the element's size or position changes.
+
 ## Demo
 
 <Demo />
 
 ## Usage
-
-With a reference to an element, you can use the `ElementRect` utility to get the bounding rectangle
-of the element.
 
 ```svelte
 <script lang="ts">
@@ -30,4 +30,27 @@ of the element.
 <p>Width: {rect.width} Height: {rect.height}</p>
 <!-- alternatively -->
 <pre>{JSON.stringify(rect.current, null, 2)}</pre>
+```
+
+## Type Definition
+
+```ts
+type Rect = Omit<DOMRect, "toJSON">;
+
+interface ElementRectOptions {
+	initialRect?: DOMRect;
+}
+
+class ElementRect {
+	constructor(node: MaybeGetter<HTMLElement | undefined | null>, options?: ElementRectOptions);
+	readonly current: Rect;
+	readonly width: number;
+	readonly height: number;
+	readonly top: number;
+	readonly left: number;
+	readonly right: number;
+	readonly bottom: number;
+	readonly x: number;
+	readonly y: number;
+}
 ```

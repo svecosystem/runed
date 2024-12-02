@@ -1,6 +1,6 @@
 ---
 title: StateHistory
-description: Track the change history of a value, providing undo and redo functionality
+description: Track state changes with undo/redo capabilities
 category: State
 ---
 

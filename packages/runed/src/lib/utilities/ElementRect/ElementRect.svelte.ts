@@ -32,7 +32,7 @@ export class ElementRect {
 		left: 0,
 	});
 
-	constructor(node: MaybeGetter<HTMLElement | undefined>, options: ElementRectOptions = {}) {
+	constructor(node: MaybeGetter<HTMLElement | undefined | null>, options: ElementRectOptions = {}) {
 		this.#rect = {
 			width: options.initialRect?.width ?? 0,
 			height: options.initialRect?.height ?? 0,

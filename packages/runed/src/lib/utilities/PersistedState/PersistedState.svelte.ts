@@ -23,14 +23,11 @@ function getValueFromStorage<T>({
 	storage: Storage | null;
 	serializer: Serializer<T>;
 }): GetValueFromStorageResult<T> {
-	if (!storage) {
-		return { found: false, value: null };
-	}
+	if (!storage) return { found: false, value: null };
 
 	const value = storage.getItem(key);
-	if (value === null) {
-		return { found: false, value: null };
-	}
+
+	if (value === null) return { found: false, value: null };
 
 	try {
 		return {
@@ -57,9 +54,7 @@ function setValueToStorage<T>({
 	storage: Storage | null;
 	serializer: Serializer<T>;
 }) {
-	if (!storage) {
-		return;
-	}
+	if (!storage) return;
 
 	try {
 		storage.setItem(key, serializer.serialize(value));
@@ -71,9 +66,7 @@ function setValueToStorage<T>({
 type StorageType = "local" | "session";
 
 function getStorage(storageType: StorageType): Storage | null {
-	if (typeof window === "undefined") {
-		return null;
-	}
+	if (typeof window === "undefined") return null;
 
 	const storageByStorageType = {
 		local: localStorage,
@@ -101,7 +94,7 @@ type PersistedStateOptions<T> = {
  * @see {@link https://runed.dev/docs/utilities/persisted-state}
  */
 export class PersistedState<T> {
-	#current = $state() as T;
+	#current: T = $state()!;
 	#key: string;
 	#storage: Storage | null;
 	#serializer: Serializer<T>;
@@ -135,18 +128,13 @@ export class PersistedState<T> {
 		});
 
 		$effect(() => {
-			if (!syncTabs) {
-				return;
-			}
-
+			if (!syncTabs) return;
 			return addEventListener(window, "storage", this.#handleStorageEvent.bind(this));
 		});
 	}
 
 	#handleStorageEvent(event: StorageEvent) {
-		if (event.key !== this.#key || !this.#storage) {
-			return;
-		}
+		if (event.key !== this.#key || !this.#storage) return;
 
 		const valueFromStorage = getValueFromStorage({
 			key: this.#key,

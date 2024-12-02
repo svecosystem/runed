@@ -1,12 +1,16 @@
 ---
 title: Previous
-description: Holds the previous value of a getter.
+description: A utility that tracks and provides access to the previous value of a reactive getter.
 category: State
 ---
 
 <script>
 import Demo from '$lib/components/demos/previous.svelte';
 </script>
+
+The `Previous` utility creates a reactive wrapper that maintains the previous value of a getter
+function. This is particularly useful when you need to compare state changes or implement transition
+effects.
 
 ## Demo
 
@@ -26,4 +30,14 @@ import Demo from '$lib/components/demos/previous.svelte';
 	<button onclick={() => count++}>Count: {count}</button>
 	<pre>Previous: {`${previous.current}`}</pre>
 </div>
+```
+
+## Type Definition
+
+```ts
+class Previous<T> {
+	constructor(getter: () => T);
+
+	readonly current: T; // Previous value
+}
 ```

@@ -7,7 +7,7 @@ function isWritable(t: Readable<unknown>): t is Writable<unknown> {
 }
 
 export class Store<T extends Readable<unknown>> {
-	#current = $state() as ReadableValue<T>;
+	#current: ReadableValue<T> = $state()!;
 	#store: T;
 
 	constructor(store: T) {

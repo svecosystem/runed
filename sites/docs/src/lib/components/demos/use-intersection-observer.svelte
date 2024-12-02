@@ -2,8 +2,8 @@
 	import { useIntersectionObserver } from "runed";
 	import { Checkbox, Label, DemoContainer } from "@svecodocs/kit";
 
-	let root = $state<HTMLElement | undefined>(undefined);
-	let target = $state<HTMLElement | undefined>(undefined);
+	let root = $state<HTMLElement>(null!);
+	let target = $state<HTMLElement>(null!);
 
 	let isVisible = $state(false);
 
