@@ -7,10 +7,10 @@ import type { MaybeGetter } from "$lib/internal/types.js";
  * @see {@link https://runed.dev/docs/utilities/is-focus-within}
  */
 export class IsFocusWithin {
-	#node: MaybeGetter<HTMLElement | undefined>;
+	#node: MaybeGetter<HTMLElement | undefined | null>;
 	#target = $derived.by(() => extract(this.#node));
 
-	constructor(node: MaybeGetter<HTMLElement | undefined>) {
+	constructor(node: MaybeGetter<HTMLElement | undefined | null>) {
 		this.#node = node;
 	}
 

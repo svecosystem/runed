@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { AnimationFrames, IsIdle } from "runed";
 	import { DemoContainer } from "@svecodocs/kit";
+	import DemoNote from "../demo-note.svelte";
 
 	const idle = new IsIdle({ timeout: 1000 });
 	let now = $state(Date.now());
@@ -22,7 +23,7 @@
 		Last active: <span class="font-medium">{secondsElapsed}s ago</span>
 	</p>
 </DemoContainer>
-<p class="text-muted-foreground mb-0 text-right text-xs">
-	By default, the time of inactivity before marking the user as idle is 1 minute.
-</p>
-<p class="text-muted-foreground mt-1.5 text-right text-xs">In this demo, it's 1 second.</p>
+<DemoNote>
+	<p>By default, the time of inactivity before marking the user as idle is 1 minute.</p>
+	<p>In this demo, it's 1 second.</p>
+</DemoNote>

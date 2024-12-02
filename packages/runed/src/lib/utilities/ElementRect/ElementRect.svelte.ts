@@ -21,7 +21,7 @@ export type ElementRectOptions = {
  * @see {@link https://runed.dev/docs/utilities/element-size}
  */
 export class ElementRect {
-	#rect: Rect = $state({
+	#rect = $state<Rect>({
 		x: 0,
 		y: 0,
 		width: 0,
@@ -32,7 +32,7 @@ export class ElementRect {
 		left: 0,
 	});
 
-	constructor(node: MaybeGetter<HTMLElement | undefined>, options: ElementRectOptions = {}) {
+	constructor(node: MaybeGetter<HTMLElement | undefined | null>, options: ElementRectOptions = {}) {
 		this.#rect = {
 			width: options.initialRect?.width ?? 0,
 			height: options.initialRect?.height ?? 0,

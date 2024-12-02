@@ -3,6 +3,7 @@
 	import { DemoContainer, Slider, Button } from "@svecodocs/kit";
 	import Pause from "phosphor-svelte/lib/Pause";
 	import Play from "phosphor-svelte/lib/Play";
+	import DemoNote from "../demo-note.svelte";
 
 	let frames = $state(0);
 	let fpsLimit = $state(10);
@@ -61,10 +62,12 @@
 		max={144}
 	/>
 </DemoContainer>
-<p class="text-muted-foreground text-right text-xs">
-	Mouse sprite extracted from <a
-		class="hover:text-foreground"
-		target="_blank"
-		href="https://www.animalwell.net/">Animal Well</a
-	>
-</p>
+<DemoNote>
+	<p>
+		Mouse sprite extracted from <a
+			class="hover:text-foreground"
+			target="_blank"
+			href="https://www.animalwell.net/">Animal Well</a
+		>
+	</p>
+</DemoNote>

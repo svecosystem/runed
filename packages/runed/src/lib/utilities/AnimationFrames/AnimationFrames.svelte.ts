@@ -56,7 +56,7 @@ export class AnimationFrames {
 		});
 	}
 
-	#loop = (timestamp: DOMHighResTimeStamp) => {
+	#loop = (timestamp: DOMHighResTimeStamp): void => {
 		if (!this.#running) return;
 
 		if (this.#previousTimestamp === null) {
@@ -76,28 +76,28 @@ export class AnimationFrames {
 		this.#frame = requestAnimationFrame(this.#loop);
 	};
 
-	start = () => {
+	start = (): void => {
 		this.#running = true;
 		this.#previousTimestamp = 0;
 		this.#frame = requestAnimationFrame(this.#loop);
 	};
 
-	stop = () => {
+	stop = (): void => {
 		if (!this.#frame) return;
 		this.#running = false;
 		cancelAnimationFrame(this.#frame);
 		this.#frame = null;
 	};
 
-	toggle = () => {
+	toggle = (): void => {
 		this.#running ? this.stop() : this.start();
 	};
 
-	get fps() {
+	get fps(): number {
 		return !this.#running ? 0 : this.#fps;
 	}
 
-	get running() {
+	get running(): boolean {
 		return this.#running;
 	}
 }

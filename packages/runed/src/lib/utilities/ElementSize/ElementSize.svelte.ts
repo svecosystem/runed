@@ -27,7 +27,7 @@ export class ElementSize {
 	});
 
 	constructor(
-		node: MaybeGetter<HTMLElement | undefined>,
+		node: MaybeGetter<HTMLElement | undefined | null>,
 		options: ElementSizeOptions = { box: "border-box" }
 	) {
 		this.#size = {

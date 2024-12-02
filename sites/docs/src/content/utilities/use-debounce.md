@@ -8,6 +8,10 @@ category: Utilities
 	import Demo from '$lib/components/demos/use-debounce.svelte';
 </script>
 
+`useDebounce` is a utility function that creates a debounced version of a callback function.
+Debouncing prevents a function from being called too frequently by delaying its execution until
+after a specified duration of inactivity.
+
 ## Demo
 
 <Demo />

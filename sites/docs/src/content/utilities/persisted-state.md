@@ -1,8 +1,8 @@
 ---
 title: PersistedState
 description:
-  Create reactive state that is persisted and synchronized across browser sessions and tabs using
-  Web Storage.
+  A reactive state manager that persists and synchronizes state across browser sessions and tabs
+  using Web Storage APIs.
 category: State
 ---
 
@@ -10,6 +10,9 @@ category: State
 import Demo from '$lib/components/demos/persisted-state.svelte';
 import { Callout } from '@svecodocs/kit'
 </script>
+
+`PersistedState` provides a reactive state container that automatically persists data to browser
+storage and optionally synchronizes changes across browser tabs in real-time.
 
 ## Demo
 
@@ -21,9 +24,7 @@ import { Callout } from '@svecodocs/kit'
 
 ## Usage
 
-`PersistedState` allows for syncing and persisting state across browser sessions using
-`localStorage` or `sessionStorage`. Initialize `PersistedState` by providing a unique key and an
-initial value for the state.
+Initialize `PersistedState` by providing a unique key and an initial value for the state.
 
 ```svelte
 <script lang="ts">
@@ -40,15 +41,49 @@ initial value for the state.
 </div>
 ```
 
-`PersistedState` also includes an `options` object.
+## Configuration Options
+
+`PersistedState` includes an `options` object that allows you to customize the behavior of the state
+manager.
 
 ```ts
-{
-	storage: 'session', // Specifies whether to use local or session storage. Default is 'local'.
-	syncTabs: false,   // Indicates if changes should sync across tabs. Default is true.
+const state = new PersistedState("user-preferences", initialValue, {
+	// Use sessionStorage instead of localStorage (default: 'local')
+	storage: "session",
+
+	// Disable cross-tab synchronization (default: true)
+	syncTabs: false,
+
+	// Custom serialization handlers
 	serializer: {
-		serialize: superjson.stringify,   // Custom serialization function. Default is JSON.stringify.
-		deserialize: superjson.parse      // Custom deserialization function. Default is JSON.parse.
+		serialize: superjson.stringify,
+		deserialize: superjson.parse
 	}
-}
+});
+```
+
+### Storage Options
+
+- `'local'`: Data persists until explicitly cleared
+- `'session'`: Data persists until the browser session ends
+
+### Cross-Tab Synchronization
+
+When `syncTabs` is enabled (default), changes are automatically synchronized across all browser tabs
+using the storage event.
+
+### Custom Serialization
+
+Provide custom `serialize` and `deserialize` functions to handle complex data types:
+
+```ts
+import superjson from "superjson";
+
+// Example with Date objects
+const lastAccessed = new PersistedState("last-accessed", new Date(), {
+	serializer: {
+		serialize: superjson.stringify,
+		deserialize: superjson.parse
+	}
+});
 ```

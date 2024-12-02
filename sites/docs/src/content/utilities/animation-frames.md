@@ -1,8 +1,6 @@
 ---
 title: AnimationFrames
-description:
-  A wrapper over `requestAnimationFrame`, with controls for limiting FPS, and information about the
-  current frame.
+description: A wrapper for requestAnimationFrame with FPS control and frame metrics
 category: Browser
 ---
 
@@ -10,22 +8,13 @@ category: Browser
 import Demo from '$lib/components/demos/animation-frames.svelte';
 </script>
 
+`AnimationFrames` provides a declarative API over the browser's
+[`requestAnimationFrame`](https://developer.mozilla.org/en-US/docs/Web/API/Window/requestAnimationFrame),
+offering FPS limiting capabilities and frame metrics while handling cleanup automatically.
+
 ## Demo
 
 <Demo />
-
-## Description
-
-`AnimationFrames` wraps over
-[`requestAnimationFrame`](https://developer.mozilla.org/en-US/docs/Web/API/Window/requestAnimationFrame).
-While it is not necessary to use it to use `requestAnimationFrame`, it removes some of the
-boilerplate, and adds common utilities for it.
-
-- Automatically interrupts the requestAnimationFrame loop once the component is unmounted
-- Lets you set an FPS limit
-- Lets you get information about the current frame, such as its current timestamp, and the
-  difference in ms between the last frame and the current one
-- Returns information about current FPS
 
 ## Usage
 

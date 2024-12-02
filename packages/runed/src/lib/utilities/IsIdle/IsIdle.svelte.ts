@@ -51,7 +51,7 @@ const DEFAULT_OPTIONS = {
  * @see {@link https://runed.dev/docs/utilities/is-idle}
  */
 export class IsIdle {
-	current = $state(false);
+	#current: boolean = $state(false);
 	#lastActive = $state(Date.now());
 
 	constructor(_options?: IsIdleOptions) {
@@ -63,11 +63,11 @@ export class IsIdle {
 		const timeout = $derived(extract(options.timeout));
 		const events = $derived(extract(options.events));
 		const detectVisibilityChanges = $derived(extract(options.detectVisibilityChanges));
-		this.current = options.initialState;
+		this.#current = options.initialState;
 
 		const debouncedReset = useDebounce(
 			() => {
-				this.current = true;
+				this.#current = true;
 			},
 			() => timeout
 		);
@@ -75,7 +75,7 @@ export class IsIdle {
 		debouncedReset();
 
 		const handleActivity = () => {
-			this.current = false;
+			this.#current = false;
 			this.#lastActive = Date.now();
 			debouncedReset();
 		};
@@ -100,5 +100,9 @@ export class IsIdle {
 
 	get lastActive(): number {
 		return this.#lastActive;
+	}
+
+	get current(): boolean {
+		return this.#current;
 	}
 }

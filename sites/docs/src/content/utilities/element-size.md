@@ -1,12 +1,15 @@
 ---
 title: ElementSize
-description: A function that returns the size of an element.
+description: Track element dimensions reactively
 category: Elements
 ---
 
 <script>
 	import Demo from '$lib/components/demos/element-size.svelte';
 </script>
+
+`ElementSize` provides reactive access to an element's width and height, automatically updating when
+the element's dimensions change. Similar to `ElementRect` but focused only on size measurements.
 
 ## Demo
 
@@ -25,4 +28,13 @@ category: Elements
 <textarea bind:this={el}></textarea>
 
 <p>Width: {size.width} Height: {size.height}</p>
+```
+
+## Type Definition
+
+```ts
+interface ElementSize {
+	readonly width: number;
+	readonly height: number;
+}
 ```

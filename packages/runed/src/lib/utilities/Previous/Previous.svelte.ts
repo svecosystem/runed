@@ -6,7 +6,7 @@ import type { Getter } from "$lib/internal/types.js";
  * @see {@link https://runed.dev/docs/utilities/previous}
  */
 export class Previous<T> {
-	#previous: T | undefined = $state();
+	#previous = $state<T | undefined>(undefined);
 	#curr?: T;
 
 	constructor(getter: Getter<T>) {
