@@ -48,7 +48,9 @@
 	</div>
 	<div class="text-center">
 		Element
-		<span class="font-medium {isVisible ? 'text-success' : 'text-destructive'}">
+		<span
+			class="font-medium {isVisible ? 'text-green-600 dark:text-green-500' : 'text-destructive'}"
+		>
 			{isVisible ? "inside" : "outside"}
 		</span>
 		the viewport

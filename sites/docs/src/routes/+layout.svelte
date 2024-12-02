@@ -1,6 +1,6 @@
 <script lang="ts">
-	import { siteConfig } from "$lib/config/site";
 	import "../app.css";
+	import { siteConfig } from "$lib/config/site";
 	import { useSiteConfig } from "@svecodocs/kit";
 
 	let { children } = $props();

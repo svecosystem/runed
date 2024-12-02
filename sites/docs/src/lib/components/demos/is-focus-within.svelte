@@ -15,15 +15,15 @@
 		bind:this={formElement}
 		class="mx-auto flex max-w-[340px] flex-col gap-4 p-4"
 	>
-		<div class="flex flex-col gap-2">
+		<div class="flex flex-col gap-3">
 			<Label for="fname">First name</Label>
 			<Input id="fname" />
 		</div>
-		<div class="flex flex-col gap-2">
+		<div class="flex flex-col gap-3">
 			<Label for="lname">Last name</Label>
 			<Input id="lname" />
 		</div>
-		<div class="flex flex-col gap-2">
+		<div class="flex flex-col gap-3">
 			<Label for="email">Email</Label>
 			<Input id="email" type="email" />
 		</div>

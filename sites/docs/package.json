@@ -29,7 +29,7 @@
 		"url": "https://github.com/svecosystem/runed.git"
 	},
 	"devDependencies": {
-		"@svecodocs/kit": "^0.0.3",
+		"@svecodocs/kit": "^0.0.4",
 		"@sveltejs/adapter-cloudflare": "^4.8.0",
 		"@sveltejs/kit": "^2.0.0",
 		"@sveltejs/vite-plugin-svelte": "^4.0.0",
