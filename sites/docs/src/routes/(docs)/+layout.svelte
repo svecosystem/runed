@@ -9,8 +9,8 @@
 
 <DocsLayout {navigation}>
 	{#snippet logo()}
-		<RunedDark class="hidden max-h-6 dark:block" />
-		<RunedLight class="block max-h-6 dark:hidden" />
+		<RunedDark class="hidden w-7 dark:block" />
+		<RunedLight class="block w-7 dark:hidden" />
 		<span class="sr-only">Svecodocs</span>
 	{/snippet}
 
