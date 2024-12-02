@@ -39,7 +39,7 @@ You can also pass a getter that returns a string.
 	import { MediaQuery } from "runed";
 
 	let media = $state("(min-width: 640px)");
-	const query = new MediaQuery(() => media);
+	const screen = new MediaQuery(() => media);
 </script>
 
 Media query {media} is currently {screen.matches}
