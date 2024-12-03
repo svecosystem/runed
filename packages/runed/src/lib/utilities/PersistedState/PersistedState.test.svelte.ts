@@ -99,8 +99,15 @@ describe("PersistedState", () => {
 			async () => {
 				const persistedState = new PersistedState(key, initialValue, { syncTabs: false });
 				await delay();
-				localStorage.setItem(key, JSON.stringify("new-value"));
-				await delay();
+				const newValue = "new-value";
+				localStorage.setItem(key, JSON.stringify(newValue));
+				const event = new StorageEvent("storage", {
+					key,
+					oldValue: initialValue,
+					newValue: JSON.stringify(newValue),
+				});
+				window.dispatchEvent(event);
+					await delay();
 				expect(persistedState.current).toBe(initialValue);
 			}
 		);
