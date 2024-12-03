@@ -1,5 +1,16 @@
 # runed
 
+## 0.16.1
+
+### Patch Changes
+
+- widen the type of element getter args to `HTMLElement | undefined | null`
+  ([#157](https://github.com/svecosystem/runed/pull/157))
+
+- ensure explicit return types for utilities ([#157](https://github.com/svecosystem/runed/pull/157))
+
+- fix: `isIdle.current` should be readonly ([#157](https://github.com/svecosystem/runed/pull/157))
+
 ## 0.16.0
 
 ### Minor Changes
@@ -10,7 +21,8 @@
 
 ### Patch Changes
 
-- docs: add jsdoc comments to the Debounced state util ([#140](https://github.com/svecosystem/runed/pull/140))
+- docs: add jsdoc comments to the Debounced state util
+  ([#140](https://github.com/svecosystem/runed/pull/140))
 
 - fix: useDebounce race condition (#139) ([#146](https://github.com/svecosystem/runed/pull/146))
 
@@ -24,13 +36,15 @@
 
 ### Patch Changes
 
-- update svelte dep ([`1aba37642783caff0a4ad327e129ce41e98b2d92`](https://github.com/svecosystem/runed/commit/1aba37642783caff0a4ad327e129ce41e98b2d92))
+- update svelte dep
+  ([`1aba37642783caff0a4ad327e129ce41e98b2d92`](https://github.com/svecosystem/runed/commit/1aba37642783caff0a4ad327e129ce41e98b2d92))
 
 ## 0.15.1
 
 ### Patch Changes
 
-- fix: avoid writing to state in media-query getter ([#122](https://github.com/svecosystem/runed/pull/122))
+- fix: avoid writing to state in media-query getter
+  ([#122](https://github.com/svecosystem/runed/pull/122))
 
 - Replace $state.frozen with $state.raw ([#130](https://github.com/svecosystem/runed/pull/130))
 
@@ -50,11 +64,13 @@
 
 ### Minor Changes
 
-- allow setting immediately and cancelling Debounced update ([#96](https://github.com/svecosystem/runed/pull/96))
+- allow setting immediately and cancelling Debounced update
+  ([#96](https://github.com/svecosystem/runed/pull/96))
 
 - feat: `IsIdle` ([#94](https://github.com/svecosystem/runed/pull/94))
 
-- allow passing multiple events to useEventListener ([#96](https://github.com/svecosystem/runed/pull/96))
+- allow passing multiple events to useEventListener
+  ([#96](https://github.com/svecosystem/runed/pull/96))
 
 - allow cancelling debounce fn ([#96](https://github.com/svecosystem/runed/pull/96))
 
@@ -82,7 +98,8 @@
 
 ### Minor Changes
 
-- feat: allow media query to be initialized in a module ([#68](https://github.com/svecosystem/runed/pull/68))
+- feat: allow media query to be initialized in a module
+  ([#68](https://github.com/svecosystem/runed/pull/68))
 
 ### Patch Changes
 
@@ -96,7 +113,8 @@
 
 ### Patch Changes
 
-- fix: ensure "add" utility exports types as well ([#74](https://github.com/svecosystem/runed/pull/74))
+- fix: ensure "add" utility exports types as well
+  ([#74](https://github.com/svecosystem/runed/pull/74))
 
 ## 0.9.1
 
@@ -142,7 +160,8 @@
 
 - fix active element erroring on SSR ([#60](https://github.com/svecosystem/runed/pull/60))
 
-- fix active element not being up to date outside effects ([#55](https://github.com/svecosystem/runed/pull/55))
+- fix active element not being up to date outside effects
+  ([#55](https://github.com/svecosystem/runed/pull/55))
 
 ## 0.6.0
 
@@ -222,4 +241,5 @@
 
 ### Patch Changes
 
-- Initial release, including `withDebounce` and `withElementSize` ([`dd5815315c353d79f9481d54b9fdcbcab308aaeb`](https://github.com/svecosystem/runed/commit/dd5815315c353d79f9481d54b9fdcbcab308aaeb))
+- Initial release, including `withDebounce` and `withElementSize`
+  ([`dd5815315c353d79f9481d54b9fdcbcab308aaeb`](https://github.com/svecosystem/runed/commit/dd5815315c353d79f9481d54b9fdcbcab308aaeb))
