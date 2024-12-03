@@ -1,7 +1,7 @@
 import { describe, expect } from "vitest";
 
+import { delay, testWithEffect } from "$lib/test/util.svelte.js";
 import { PersistedState } from "./index.js";
-import { testWithEffect } from "$lib/test/util.svelte.js";
 
 const key = "test-key";
 const initialValue = "test-value";
@@ -77,25 +77,47 @@ describe("PersistedState", () => {
 		});
 	});
 
-	describe.skip("syncTabs", () => {
+	describe("syncTabs", () => {
 		testWithEffect("updates persisted value when local storage changes independently", async () => {
-			// TODO: figure out why this test is failing even though it works in the browser. maybe jsdom doesn't emit storage events?
-			// expect(true).toBe(true);
-			// const persistedState = new PersistedState(key, initialValue);
-			// localStorage.setItem(key, JSON.stringify("new-value"));
-			// await new Promise((resolve) => setTimeout(resolve, 0));
-			// expect(persistedState.current).toBe("new-value");
+			const persistedState = new PersistedState(key, initialValue);
+			await delay();
+			expect(persistedState.current).toBe(initialValue);
+			const newValue = "new-value";
+			localStorage.setItem(key, JSON.stringify(newValue));
+			const event = new StorageEvent("storage", {
+				key,
+				oldValue: initialValue,
+				newValue: JSON.stringify(newValue),
+			});
+			window.dispatchEvent(event);
+			await delay();
+			expect(persistedState.current).toBe(newValue);
 		});
 
-		// TODO: this test passes, but likely only because the storage event is not being emitted either way from jsdom
 		testWithEffect(
 			"does not update persisted value when local storage changes independently if syncTabs is false",
 			async () => {
 				const persistedState = new PersistedState(key, initialValue, { syncTabs: false });
+				await delay();
 				localStorage.setItem(key, JSON.stringify("new-value"));
-				await new Promise((resolve) => setTimeout(resolve, 0));
+				await delay();
 				expect(persistedState.current).toBe(initialValue);
 			}
 		);
+
+		testWithEffect("does not handle the storage event when 'session' storage is used", async () => {
+			const persistedState = new PersistedState(key, initialValue, { storage: "session" });
+			await delay();
+			const newValue = "new-value";
+			localStorage.setItem(key, JSON.stringify(newValue));
+			const event = new StorageEvent("storage", {
+				key,
+				oldValue: initialValue,
+				newValue: JSON.stringify(newValue),
+			});
+			window.dispatchEvent(event);
+			await delay();
+			expect(persistedState.current).toBe(initialValue);
+		});
 	});
 });
