@@ -56,6 +56,10 @@ export class ElementSize {
 		});
 	}
 
+	get current(): { width: number; height: number } {
+		return this.#size;
+	}
+
 	get width(): number {
 		return this.#size.width;
 	}

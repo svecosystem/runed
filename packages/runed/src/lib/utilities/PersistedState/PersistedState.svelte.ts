@@ -133,7 +133,7 @@ export class PersistedState<T> {
 		});
 	}
 
-	#handleStorageEvent(event: StorageEvent) {
+	#handleStorageEvent(event: StorageEvent): void {
 		if (event.key !== this.#key || !this.#storage) return;
 
 		const valueFromStorage = getValueFromStorage({

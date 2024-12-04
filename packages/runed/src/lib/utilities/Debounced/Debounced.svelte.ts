@@ -37,6 +37,9 @@ export class Debounced<T> {
 	constructor(getter: Getter<T>, wait: MaybeGetter<number> = 250) {
 		this.#current = getter(); // immediately set the initial value
 
+		this.cancel = this.cancel.bind(this);
+		this.setImmediately = this.setImmediately.bind(this);
+
 		this.#debounceFn = useDebounce(() => {
 			this.#current = getter();
 		}, wait);
@@ -56,15 +59,15 @@ export class Debounced<T> {
 	/**
 	 * Cancel the latest timer.
 	 */
-	cancel = (): void => {
+	cancel(): void {
 		this.#debounceFn.cancel();
-	};
+	}
 
 	/**
 	 * Set the `current` value without waiting.
 	 */
-	setImmediately = (v: T): void => {
+	setImmediately(v: T): void {
 		this.cancel();
 		this.#current = v;
-	};
+	}
 }

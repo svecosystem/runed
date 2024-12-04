@@ -27,6 +27,8 @@ export class StateHistory<T> {
 	constructor(value: MaybeGetter<T>, set: Setter<T>, options?: StateHistoryOptions) {
 		this.#redoStack = [];
 		this.#set = set;
+		this.redo = this.redo.bind(this);
+		this.undo = this.undo.bind(this);
 
 		const addEvent = (event: LogEvent<T>): void => {
 			this.log.push(event);
@@ -58,20 +60,20 @@ export class StateHistory<T> {
 		);
 	}
 
-	readonly undo = (): void => {
+	undo(): void {
 		const [prev, curr] = this.log.slice(-2);
 		if (!curr || !prev) return;
 		this.#ignoreUpdate = true;
 		this.#redoStack.push(curr);
 		this.log.pop();
 		this.#set(prev.snapshot);
-	};
+	}
 
-	readonly redo = (): void => {
+	redo(): void {
 		const nextEvent = this.#redoStack.pop();
 		if (!nextEvent) return;
 		this.#ignoreUpdate = true;
 		this.log.push(nextEvent);
 		this.#set(nextEvent.snapshot);
-	};
+	}
 }
