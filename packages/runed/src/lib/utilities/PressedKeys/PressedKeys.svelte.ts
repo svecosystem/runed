@@ -1,3 +1,4 @@
+import { autobind } from "$lib/internal/utils/autobind.js";
 import { addEventListener } from "$lib/internal/utils/event.js";
 
 /**
@@ -9,8 +10,6 @@ export class PressedKeys {
 	#pressedKeys = $state<string[]>([]);
 
 	constructor() {
-		this.has = this.has.bind(this);
-
 		$effect(() => {
 			const callbacks: VoidFunction[] = [];
 
@@ -34,6 +33,7 @@ export class PressedKeys {
 		});
 	}
 
+	@autobind
 	has(...keys: string[]): boolean {
 		const normalizedKeys = keys.map((key) => key.toLowerCase());
 		return normalizedKeys.every((key) => this.#pressedKeys.includes(key));

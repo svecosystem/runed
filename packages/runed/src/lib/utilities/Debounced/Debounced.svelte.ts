@@ -2,6 +2,7 @@ import { useDebounce } from "../useDebounce/useDebounce.svelte.js";
 import { watch } from "../watch/watch.svelte.js";
 import type { Getter, MaybeGetter } from "$lib/internal/types.js";
 import { noop } from "$lib/internal/utils/function.js";
+import { autobind } from "$lib/internal/utils/autobind.js";
 
 /**
  * A wrapper over {@link useDebounce} that creates a debounced state.
@@ -37,9 +38,6 @@ export class Debounced<T> {
 	constructor(getter: Getter<T>, wait: MaybeGetter<number> = 250) {
 		this.#current = getter(); // immediately set the initial value
 
-		this.cancel = this.cancel.bind(this);
-		this.setImmediately = this.setImmediately.bind(this);
-
 		this.#debounceFn = useDebounce(() => {
 			this.#current = getter();
 		}, wait);
@@ -59,6 +57,7 @@ export class Debounced<T> {
 	/**
 	 * Cancel the latest timer.
 	 */
+	@autobind
 	cancel(): void {
 		this.#debounceFn.cancel();
 	}
@@ -66,6 +65,7 @@ export class Debounced<T> {
 	/**
 	 * Set the `current` value without waiting.
 	 */
+	@autobind
 	setImmediately(v: T): void {
 		this.cancel();
 		this.#current = v;

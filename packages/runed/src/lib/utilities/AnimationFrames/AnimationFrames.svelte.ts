@@ -1,6 +1,7 @@
 import { untrack } from "svelte";
 import { extract } from "../extract/index.js";
 import type { MaybeGetter } from "$lib/internal/types.js";
+import { autobind } from "$lib/internal/utils/autobind.js";
 
 type RafCallbackParams = {
 	/** The number of milliseconds since the last frame. */
@@ -47,10 +48,6 @@ export class AnimationFrames {
 		this.#fpsLimitOption = options.fpsLimit;
 		this.#callback = callback;
 
-		this.start = this.start.bind(this);
-		this.stop = this.stop.bind(this);
-		this.toggle = this.toggle.bind(this);
-
 		$effect(() => {
 			if (options.immediate ?? true) {
 				untrack(this.start);
@@ -80,12 +77,14 @@ export class AnimationFrames {
 		this.#frame = requestAnimationFrame(this.#loop);
 	}
 
+	@autobind
 	start(): void {
 		this.#running = true;
 		this.#previousTimestamp = 0;
 		this.#frame = requestAnimationFrame(this.#loop);
 	}
 
+	@autobind
 	stop(): void {
 		if (!this.#frame) return;
 		this.#running = false;
@@ -93,6 +92,7 @@ export class AnimationFrames {
 		this.#frame = null;
 	}
 
+	@autobind
 	toggle(): void {
 		this.#running ? this.stop() : this.start();
 	}
