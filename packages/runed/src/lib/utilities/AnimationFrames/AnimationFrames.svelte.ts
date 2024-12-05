@@ -1,6 +1,7 @@
 import { untrack } from "svelte";
 import { extract } from "../extract/index.js";
 import type { MaybeGetter } from "$lib/internal/types.js";
+import { defaultWindow, type ConfigurableWindow } from "$lib/internal/configurable-globals.js";
 
 type RafCallbackParams = {
 	/** The number of milliseconds since the last frame. */
@@ -12,7 +13,7 @@ type RafCallbackParams = {
 	timestamp: DOMHighResTimeStamp;
 };
 
-export type AnimationFramesOptions = {
+export type AnimationFramesOptions = ConfigurableWindow & {
 	/**
 	 * Start calling requestAnimationFrame immediately.
 	 *
@@ -42,8 +43,10 @@ export class AnimationFrames {
 
 	#fps = $state(0);
 	#running = $state(false);
+	#window: Window = defaultWindow!;
 
 	constructor(callback: (params: RafCallbackParams) => void, options: AnimationFramesOptions = {}) {
+		this.#window = options.window ?? defaultWindow!;
 		this.#fpsLimitOption = options.fpsLimit;
 		this.#callback = callback;
 
@@ -70,26 +73,26 @@ export class AnimationFrames {
 		const delta = timestamp - this.#previousTimestamp;
 		const fps = 1000 / delta;
 		if (this.#fpsLimit && fps > this.#fpsLimit) {
-			this.#frame = requestAnimationFrame(this.#loop);
+			this.#frame = this.#window.requestAnimationFrame(this.#loop);
 			return;
 		}
 
 		this.#fps = fps;
 		this.#previousTimestamp = timestamp;
 		this.#callback({ delta, timestamp });
-		this.#frame = requestAnimationFrame(this.#loop);
+		this.#frame = this.#window.requestAnimationFrame(this.#loop);
 	}
 
 	start(): void {
 		this.#running = true;
 		this.#previousTimestamp = 0;
-		this.#frame = requestAnimationFrame(this.#loop);
+		this.#frame = this.#window.requestAnimationFrame(this.#loop);
 	}
 
 	stop(): void {
 		if (!this.#frame) return;
 		this.#running = false;
-		cancelAnimationFrame(this.#frame);
+		this.#window.cancelAnimationFrame(this.#frame);
 		this.#frame = null;
 	}
 
