@@ -1,5 +1,14 @@
 # runed
 
+## 0.17.0
+
+### Minor Changes
+
+- change: handle boolean conversion within `IsSupported` to improve DX
+  ([#165](https://github.com/svecosystem/runed/pull/165))
+
+- feat: `useGeolocation` ([#165](https://github.com/svecosystem/runed/pull/165))
+
 ## 0.16.3
 
 ### Patch Changes
