@@ -60,7 +60,7 @@ export class AnimationFrames {
 		});
 	}
 
-	#loop(timestamp: DOMHighResTimeStamp): void {
+	#loop = (timestamp: DOMHighResTimeStamp): void => {
 		if (!this.#running) return;
 
 		if (this.#previousTimestamp === null) {
@@ -78,7 +78,7 @@ export class AnimationFrames {
 		this.#previousTimestamp = timestamp;
 		this.#callback({ delta, timestamp });
 		this.#frame = requestAnimationFrame(this.#loop);
-	}
+	};
 
 	start(): void {
 		this.#running = true;
