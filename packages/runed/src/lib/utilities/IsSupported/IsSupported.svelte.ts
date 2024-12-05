@@ -10,7 +10,6 @@ export class IsSupported {
 
 	constructor(predicate: () => unknown) {
 		$effect(() => {
-			console.log("predicate", predicate());
 			this.#current = Boolean(predicate());
 		});
 	}
