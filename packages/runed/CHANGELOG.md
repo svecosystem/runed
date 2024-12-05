@@ -1,5 +1,13 @@
 # runed
 
+## 0.16.2
+
+### Patch Changes
+
+- Refactored public methods to use prototype-based bound functions instead of arrow functions for
+  ([#161](https://github.com/svecosystem/runed/pull/161)) better inheritance and reduced memory
+  usage
+
 ## 0.16.1
 
 ### Patch Changes
