@@ -62,6 +62,10 @@ export class FiniteStateMachine<StatesT extends string, EventsT extends string> 
 	constructor(initial: StatesT, states: Transition<StatesT, EventsT>) {
 		this.#current = initial;
 		this.states = states;
+
+		this.send = this.send.bind(this);
+		this.debounce = this.debounce.bind(this);
+
 		// synthetically trigger _enter for the initial state.
 		this.#dispatch("_enter", { from: null, to: initial, event: null, args: [] });
 	}
@@ -93,16 +97,16 @@ export class FiniteStateMachine<StatesT extends string, EventsT extends string> 
 	}
 
 	/** Triggers a new event and returns the new state. */
-	send = (event: EventsT, ...args: unknown[]): StatesT => {
+	send(event: EventsT, ...args: unknown[]): StatesT {
 		const newState = this.#dispatch(event, ...args);
 		if (newState && newState !== this.#current) {
 			this.#transition(newState as StatesT, event, args);
 		}
 		return this.#current;
-	};
+	}
 
 	/** Debounces the triggering of an event. */
-	debounce = async (wait: number = 500, event: EventsT, ...args: unknown[]): Promise<StatesT> => {
+	async debounce(wait: number = 500, event: EventsT, ...args: unknown[]): Promise<StatesT> {
 		if (this.#timeout[event]) {
 			clearTimeout(this.#timeout[event]);
 		}
@@ -112,7 +116,7 @@ export class FiniteStateMachine<StatesT extends string, EventsT extends string> 
 				resolve(this.send(event, ...args));
 			}, wait);
 		});
-	};
+	}
 
 	/** The current state. */
 	get current(): StatesT {

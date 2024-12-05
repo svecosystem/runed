@@ -9,6 +9,7 @@ export class PressedKeys {
 	#pressedKeys = $state<string[]>([]);
 
 	constructor() {
+		this.has = this.has.bind(this);
 		$effect(() => {
 			const callbacks: VoidFunction[] = [];
 
@@ -32,10 +33,10 @@ export class PressedKeys {
 		});
 	}
 
-	has = (...keys: string[]): boolean => {
+	has(...keys: string[]): boolean {
 		const normalizedKeys = keys.map((key) => key.toLowerCase());
 		return normalizedKeys.every((key) => this.#pressedKeys.includes(key));
-	};
+	}
 
 	get all(): string[] {
 		return this.#pressedKeys;
