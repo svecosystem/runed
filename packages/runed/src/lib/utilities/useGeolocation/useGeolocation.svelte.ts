@@ -16,6 +16,8 @@ type WritableProperties<T> = {
 
 /**
  * Reactive access to the browser's [Geolocation API](https://developer.mozilla.org/en-US/docs/Web/API/Geolocation_API).
+ *
+ * @see https://runed.dev/docs/utilities/use-geolocation
  */
 export function useGeolocation(options: UseGeolocationOptions = {}) {
 	const {
