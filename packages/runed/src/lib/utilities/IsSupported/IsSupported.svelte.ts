@@ -8,9 +8,9 @@
 export class IsSupported {
 	#current: boolean = $state(false);
 
-	constructor(predicate: () => boolean) {
+	constructor(predicate: () => unknown) {
 		$effect(() => {
-			this.#current = predicate();
+			this.#current = Boolean(predicate());
 		});
 	}
 

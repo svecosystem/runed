@@ -51,7 +51,7 @@ fs.writeFileSync(
 	`
 <script lang="ts">
 	import { ${utilName} } from 'runed';
-	import { DemoContainer } from '@svecodocs/ui';
+	import { DemoContainer } from '@svecodocs/kit';
 </script>
 
 <DemoContainer>
