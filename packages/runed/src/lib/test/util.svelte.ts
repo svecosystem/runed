@@ -29,7 +29,3 @@ export function focus(node: HTMLElement | null | undefined) {
 		flushSync(() => node.focus());
 	}
 }
-
-export function delay(timeout = 0) {
-	return new Promise((resolve) => setTimeout(resolve, timeout));
-}

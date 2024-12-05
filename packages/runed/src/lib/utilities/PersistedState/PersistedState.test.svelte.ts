@@ -1,7 +1,8 @@
 import { describe, expect } from "vitest";
 
-import { delay, testWithEffect } from "$lib/test/util.svelte.js";
-import { PersistedState } from "./index.js";
+import { sleep } from "$lib/internal/utils/sleep.js";
+import { testWithEffect } from "$lib/test/util.svelte.js";
+import { PersistedState } from "./PersistedState.svelte.js";
 
 const key = "test-key";
 const initialValue = "test-value";
@@ -80,7 +81,7 @@ describe("PersistedState", () => {
 	describe("syncTabs", () => {
 		testWithEffect("updates persisted value when local storage changes independently", async () => {
 			const persistedState = new PersistedState(key, initialValue);
-			await delay();
+			await sleep();
 			expect(persistedState.current).toBe(initialValue);
 			const newValue = "new-value";
 			localStorage.setItem(key, JSON.stringify(newValue));
@@ -90,7 +91,7 @@ describe("PersistedState", () => {
 				newValue: JSON.stringify(newValue),
 			});
 			window.dispatchEvent(event);
-			await delay();
+			await sleep();
 			expect(persistedState.current).toBe(newValue);
 		});
 
@@ -98,7 +99,7 @@ describe("PersistedState", () => {
 			"does not update persisted value when local storage changes independently if syncTabs is false",
 			async () => {
 				const persistedState = new PersistedState(key, initialValue, { syncTabs: false });
-				await delay();
+				await sleep();
 				const newValue = "new-value";
 				localStorage.setItem(key, JSON.stringify(newValue));
 				const event = new StorageEvent("storage", {
@@ -107,14 +108,14 @@ describe("PersistedState", () => {
 					newValue: JSON.stringify(newValue),
 				});
 				window.dispatchEvent(event);
-					await delay();
+				await sleep();
 				expect(persistedState.current).toBe(initialValue);
 			}
 		);
 
 		testWithEffect("does not handle the storage event when 'session' storage is used", async () => {
 			const persistedState = new PersistedState(key, initialValue, { storage: "session" });
-			await delay();
+			await sleep();
 			const newValue = "new-value";
 			localStorage.setItem(key, JSON.stringify(newValue));
 			const event = new StorageEvent("storage", {
@@ -123,7 +124,7 @@ describe("PersistedState", () => {
 				newValue: JSON.stringify(newValue),
 			});
 			window.dispatchEvent(event);
-			await delay();
+			await sleep();
 			expect(persistedState.current).toBe(initialValue);
 		});
 	});
