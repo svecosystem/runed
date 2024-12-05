@@ -60,7 +60,7 @@ export class AnimationFrames {
 		});
 	}
 
-	#loop = (timestamp: DOMHighResTimeStamp): void => {
+	#loop(timestamp: DOMHighResTimeStamp): void {
 		if (!this.#running) return;
 
 		if (this.#previousTimestamp === null) {
@@ -70,20 +70,20 @@ export class AnimationFrames {
 		const delta = timestamp - this.#previousTimestamp;
 		const fps = 1000 / delta;
 		if (this.#fpsLimit && fps > this.#fpsLimit) {
-			this.#frame = requestAnimationFrame(this.#loop);
+			this.#frame = requestAnimationFrame(this.#loop.bind(this));
 			return;
 		}
 
 		this.#fps = fps;
 		this.#previousTimestamp = timestamp;
 		this.#callback({ delta, timestamp });
-		this.#frame = requestAnimationFrame(this.#loop);
-	};
+		this.#frame = requestAnimationFrame(this.#loop.bind(this));
+	}
 
 	start(): void {
 		this.#running = true;
 		this.#previousTimestamp = 0;
-		this.#frame = requestAnimationFrame(this.#loop);
+		this.#frame = requestAnimationFrame(this.#loop.bind(this));
 	}
 
 	stop(): void {
