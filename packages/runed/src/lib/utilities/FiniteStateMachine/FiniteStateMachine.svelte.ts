@@ -1,5 +1,3 @@
-import { autobind } from "$lib/internal/utils/autobind.js";
-
 export type FSMLifecycleFn<StatesT extends string, EventsT extends string> = (
 	meta: LifecycleFnMeta<StatesT, EventsT>
 ) => void;
@@ -65,6 +63,9 @@ export class FiniteStateMachine<StatesT extends string, EventsT extends string> 
 		this.#current = initial;
 		this.states = states;
 
+		this.send = this.send.bind(this);
+		this.debounce = this.debounce.bind(this);
+
 		// synthetically trigger _enter for the initial state.
 		this.#dispatch("_enter", { from: null, to: initial, event: null, args: [] });
 	}
@@ -96,7 +97,6 @@ export class FiniteStateMachine<StatesT extends string, EventsT extends string> 
 	}
 
 	/** Triggers a new event and returns the new state. */
-	@autobind
 	send(event: EventsT, ...args: unknown[]): StatesT {
 		const newState = this.#dispatch(event, ...args);
 		if (newState && newState !== this.#current) {
@@ -106,7 +106,6 @@ export class FiniteStateMachine<StatesT extends string, EventsT extends string> 
 	}
 
 	/** Debounces the triggering of an event. */
-	@autobind
 	async debounce(wait: number = 500, event: EventsT, ...args: unknown[]): Promise<StatesT> {
 		if (this.#timeout[event]) {
 			clearTimeout(this.#timeout[event]);

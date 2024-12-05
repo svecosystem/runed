@@ -1,7 +1,6 @@
 import { watch } from "../watch/watch.svelte.js";
 import type { MaybeGetter, Setter } from "$lib/internal/types.js";
 import { get } from "$lib/internal/utils/get.js";
-import { autobind } from "$lib/internal/utils/autobind.js";
 
 type LogEvent<T> = {
 	snapshot: T;
@@ -28,6 +27,8 @@ export class StateHistory<T> {
 	constructor(value: MaybeGetter<T>, set: Setter<T>, options?: StateHistoryOptions) {
 		this.#redoStack = [];
 		this.#set = set;
+		this.undo = this.undo.bind(this);
+		this.redo = this.redo.bind(this);
 
 		const addEvent = (event: LogEvent<T>): void => {
 			this.log.push(event);
@@ -59,7 +60,6 @@ export class StateHistory<T> {
 		);
 	}
 
-	@autobind
 	undo(): void {
 		const [prev, curr] = this.log.slice(-2);
 		if (!curr || !prev) return;
@@ -69,7 +69,6 @@ export class StateHistory<T> {
 		this.#set(prev.snapshot);
 	}
 
-	@autobind
 	redo(): void {
 		const nextEvent = this.#redoStack.pop();
 		if (!nextEvent) return;
