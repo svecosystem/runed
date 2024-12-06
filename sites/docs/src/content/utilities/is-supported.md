@@ -17,3 +17,11 @@ category: Utilities
 	}
 </script>
 ```
+
+## Type Definition
+
+```ts
+class IsSupported {
+	readonly current: boolean;
+}
+```

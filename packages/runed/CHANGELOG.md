@@ -1,5 +1,26 @@
 # runed
 
+## 0.18.0
+
+### Minor Changes
+
+- feat: add `runScheduledNow` and `updateImmediately` to `Debounced`
+  ([#142](https://github.com/svecosystem/runed/pull/142))
+
+### Patch Changes
+
+- fix: `PersistedState` - only listen for the `'storage'` event if using `'local'` storage
+  ([#159](https://github.com/svecosystem/runed/pull/159))
+
+## 0.17.0
+
+### Minor Changes
+
+- change: handle boolean conversion within `IsSupported` to improve DX
+  ([#165](https://github.com/svecosystem/runed/pull/165))
+
+- feat: `useGeolocation` ([#165](https://github.com/svecosystem/runed/pull/165))
+
 ## 0.16.3
 
 ### Patch Changes
