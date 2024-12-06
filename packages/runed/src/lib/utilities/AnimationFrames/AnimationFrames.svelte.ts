@@ -43,13 +43,10 @@ export class AnimationFrames {
 
 	#fps = $state(0);
 	#running = $state(false);
-	#window: Window = defaultWindow!;
+	#window: AnimationFramesOptions["window"] = defaultWindow;
 
-	constructor(
-		callback: (params: RafCallbackParams) => void,
-		{ window = defaultWindow, ...options }: AnimationFramesOptions = {}
-	) {
-		this.#window = window!;
+	constructor(callback: (params: RafCallbackParams) => void, options: AnimationFramesOptions = {}) {
+		if (options.window) this.#window = options.window;
 		this.#fpsLimitOption = options.fpsLimit;
 		this.#callback = callback;
 
@@ -67,7 +64,7 @@ export class AnimationFrames {
 	}
 
 	#loop(timestamp: DOMHighResTimeStamp): void {
-		if (!this.#running) return;
+		if (!this.#running || !this.#window) return;
 
 		if (this.#previousTimestamp === null) {
 			this.#previousTimestamp = timestamp;
@@ -87,13 +84,14 @@ export class AnimationFrames {
 	}
 
 	start(): void {
+		if (!this.#window) return;
 		this.#running = true;
 		this.#previousTimestamp = 0;
 		this.#frame = this.#window.requestAnimationFrame(this.#loop.bind(this));
 	}
 
 	stop(): void {
-		if (!this.#frame) return;
+		if (!this.#frame || !this.#window) return;
 		this.#running = false;
 		this.#window.cancelAnimationFrame(this.#frame);
 		this.#frame = null;

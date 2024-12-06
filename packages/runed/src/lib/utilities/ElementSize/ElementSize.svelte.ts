@@ -1,7 +1,8 @@
-import type { MaybeGetter } from "$lib/internal/types.js";
+import { defaultWindow, type ConfigurableWindow } from "$lib/internal/configurable-globals.js";
+import type { GlobalWindow, MaybeGetter } from "$lib/internal/types.js";
 import { get } from "$lib/internal/utils/get.js";
 
-export type ElementSizeOptions = {
+export type ElementSizeOptions = ConfigurableWindow & {
 	initialSize?: {
 		width: number;
 		height: number;
@@ -30,16 +31,19 @@ export class ElementSize {
 		node: MaybeGetter<HTMLElement | undefined | null>,
 		options: ElementSizeOptions = { box: "border-box" }
 	) {
+		const window = options.window ?? defaultWindow;
+
 		this.#size = {
 			width: options.initialSize?.width ?? 0,
 			height: options.initialSize?.height ?? 0,
 		};
 
 		$effect(() => {
+			if (!window || !("ResizeObserver" in window)) return;
 			const node$ = get(node);
 			if (!node$) return;
 
-			const observer = new ResizeObserver((entries) => {
+			const observer = new (window as GlobalWindow).ResizeObserver((entries) => {
 				for (const entry of entries) {
 					const boxSize =
 						options.box === "content-box" ? entry.contentBoxSize : entry.borderBoxSize;

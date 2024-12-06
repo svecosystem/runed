@@ -2,10 +2,11 @@ import { extract } from "../extract/index.js";
 import { useDebounce } from "../useDebounce/index.js";
 import type { MaybeGetter } from "$lib/internal/types.js";
 import { useEventListener } from "$lib/utilities/useEventListener/useEventListener.svelte.js";
+import { defaultDocument, type ConfigurableDocument } from "$lib/internal/configurable-globals.js";
 
 type WindowEvent = keyof WindowEventMap;
 
-export type IsIdleOptions = {
+export type IsIdleOptions = ConfigurableDocument & {
 	/**
 	 * The events that should set the idle state to `true`
 	 *
@@ -57,6 +58,7 @@ export class IsIdle {
 	constructor(_options?: IsIdleOptions) {
 		const options = {
 			...DEFAULT_OPTIONS,
+			document: defaultDocument,
 			..._options,
 		};
 
@@ -90,9 +92,9 @@ export class IsIdle {
 		);
 
 		$effect(() => {
-			if (!detectVisibilityChanges) return;
-			useEventListener(document, ["visibilitychange"], () => {
-				if (document.hidden) return;
+			if (!detectVisibilityChanges || !options.document) return;
+			useEventListener(options.document, ["visibilitychange"], () => {
+				if (options.document!.hidden) return;
 				handleActivity();
 			});
 		});

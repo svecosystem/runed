@@ -2,10 +2,11 @@ import { extract } from "../extract/extract.svelte.js";
 import { useMutationObserver } from "../useMutationObserver/useMutationObserver.svelte.js";
 import { useResizeObserver } from "../useResizeObserver/useResizeObserver.svelte.js";
 import type { MaybeGetter } from "$lib/internal/types.js";
+import type { ConfigurableWindow } from "$lib/internal/configurable-globals.js";
 
 type Rect = Omit<DOMRect, "toJSON">;
 
-export type ElementRectOptions = {
+export type ElementRectOptions = ConfigurableWindow & {
 	initialRect?: DOMRect;
 };
 
@@ -60,9 +61,12 @@ export class ElementRect {
 			};
 		};
 
-		useResizeObserver(() => el, update);
+		useResizeObserver(() => el, update, { window: options.window });
 		$effect(update);
-		useMutationObserver(() => el, update, { attributeFilter: ["style", "class"] });
+		useMutationObserver(() => el, update, {
+			attributeFilter: ["style", "class"],
+			window: options.window,
+		});
 	}
 
 	get x(): number {
