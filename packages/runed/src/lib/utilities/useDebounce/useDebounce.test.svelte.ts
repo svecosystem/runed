@@ -78,4 +78,50 @@ describe("useDebounce", () => {
 		expect(debounced.pending).toBe(false);
 		expect(calledNTimes).toBe(2);
 	});
+
+	testWithEffect("Can run scheduled now", async () => {
+		const fn = vi.fn();
+		const debounced = useDebounce(fn, 100);
+
+		expect(fn).not.toHaveBeenCalled();
+		debounced();
+		expect(fn).not.toHaveBeenCalled();
+		debounced.runScheduledNow();
+		expect(fn).toHaveBeenCalledTimes(1);
+	});
+
+	testWithEffect("Can run scheduled now and wait for completion", async () => {
+		let calledNTimes = 0;
+		let completed = false;
+
+		const slowFunction = async () => {
+			calledNTimes++;
+
+			await new Promise((resolve) => setTimeout(resolve, 100));
+			completed = true;
+		};
+		const debounced = useDebounce(slowFunction, 100);
+
+		expect(calledNTimes).toBe(0);
+		debounced();
+		expect(calledNTimes).toBe(0);
+		debounced.runScheduledNow();
+		expect(calledNTimes).toBe(1);
+		expect(completed).toBe(false);
+
+		await new Promise((resolve) => setTimeout(resolve, 110));
+		expect(calledNTimes).toBe(1);
+		debounced();
+		expect(calledNTimes).toBe(1);
+		await debounced.runScheduledNow();
+		expect(calledNTimes).toBe(2);
+		expect(completed).toBe(true);
+	});
+
+	testWithEffect("runScheduledNow does not raise if runner rejects", async () => {
+		const debounced = useDebounce(() => Promise.reject(new Error("error")), 100);
+
+		debounced().catch(() => {});
+		await debounced.runScheduledNow();
+	});
 });
