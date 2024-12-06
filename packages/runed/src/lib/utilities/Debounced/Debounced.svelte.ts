@@ -38,6 +38,7 @@ export class Debounced<T> {
 		this.#current = getter(); // immediately set the initial value
 		this.cancel = this.cancel.bind(this);
 		this.setImmediately = this.setImmediately.bind(this);
+		this.updateImmediately = this.updateImmediately.bind(this);
 
 		this.#debounceFn = useDebounce(() => {
 			this.#current = getter();
@@ -65,7 +66,7 @@ export class Debounced<T> {
 	/**
 	 * Run the debounced function immediately.
 	 */
-	updateImmediately() {
+	updateImmediately(): Promise<void> {
 		return this.#debounceFn.runScheduledNow();
 	}
 
