@@ -128,7 +128,8 @@ export class PersistedState<T> {
 		});
 
 		$effect(() => {
-			if (!syncTabs) return;
+			if (!syncTabs || storageType !== "local") return;
+
 			return addEventListener(window, "storage", this.#handleStorageEvent.bind(this));
 		});
 	}
