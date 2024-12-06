@@ -1,8 +1,7 @@
 <script lang="ts">
 	import { Store } from "runed";
 	import { writable } from "svelte/store";
-	import Button from "$lib/components/ui/button/button.svelte";
-	import DemoContainer from "$lib/components/demo-container.svelte";
+	import { Button, DemoContainer } from "@svecodocs/kit";
 
 	const store = writable(0);
 	const runeStore = new Store(store);

@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { useMutationObserver } from "runed";
-	import DemoContainer from "$lib/components/demo-container.svelte";
+	import { DemoContainer } from "@svecodocs/kit";
 
 	let el = $state<HTMLElement | null>(null);
 	const messages = $state<string[]>([]);

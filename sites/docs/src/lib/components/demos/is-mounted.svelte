@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { IsMounted } from "runed";
-	import DemoContainer from "$lib/components/demo-container.svelte";
+	import { DemoContainer } from "@svecodocs/kit";
 
 	const isMounted = new IsMounted();
 </script>

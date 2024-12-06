@@ -6,9 +6,10 @@ import { addEventListener } from "$lib/internal/utils/event.js";
  * @see {@link https://runed.dev/docs/utilities/pressed-keys}
  */
 export class PressedKeys {
-	#pressedKeys: string[] = $state([]);
+	#pressedKeys = $state<string[]>([]);
 
 	constructor() {
+		this.has = this.has.bind(this);
 		$effect(() => {
 			const callbacks: VoidFunction[] = [];
 

@@ -1,10 +1,9 @@
 <script lang="ts">
 	import { ElementRect } from "runed";
-	import DemoContainer from "$lib/components/demo-container.svelte";
-	import { Textarea } from "$lib/components/ui/textarea";
+	import { DemoContainer, Textarea } from "@svecodocs/kit";
 
-	let el = $state() as HTMLTextAreaElement;
-	const rect = new ElementRect(() => el);
+	let ref = $state<HTMLTextAreaElement>(null!);
+	const rect = new ElementRect(() => ref);
 	const text = $derived(
 		Object.entries(rect.current)
 			.map(([key, value]) => `${key}: ${value}`)
@@ -14,8 +13,8 @@
 
 <DemoContainer>
 	<Textarea
-		bind:el
-		class="h-[330px] min-h-[300px] w-[300px] min-w-[200px] resize text-base"
+		bind:ref
+		class="h-[330px] min-h-[300px] w-[300px] resize text-base"
 		value={text}
 		readonly
 	/>

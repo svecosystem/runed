@@ -6,7 +6,7 @@ import { noop } from "$lib/internal/utils/function.js";
 /**
  * A wrapper over {@link useDebounce} that creates a debounced state.
  * It takes a "getter" function which returns the state you want to debounce.
- * Everytime this state changes a timer (re)starts, the length of which is
+ * Every time this state changes a timer (re)starts, the length of which is
  * configurable with the `wait` arg. When the timer ends the `current` value
  * is updated.
  *
@@ -36,6 +36,8 @@ export class Debounced<T> {
 	 */
 	constructor(getter: Getter<T>, wait: MaybeGetter<number> = 250) {
 		this.#current = getter(); // immediately set the initial value
+		this.cancel = this.cancel.bind(this);
+		this.setImmediately = this.setImmediately.bind(this);
 
 		this.#debounceFn = useDebounce(() => {
 			this.#current = getter();
@@ -56,7 +58,7 @@ export class Debounced<T> {
 	/**
 	 * Cancel the latest timer.
 	 */
-	cancel() {
+	cancel(): void {
 		this.#debounceFn.cancel();
 	}
 
@@ -70,7 +72,7 @@ export class Debounced<T> {
 	/**
 	 * Set the `current` value without waiting.
 	 */
-	setImmediately(v: T) {
+	setImmediately(v: T): void {
 		this.cancel();
 		this.#current = v;
 	}
