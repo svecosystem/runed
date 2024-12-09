@@ -1,4 +1,5 @@
 import { addEventListener } from "$lib/internal/utils/event.js";
+import { createSubscriber } from "svelte/reactivity";
 
 type Serializer<T> = {
 	serialize: (value: T) => string;
@@ -98,6 +99,7 @@ export class PersistedState<T> {
 	#key: string;
 	#storage: Storage | null;
 	#serializer: Serializer<T>;
+	#subscribe: VoidFunction;
 
 	constructor(key: string, initialValue: T, options: PersistedStateOptions<T> = {}) {
 		const {
@@ -118,19 +120,23 @@ export class PersistedState<T> {
 
 		this.#current = valueFromStorage.found ? valueFromStorage.value : initialValue;
 
-		$effect(() => {
-			setValueToStorage({
-				key: this.#key,
-				value: this.#current,
-				storage: this.#storage,
-				serializer: this.#serializer,
+		this.#subscribe = createSubscriber(() => {
+			return $effect.root(() => {
+				$effect(() => {
+					setValueToStorage({
+						key: this.#key,
+						value: this.#current,
+						storage: this.#storage,
+						serializer: this.#serializer,
+					});
+				});
+
+				$effect(() => {
+					if (!syncTabs || storageType !== "local") return;
+
+					return addEventListener(window, "storage", this.#handleStorageEvent.bind(this));
+				});
 			});
-		});
-
-		$effect(() => {
-			if (!syncTabs || storageType !== "local") return;
-
-			return addEventListener(window, "storage", this.#handleStorageEvent.bind(this));
 		});
 	}
 
@@ -149,6 +155,7 @@ export class PersistedState<T> {
 	}
 
 	get current(): T {
+		this.#subscribe();
 		return this.#current;
 	}
 
