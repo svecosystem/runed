@@ -61,7 +61,7 @@
 		"jsdom": "^24.0.0",
 		"publint": "^0.1.9",
 		"resize-observer-polyfill": "^1.5.1",
-		"svelte": "^5.10.0",
+		"svelte": "^5.11.0",
 		"svelte-check": "^4.1.1",
 		"tslib": "^2.4.1",
 		"typescript": "^5.0.0",
