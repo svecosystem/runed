@@ -1,4 +1,4 @@
-import { addEventListener } from "$lib/internal/utils/event.js";
+import { on } from "svelte/events";
 import { createSubscriber } from "svelte/reactivity";
 
 type Serializer<T> = {
@@ -6,75 +6,15 @@ type Serializer<T> = {
 	deserialize: (value: string) => T;
 };
 
-type GetValueFromStorageResult<T> =
-	| {
-			found: true;
-			value: T;
-	  }
-	| {
-			found: false;
-			value: null;
-	  };
-function getValueFromStorage<T>({
-	key,
-	storage,
-	serializer,
-}: {
-	key: string;
-	storage: Storage | null;
-	serializer: Serializer<T>;
-}): GetValueFromStorageResult<T> {
-	if (!storage) return { found: false, value: null };
-
-	const value = storage.getItem(key);
-
-	if (value === null) return { found: false, value: null };
-
-	try {
-		return {
-			found: true,
-			value: serializer.deserialize(value),
-		};
-	} catch (e) {
-		console.error(`Error when parsing ${value} from persisted store "${key}"`, e);
-		return {
-			found: false,
-			value: null,
-		};
-	}
-}
-
-function setValueToStorage<T>({
-	key,
-	value,
-	storage,
-	serializer,
-}: {
-	key: string;
-	value: T;
-	storage: Storage | null;
-	serializer: Serializer<T>;
-}) {
-	if (!storage) return;
-
-	try {
-		storage.setItem(key, serializer.serialize(value));
-	} catch (e) {
-		console.error(`Error when writing value from persisted store "${key}" to ${storage}`, e);
-	}
-}
-
 type StorageType = "local" | "session";
 
-function getStorage(storageType: StorageType): Storage | null {
-	if (typeof window === "undefined") return null;
-
-	const storageByStorageType = {
-		local: localStorage,
-		session: sessionStorage,
-	} satisfies Record<StorageType, Storage>;
-
-	return storageByStorageType[storageType];
+function getStorage(storageType: StorageType): Storage {
+	switch (storageType) {
+		case "local":
+			return localStorage;
+		case "session":
+			return sessionStorage;
+	}
 }
 
 type PersistedStateOptions<T> = {
@@ -97,9 +37,9 @@ type PersistedStateOptions<T> = {
 export class PersistedState<T> {
 	#current: T = $state()!;
 	#key: string;
-	#storage: Storage | null;
 	#serializer: Serializer<T>;
-	#subscribe: VoidFunction;
+	#storage?: Storage;
+	#subscribe?: VoidFunction;
 
 	constructor(key: string, initialValue: T, options: PersistedStateOptions<T> = {}) {
 		const {
@@ -108,58 +48,59 @@ export class PersistedState<T> {
 			syncTabs = true,
 		} = options;
 
+		this.#current = initialValue;
 		this.#key = key;
-		this.#storage = getStorage(storageType);
 		this.#serializer = serializer;
 
-		const valueFromStorage = getValueFromStorage({
-			key: this.#key,
-			storage: this.#storage,
-			serializer: this.#serializer,
-		});
+		if (typeof window === "undefined") return;
 
-		this.#current = valueFromStorage.found ? valueFromStorage.value : initialValue;
+		const storage = getStorage(storageType);
+		this.#storage = storage;
 
-		this.#subscribe = createSubscriber(() => {
-			return $effect.root(() => {
-				$effect(() => {
-					setValueToStorage({
-						key: this.#key,
-						value: this.#current,
-						storage: this.#storage,
-						serializer: this.#serializer,
-					});
-				});
+		const existingValue = storage.getItem(key);
+		if (existingValue !== null) {
+			this.#deserialize(existingValue);
+		}
 
-				$effect(() => {
-					if (!syncTabs || storageType !== "local") return;
-
-					return addEventListener(window, "storage", this.#handleStorageEvent);
-				});
+		if (syncTabs && storageType === "local") {
+			this.#subscribe = createSubscriber(() => {
+				return on(window, "storage", this.#handleStorageEvent);
 			});
-		});
+		}
 	}
 
-	#handleStorageEvent = (event: StorageEvent): void => {
-		if (event.key !== this.#key || !this.#storage) return;
-
-		const valueFromStorage = getValueFromStorage({
-			key: this.#key,
-			storage: this.#storage,
-			serializer: this.#serializer,
-		});
-
-		if (valueFromStorage.found) {
-			this.#current = valueFromStorage.value;
-		}
-	};
-
 	get current(): T {
-		this.#subscribe();
+		this.#subscribe?.();
 		return this.#current;
 	}
 
 	set current(newValue: T) {
 		this.#current = newValue;
+		this.#serialize(newValue);
+	}
+
+	#handleStorageEvent = (event: StorageEvent): void => {
+		if (event.key !== this.#key || event.newValue === null) return;
+
+		this.#deserialize(event.newValue);
+	};
+
+	#deserialize(value: string): void {
+		try {
+			this.#current = this.#serializer.deserialize(value);
+		} catch (error) {
+			console.error(`Error when parsing "${value}" from persisted store "${this.#key}"`, error);
+		}
+	}
+
+	#serialize(value: T): void {
+		try {
+			this.#storage?.setItem(this.#key, this.#serializer.serialize(value));
+		} catch (error) {
+			console.error(
+				`Error when writing value from persisted store "${this.#key}" to ${this.#storage}`,
+				error
+			);
+		}
 	}
 }
