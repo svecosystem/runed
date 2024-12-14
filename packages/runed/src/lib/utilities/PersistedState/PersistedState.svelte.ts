@@ -134,13 +134,13 @@ export class PersistedState<T> {
 				$effect(() => {
 					if (!syncTabs || storageType !== "local") return;
 
-					return addEventListener(window, "storage", this.#handleStorageEvent.bind(this));
+					return addEventListener(window, "storage", this.#handleStorageEvent);
 				});
 			});
 		});
 	}
 
-	#handleStorageEvent(event: StorageEvent): void {
+	#handleStorageEvent = (event: StorageEvent): void => {
 		if (event.key !== this.#key || !this.#storage) return;
 
 		const valueFromStorage = getValueFromStorage({
@@ -152,7 +152,7 @@ export class PersistedState<T> {
 		if (valueFromStorage.found) {
 			this.#current = valueFromStorage.value;
 		}
-	}
+	};
 
 	get current(): T {
 		this.#subscribe();
