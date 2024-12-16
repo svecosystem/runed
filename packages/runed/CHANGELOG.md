@@ -1,5 +1,16 @@
 # runed
 
+## 0.19.0
+
+### Minor Changes
+
+- Breaking: Set minimum peer dep to `svelte@5.7.0` or greater to support
+  [`createSubscriber`](https://svelte.dev/docs/svelte/svelte-reactivity#createSubscriber) API
+  ([#177](https://github.com/svecosystem/runed/pull/177))
+
+- Enable `PersistedState` to be used in `.svelte.[ts|js]` files
+  ([#177](https://github.com/svecosystem/runed/pull/177))
+
 ## 0.18.0
 
 ### Minor Changes
