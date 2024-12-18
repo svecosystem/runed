@@ -1,5 +1,15 @@
 # runed
 
+## 0.20.0
+
+### Minor Changes
+
+- feat: `Context` - a type-safe wrapper around the Svelte
+  [Context](https://svelte.dev/docs/svelte/context) API.
+  ([#178](https://github.com/svecosystem/runed/pull/178))
+
+- feat: `IsInViewport` ([#181](https://github.com/svecosystem/runed/pull/181))
+
 ## 0.19.0
 
 ### Minor Changes
