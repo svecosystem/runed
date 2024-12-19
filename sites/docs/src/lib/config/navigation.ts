@@ -4,22 +4,41 @@ import Notebook from "phosphor-svelte/lib/Notebook";
 import RocketLaunch from "phosphor-svelte/lib/RocketLaunch";
 import Tag from "phosphor-svelte/lib/Tag";
 
-function docToNavItem(doc: (typeof docs)[number]) {
+type NavItem = {
+	title: string;
+	href: string;
+};
+
+function docToNavItem(doc: (typeof docs)[number]): NavItem {
 	return {
 		title: doc.title,
 		href: `/docs/${doc.slug}`,
 	};
 }
 
-const newSection = docs.filter((doc) => doc.category === "New").map(docToNavItem);
-const reactivitySection = docs.filter((doc) => doc.category === "Reactivity").map(docToNavItem);
-const stateSection = docs.filter((doc) => doc.category === "State").map(docToNavItem);
-const elementsSection = docs.filter((doc) => doc.category === "Elements").map(docToNavItem);
-const browserSection = docs.filter((doc) => doc.category === "Browser").map(docToNavItem);
-const componentSection = docs.filter((doc) => doc.category === "Component").map(docToNavItem);
-const utilitiesSection = docs.filter((doc) => doc.category === "Utilities").map(docToNavItem);
-const animationSection = docs.filter((doc) => doc.category === "Animation").map(docToNavItem);
-const sensorsSection = docs.filter((doc) => doc.category === "Sensors").map(docToNavItem);
+function buildSections() {
+	const sections: Record<(typeof docs)[0]["category"], NavItem[]> = {
+		New: [],
+		Reactivity: [],
+		State: [],
+		Elements: [],
+		Browser: [],
+		Component: [],
+		Utilities: [],
+		Animation: [],
+		Sensors: [],
+		Anchor: [],
+	};
+
+	for (const doc of docs) {
+		sections[doc.category].push(docToNavItem(doc));
+	}
+
+	return sections;
+}
+
+const { New, Reactivity, State, Elements, Browser, Component, Utilities, Animation, Sensors } =
+	buildSections();
 
 export const navigation = defineNavigation({
 	anchors: [
@@ -42,39 +61,39 @@ export const navigation = defineNavigation({
 	sections: [
 		{
 			title: "New",
-			items: newSection,
+			items: New,
 		},
 		{
 			title: "Reactivity",
-			items: reactivitySection,
+			items: Reactivity,
 		},
 		{
 			title: "State",
-			items: stateSection,
+			items: State,
 		},
 		{
 			title: "Elements",
-			items: elementsSection,
+			items: Elements,
 		},
 		{
 			title: "Browser",
-			items: browserSection,
+			items: Browser,
 		},
 		{
 			title: "Sensors",
-			items: sensorsSection,
+			items: Sensors,
 		},
 		{
 			title: "Animation",
-			items: animationSection,
+			items: Animation,
 		},
 		{
 			title: "Utilities",
-			items: utilitiesSection,
+			items: Utilities,
 		},
 		{
 			title: "Component",
-			items: componentSection,
+			items: Component,
 		},
 	].filter((item) => item.items.length),
 });
