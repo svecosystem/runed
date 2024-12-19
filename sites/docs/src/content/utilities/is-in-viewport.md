@@ -1,7 +1,7 @@
 ---
 title: IsInViewport
-description: N/A
-category: Utilities
+description: Track if an element is visible within the current viewport.
+category: Elements
 ---
 
 <script>

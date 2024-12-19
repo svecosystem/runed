@@ -1,7 +1,7 @@
 ---
 title: IsIdle
 description: Track if a user is idle and the last time they were active.
-category: Utilities
+category: Sensors
 ---
 
 <script>

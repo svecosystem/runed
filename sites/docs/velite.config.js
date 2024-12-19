@@ -17,6 +17,8 @@ const baseSchema = s.object({
 		"Component",
 		"Utilities",
 		"Anchor",
+		"Animation",
+		"Sensors",
 	]),
 });
 

@@ -3,7 +3,7 @@ title: Context
 description:
   A wrapper around Svelte's Context API that provides type safety and improved ergonomics for
   sharing data between components.
-category: Utilities
+category: State
 ---
 
 <script>

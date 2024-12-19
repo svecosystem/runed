@@ -18,6 +18,8 @@ const elementsSection = docs.filter((doc) => doc.category === "Elements").map(do
 const browserSection = docs.filter((doc) => doc.category === "Browser").map(docToNavItem);
 const componentSection = docs.filter((doc) => doc.category === "Component").map(docToNavItem);
 const utilitiesSection = docs.filter((doc) => doc.category === "Utilities").map(docToNavItem);
+const animationSection = docs.filter((doc) => doc.category === "Animation").map(docToNavItem);
+const sensorsSection = docs.filter((doc) => doc.category === "Sensors").map(docToNavItem);
 
 export const navigation = defineNavigation({
 	anchors: [
@@ -59,12 +61,20 @@ export const navigation = defineNavigation({
 			items: browserSection,
 		},
 		{
-			title: "Component",
-			items: componentSection,
+			title: "Sensors",
+			items: sensorsSection,
+		},
+		{
+			title: "Animation",
+			items: animationSection,
 		},
 		{
 			title: "Utilities",
 			items: utilitiesSection,
+		},
+		{
+			title: "Component",
+			items: componentSection,
 		},
 	].filter((item) => item.items.length),
 });

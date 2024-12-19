@@ -1,7 +1,7 @@
 ---
 title: useGeolocation
 description: Reactive access to the browser's Geolocation API.
-category: Browser
+category: Sensors
 ---
 
 <script>

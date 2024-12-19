@@ -1,7 +1,7 @@
 ---
 title: PressedKeys
 description: Tracks which keys are currently pressed
-category: Browser
+category: Sensors
 ---
 
 <script>

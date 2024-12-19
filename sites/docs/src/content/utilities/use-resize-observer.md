@@ -1,7 +1,7 @@
 ---
 title: useResizeObserver
 description: Detects changes in the size of an element
-category: Browser
+category: Elements
 ---
 
 <script>
