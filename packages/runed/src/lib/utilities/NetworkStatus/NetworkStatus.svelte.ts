@@ -1,5 +1,4 @@
 import { onMount } from "svelte";
-import { browser } from "$lib/internal/utils/browser.js";
 import { IsSupported, useEventListener } from "$lib/utilities/index.js";
 
 /**
@@ -31,7 +30,7 @@ type NavigatorWithConnection = Navigator & { connection: NetworkInformation };
  * @see {@link https://runed.dev/docs/utilities/network-status}
  */
 export class NetworkStatus {
-	#isSupported = new IsSupported(() => browser && "navigator" in window);
+	#isSupported = new IsSupported(() => "navigator" in window);
 	#navigator?: Navigator = $derived(this.#isSupported.current ? window.navigator : undefined);
 	#connection?: NetworkInformation = $derived(
 		this.#navigator && "connection" in this.#navigator
@@ -42,43 +41,49 @@ export class NetworkStatus {
 	#updatedAt: Date = $state(new Date());
 
 	constructor() {
-		onMount(() => {
-			this.#updateStatus();
+		onMount(() => this.#updateStatus());
 
-			if (this.#connection) {
-				useEventListener(this.#connection, "change", this.#updateStatus, { passive: true });
-			} else {
-				useEventListener(window, "online", this.#updateStatus, { passive: true });
-				useEventListener(window, "offline", this.#updateStatus, { passive: true });
-			}
-		});
+		if (this.#connection) {
+			useEventListener(this.#connection, "change", this.#updateStatus, { passive: true });
+		} else {
+			useEventListener(window, "online", this.#updateStatus, { passive: true });
+			useEventListener(window, "offline", this.#updateStatus, { passive: true });
+		}
 	}
 
-	#updateStatus = () => {
+	#updateStatus() {
 		if (!this.#navigator) return;
 		this.#online = this.#navigator.onLine;
 		this.#updatedAt = new Date();
-	};
+	}
 
 	/**
-	 * @desc Whether the network status API is supported on this device.
+	 * @desc Whether the network status API is supported in the environment.
 	 */
-	get isSupported() {
+	get isSupported(): boolean {
 		return this.#isSupported.current;
+	}
+
+	/**
+	 * @desc The `NetworkInformation` interface of the Network Information API
+	 * @see https://developer.mozilla.org/en-US/docs/Web/API/NetworkInformation
+	 */
+	get connection(): NetworkInformation | undefined {
+		return this.#connection;
 	}
 
 	/**
 	 * @desc Returns the online status of the browser.
 	 * @see https://developer.mozilla.org/en-US/docs/Web/API/Navigator/onLine
 	 */
-	get online() {
+	get online(): boolean {
 		return this.#online;
 	}
 
 	/**
 	 * @desc The {Date} object pointing to the moment when state update occurred.
 	 */
-	get updatedAt() {
+	get updatedAt(): Date {
 		return this.#updatedAt;
 	}
 
@@ -87,7 +92,7 @@ export class NetworkStatus {
 	 * nearest multiple of 25 kilobits per seconds.
 	 * @see https://developer.mozilla.org/en-US/docs/Web/API/NetworkInformation/downlink
 	 */
-	get downlink() {
+	get downlink(): NetworkInformation["downlink"] | undefined {
 		return this.#connection?.downlink;
 	}
 
@@ -96,7 +101,7 @@ export class NetworkStatus {
 	 * underlying connection technology
 	 * @see https://developer.mozilla.org/en-US/docs/Web/API/NetworkInformation/downlinkMax
 	 */
-	get downlinkMax() {
+	get downlinkMax(): NetworkInformation["downlinkMax"] | undefined {
 		return this.#connection?.downlinkMax;
 	}
 
@@ -106,7 +111,7 @@ export class NetworkStatus {
 	 * and downlink values.
 	 * @see https://developer.mozilla.org/en-US/docs/Web/API/NetworkInformation/effectiveType
 	 */
-	get effectiveType() {
+	get effectiveType(): NetworkInformation["effectiveType"] | undefined {
 		return this.#connection?.effectiveType;
 	}
 
@@ -115,7 +120,7 @@ export class NetworkStatus {
 	 * to the nearest multiple of 25 milliseconds
 	 * @see https://developer.mozilla.org/en-US/docs/Web/API/NetworkInformation/rtt
 	 */
-	get rtt() {
+	get rtt(): NetworkInformation["rtt"] | undefined {
 		return this.#connection?.rtt;
 	}
 
@@ -123,7 +128,7 @@ export class NetworkStatus {
 	 * @desc {true} if the user has set a reduced data usage option on the user agent.
 	 * @see https://developer.mozilla.org/en-US/docs/Web/API/NetworkInformation/saveData
 	 */
-	get saveData() {
+	get saveData(): NetworkInformation["saveData"] | undefined {
 		return this.#connection?.saveData;
 	}
 
@@ -131,7 +136,7 @@ export class NetworkStatus {
 	 * @desc The type of connection a device is using to communicate with the network.
 	 *  @see https://developer.mozilla.org/en-US/docs/Web/API/NetworkInformation/type
 	 */
-	get type() {
+	get type(): NetworkInformation["type"] | undefined {
 		return this.#connection?.type;
 	}
 }

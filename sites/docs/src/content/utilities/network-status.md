@@ -1,7 +1,7 @@
 ---
 title: NetworkStatus
 description: Watch for network status changes.
-category: Browser
+category: Sensors
 ---
 
 <script>
