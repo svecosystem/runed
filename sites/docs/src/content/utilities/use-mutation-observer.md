@@ -1,7 +1,7 @@
 ---
 title: useMutationObserver
 description: Observe changes in an element
-category: Browser
+category: Elements
 ---
 
 <script>

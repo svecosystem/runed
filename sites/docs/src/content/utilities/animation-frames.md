@@ -1,7 +1,7 @@
 ---
 title: AnimationFrames
 description: A wrapper for requestAnimationFrame with FPS control and frame metrics
-category: Browser
+category: Animation
 ---
 
 <script>

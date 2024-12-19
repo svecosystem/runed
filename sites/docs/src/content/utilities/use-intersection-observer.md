@@ -1,7 +1,7 @@
 ---
 title: useIntersectionObserver
 description: Watch for intersection changes of a target element.
-category: Browser
+category: Elements
 ---
 
 <script>
