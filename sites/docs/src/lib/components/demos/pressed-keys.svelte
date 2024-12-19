@@ -1,8 +1,8 @@
 <script lang="ts">
 	import { PressedKeys, watch } from "runed";
 	import { fade, scale } from "svelte/transition";
+	import { cn, DemoContainer } from "@svecodocs/kit";
 	import RunedIcon from "$lib/components/logos/runed-icon.svelte";
-	import DemoContainer from "$lib/components/demo-container.svelte";
 
 	const keys = new PressedKeys();
 	const toPress = "Runed".split("");
@@ -35,22 +35,25 @@
 		{#if allPressed}
 			<div
 				transition:scale={{ start: 0.75, duration: 300 }}
-				class="absolute left-0 top-1/2 -translate-y-1/2 translate-x-[calc(-100%-0.5rem)]"
+				class="bg-background dark:bg-muted absolute left-0 top-1/2 -translate-y-1/2 translate-x-[calc(-100%-0.5rem)]"
 			>
-				<RunedIcon class="size-11 " />
+				<RunedIcon class="size-12" />
 			</div>
 		{/if}
 		{#each toPress as key}
 			<!-- svelte-ignore a11y_click_events_have_key_events -->
 			<!-- svelte-ignore a11y_no_static_element_interactions -->
 			<div
-				class="grid size-12 place-items-center rounded-lg border transition-all duration-200
-				{allPressed ? 'border-brand' : 'border-border'} bg-background"
+				class={cn(
+					"border-input bg-background dark:bg-muted ring-offset-background placeholder:text-muted-foreground focus-visible:ring-ring flex h-10 w-full rounded-md border px-3 py-2 text-sm file:border-0 file:bg-transparent file:text-sm file:font-medium focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50",
+					"grid size-12 place-items-center rounded-lg border-2 transition-all duration-200",
+					allPressed && "border-brand"
+				)}
 				onclick={() => (triedInputting = true)}
 			>
 				{#if keys.has(key)}
 					<span
-						class="duration-250 text-xl font-bold text-foreground transition-all"
+						class="text-foreground duration-250 text-xl font-bold transition-all"
 						transition:fade={{ duration: 100 }}
 					>
 						{key}
@@ -64,7 +67,7 @@
 	{#if !guessedCorrectly && triedInputting}
 		<p
 			transition:fade={{ duration: 300 }}
-			class="absolute bottom-2 right-2 mb-0 text-center text-sm text-foreground/50"
+			class="text-muted-foreground absolute bottom-2 right-2 mb-0 text-center text-sm"
 		>
 			Press any key to start, no need to select anything
 		</p>

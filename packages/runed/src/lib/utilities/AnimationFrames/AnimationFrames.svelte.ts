@@ -47,6 +47,10 @@ export class AnimationFrames {
 		this.#fpsLimitOption = options.fpsLimit;
 		this.#callback = callback;
 
+		this.start = this.start.bind(this);
+		this.stop = this.stop.bind(this);
+		this.toggle = this.toggle.bind(this);
+
 		$effect(() => {
 			if (options.immediate ?? true) {
 				untrack(this.start);
@@ -56,7 +60,7 @@ export class AnimationFrames {
 		});
 	}
 
-	#loop = (timestamp: DOMHighResTimeStamp) => {
+	#loop(timestamp: DOMHighResTimeStamp): void {
 		if (!this.#running) return;
 
 		if (this.#previousTimestamp === null) {
@@ -66,38 +70,38 @@ export class AnimationFrames {
 		const delta = timestamp - this.#previousTimestamp;
 		const fps = 1000 / delta;
 		if (this.#fpsLimit && fps > this.#fpsLimit) {
-			this.#frame = requestAnimationFrame(this.#loop);
+			this.#frame = requestAnimationFrame(this.#loop.bind(this));
 			return;
 		}
 
 		this.#fps = fps;
 		this.#previousTimestamp = timestamp;
 		this.#callback({ delta, timestamp });
-		this.#frame = requestAnimationFrame(this.#loop);
-	};
+		this.#frame = requestAnimationFrame(this.#loop.bind(this));
+	}
 
-	start = () => {
+	start(): void {
 		this.#running = true;
 		this.#previousTimestamp = 0;
-		this.#frame = requestAnimationFrame(this.#loop);
-	};
+		this.#frame = requestAnimationFrame(this.#loop.bind(this));
+	}
 
-	stop = () => {
+	stop(): void {
 		if (!this.#frame) return;
 		this.#running = false;
 		cancelAnimationFrame(this.#frame);
 		this.#frame = null;
-	};
+	}
 
-	toggle = () => {
+	toggle(): void {
 		this.#running ? this.stop() : this.start();
-	};
+	}
 
-	get fps() {
+	get fps(): number {
 		return !this.#running ? 0 : this.#fps;
 	}
 
-	get running() {
+	get running(): boolean {
 		return this.#running;
 	}
 }

@@ -1,4 +1,4 @@
-import { extract } from "../extract/extract.js";
+import { extract } from "../extract/extract.svelte.js";
 import type { MaybeGetter } from "$lib/internal/types.js";
 import { get } from "$lib/internal/utils/get.js";
 

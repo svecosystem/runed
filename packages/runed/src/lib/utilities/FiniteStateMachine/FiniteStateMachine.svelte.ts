@@ -55,13 +55,17 @@ export type Transition<StatesT extends string, EventsT extends string> = {
  * @see {@link https://runed.dev/docs/utilities/finite-state-machine}
  */
 export class FiniteStateMachine<StatesT extends string, EventsT extends string> {
-	#current = $state() as StatesT;
+	#current: StatesT = $state()!;
 	readonly states: Transition<StatesT, EventsT>;
 	#timeout: Partial<Record<EventsT, NodeJS.Timeout>> = {};
 
 	constructor(initial: StatesT, states: Transition<StatesT, EventsT>) {
 		this.#current = initial;
 		this.states = states;
+
+		this.send = this.send.bind(this);
+		this.debounce = this.debounce.bind(this);
+
 		// synthetically trigger _enter for the initial state.
 		this.#dispatch("_enter", { from: null, to: initial, event: null, args: [] });
 	}
@@ -93,7 +97,7 @@ export class FiniteStateMachine<StatesT extends string, EventsT extends string> 
 	}
 
 	/** Triggers a new event and returns the new state. */
-	send(event: EventsT, ...args: unknown[]) {
+	send(event: EventsT, ...args: unknown[]): StatesT {
 		const newState = this.#dispatch(event, ...args);
 		if (newState && newState !== this.#current) {
 			this.#transition(newState as StatesT, event, args);
@@ -115,7 +119,7 @@ export class FiniteStateMachine<StatesT extends string, EventsT extends string> 
 	}
 
 	/** The current state. */
-	get current() {
+	get current(): StatesT {
 		return this.#current;
 	}
 }

@@ -1,13 +1,12 @@
 <script lang="ts">
 	import { useResizeObserver } from "runed";
-	import Textarea from "../ui/textarea/textarea.svelte";
-	import DemoContainer from "$lib/components/demo-container.svelte";
+	import { Textarea, DemoContainer } from "@svecodocs/kit";
 
-	let el = $state<HTMLElement | undefined>();
+	let ref = $state<HTMLElement>(null!);
 	let text = $state("");
 
 	useResizeObserver(
-		() => el,
+		() => ref,
 		(entries) => {
 			const entry = entries[0];
 			if (!entry) return;
@@ -22,7 +21,7 @@
 	<Textarea
 		readonly
 		value={text}
-		bind:el
-		class="h-[200px] min-h-[100px] w-[300px] min-w-[200px] resize text-base"
+		bind:ref
+		class="h-[200px] min-h-[100px] w-[300px]  resize text-base"
 	/>
 </DemoContainer>
