@@ -1,5 +1,19 @@
 # runed
 
+## 0.21.0
+
+### Minor Changes
+
+- breaking: deprecate `MediaQuery` in favor of Svelte's `MediaQuery`
+  ([#184](https://github.com/svecosystem/runed/pull/184))
+
+- breaking: deprecate `Store` in favor of Svelte's `fromStore` and `toStore`
+  ([#184](https://github.com/svecosystem/runed/pull/184))
+
+### Patch Changes
+
+- simplify `IsSupported` internals ([#184](https://github.com/svecosystem/runed/pull/184))
+
 ## 0.20.0
 
 ### Minor Changes
