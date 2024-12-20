@@ -1,5 +1,40 @@
 # runed
 
+## 0.21.0
+
+### Minor Changes
+
+- breaking: deprecate `MediaQuery` in favor of Svelte's `MediaQuery`
+  ([#184](https://github.com/svecosystem/runed/pull/184))
+
+- breaking: deprecate `Store` in favor of Svelte's `fromStore` and `toStore`
+  ([#184](https://github.com/svecosystem/runed/pull/184))
+
+### Patch Changes
+
+- simplify `IsSupported` internals ([#184](https://github.com/svecosystem/runed/pull/184))
+
+## 0.20.0
+
+### Minor Changes
+
+- feat: `Context` - a type-safe wrapper around the Svelte
+  [Context](https://svelte.dev/docs/svelte/context) API.
+  ([#178](https://github.com/svecosystem/runed/pull/178))
+
+- feat: `IsInViewport` ([#181](https://github.com/svecosystem/runed/pull/181))
+
+## 0.19.0
+
+### Minor Changes
+
+- Breaking: Set minimum peer dep to `svelte@5.7.0` or greater to support
+  [`createSubscriber`](https://svelte.dev/docs/svelte/svelte-reactivity#createSubscriber) API
+  ([#177](https://github.com/svecosystem/runed/pull/177))
+
+- Enable `PersistedState` to be used in `.svelte.[ts|js]` files
+  ([#177](https://github.com/svecosystem/runed/pull/177))
+
 ## 0.18.0
 
 ### Minor Changes

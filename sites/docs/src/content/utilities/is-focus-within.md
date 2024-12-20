@@ -3,7 +3,7 @@ title: IsFocusWithin
 description:
   A utility that tracks whether any descendant element has focus within a specified container
   element.
-category: Utilities
+category: Elements
 ---
 
 <script>
