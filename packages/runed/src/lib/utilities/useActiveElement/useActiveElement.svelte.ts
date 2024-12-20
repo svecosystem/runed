@@ -30,14 +30,10 @@ export function useActiveElement(opts: UseActiveElementOptions = {}) {
 
 		const removeFocusIn = addEventListener(window, "focusin", update);
 		const removeFocusOut = addEventListener(window, "focusout", update);
-		const removeFocus = addEventListener(window, "focus", update);
-		const removeBlur = addEventListener(window, "blur", update);
 
 		return () => {
 			removeFocusIn();
 			removeFocusOut();
-			removeFocus();
-			removeBlur();
 		};
 	});
 }
