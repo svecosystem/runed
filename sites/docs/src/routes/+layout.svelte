@@ -3,6 +3,7 @@
 	import { siteConfig } from "$lib/config/site";
 	import { useSiteConfig } from "@svecodocs/kit";
 	import { dev } from "$app/environment";
+	import { Toaster } from "svelte-sonner";
 
 	let { children } = $props();
 
@@ -15,4 +16,5 @@
 	{/if}
 </svelte:head>
 
+<Toaster />
 {@render children?.()}
