@@ -14,6 +14,10 @@ export type UseGeolocationOptions = Partial<PositionOptions> & {
 	immediate?: boolean;
 } & ConfigurableNavigator;
 
+type UseGeolocationPosition = WritableProperties<Omit<GeolocationPosition, "toJSON" | "coords">> & {
+	coords: WritableProperties<Omit<GeolocationPosition["coords"], "toJSON">>;
+};
+
 /**
  * Reactive access to the browser's [Geolocation API](https://developer.mozilla.org/en-US/docs/Web/API/Geolocation_API).
  *
@@ -30,28 +34,31 @@ export function useGeolocation(options: UseGeolocationOptions = {}) {
 
 	const isSupported = Boolean(navigator);
 
-	let locatedAt = $state<number | null>(null);
 	let error = $state.raw<GeolocationPositionError | null>(null);
-	let coords = $state<WritableProperties<Omit<GeolocationPosition["coords"], "toJSON">>>({
-		accuracy: 0,
-		latitude: Number.POSITIVE_INFINITY,
-		longitude: Number.POSITIVE_INFINITY,
-		altitude: null,
-		altitudeAccuracy: null,
-		heading: null,
-		speed: null,
+	let position = $state<UseGeolocationPosition>({
+		timestamp: 0,
+		coords: {
+			accuracy: 0,
+			latitude: Number.POSITIVE_INFINITY,
+			longitude: Number.POSITIVE_INFINITY,
+			altitude: null,
+			altitudeAccuracy: null,
+			heading: null,
+			speed: null,
+		},
 	});
 	let isPaused = $state(false);
 
-	function updatePosition(position: GeolocationPosition) {
-		locatedAt = position.timestamp;
-		coords.accuracy = position.coords.accuracy;
-		coords.altitude = position.coords.altitude;
-		coords.altitudeAccuracy = position.coords.altitudeAccuracy;
-		coords.heading = position.coords.heading;
-		coords.latitude = position.coords.latitude;
-		coords.longitude = position.coords.longitude;
-		coords.speed = position.coords.speed;
+	function updatePosition(_position: GeolocationPosition) {
+		error = null;
+		position.timestamp = _position.timestamp;
+		position.coords.accuracy = _position.coords.accuracy;
+		position.coords.altitude = _position.coords.altitude;
+		position.coords.altitudeAccuracy = _position.coords.altitudeAccuracy;
+		position.coords.heading = _position.coords.heading;
+		position.coords.latitude = _position.coords.latitude;
+		position.coords.longitude = _position.coords.longitude;
+		position.coords.speed = _position.coords.speed;
 	}
 
 	let watcher: number;
@@ -82,11 +89,8 @@ export function useGeolocation(options: UseGeolocationOptions = {}) {
 		get isSupported() {
 			return isSupported;
 		},
-		get coords() {
-			return coords;
-		},
-		get locatedAt() {
-			return locatedAt;
+		get position() {
+			return position;
 		},
 		get error() {
 			return error;
