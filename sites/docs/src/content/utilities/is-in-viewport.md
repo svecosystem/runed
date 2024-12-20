@@ -46,4 +46,4 @@ export declare class IsInViewport {
 ```
 
 <!-- Ensure the page can scroll so the target can be outside of the viewport -->
-<div class="h-80"></div>
+<div class="h-[500px]"></div>

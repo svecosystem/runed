@@ -23,3 +23,4 @@ export * from "./PersistedState/index.js";
 export * from "./useGeolocation/index.js";
 export * from "./Context/index.js";
 export * from "./IsInViewport/index.js";
+export * from "./useActiveElement/index.js";

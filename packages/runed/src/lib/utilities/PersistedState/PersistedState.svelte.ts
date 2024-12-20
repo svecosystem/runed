@@ -1,3 +1,4 @@
+import { defaultWindow, type ConfigurableWindow } from "$lib/internal/configurable-globals.js";
 import { on } from "svelte/events";
 import { createSubscriber } from "svelte/reactivity";
 
@@ -8,12 +9,12 @@ type Serializer<T> = {
 
 type StorageType = "local" | "session";
 
-function getStorage(storageType: StorageType): Storage {
+function getStorage(storageType: StorageType, window: Window & typeof globalThis): Storage {
 	switch (storageType) {
 		case "local":
-			return localStorage;
+			return window.localStorage;
 		case "session":
-			return sessionStorage;
+			return window.sessionStorage;
 	}
 }
 
@@ -24,7 +25,7 @@ type PersistedStateOptions<T> = {
 	serializer?: Serializer<T>;
 	/** Whether to sync with the state changes from other tabs. Defaults to `true`. */
 	syncTabs?: boolean;
-};
+} & ConfigurableWindow;
 
 /**
  * Creates reactive state that is persisted and synchronized across browser sessions and tabs using Web Storage.
@@ -46,15 +47,16 @@ export class PersistedState<T> {
 			storage: storageType = "local",
 			serializer = { serialize: JSON.stringify, deserialize: JSON.parse },
 			syncTabs = true,
+			window = defaultWindow,
 		} = options;
 
 		this.#current = initialValue;
 		this.#key = key;
 		this.#serializer = serializer;
 
-		if (typeof window === "undefined") return;
+		if (window === undefined) return;
 
-		const storage = getStorage(storageType);
+		const storage = getStorage(storageType, window);
 		this.#storage = storage;
 
 		const existingValue = storage.getItem(key);

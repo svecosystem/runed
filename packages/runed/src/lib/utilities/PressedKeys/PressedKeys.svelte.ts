@@ -1,5 +1,7 @@
-import { addEventListener } from "$lib/internal/utils/event.js";
+import { defaultWindow, type ConfigurableWindow } from "$lib/internal/configurable-globals.js";
+import { useEventListener } from "../useEventListener/useEventListener.svelte.js";
 
+export type PressedKeysOptions = ConfigurableWindow;
 /**
  * Tracks which keys are currently pressed.
  *
@@ -8,28 +10,22 @@ import { addEventListener } from "$lib/internal/utils/event.js";
 export class PressedKeys {
 	#pressedKeys = $state<string[]>([]);
 
-	constructor() {
+	constructor(options: PressedKeysOptions = {}) {
+		const { window = defaultWindow } = options;
 		this.has = this.has.bind(this);
-		$effect(() => {
-			const callbacks: VoidFunction[] = [];
 
-			callbacks.push(
-				addEventListener(window, "keydown", (e) => {
-					const key = e.key.toLowerCase();
-					if (!this.#pressedKeys.includes(key)) {
-						this.#pressedKeys.push(key);
-					}
-				})
-			);
+		if (!window) return;
 
-			callbacks.push(
-				addEventListener(window, "keyup", (e) => {
-					const key = e.key.toLowerCase();
-					this.#pressedKeys = this.#pressedKeys.filter((k) => k !== key);
-				})
-			);
+		useEventListener(window, "keydown", (e) => {
+			const key = e.key.toLowerCase();
+			if (!this.#pressedKeys.includes(key)) {
+				this.#pressedKeys.push(key);
+			}
+		});
 
-			return () => callbacks.forEach((c) => c());
+		useEventListener(window, "keyup", (e) => {
+			const key = e.key.toLowerCase();
+			this.#pressedKeys = this.#pressedKeys.filter((k) => k !== key);
 		});
 	}
 
