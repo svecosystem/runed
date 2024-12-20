@@ -39,6 +39,7 @@
 		"runed": "workspace:^",
 		"svelte": "^5.11.0",
 		"svelte-check": "^4.1.1",
+		"svelte-sonner": "^0.3.28",
 		"tailwindcss": "4.0.0-beta.5",
 		"typescript": "^5.7.2",
 		"velite": "^0.2.1",
