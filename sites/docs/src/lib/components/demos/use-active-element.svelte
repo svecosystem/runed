@@ -1,9 +1,15 @@
-
 <script lang="ts">
-	import { useActiveElement } from 'runed';
-	import { DemoContainer } from '@svecodocs/kit';
+	import { useActiveElement } from "runed";
+	import { DemoContainer } from "@svecodocs/kit";
+
+	const activeElement = useActiveElement();
 </script>
 
 <DemoContainer>
-	<!-- Add your demo here -->
+	<p>
+		Currently active element:
+		<code class="font-bold">
+			{activeElement.current?.localName ?? "No active element found"}
+		</code>
+	</p>
 </DemoContainer>
