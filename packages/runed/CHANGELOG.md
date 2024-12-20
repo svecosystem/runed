@@ -1,5 +1,15 @@
 # runed
 
+## 0.22.0
+
+### Minor Changes
+
+- feat: Configurable globals (`window`, `document`, `navigator`, etc.)
+  ([#186](https://github.com/svecosystem/runed/pull/186))
+
+- breaking: Align `useGeolocation` API with the Geolocation Web API
+  ([#189](https://github.com/svecosystem/runed/pull/189))
+
 ## 0.21.0
 
 ### Minor Changes
