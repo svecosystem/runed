@@ -14,8 +14,14 @@ export type UseGeolocationOptions = Partial<PositionOptions> & {
 	immediate?: boolean;
 } & ConfigurableNavigator;
 
-type UseGeolocationPosition = WritableProperties<Omit<GeolocationPosition, "toJSON" | "coords">> & {
+type WritableGeolocationPosition = WritableProperties<
+	Omit<GeolocationPosition, "toJSON" | "coords">
+> & {
 	coords: WritableProperties<Omit<GeolocationPosition["coords"], "toJSON">>;
+};
+
+export type UseGeolocationPosition = Omit<GeolocationPosition, "toJSON" | "coords"> & {
+	coords: Omit<GeolocationPosition["coords"], "toJSON">;
 };
 
 export type UseGeolocationReturn = {
@@ -44,7 +50,7 @@ export function useGeolocation(options: UseGeolocationOptions = {}): UseGeolocat
 	const isSupported = Boolean(navigator);
 
 	let error = $state.raw<GeolocationPositionError | null>(null);
-	let position = $state<UseGeolocationPosition>({
+	let position = $state<WritableGeolocationPosition>({
 		timestamp: 0,
 		coords: {
 			accuracy: 0,
