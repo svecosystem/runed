@@ -1,11 +1,12 @@
 import { extract } from "../extract/extract.svelte.js";
 import { useMutationObserver } from "../useMutationObserver/useMutationObserver.svelte.js";
 import { useResizeObserver } from "../useResizeObserver/useResizeObserver.svelte.js";
-import type { MaybeGetter } from "$lib/internal/types.js";
+import type { MaybeElementGetter, WritableProperties } from "$lib/internal/types.js";
+import type { ConfigurableWindow } from "$lib/internal/configurable-globals.js";
 
-type Rect = Omit<DOMRect, "toJSON">;
+type Rect = WritableProperties<Omit<DOMRect, "toJSON">>;
 
-export type ElementRectOptions = {
+export type ElementRectOptions = ConfigurableWindow & {
 	initialRect?: DOMRect;
 };
 
@@ -32,7 +33,7 @@ export class ElementRect {
 		left: 0,
 	});
 
-	constructor(node: MaybeGetter<HTMLElement | undefined | null>, options: ElementRectOptions = {}) {
+	constructor(node: MaybeElementGetter, options: ElementRectOptions = {}) {
 		this.#rect = {
 			width: options.initialRect?.width ?? 0,
 			height: options.initialRect?.height ?? 0,
@@ -48,21 +49,22 @@ export class ElementRect {
 		const update = () => {
 			if (!el) return;
 			const rect = el.getBoundingClientRect();
-			this.#rect = {
-				width: rect.width,
-				height: rect.height,
-				x: rect.x,
-				y: rect.y,
-				top: rect.top,
-				right: rect.right,
-				bottom: rect.bottom,
-				left: rect.left,
-			};
+			this.#rect.width = rect.width;
+			this.#rect.height = rect.height;
+			this.#rect.x = rect.x;
+			this.#rect.y = rect.y;
+			this.#rect.top = rect.top;
+			this.#rect.right = rect.right;
+			this.#rect.bottom = rect.bottom;
+			this.#rect.left = rect.left;
 		};
 
-		useResizeObserver(() => el, update);
+		useResizeObserver(() => el, update, { window: options.window });
 		$effect(update);
-		useMutationObserver(() => el, update, { attributeFilter: ["style", "class"] });
+		useMutationObserver(() => el, update, {
+			attributeFilter: ["style", "class"],
+			window: options.window,
+		});
 	}
 
 	get x(): number {

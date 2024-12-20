@@ -1,7 +1,8 @@
 import { extract } from "../extract/extract.svelte.js";
 import type { MaybeGetter } from "$lib/internal/types.js";
+import { defaultWindow, type ConfigurableWindow } from "$lib/internal/configurable-globals.js";
 
-export interface UseMutationObserverOptions extends MutationObserverInit {}
+export interface UseMutationObserverOptions extends MutationObserverInit, ConfigurableWindow {}
 
 /**
  * Watch for changes being made to the DOM tree.
@@ -14,6 +15,7 @@ export function useMutationObserver(
 	callback: MutationCallback,
 	options: UseMutationObserverOptions = {}
 ) {
+	const { window = defaultWindow } = options;
 	let observer: MutationObserver | undefined;
 
 	const targets = $derived.by(() => {
@@ -23,8 +25,8 @@ export function useMutationObserver(
 
 	const stop = $effect.root(() => {
 		$effect(() => {
-			if (!targets.size) return;
-			observer = new MutationObserver(callback);
+			if (!targets.size || !window) return;
+			observer = new window.MutationObserver(callback);
 			for (const el of targets) observer.observe(el, options);
 
 			return () => {
