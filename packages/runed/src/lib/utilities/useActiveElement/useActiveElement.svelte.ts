@@ -37,3 +37,5 @@ export function useActiveElement(opts: UseActiveElementOptions = {}) {
 		};
 	});
 }
+
+export type useActiveElementReturn = ReturnType<typeof useActiveElement>;
