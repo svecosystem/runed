@@ -98,3 +98,5 @@ export function useGeolocation(options: UseGeolocationOptions = {}) {
 		pause,
 	};
 }
+
+export type useGeolocationReturn = ReturnType<typeof useGeolocation>;
