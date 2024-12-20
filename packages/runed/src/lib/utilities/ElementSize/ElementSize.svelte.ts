@@ -1,5 +1,5 @@
 import { defaultWindow, type ConfigurableWindow } from "$lib/internal/configurable-globals.js";
-import type { MaybeGetter } from "$lib/internal/types.js";
+import type { MaybeElementGetter } from "$lib/internal/types.js";
 import { get } from "$lib/internal/utils/get.js";
 
 export type ElementSizeOptions = ConfigurableWindow & {
@@ -27,10 +27,7 @@ export class ElementSize {
 		height: 0,
 	});
 
-	constructor(
-		node: MaybeGetter<HTMLElement | undefined | null>,
-		options: ElementSizeOptions = { box: "border-box" }
-	) {
+	constructor(node: MaybeElementGetter, options: ElementSizeOptions = { box: "border-box" }) {
 		const window = options.window ?? defaultWindow;
 
 		this.#size = {
