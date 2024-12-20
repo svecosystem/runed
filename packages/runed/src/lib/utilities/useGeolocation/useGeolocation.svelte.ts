@@ -18,12 +18,21 @@ type UseGeolocationPosition = WritableProperties<Omit<GeolocationPosition, "toJS
 	coords: WritableProperties<Omit<GeolocationPosition["coords"], "toJSON">>;
 };
 
+export type UseGeolocationReturn = {
+	readonly isSupported: boolean;
+	readonly position: UseGeolocationPosition;
+	readonly error: GeolocationPositionError | null;
+	readonly isPaused: boolean;
+	resume: () => void;
+	pause: () => void;
+};
+
 /**
  * Reactive access to the browser's [Geolocation API](https://developer.mozilla.org/en-US/docs/Web/API/Geolocation_API).
  *
  * @see https://runed.dev/docs/utilities/use-geolocation
  */
-export function useGeolocation(options: UseGeolocationOptions = {}) {
+export function useGeolocation(options: UseGeolocationOptions = {}): UseGeolocationReturn {
 	const {
 		enableHighAccuracy = true,
 		maximumAge = 30000,
@@ -89,9 +98,7 @@ export function useGeolocation(options: UseGeolocationOptions = {}) {
 		get isSupported() {
 			return isSupported;
 		},
-		get position() {
-			return position;
-		},
+		position,
 		get error() {
 			return error;
 		},
@@ -102,5 +109,3 @@ export function useGeolocation(options: UseGeolocationOptions = {}) {
 		pause,
 	};
 }
-
-export type useGeolocationReturn = ReturnType<typeof useGeolocation>;
