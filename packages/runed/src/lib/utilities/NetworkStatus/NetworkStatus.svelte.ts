@@ -6,11 +6,40 @@ import { IsSupported, useEventListener } from "$lib/utilities/index.js";
  * @see https://developer.mozilla.org/en-US/docs/Web/API/NetworkInformation
  */
 export type NetworkInformation = {
+	/**
+	 * @desc Effective bandwidth estimate in megabits per second, rounded to the
+	 * nearest multiple of 25 kilobits per seconds.
+	 * @see https://developer.mozilla.org/en-US/docs/Web/API/NetworkInformation/downlink
+	 */
 	readonly downlink: number;
+	/**
+	 * @desc Maximum downlink speed, in megabits per second (Mbps), for the
+	 * underlying connection technology
+	 * @see https://developer.mozilla.org/en-US/docs/Web/API/NetworkInformation/downlinkMax
+	 */
 	readonly downlinkMax: number;
+	/**
+	 * @desc Effective type of the connection meaning one of 'slow-2g', '2g', '3g', or '4g'.
+	 * This value is determined using a combination of recently observed round-trip time
+	 * and downlink values.
+	 * @see https://developer.mozilla.org/en-US/docs/Web/API/NetworkInformation/effectiveType
+	 */
 	readonly effectiveType: "slow-2g" | "2g" | "3g" | "4g";
+	/**
+	 * @desc Estimated effective round-trip time of the current connection, rounded
+	 * to the nearest multiple of 25 milliseconds
+	 * @see https://developer.mozilla.org/en-US/docs/Web/API/NetworkInformation/rtt
+	 */
 	readonly rtt: number;
+	/**
+	 * @desc {true} if the user has set a reduced data usage option on the user agent.
+	 * @see https://developer.mozilla.org/en-US/docs/Web/API/NetworkInformation/saveData
+	 */
 	readonly saveData: boolean;
+	/**
+	 * @desc The type of connection a device is using to communicate with the network.
+	 *  @see https://developer.mozilla.org/en-US/docs/Web/API/NetworkInformation/type
+	 */
 	readonly type:
 		| "bluetooth"
 		| "cellular"
@@ -31,8 +60,8 @@ type NavigatorWithConnection = Navigator & { connection: NetworkInformation };
  */
 export class NetworkStatus {
 	#isSupported = new IsSupported(() => "navigator" in window);
-	#navigator?: Navigator = $derived(this.#isSupported.current ? window.navigator : undefined);
-	#connection?: NetworkInformation = $derived(
+	#navigator: Navigator | undefined;
+	#connection?: NetworkInformation = $derived.by(() =>
 		this.#navigator && "connection" in this.#navigator
 			? (this.#navigator as NavigatorWithConnection).connection
 			: undefined
@@ -42,6 +71,11 @@ export class NetworkStatus {
 
 	constructor() {
 		onMount(() => this.#updateStatus());
+		if (this.#isSupported.current) {
+			this.#navigator = window.navigator;
+		} else {
+			this.#navigator = undefined;
+		}
 
 		if (this.#connection) {
 			useEventListener(this.#connection, "change", this.#updateStatus, { passive: true });

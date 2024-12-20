@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { NetworkStatus, Previous } from "runed";
+	import { DemoContainer } from "@svecodocs/kit";
 	import { toast } from "svelte-sonner";
-	import DemoContainer from "$lib/components/demo-container.svelte";
 
 	const networkStatus = new NetworkStatus();
 	const previousNetworkStatus = new Previous(() => ({
