@@ -6,8 +6,8 @@
 </script>
 
 <DemoContainer class="flex flex-col gap-1">
-	<pre>Coords: {JSON.stringify(location.coords, null, 2)}</pre>
-	<pre>Located at: {location.locatedAt}</pre>
+	<pre>Coords: {JSON.stringify(location.position.coords, null, 2)}</pre>
+	<pre>Located at: {location.position.timestamp}</pre>
 	<pre>Error: {JSON.stringify(location.error, null, 2)}</pre>
 	<pre>Is Supported: {location.isSupported}</pre>
 	<div class="mt-4 flex items-center gap-2">

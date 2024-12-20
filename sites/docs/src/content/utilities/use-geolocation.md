@@ -24,8 +24,8 @@ import Demo from '$lib/components/demos/use-geolocation.svelte';
 	const location = useGeolocation();
 </script>
 
-<pre>Coords: {JSON.stringify(location.coords, null, 2)}</pre>
-<pre>Located at: {location.locatedAt}</pre>
+<pre>Coords: {JSON.stringify(location.position.coords, null, 2)}</pre>
+<pre>Located at: {location.position.timestamp}</pre>
 <pre>Error: {JSON.stringify(location.error, null, 2)}</pre>
 <pre>Is Supported: {location.isSupported}</pre>
 <button onclick={location.pause} disabled={location.isPaused}>Pause</button>
@@ -47,15 +47,10 @@ type UseGeolocationOptions = Partial<PositionOptions> & {
 
 type UseGeolocationReturn = {
 	readonly isSupported: boolean;
-	readonly coords: Omit<GeolocationPosition["coords"], "toJSON">;
-	readonly locatedAt: number | null;
+	readonly position: Omit<GeolocationPosition, "toJSON">;
 	readonly error: GeolocationPositionError | null;
 	readonly isPaused: boolean;
 	pause: () => void;
 	resume: () => void;
 };
-```
-
-```
-
 ```
