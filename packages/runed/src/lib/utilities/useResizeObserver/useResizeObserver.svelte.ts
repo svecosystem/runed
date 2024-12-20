@@ -1,5 +1,5 @@
 import { extract } from "../extract/extract.svelte.js";
-import type { GlobalWindow, MaybeGetter } from "$lib/internal/types.js";
+import type { MaybeGetter } from "$lib/internal/types.js";
 import { defaultWindow, type ConfigurableWindow } from "$lib/internal/configurable-globals.js";
 
 export interface ResizeObserverSize {
@@ -57,8 +57,8 @@ export function useResizeObserver(
 
 	const stop = $effect.root(() => {
 		$effect(() => {
-			if (!targets.size || !window || !("ResizeObserver" in window)) return;
-			observer = new (window as GlobalWindow).ResizeObserver(callback);
+			if (!targets.size || !window) return;
+			observer = new window.ResizeObserver(callback);
 			for (const el of targets) observer.observe(el, options);
 
 			return () => {

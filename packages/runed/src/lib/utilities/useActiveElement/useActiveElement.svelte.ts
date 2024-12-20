@@ -1,29 +1,39 @@
-import { defaultDocument, type ConfigurableDocument } from "$lib/internal/configurable-globals.js";
+import {
+	defaultWindow,
+	type ConfigurableDocumentOrShadowRoot,
+	type ConfigurableWindow,
+} from "$lib/internal/configurable-globals.js";
+import { getActiveElement } from "$lib/internal/utils/dom.js";
+import { addEventListener } from "$lib/internal/utils/event.js";
 import { Readable } from "../Readable/readable.svelte.js";
+
+export type UseActiveElementOptions = ConfigurableDocumentOrShadowRoot & ConfigurableWindow;
 
 /**
  * Returns a reactive value that is equal to `document.activeElement`.
- * Optionally accepts a options object with a `document` property to configure
- * a different document to listen to.
+ * Optionally accepts a options object to configure custom `document` and `window` environments.
+ * When
  */
-export function useActiveElement(opts: ConfigurableDocument = {}) {
-	const { document = defaultDocument } = opts;
+export function useActiveElement(opts: UseActiveElementOptions = {}) {
+	const { window = defaultWindow } = opts;
+	const document = opts.document ?? window?.document;
+
 	return new Readable<Element | null>(null, (set, insideEffect) => {
 		function update() {
 			if (!document) return;
-			set(document.activeElement);
+			set(getActiveElement(document));
 		}
 
 		update();
 
-		if (!insideEffect || !document) return;
+		if (!insideEffect || !window) return;
 
-		document.addEventListener("focusin", update);
-		document.addEventListener("focusout", update);
+		const removeFocusIn = addEventListener(window, "focus", update);
+		const removeFocusOut = addEventListener(window, "blur", update);
 
 		return () => {
-			document.removeEventListener("focusin", update);
-			document.removeEventListener("focusout", update);
+			removeFocusIn();
+			removeFocusOut();
 		};
 	});
 }

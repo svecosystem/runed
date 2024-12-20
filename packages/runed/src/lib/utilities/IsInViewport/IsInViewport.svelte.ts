@@ -1,10 +1,11 @@
-import type { MaybeGetter } from "$lib/internal/types.js";
+import type { ConfigurableWindow } from "$lib/internal/configurable-globals.js";
+import type { MaybeElementGetter } from "$lib/internal/types.js";
 import {
 	useIntersectionObserver,
 	type UseIntersectionObserverOptions,
 } from "../useIntersectionObserver/useIntersectionObserver.svelte.js";
 
-export type IsInViewportOptions = UseIntersectionObserverOptions;
+export type IsInViewportOptions = ConfigurableWindow & UseIntersectionObserverOptions;
 
 /**
  * Tracks if an element is visible within the current viewport.
@@ -14,7 +15,7 @@ export type IsInViewportOptions = UseIntersectionObserverOptions;
 export class IsInViewport {
 	#isInViewport = $state(false);
 
-	constructor(node: MaybeGetter<HTMLElement | null | undefined>, options?: IsInViewportOptions) {
+	constructor(node: MaybeElementGetter, options?: IsInViewportOptions) {
 		useIntersectionObserver(
 			node,
 			(intersectionObserverEntries) => {

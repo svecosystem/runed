@@ -40,10 +40,9 @@ export class AnimationFrames {
 	#fpsLimit = $derived(extract(this.#fpsLimitOption) ?? 0);
 	#previousTimestamp: number | null = null;
 	#frame: number | null = null;
-
 	#fps = $state(0);
 	#running = $state(false);
-	#window: AnimationFramesOptions["window"] = defaultWindow;
+	#window = defaultWindow;
 
 	constructor(callback: (params: RafCallbackParams) => void, options: AnimationFramesOptions = {}) {
 		if (options.window) this.#window = options.window;

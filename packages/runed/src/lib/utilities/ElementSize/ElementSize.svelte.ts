@@ -1,5 +1,5 @@
 import { defaultWindow, type ConfigurableWindow } from "$lib/internal/configurable-globals.js";
-import type { GlobalWindow, MaybeGetter } from "$lib/internal/types.js";
+import type { MaybeGetter } from "$lib/internal/types.js";
 import { get } from "$lib/internal/utils/get.js";
 
 export type ElementSizeOptions = ConfigurableWindow & {
@@ -39,11 +39,11 @@ export class ElementSize {
 		};
 
 		$effect(() => {
-			if (!window || !("ResizeObserver" in window)) return;
+			if (!window) return;
 			const node$ = get(node);
 			if (!node$) return;
 
-			const observer = new (window as GlobalWindow).ResizeObserver((entries) => {
+			const observer = new window.ResizeObserver((entries) => {
 				for (const entry of entries) {
 					const boxSize =
 						options.box === "content-box" ? entry.contentBoxSize : entry.borderBoxSize;

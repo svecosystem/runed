@@ -1,6 +1,10 @@
-import { IsSupported } from "../IsSupported/IsSupported.svelte.js";
+import {
+	defaultNavigator,
+	type ConfigurableNavigator,
+} from "$lib/internal/configurable-globals.js";
+import type { WritableProperties } from "$lib/internal/types.js";
 
-type UseGeolocationOptions = Partial<PositionOptions> & {
+export type UseGeolocationOptions = Partial<PositionOptions> & {
 	/**
 	 * Whether to start the watcher immediately upon creation. If set to `false`, the watcher
 	 * will only start tracking the position when `resume()` is called.
@@ -8,11 +12,7 @@ type UseGeolocationOptions = Partial<PositionOptions> & {
 	 * @defaultValue true
 	 */
 	immediate?: boolean;
-};
-
-type WritableProperties<T> = {
-	-readonly [P in keyof T]: T[P];
-};
+} & ConfigurableNavigator;
 
 /**
  * Reactive access to the browser's [Geolocation API](https://developer.mozilla.org/en-US/docs/Web/API/Geolocation_API).
@@ -25,9 +25,10 @@ export function useGeolocation(options: UseGeolocationOptions = {}) {
 		maximumAge = 30000,
 		timeout = 27000,
 		immediate = true,
+		navigator = defaultNavigator,
 	} = options;
 
-	const isSupported = new IsSupported(() => navigator && "geolocation" in navigator);
+	const isSupported = Boolean(navigator);
 
 	let locatedAt = $state<number | null>(null);
 	let error = $state.raw<GeolocationPositionError | null>(null);
@@ -56,8 +57,8 @@ export function useGeolocation(options: UseGeolocationOptions = {}) {
 	let watcher: number;
 
 	function resume() {
-		if (!isSupported.current) return;
-		watcher = navigator!.geolocation.watchPosition(updatePosition, (err) => (error = err), {
+		if (!navigator) return;
+		watcher = navigator.geolocation.watchPosition(updatePosition, (err) => (error = err), {
 			enableHighAccuracy,
 			maximumAge,
 			timeout,
@@ -66,7 +67,9 @@ export function useGeolocation(options: UseGeolocationOptions = {}) {
 	}
 
 	function pause() {
-		if (watcher && navigator) navigator.geolocation.clearWatch(watcher);
+		if (watcher && navigator) {
+			navigator.geolocation.clearWatch(watcher);
+		}
 		isPaused = true;
 	}
 
@@ -77,7 +80,7 @@ export function useGeolocation(options: UseGeolocationOptions = {}) {
 
 	return {
 		get isSupported() {
-			return isSupported.current;
+			return isSupported;
 		},
 		get coords() {
 			return coords;

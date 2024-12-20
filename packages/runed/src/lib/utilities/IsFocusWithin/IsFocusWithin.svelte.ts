@@ -1,5 +1,5 @@
 import { extract } from "../extract/extract.svelte.js";
-import type { MaybeGetter } from "$lib/internal/types.js";
+import type { MaybeElementGetter } from "$lib/internal/types.js";
 import { defaultDocument, type ConfigurableDocument } from "$lib/internal/configurable-globals.js";
 import { useActiveElement } from "../useActiveElement/useActiveElement.svelte.js";
 
@@ -10,15 +10,12 @@ type IsFocusWithinOptions = ConfigurableDocument;
  * @see {@link https://runed.dev/docs/utilities/is-focus-within}
  */
 export class IsFocusWithin {
-	#node: MaybeGetter<HTMLElement | undefined | null>;
+	#node: MaybeElementGetter;
 	#target = $derived.by(() => extract(this.#node));
 	#document: IsFocusWithinOptions["document"] = defaultDocument;
 	#activeElement: ReturnType<typeof useActiveElement>;
 
-	constructor(
-		node: MaybeGetter<HTMLElement | undefined | null>,
-		options: IsFocusWithinOptions = {}
-	) {
+	constructor(node: MaybeElementGetter, options: IsFocusWithinOptions = {}) {
 		this.#node = node;
 		if (options.document) this.#document = options.document;
 		this.#activeElement = useActiveElement({ document: this.#document });

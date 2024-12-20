@@ -1,5 +1,5 @@
 import { extract } from "../extract/extract.svelte.js";
-import type { GlobalWindow, MaybeGetter } from "$lib/internal/types.js";
+import type { MaybeGetter } from "$lib/internal/types.js";
 import { defaultWindow, type ConfigurableWindow } from "$lib/internal/configurable-globals.js";
 
 export interface UseMutationObserverOptions extends MutationObserverInit, ConfigurableWindow {}
@@ -25,8 +25,8 @@ export function useMutationObserver(
 
 	const stop = $effect.root(() => {
 		$effect(() => {
-			if (!targets.size || !window || !("MutationObserver" in window)) return;
-			observer = new (window as GlobalWindow).MutationObserver(callback);
+			if (!targets.size || !window) return;
+			observer = new window.MutationObserver(callback);
 			for (const el of targets) observer.observe(el, options);
 
 			return () => {
