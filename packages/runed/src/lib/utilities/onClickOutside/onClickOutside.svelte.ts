@@ -45,6 +45,7 @@ export function onClickOutside<T extends Element = HTMLElement>(
 	opts: OnClickOutsideOptions = {}
 ): void {
 	const { document = defaultDocument } = opts;
+	const node = $derived(extract(container));
 
 	/**
 	 * WIP - need to handle cases where a pointerdown starts in the container
@@ -58,9 +59,7 @@ export function onClickOutside<T extends Element = HTMLElement>(
 	 */
 
 	function handleClick(e: MouseEvent) {
-		if (!e.target) return;
-		const node = extract(container);
-		if (!node) return;
+		if (!e.target || !node) return;
 
 		const rect = node.getBoundingClientRect();
 		const wasInsideClick =
