@@ -66,12 +66,12 @@ export function onClickOutside<T extends Element = HTMLElement>(
 	let removePointerListeners = noop;
 
 	const handleClickOutside = useDebounce((e: PointerEvent) => {
-		if (!node || !nodeOwnerDocument) {
+		if (!node || !nodeOwnerDocument || !document) {
 			removeClickListener();
 			return;
 		}
 
-		if (pointerDownIntercepted === true || !isValidEvent(e, node)) {
+		if (pointerDownIntercepted === true || !isValidEvent(e, node, document)) {
 			removeClickListener();
 			return;
 		}
@@ -108,8 +108,8 @@ export function onClickOutside<T extends Element = HTMLElement>(
 				nodeOwnerDocument,
 				"pointerdown",
 				(e) => {
-					if (!node) return;
-					if (isValidEvent(e, node)) {
+					if (!node || !document) return;
+					if (isValidEvent(e, node, document)) {
 						pointerDownIntercepted = true;
 					}
 				},
@@ -176,11 +176,11 @@ export function onClickOutside<T extends Element = HTMLElement>(
 	};
 }
 
-function isValidEvent(e: PointerEvent, container: Element): boolean {
+function isValidEvent(e: PointerEvent, container: Element, defaultDocument: Document): boolean {
 	if ("button" in e && e.button > 0) return false;
 	const target = e.target;
 	if (!isElement(target)) return false;
-	const ownerDocument = getOwnerDocument(target);
+	const ownerDocument = getOwnerDocument(target, defaultDocument);
 	if (!ownerDocument) return false;
 	// handle the case where a user may have pressed a pseudo element by
 	// checking the bounding rect of the container
