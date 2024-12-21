@@ -81,5 +81,3 @@ const clickOutside = onClickOutside(
 // later when you want to start the listener
 clickOutside.start();
 ```
-
-deploy
