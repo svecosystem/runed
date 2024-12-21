@@ -187,7 +187,7 @@ function isValidEvent(e: PointerEvent, container: Element): boolean {
 			e.clientY <= rect.top + rect.height &&
 			rect.left <= e.clientX &&
 			e.clientX <= rect.left + rect.width;
-		if (wasInsideClick) return false;
+		return !wasInsideClick;
 	}
 	return ownerDocument.documentElement.contains(target) && !isOrContainsTarget(container, target);
 }

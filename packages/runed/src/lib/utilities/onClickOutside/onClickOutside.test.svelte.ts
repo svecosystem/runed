@@ -193,4 +193,48 @@ describe("onClickOutside", () => {
 		await advanceTimers();
 		expect(callbackFn).toHaveBeenCalledOnce();
 	});
+
+	testWithEffect("handles pseudo-element clicks outside element bounds", async () => {
+		const dialog = document.createElement("dialog");
+		document.body.appendChild(dialog);
+
+		onClickOutside(() => dialog, callbackFn);
+		await tick();
+
+		dialog.getBoundingClientRect = vi.fn(() => ({
+			height: 200,
+			width: 200,
+			top: 100,
+			left: 100,
+			bottom: 300,
+			right: 300,
+			x: 100,
+			y: 100,
+			toJSON: vi.fn(),
+		}));
+
+		// click inside dialog's actual bounds
+		const insideDialogClick = createPointerEvent("pointerdown", {
+			clientX: 150,
+			clientY: 150,
+		});
+		Object.defineProperty(insideDialogClick, "target", { value: dialog });
+		document.dispatchEvent(insideDialogClick);
+		await advanceTimers();
+
+		expect(callbackFn).not.toHaveBeenCalled();
+
+		// click outside dialog's bounds but with dialog as target (simulating pseudo-element)
+		const pseudoElementClick = createPointerEvent("pointerdown", {
+			clientX: 400,
+			clientY: 400,
+		});
+		Object.defineProperty(pseudoElementClick, "target", { value: dialog });
+		document.dispatchEvent(pseudoElementClick);
+		await advanceTimers();
+
+		expect(callbackFn).toHaveBeenCalledOnce();
+
+		dialog.remove();
+	});
 });
