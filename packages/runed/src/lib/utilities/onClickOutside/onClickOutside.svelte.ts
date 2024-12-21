@@ -28,6 +28,7 @@ export type OnClickOutsideOptions = ConfigurableDocument & {
  * @param {() => void} callback - The callback function to call when a click event occurs outside of the container.
  * @param {OnClickOutsideOptions} [opts={}] - Optional configuration object.
  * @param {ConfigurableDocument} [opts.document=defaultDocument] - The document object to use, defaults to the global document.
+ * @param {boolean} [opts.immediate=true] - Whether the click outside handler is enabled by default or not.
  *
  * @example
  * ```svelte
@@ -35,7 +36,7 @@ export type OnClickOutsideOptions = ConfigurableDocument & {
  *   import { onClickOutside } from 'runed'
  *   let container = $state<HTMLElement>()!
  *
- *   onClickOutside(() => container, () => {
+ *   const clickOutside = onClickOutside(() => container, () => {
  *     console.log('clicked outside the container!')
  *   });
  * </script>
@@ -44,6 +45,9 @@ export type OnClickOutsideOptions = ConfigurableDocument & {
  *  <span>Inside</span>
  * </div>
  * <button>Outside, click me to trigger callback</button>
+ * <button onclick={clickOutside.start}>Start</button>
+ * <button onclick={clickOutside.stop}>Stop</button>
+ * <span>Enabled: {clickOutside.enabled}</span>
  *```
  * @see {@link https://runed.dev/docs/utilities/on-click-outside}
  */
