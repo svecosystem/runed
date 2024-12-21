@@ -2,35 +2,41 @@ import { extract } from "../extract/index.js";
 import { useDebounce } from "../useDebounce/index.js";
 import type { MaybeGetter } from "$lib/internal/types.js";
 import { useEventListener } from "$lib/utilities/useEventListener/useEventListener.svelte.js";
+import {
+	defaultWindow,
+	type ConfigurableDocument,
+	type ConfigurableWindow,
+} from "$lib/internal/configurable-globals.js";
 
 type WindowEvent = keyof WindowEventMap;
 
-export type IsIdleOptions = {
-	/**
-	 * The events that should set the idle state to `true`
-	 *
-	 * @default ['mousemove', 'mousedown', 'resize', 'keydown', 'touchstart', 'wheel']
-	 */
-	events?: MaybeGetter<(keyof WindowEventMap)[]>;
-	/**
-	 * The timeout in milliseconds before the idle state is set to `true`. Defaults to 60 seconds.
-	 *
-	 * @default 60000
-	 */
-	timeout?: MaybeGetter<number>;
-	/**
-	 * Detect document visibility changes
-	 *
-	 * @default true
-	 */
-	detectVisibilityChanges?: MaybeGetter<boolean>;
-	/**
-	 * The initial state of the idle property
-	 *
-	 * @default false
-	 */
-	initialState?: boolean;
-};
+export type IsIdleOptions = ConfigurableDocument &
+	ConfigurableWindow & {
+		/**
+		 * The events that should set the idle state to `true`
+		 *
+		 * @default ['mousemove', 'mousedown', 'resize', 'keydown', 'touchstart', 'wheel']
+		 */
+		events?: MaybeGetter<(keyof WindowEventMap)[]>;
+		/**
+		 * The timeout in milliseconds before the idle state is set to `true`. Defaults to 60 seconds.
+		 *
+		 * @default 60000
+		 */
+		timeout?: MaybeGetter<number>;
+		/**
+		 * Detect document visibility changes
+		 *
+		 * @default true
+		 */
+		detectVisibilityChanges?: MaybeGetter<boolean>;
+		/**
+		 * The initial state of the idle property
+		 *
+		 * @default false
+		 */
+		initialState?: boolean;
+	};
 
 const DEFAULT_EVENTS = [
 	"keypress",
@@ -51,23 +57,25 @@ const DEFAULT_OPTIONS = {
  * @see {@link https://runed.dev/docs/utilities/is-idle}
  */
 export class IsIdle {
-	current = $state(false);
+	#current: boolean = $state(false);
 	#lastActive = $state(Date.now());
 
 	constructor(_options?: IsIdleOptions) {
-		const options = {
+		const opts = {
 			...DEFAULT_OPTIONS,
 			..._options,
 		};
+		const window = opts.window ?? defaultWindow;
+		const document = opts.document ?? window?.document;
 
-		const timeout = $derived(extract(options.timeout));
-		const events = $derived(extract(options.events));
-		const detectVisibilityChanges = $derived(extract(options.detectVisibilityChanges));
-		this.current = options.initialState;
+		const timeout = $derived(extract(opts.timeout));
+		const events = $derived(extract(opts.events));
+		const detectVisibilityChanges = $derived(extract(opts.detectVisibilityChanges));
+		this.#current = opts.initialState;
 
 		const debouncedReset = useDebounce(
 			() => {
-				this.current = true;
+				this.#current = true;
 			},
 			() => timeout
 		);
@@ -75,7 +83,7 @@ export class IsIdle {
 		debouncedReset();
 
 		const handleActivity = () => {
-			this.current = false;
+			this.#current = false;
 			this.#lastActive = Date.now();
 			debouncedReset();
 		};
@@ -90,7 +98,7 @@ export class IsIdle {
 		);
 
 		$effect(() => {
-			if (!detectVisibilityChanges) return;
+			if (!detectVisibilityChanges || !document) return;
 			useEventListener(document, ["visibilitychange"], () => {
 				if (document.hidden) return;
 				handleActivity();
@@ -100,5 +108,9 @@ export class IsIdle {
 
 	get lastActive(): number {
 		return this.#lastActive;
+	}
+
+	get current(): boolean {
+		return this.#current;
 	}
 }

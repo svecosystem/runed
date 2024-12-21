@@ -12,7 +12,8 @@
 		"module": "NodeNext",
 		"moduleResolution": "NodeNext",
 		"noUncheckedIndexedAccess": true,
-		"types": ["vitest/globals"]
+		"types": ["vitest/globals"],
+		"experimentalDecorators": true
 	},
 	"include": [
 		"./.svelte-kit/ambient.d.ts",

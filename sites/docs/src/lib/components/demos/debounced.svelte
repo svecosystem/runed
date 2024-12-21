@@ -1,7 +1,6 @@
 <script lang="ts">
 	import { Debounced } from "runed";
-	import DemoContainer from "$lib/components/demo-container.svelte";
-	import Input from "$lib/components/ui/input/input.svelte";
+	import { DemoContainer, Input } from "@svecodocs/kit";
 
 	let search = $state("");
 	const debounced = new Debounced(() => search, 500);

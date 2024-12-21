@@ -1,3 +1,5 @@
+import { browser } from "$lib/internal/utils/browser.js";
+
 /**
  * A class that takes a predicate to determine if a browser API is supported.
  *
@@ -6,12 +8,10 @@
  * @see {@link https://runed.dev/docs/utilities/supported}
  */
 export class IsSupported {
-	#current: boolean = $state(false);
+	#current: boolean = false;
 
-	constructor(predicate: () => boolean) {
-		$effect(() => {
-			this.#current = predicate();
-		});
+	constructor(predicate: () => unknown) {
+		if (browser) this.#current = Boolean(predicate());
 	}
 
 	get current(): boolean {

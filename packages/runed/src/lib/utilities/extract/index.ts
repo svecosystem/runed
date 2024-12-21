@@ -1,1 +1,1 @@
-export { extract } from "./extract.js";
+export { extract } from "./extract.svelte.js";

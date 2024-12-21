@@ -1,5 +1,6 @@
-import { extract } from "../extract/extract.js";
+import { extract } from "../extract/extract.svelte.js";
 import type { MaybeGetter } from "$lib/internal/types.js";
+import { defaultWindow, type ConfigurableWindow } from "$lib/internal/configurable-globals.js";
 
 export interface ResizeObserverSize {
 	readonly inlineSize: number;
@@ -19,7 +20,7 @@ export type ResizeObserverCallback = (
 	observer: ResizeObserver
 ) => void;
 
-export interface UseResizeObserverOptions {
+export interface UseResizeObserverOptions extends ConfigurableWindow {
 	/**
 	 * Sets which box model the observer will observe changes to. Possible values
 	 * are `content-box` (the default), `border-box` and `device-pixel-content-box`.
@@ -46,6 +47,7 @@ export function useResizeObserver(
 	callback: ResizeObserverCallback,
 	options: UseResizeObserverOptions = {}
 ) {
+	const { window = defaultWindow } = options;
 	let observer: ResizeObserver | undefined;
 
 	const targets = $derived.by(() => {
@@ -55,8 +57,8 @@ export function useResizeObserver(
 
 	const stop = $effect.root(() => {
 		$effect(() => {
-			if (!targets.size) return;
-			observer = new ResizeObserver(callback);
+			if (!targets.size || !window) return;
+			observer = new window.ResizeObserver(callback);
 			for (const el of targets) observer.observe(el, options);
 
 			return () => {

@@ -1,6 +1,7 @@
 import { untrack } from "svelte";
 import { extract } from "../extract/index.js";
 import type { MaybeGetter } from "$lib/internal/types.js";
+import { defaultWindow, type ConfigurableWindow } from "$lib/internal/configurable-globals.js";
 
 type RafCallbackParams = {
 	/** The number of milliseconds since the last frame. */
@@ -12,7 +13,7 @@ type RafCallbackParams = {
 	timestamp: DOMHighResTimeStamp;
 };
 
-export type AnimationFramesOptions = {
+export type AnimationFramesOptions = ConfigurableWindow & {
 	/**
 	 * Start calling requestAnimationFrame immediately.
 	 *
@@ -39,13 +40,18 @@ export class AnimationFrames {
 	#fpsLimit = $derived(extract(this.#fpsLimitOption) ?? 0);
 	#previousTimestamp: number | null = null;
 	#frame: number | null = null;
-
 	#fps = $state(0);
 	#running = $state(false);
+	#window = defaultWindow;
 
 	constructor(callback: (params: RafCallbackParams) => void, options: AnimationFramesOptions = {}) {
+		if (options.window) this.#window = options.window;
 		this.#fpsLimitOption = options.fpsLimit;
 		this.#callback = callback;
+
+		this.start = this.start.bind(this);
+		this.stop = this.stop.bind(this);
+		this.toggle = this.toggle.bind(this);
 
 		$effect(() => {
 			if (options.immediate ?? true) {
@@ -56,8 +62,8 @@ export class AnimationFrames {
 		});
 	}
 
-	#loop = (timestamp: DOMHighResTimeStamp) => {
-		if (!this.#running) return;
+	#loop(timestamp: DOMHighResTimeStamp): void {
+		if (!this.#running || !this.#window) return;
 
 		if (this.#previousTimestamp === null) {
 			this.#previousTimestamp = timestamp;
@@ -66,38 +72,39 @@ export class AnimationFrames {
 		const delta = timestamp - this.#previousTimestamp;
 		const fps = 1000 / delta;
 		if (this.#fpsLimit && fps > this.#fpsLimit) {
-			this.#frame = requestAnimationFrame(this.#loop);
+			this.#frame = this.#window.requestAnimationFrame(this.#loop.bind(this));
 			return;
 		}
 
 		this.#fps = fps;
 		this.#previousTimestamp = timestamp;
 		this.#callback({ delta, timestamp });
-		this.#frame = requestAnimationFrame(this.#loop);
-	};
+		this.#frame = this.#window.requestAnimationFrame(this.#loop.bind(this));
+	}
 
-	start = () => {
+	start(): void {
+		if (!this.#window) return;
 		this.#running = true;
 		this.#previousTimestamp = 0;
-		this.#frame = requestAnimationFrame(this.#loop);
-	};
+		this.#frame = this.#window.requestAnimationFrame(this.#loop.bind(this));
+	}
 
-	stop = () => {
-		if (!this.#frame) return;
+	stop(): void {
+		if (!this.#frame || !this.#window) return;
 		this.#running = false;
-		cancelAnimationFrame(this.#frame);
+		this.#window.cancelAnimationFrame(this.#frame);
 		this.#frame = null;
-	};
+	}
 
-	toggle = () => {
+	toggle(): void {
 		this.#running ? this.stop() : this.start();
-	};
+	}
 
-	get fps() {
+	get fps(): number {
 		return !this.#running ? 0 : this.#fps;
 	}
 
-	get running() {
+	get running(): boolean {
 		return this.#running;
 	}
 }

@@ -1,17 +1,16 @@
 <script lang="ts">
 	import { ElementSize } from "runed";
-	import DemoContainer from "$lib/components/demo-container.svelte";
-	import { Textarea } from "$lib/components/ui/textarea";
+	import { DemoContainer, Textarea } from "@svecodocs/kit";
 
-	let el = $state() as HTMLTextAreaElement;
-	const size = new ElementSize(() => el);
+	let ref = $state<HTMLTextAreaElement>(null!);
+	const size = new ElementSize(() => ref);
 	const text = $derived(`Width: ${size.width}\nHeight: ${size.height}`);
 </script>
 
 <DemoContainer>
 	<Textarea
-		bind:el
-		class="h-[200px] min-h-[100px] w-[300px] min-w-[200px] resize text-base"
+		bind:ref
+		class="h-[200px] min-h-[100px] w-[300px] resize text-base"
 		value={text}
 		readonly
 	/>

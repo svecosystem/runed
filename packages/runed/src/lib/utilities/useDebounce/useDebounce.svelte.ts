@@ -5,7 +5,16 @@ type UseDebounceReturn<Args extends unknown[], Return> = ((
 	...args: Args
 ) => Promise<Return>) & {
 	cancel: () => void;
+	runScheduledNow: () => Promise<void>;
 	pending: boolean;
+};
+
+type DebounceContext<Return> = {
+	timeout: ReturnType<typeof setTimeout> | null;
+	runner: (() => Promise<void>) | null;
+	resolve: (value: Return) => void;
+	reject: (reason: unknown) => void;
+	promise: Promise<Return>;
 };
 
 /**
@@ -20,69 +29,90 @@ type UseDebounceReturn<Args extends unknown[], Return> = ((
  * The second parameter is the time to wait before calling the original callback.
  * Alternatively, it can also be a getter function that returns the time to wait.
  *
- *
  * @see {@link https://runed.dev/docs/utilities/use-debounce}
+ *
+ * @param callback The callback to call when the time has passed.
+ * @param wait The length of time to wait in ms, defaults to 250.
  */
 export function useDebounce<Args extends unknown[], Return>(
 	callback: (...args: Args) => Return,
 	wait: MaybeGetter<number> = 250
 ): UseDebounceReturn<Args, Return> {
-	let timeout = $state<ReturnType<typeof setTimeout>>();
-	let resolve: null | ((value: Return) => void) = null;
-	let reject: null | ((reason: unknown) => void) = null;
-	let promise: Promise<Return> | null = null;
-
-	function reset() {
-		timeout = undefined;
-		promise = null;
-		resolve = null;
-		reject = null;
-	}
+	let context = $state<DebounceContext<Return> | null>(null);
 
 	function debounced(this: unknown, ...args: Args) {
-		if (timeout) {
-			clearTimeout(timeout);
-		}
-
-		if (!promise) {
-			promise = new Promise((res, rej) => {
+		if (context) {
+			// Old context will be reused so callers awaiting the promise will get the
+			// new value
+			if (context.timeout) {
+				clearTimeout(context.timeout);
+			}
+		} else {
+			// No old context, create a new one
+			let resolve: (value: Return) => void;
+			let reject: (reason: unknown) => void;
+			const promise = new Promise<Return>((res, rej) => {
 				resolve = res;
 				reject = rej;
 			});
+
+			context = {
+				timeout: null,
+				runner: null,
+				promise,
+				resolve: resolve!,
+				reject: reject!,
+			};
 		}
 
-		timeout = setTimeout(
-			async () => {
-				try {
-					resolve?.(await callback.apply(this, args));
-				} catch (error) {
-					reject?.(error);
-				} finally {
-					reset();
-				}
-			},
-			typeof wait === "function" ? wait() : wait
-		);
+		context.runner = async () => {
+			// Grab the context and reset it
+			// -> new debounced calls will create a new context
+			if (!context) return;
+			const ctx = context;
+			context = null;
 
-		return promise;
+			try {
+				ctx.resolve(await callback.apply(this, args));
+			} catch (error) {
+				ctx.reject(error);
+			}
+		};
+
+		context.timeout = setTimeout(context.runner, typeof wait === "function" ? wait() : wait);
+
+		return context.promise;
 	}
 
 	debounced.cancel = async () => {
-		if (timeout === undefined) {
+		if (!context || context.timeout === null) {
 			// Wait one event loop to see if something triggered the debounced function
 			await new Promise((resolve) => setTimeout(resolve, 0));
-			if (timeout === undefined) return;
+			if (!context || context.timeout === null) return;
 		}
 
-		clearTimeout(timeout);
-		reject?.("Cancelled");
-		reset();
+		clearTimeout(context.timeout);
+		context.reject("Cancelled");
+		context = null;
+	};
+
+	debounced.runScheduledNow = async () => {
+		if (!context || !context.timeout) {
+			// Wait one event loop to see if something triggered the debounced function
+			await new Promise((resolve) => setTimeout(resolve, 0));
+			if (!context || !context.timeout) return;
+		}
+
+		clearTimeout(context.timeout);
+		context.timeout = null;
+
+		await context.runner?.();
 	};
 
 	Object.defineProperty(debounced, "pending", {
 		enumerable: true,
 		get() {
-			return !!timeout;
+			return !!context?.timeout;
 		},
 	});
 
