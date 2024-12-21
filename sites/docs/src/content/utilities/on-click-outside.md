@@ -40,7 +40,8 @@ components.
 
 ### Controlled Listener
 
-The function returns control methods to programmatically manage the listener, `start` and `stop`:
+The function returns control methods to programmatically manage the listener, `start` and `stop` and
+a reactive read-only property `enabled` to check the current status of the listeners.
 
 ```svelte
 <script lang="ts">
@@ -55,6 +56,7 @@ The function returns control methods to programmatically manage the listener, `s
 </script>
 
 <div>
+	<p>Status: {clickOutside.enabled ? "Enabled" : "Disabled"}</p>
 	<button on:click={clickOutside.stop}>Disable</button>
 	<button on:click={clickOutside.start}>Enable</button>
 </div>
@@ -62,4 +64,20 @@ The function returns control methods to programmatically manage the listener, `s
 <div bind:this={container}>
 	<!-- Content -->
 </div>
+```
+
+### Immediate
+
+By default, `onClickOutside` will start listening for clicks outside the element immediately. You
+can opt to disabled this behavior by passing `{ immediate: false }` to the options argument.
+
+```ts {4}
+const clickOutside = onClickOutside(
+	() => container,
+	() => console.log("clicked outside"),
+	{ immediate: false }
+);
+
+// later when you want to start the listener
+clickOutside.start();
 ```

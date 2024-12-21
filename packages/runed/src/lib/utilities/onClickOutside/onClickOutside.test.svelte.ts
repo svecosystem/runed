@@ -9,7 +9,27 @@ describe("onClickOutside", () => {
 	let outsideButton: HTMLButtonElement;
 	let callbackFn: ReturnType<typeof vi.fn>;
 
+	class MockPointerEvent extends Event {
+		clientX: number;
+		clientY: number;
+		pointerType: string;
+		button: number;
+
+		// eslint-disable-next-line @typescript-eslint/no-explicit-any
+		constructor(type: string, options: any = {}) {
+			super(type, { bubbles: true, ...options });
+			this.clientX = options.clientX ?? 0;
+			this.clientY = options.clientY ?? 0;
+			this.pointerType = options.pointerType ?? "mouse";
+			this.button = options.button ?? 0;
+		}
+	}
+
+	const PointerEvent = globalThis.PointerEvent ?? MockPointerEvent;
+
 	beforeEach(() => {
+		vi.useFakeTimers();
+
 		container = document.createElement("div");
 		innerButton = document.createElement("button");
 		outsideButton = document.createElement("button");
@@ -18,7 +38,6 @@ describe("onClickOutside", () => {
 		document.body.appendChild(outsideButton);
 		container.appendChild(innerButton);
 
-		// we need to mock getBoundingClientRect
 		container.getBoundingClientRect = vi.fn(() => ({
 			height: 100,
 			width: 100,
@@ -38,74 +57,140 @@ describe("onClickOutside", () => {
 		document.body.removeChild(container);
 		document.body.removeChild(outsideButton);
 		vi.clearAllMocks();
+		vi.useRealTimers();
 	});
 
-	const createMouseEvent = (x: number, y: number) =>
-		new MouseEvent("click", {
+	const createPointerEvent = (type: string, options: Partial<PointerEventInit> = {}) => {
+		return new PointerEvent(type, {
 			bubbles: true,
-			clientX: x,
-			clientY: y,
+			cancelable: true,
+			clientX: 10,
+			clientY: 10,
+			pointerType: "mouse",
+			button: 0,
+			...options,
 		});
+	};
 
-	testWithEffect("calls callback on click outside container", async () => {
+	const advanceTimers = async () => {
+		await vi.advanceTimersByTimeAsync(10); // Match the debounce time
+		await tick();
+	};
+
+	testWithEffect("starts enabled by default", async () => {
 		onClickOutside(() => container, callbackFn);
 		await tick();
 
-		outsideButton.dispatchEvent(createMouseEvent(10, 10));
+		outsideButton.dispatchEvent(createPointerEvent("pointerdown"));
+		await advanceTimers();
+
 		expect(callbackFn).toHaveBeenCalledOnce();
 	});
 
-	testWithEffect("doesn't call callback on click inside container", async () => {
-		onClickOutside(() => container, callbackFn);
+	testWithEffect("respects `immediate` option", async () => {
+		const controls = onClickOutside(() => container, callbackFn, { immediate: false });
 		await tick();
 
-		innerButton.dispatchEvent(createMouseEvent(75, 75));
+		outsideButton.dispatchEvent(createPointerEvent("pointerdown"));
+		await advanceTimers();
 		expect(callbackFn).not.toHaveBeenCalled();
 
-		container.dispatchEvent(createMouseEvent(60, 60));
-		expect(callbackFn).not.toHaveBeenCalled();
+		controls.start();
+		await tick();
+
+		outsideButton.dispatchEvent(createPointerEvent("pointerdown"));
+		await advanceTimers();
+		expect(callbackFn).toHaveBeenCalledOnce();
 	});
 
-	testWithEffect("handles edge cases of container boundaries", async () => {
+	testWithEffect("handles touch events with click confirmation", async () => {
 		onClickOutside(() => container, callbackFn);
 		await tick();
 
-		// Click exactly on boundaries
-		outsideButton.dispatchEvent(createMouseEvent(50, 50)); // Top-left corner
+		outsideButton.dispatchEvent(createPointerEvent("pointerdown", { pointerType: "touch" }));
+		await advanceTimers();
+
+		// Without the click event, callback shouldn't be called yet
 		expect(callbackFn).not.toHaveBeenCalled();
 
-		outsideButton.dispatchEvent(createMouseEvent(150, 150)); // Bottom-right corner
-		expect(callbackFn).not.toHaveBeenCalled();
+		outsideButton.dispatchEvent(new Event("click", { bubbles: true }));
+		await advanceTimers();
 
-		// Click just outside boundaries
-		outsideButton.dispatchEvent(createMouseEvent(49, 50));
+		expect(callbackFn).toHaveBeenCalledOnce();
+	});
+
+	testWithEffect("debounces rapid pointer events", async () => {
+		onClickOutside(() => container, callbackFn);
+		await tick();
+
+		outsideButton.dispatchEvent(createPointerEvent("pointerdown"));
+		outsideButton.dispatchEvent(createPointerEvent("pointerdown"));
+		outsideButton.dispatchEvent(createPointerEvent("pointerdown"));
+
+		await advanceTimers();
+
+		// due to debouncing, should only be called once
+		expect(callbackFn).toHaveBeenCalledOnce();
+	});
+
+	testWithEffect("can be stopped and started", async () => {
+		const controls = onClickOutside(() => container, callbackFn);
+		await tick();
+
+		// Initial state (enabled)
+		outsideButton.dispatchEvent(createPointerEvent("pointerdown"));
+		await advanceTimers();
 		expect(callbackFn).toHaveBeenCalledTimes(1);
 
-		outsideButton.dispatchEvent(createMouseEvent(151, 150));
+		// Stop listening
+		controls.stop();
+		await tick();
+
+		outsideButton.dispatchEvent(createPointerEvent("pointerdown"));
+		await advanceTimers();
+		expect(callbackFn).toHaveBeenCalledTimes(1);
+
+		// Start listening again
+		controls.start();
+		await tick();
+
+		outsideButton.dispatchEvent(createPointerEvent("pointerdown"));
+		await advanceTimers();
 		expect(callbackFn).toHaveBeenCalledTimes(2);
 	});
 
-	testWithEffect("handles null container gracefully", async () => {
-		onClickOutside(() => null, callbackFn);
-		await tick();
-
-		outsideButton.dispatchEvent(createMouseEvent(0, 0));
-		expect(callbackFn).not.toHaveBeenCalled();
-	});
-
-	testWithEffect("handles clicks when target is null", async () => {
+	testWithEffect("respects button type in pointer events", async () => {
 		onClickOutside(() => container, callbackFn);
 		await tick();
 
-		// Simulate a click event with null target
-		const nullTargetEvent = new MouseEvent("click", {
-			bubbles: true,
-			clientX: 0,
-			clientY: 0,
-		});
-		Object.defineProperty(nullTargetEvent, "target", { value: null });
-
-		document.dispatchEvent(nullTargetEvent);
+		// Right click should be ignored
+		outsideButton.dispatchEvent(createPointerEvent("pointerdown", { button: 2 }));
+		await advanceTimers();
 		expect(callbackFn).not.toHaveBeenCalled();
+
+		// Left click should trigger callback
+		outsideButton.dispatchEvent(createPointerEvent("pointerdown", { button: 0 }));
+		await advanceTimers();
+		expect(callbackFn).toHaveBeenCalledOnce();
+	});
+
+	testWithEffect("handles pointer down interception correctly", async () => {
+		onClickOutside(() => container, callbackFn);
+		await tick();
+
+		// Simulate captured pointerdown (should be intercepted)
+		container.dispatchEvent(
+			createPointerEvent("pointerdown", {
+				clientX: 75,
+				clientY: 75,
+			})
+		);
+		await advanceTimers();
+		expect(callbackFn).not.toHaveBeenCalled();
+
+		// Simulate non-intercepted pointerdown
+		outsideButton.dispatchEvent(createPointerEvent("pointerdown"));
+		await advanceTimers();
+		expect(callbackFn).toHaveBeenCalledOnce();
 	});
 });

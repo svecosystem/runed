@@ -1,14 +1,22 @@
 import { defaultDocument, type ConfigurableDocument } from "$lib/internal/configurable-globals.js";
-import type { MaybeElement, MaybeElementGetter, MaybeGetter } from "$lib/internal/types.js";
+import type { MaybeElementGetter } from "$lib/internal/types.js";
+import { getOwnerDocument, isOrContainsTarget } from "$lib/internal/utils/dom.js";
+import { addEventListener } from "$lib/internal/utils/event.js";
+import { noop } from "$lib/internal/utils/function.js";
+import { isElement } from "$lib/internal/utils/is.js";
 import { extract } from "../extract/extract.svelte.js";
-import { useEventListener } from "../useEventListener/useEventListener.svelte.js";
+import { useDebounce } from "../useDebounce/useDebounce.svelte.js";
+import { watch } from "../watch/watch.svelte.js";
 
 export type OnClickOutsideOptions = ConfigurableDocument & {
 	/**
-	 * A list of elements and/or selectors to ignore when determining if a click
-	 * event occurred outside of the container.
+	 * Whether the click outside handler is enabled by default or not.
+	 * If set to false, the handler will not be active until enabled by
+	 * calling the returned `start` function
+	 *
+	 * @default true
 	 */
-	ignore?: MaybeGetter<Array<MaybeElement | string>>;
+	immediate?: boolean;
 };
 
 /**
@@ -41,35 +49,145 @@ export type OnClickOutsideOptions = ConfigurableDocument & {
  */
 export function onClickOutside<T extends Element = HTMLElement>(
 	container: MaybeElementGetter<T>,
-	callback: () => void,
+	callback: (event: PointerEvent) => void,
 	opts: OnClickOutsideOptions = {}
-): void {
-	const { document = defaultDocument } = opts;
+) {
+	const { document = defaultDocument, immediate = true } = opts;
 	const node = $derived(extract(container));
+	const nodeOwnerDocument = $derived(getOwnerDocument(node, document));
+
+	let enabled = $state(immediate);
+	let pointerDownIntercepted = false;
+	let removeClickListener = noop;
+	let removePointerListeners = noop;
+
+	const handleClickOutside = useDebounce((e: PointerEvent) => {
+		if (!node || !nodeOwnerDocument) {
+			removeClickListener();
+			return;
+		}
+
+		if (pointerDownIntercepted === true || !isValidEvent(e, node)) {
+			removeClickListener();
+			return;
+		}
+
+		if (e.pointerType === "touch") {
+			/**
+			 * If the pointer type is touch, we add a listener to wait for the click
+			 * event that will follow the pointerdown event if the user interacts in a way
+			 * that would trigger a click event.
+			 *
+			 * This prevents us from prematurely calling the callback if the user is simply
+			 * scrolling or dragging the page.
+			 */
+			removeClickListener();
+			removeClickListener = addEventListener(nodeOwnerDocument, "click", () => callback(e), {
+				once: true,
+			});
+		} else {
+			/**
+			 * I
+			 */
+			callback(e);
+		}
+	}, 10);
+
+	function addPointerDownListeners() {
+		if (!nodeOwnerDocument) return noop;
+		const events = [
+			/**
+			 * CAPTURE INTERACTION START
+			 * mark the pointerdown event as intercepted
+			 */
+			addEventListener(
+				nodeOwnerDocument,
+				"pointerdown",
+				(e) => {
+					if (!node) return;
+					if (isValidEvent(e, node)) {
+						pointerDownIntercepted = true;
+					}
+				},
+				true
+			),
+			/**
+			 * BUBBLE INTERACTION START
+			 * Mark the pointerdown event as non-intercepted. Debounce `handleClickOutside` to
+			 * avoid prematurely checking if other events were intercepted.
+			 */
+			addEventListener(nodeOwnerDocument, "pointerdown", (e) => {
+				pointerDownIntercepted = false;
+				handleClickOutside(e);
+			}),
+		];
+		return () => {
+			for (const event of events) {
+				event();
+			}
+		};
+	}
+
+	function cleanup() {
+		pointerDownIntercepted = false;
+		handleClickOutside.cancel();
+		removeClickListener();
+		removePointerListeners();
+	}
+
+	watch([() => enabled, () => node], ([enabled$, node$]) => {
+		if (enabled$ && node$) {
+			removePointerListeners();
+			removePointerListeners = addPointerDownListeners();
+		} else {
+			cleanup();
+		}
+	});
+
+	$effect(() => {
+		return () => {
+			cleanup();
+		};
+	});
 
 	/**
-	 * WIP - need to handle cases where a pointerdown starts in the container
-	 * but is released outside the container. This would result in a click event
-	 * occurring outside the container, but we shouldn't trigger the callback
-	 * unless the _complete_ click event occurred outside.
-	 *
-	 * Additionally, we should _really_ only doing the rect comparison if the event target
-	 * is the same as the container or a descendant of the container which should cover the
-	 * cases of pseudo elements being clicked.
+	 * Stop listening for click events outside the container.
 	 */
+	const stop = () => (enabled = false);
 
-	function handleClick(e: MouseEvent) {
-		if (!e.target || !node) return;
+	/**
+	 * Start listening for click events outside the container.
+	 */
+	const start = () => (enabled = true);
 
-		const rect = node.getBoundingClientRect();
+	return {
+		stop,
+		start,
+		/**
+		 * Whether the click outside handler is currently enabled or not.
+		 */
+		get enabled() {
+			return enabled;
+		},
+	};
+}
+
+function isValidEvent(e: PointerEvent, container: Element): boolean {
+	if ("button" in e && e.button > 0) return false;
+	const target = e.target;
+	if (!isElement(target)) return false;
+	const ownerDocument = getOwnerDocument(target);
+	if (!ownerDocument) return false;
+	// handle the case where a user may have pressed a pseudo element by
+	// checking the bounding rect of the container
+	if (target === container) {
+		const rect = container.getBoundingClientRect();
 		const wasInsideClick =
 			rect.top <= e.clientY &&
 			e.clientY <= rect.top + rect.height &&
 			rect.left <= e.clientX &&
 			e.clientX <= rect.left + rect.width;
-
-		if (!wasInsideClick) callback();
+		if (wasInsideClick) return false;
 	}
-
-	useEventListener(() => document, "click", handleClick);
+	return ownerDocument.documentElement.contains(target) && !isOrContainsTarget(container, target);
 }

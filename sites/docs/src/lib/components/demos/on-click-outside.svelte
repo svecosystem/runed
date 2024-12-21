@@ -5,7 +5,7 @@
 	let containerText = $state("Has not clicked outside yet.");
 	let container = $state<HTMLElement>()!;
 
-	onClickOutside(
+	const clickOutside = onClickOutside(
 		() => container,
 		() => {
 			containerText = "Has clicked outside.";
@@ -21,8 +21,17 @@
 			container
 		</span>
 		<p class="select-none pb-4">{containerText}</p>
-		<Button size="sm" onclick={() => (containerText = "Has clicked within container")}>
-			Reset
-		</Button>
+		<p class="mb-3 font-mono">
+			Status: <span class={clickOutside.enabled ? "text-green-500" : "text-destructive"}
+				>{clickOutside.enabled ? "Enabled" : "Disabled"}</span
+			>
+		</p>
+		<div class="flex items-center gap-3">
+			<Button disabled={clickOutside.enabled} size="sm" onclick={clickOutside.start}>Start</Button>
+			<Button disabled={!clickOutside.enabled} size="sm" onclick={clickOutside.stop}>Stop</Button>
+			<Button size="sm" onclick={() => (containerText = "Has not clicked outside yet.")}>
+				Reset
+			</Button>
+		</div>
 	</div>
 </DemoContainer>
