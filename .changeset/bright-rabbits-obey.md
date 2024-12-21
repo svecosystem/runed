@@ -2,4 +2,4 @@
 "runed": minor
 ---
 
-feat: `useClickOutside`
+feat: `onClickOutside`
