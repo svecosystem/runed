@@ -1,0 +1,5 @@
+---
+"runed": minor
+---
+
+feat: `onClickOutside`
