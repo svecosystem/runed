@@ -3,7 +3,7 @@ import { BROWSER } from "esm-env";
 
 export type ConfigurableWindow = {
 	/** Provide a custom `window` object to use in place of the global `window` object. */
-	window?: typeof globalThis & Window;
+	window?: Window;
 };
 
 export type ConfigurableDocument = {

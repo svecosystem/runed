@@ -8,3 +8,4 @@ export type Expand<T> = T extends infer U ? { [K in keyof U]: U[K] } : never;
 export type WritableProperties<T> = {
 	-readonly [P in keyof T]: T[P];
 };
+export type GlobalWindow = Window & typeof globalThis;
