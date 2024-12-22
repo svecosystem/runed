@@ -1,7 +1,6 @@
+import { effectRootScope } from "$lib/test/util.svelte.js";
 import { describe, expect } from "vitest";
-import { focus, testWithEffect } from "$lib/test/util.svelte.js";
 import { IsFocusWithin } from "./IsFocusWithin.svelte.js";
-import { sleep } from "$lib/internal/utils/sleep.js";
 
 describe("IsFocusWithin", () => {
 	let shadowHost: HTMLElement;
@@ -42,86 +41,115 @@ describe("IsFocusWithin", () => {
 		outsideInput.remove();
 	});
 
-	testWithEffect("should be false on initial render", async () => {
+	it("should be false on initial render", () => {
 		const isFocusWithin = new IsFocusWithin(() => container);
 		expect(isFocusWithin.current).toBe(false);
 	});
 
-	testWithEffect("should be true when child element is focused", async () => {
-		const isFocusWithin = new IsFocusWithin(() => container);
-		expect(isFocusWithin.current).toBe(false);
-		focus(input);
-		await sleep();
-		expect(isFocusWithin.current).toBe(true);
+	it("should be true when child element is focused", () => {
+		effectRootScope(() => {
+			const isFocusWithin = new IsFocusWithin(() => container);
+			const current = $derived(isFocusWithin.current);
+			expect(current).toBe(false);
+
+			input.focus();
+			expect(current).toBe(true);
+		});
 	});
 
-	testWithEffect("should be true when any child of the target is focused", async () => {
-		const isFocusWithin = new IsFocusWithin(() => container);
-		expect(isFocusWithin.current).toBe(false);
-		focus(input);
-		await sleep();
-		expect(isFocusWithin.current).toBe(true);
-		focus(input2);
-		await sleep();
-		expect(isFocusWithin.current).toBe(true);
+	it("should be true when any child of the target is focused", () => {
+		effectRootScope(() => {
+			const isFocusWithin = new IsFocusWithin(() => container);
+			const current = $derived(isFocusWithin.current);
+			expect(current).toBe(false);
+
+			input.focus();
+			expect(current).toBe(true);
+
+			input2.focus();
+			expect(current).toBe(true);
+		});
 	});
 
-	testWithEffect("should be false when focus leaves the target", async () => {
-		const isFocusWithin = new IsFocusWithin(() => container);
-		expect(isFocusWithin.current).toBe(false);
-		focus(input);
-		await sleep();
-		expect(isFocusWithin.current).toBe(true);
-		focus(outsideInput);
-		await sleep();
-		expect(isFocusWithin.current).toBe(false);
+	it("should be false when focus leaves the target", () => {
+		effectRootScope(() => {
+			const isFocusWithin = new IsFocusWithin(() => container);
+			const current = $derived(isFocusWithin.current);
+			expect(current).toBe(false);
+
+			input.focus();
+			expect(current).toBe(true);
+
+			outsideInput.focus();
+			expect(current).toBe(false);
+		});
 	});
 
-	testWithEffect("shadow dom - should be false on initial render", () => {
-		const focusWithin = new IsFocusWithin(() => shadowContainer, { document: shadowRoot });
-		expect(focusWithin.current).toBe(false);
-	});
-	testWithEffect("shadow dom - should be true when shadow child element is focused", async () => {
-		const focusWithin = new IsFocusWithin(() => shadowContainer, { document: shadowRoot });
-		expect(focusWithin.current).toBe(false);
-		focus(shadowInput);
-		await sleep();
-		expect(focusWithin.current).toBe(true);
-	});
-
-	testWithEffect(
-		"shadow dom - should be true when any shadow child of the target is focused",
-		async () => {
-			const focusWithin = new IsFocusWithin(() => shadowContainer, { document: shadowRoot });
-			expect(focusWithin.current).toBe(false);
-			focus(shadowInput);
-			await sleep();
-			expect(focusWithin.current).toBe(true);
-			focus(shadowInput2);
-			await sleep();
-			expect(focusWithin.current).toBe(true);
-		}
-	);
-
-	testWithEffect("shadow dom - should be false when focus leaves the shadow target", async () => {
-		const focusWithin = new IsFocusWithin(() => shadowContainer, { document: shadowRoot });
-		expect(focusWithin.current).toBe(false);
-		focus(shadowInput);
-		await sleep();
-		expect(focusWithin.current).toBe(true);
-		focus(outsideInput);
-		await sleep();
+	it("shadow dom - should be false on initial render", () => {
+		const focusWithin = new IsFocusWithin(() => shadowContainer, {
+			document: shadowRoot,
+		});
 		expect(focusWithin.current).toBe(false);
 	});
 
-	testWithEffect("shadow dom - should be false when focus moves to light DOM", async () => {
-		const focusWithin = new IsFocusWithin(() => shadowContainer, { document: shadowRoot });
-		expect(focusWithin.current).toBe(false);
-		focus(shadowInput);
-		await sleep();
-		expect(focusWithin.current).toBe(true);
-		focus(input);
-		await sleep();
-		expect(focusWithin.current).toBe(false);
+	it("shadow dom - should be true when shadow child element is focused", () => {
+		effectRootScope(() => {
+			const isFocusWithin = new IsFocusWithin(() => shadowContainer, {
+				document: shadowRoot,
+			});
+			const current = $derived(isFocusWithin.current);
+			expect(current).toBe(false);
+
+			shadowInput.focus();
+			expect(current).toBe(true);
+		});
+	});
+
+	it("shadow dom - should be true when any shadow child of the target is focused", () => {
+		effectRootScope(() => {
+			const isFocusWithin = new IsFocusWithin(() => shadowContainer, {
+				document: shadowRoot,
+			});
+			const current = $derived(isFocusWithin.current);
+			expect(current).toBe(false);
+
+			shadowInput.focus();
+			expect(current).toBe(true);
+
+			shadowInput2.focus();
+			expect(current).toBe(true);
+		});
+	});
+
+	it("shadow dom - should be false when focus leaves the shadow target", () => {
+		effectRootScope(() => {
+			const isFocusWithin = new IsFocusWithin(() => shadowContainer, {
+				document: shadowRoot,
+			});
+			const current = $derived(isFocusWithin.current);
+			expect(current).toBe(false);
+
+			shadowInput.focus();
+			expect(current).toBe(true);
+
+			outsideInput.focus();
+			expect(current).toBe(false);
+		});
+	});
+
+	it("shadow dom - should be false when focus moves to light DOM", () => {
+		effectRootScope(() => {
+			const isFocusWithin = new IsFocusWithin(() => shadowContainer, {
+				document: shadowRoot,
+			});
+			const current = $derived(isFocusWithin.current);
+			expect(current).toBe(false);
+
+			shadowInput.focus();
+			expect(current).toBe(true);
+
+			input.focus();
+			expect(current).toBe(false);
+		});
 	});
 });

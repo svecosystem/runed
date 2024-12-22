@@ -1,4 +1,41 @@
-import { useActiveElement } from "../useActiveElement/useActiveElement.svelte.js";
+import {
+	defaultWindow,
+	type ConfigurableDocumentOrShadowRoot,
+	type ConfigurableWindow,
+} from "$lib/internal/configurable-globals.js";
+import { getActiveElement } from "$lib/internal/utils/dom.js";
+import { on } from "svelte/events";
+import { createSubscriber } from "svelte/reactivity";
+
+export interface ActiveElementOptions
+	extends ConfigurableDocumentOrShadowRoot,
+		ConfigurableWindow {}
+
+export class ActiveElement {
+	readonly #document?: DocumentOrShadowRoot;
+	readonly #subscribe?: () => void;
+
+	constructor(options: ActiveElementOptions = {}) {
+		const { window = defaultWindow, document = window?.document } = options;
+		if (window === undefined) return;
+
+		this.#document = document;
+		this.#subscribe = createSubscriber((update) => {
+			const cleanupFocusIn = on(window, "focusin", update);
+			const cleanupFocusOut = on(window, "focusout", update);
+			return () => {
+				cleanupFocusIn();
+				cleanupFocusOut();
+			};
+		});
+	}
+
+	get current(): Element | null {
+		this.#subscribe?.();
+		if (!this.#document) return null;
+		return getActiveElement(this.#document);
+	}
+}
 
 /**
  * An object holding a reactive value that is equal to `document.activeElement`.
@@ -9,4 +46,4 @@ import { useActiveElement } from "../useActiveElement/useActiveElement.svelte.js
  *
  * @see {@link https://runed.dev/docs/utilities/active-element}
  */
-export const activeElement = useActiveElement();
+export const activeElement = new ActiveElement();
