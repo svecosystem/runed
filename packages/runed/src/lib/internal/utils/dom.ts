@@ -1,3 +1,5 @@
+import { defaultDocument } from "../configurable-globals.js";
+
 /**
  * Handles getting the active element in a document or shadow root.
  * If the active element is within a shadow root, it will traverse the shadow root
@@ -17,4 +19,28 @@ export function getActiveElement(document: DocumentOrShadowRoot): Element | null
 	}
 
 	return activeElement;
+}
+
+/**
+ * Returns the owner document of a given element.
+ *
+ * @param node The element to get the owner document from.
+ * @returns
+ */
+export function getOwnerDocument(
+	node: Element | null | undefined,
+	fallback = defaultDocument
+): Document | undefined {
+	return node?.ownerDocument ?? fallback;
+}
+
+/**
+ * Checks if an element is or is contained by another element.
+ *
+ * @param node The element to check if it or its descendants contain the target element.
+ * @param target The element to check if it is contained by the node.
+ * @returns
+ */
+export function isOrContainsTarget(node: Element, target: Element) {
+	return node === target || node.contains(target);
 }
