@@ -4,15 +4,10 @@
 
 	let containerText = $state("Has not clicked outside yet.");
 	let container = $state<HTMLElement>()!;
-	let dialog = $state<HTMLDialogElement>()!;
 
 	const clickOutside = onClickOutside(
-		() => dialog,
-		() => {
-			dialog.close();
-			clickOutside.stop();
-		},
-		{ immediate: false }
+		() => container,
+		() => (containerText = "Clicked outside!")
 	);
 </script>
 
@@ -37,16 +32,4 @@
 			</Button>
 		</div>
 	</div>
-	<button
-		onclick={() => {
-			dialog.showModal();
-			clickOutside.start();
-		}}>Open</button
-	>
-	<dialog bind:this={dialog}>
-		<div class="p-4">
-			<p class="mb-4">This is a dialog.</p>
-			<button onclick={() => dialog.close()}>Close</button>
-		</div>
-	</dialog>
 </DemoContainer>

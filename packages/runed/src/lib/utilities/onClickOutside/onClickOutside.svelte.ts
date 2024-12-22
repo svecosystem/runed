@@ -1,23 +1,40 @@
-import { defaultDocument, type ConfigurableDocument } from "$lib/internal/configurable-globals.js";
+import {
+	defaultWindow,
+	type ConfigurableDocument,
+	type ConfigurableWindow,
+} from "$lib/internal/configurable-globals.js";
 import type { MaybeElementGetter } from "$lib/internal/types.js";
-import { getOwnerDocument, isOrContainsTarget } from "$lib/internal/utils/dom.js";
+import { getActiveElement, getOwnerDocument, isOrContainsTarget } from "$lib/internal/utils/dom.js";
 import { addEventListener } from "$lib/internal/utils/event.js";
 import { noop } from "$lib/internal/utils/function.js";
 import { isElement } from "$lib/internal/utils/is.js";
+import { sleep } from "$lib/internal/utils/sleep.js";
 import { extract } from "../extract/extract.svelte.js";
 import { useDebounce } from "../useDebounce/useDebounce.svelte.js";
 import { watch } from "../watch/watch.svelte.js";
 
-export type OnClickOutsideOptions = ConfigurableDocument & {
-	/**
-	 * Whether the click outside handler is enabled by default or not.
-	 * If set to false, the handler will not be active until enabled by
-	 * calling the returned `start` function
-	 *
-	 * @default true
-	 */
-	immediate?: boolean;
-};
+export type OnClickOutsideOptions = ConfigurableWindow &
+	ConfigurableDocument & {
+		/**
+		 * Whether the click outside handler is enabled by default or not.
+		 * If set to false, the handler will not be active until enabled by
+		 * calling the returned `start` function
+		 *
+		 * @default true
+		 */
+		immediate?: boolean;
+
+		/**
+		 * Controls whether focus events from iframes trigger the callback.
+		 *
+		 * Since iframe click events don't bubble to the parent document,
+		 * you may want to enable this if you need to detect when users
+		 * interact with iframe content.
+		 *
+		 * @default false
+		 */
+		detectIframe?: boolean;
+	};
 
 /**
  * A utility that calls a given callback when a click event occurs outside of
@@ -29,6 +46,7 @@ export type OnClickOutsideOptions = ConfigurableDocument & {
  * @param {OnClickOutsideOptions} [opts={}] - Optional configuration object.
  * @param {ConfigurableDocument} [opts.document=defaultDocument] - The document object to use, defaults to the global document.
  * @param {boolean} [opts.immediate=true] - Whether the click outside handler is enabled by default or not.
+ * @param {boolean} [opts.detectIframe=false] - Controls whether focus events from iframes trigger the callback.
  *
  * @example
  * ```svelte
@@ -53,25 +71,26 @@ export type OnClickOutsideOptions = ConfigurableDocument & {
  */
 export function onClickOutside<T extends Element = HTMLElement>(
 	container: MaybeElementGetter<T>,
-	callback: (event: PointerEvent) => void,
+	callback: (event: PointerEvent | FocusEvent) => void,
 	opts: OnClickOutsideOptions = {}
 ) {
-	const { document = defaultDocument, immediate = true } = opts;
+	const { window = defaultWindow, immediate = true, detectIframe = false } = opts;
+	const document = opts.document ?? window?.document;
 	const node = $derived(extract(container));
 	const nodeOwnerDocument = $derived(getOwnerDocument(node, document));
 
 	let enabled = $state(immediate);
 	let pointerDownIntercepted = false;
 	let removeClickListener = noop;
-	let removePointerListeners = noop;
+	let removeListeners = noop;
 
 	const handleClickOutside = useDebounce((e: PointerEvent) => {
-		if (!node || !nodeOwnerDocument || !document) {
+		if (!node || !nodeOwnerDocument) {
 			removeClickListener();
 			return;
 		}
 
-		if (pointerDownIntercepted === true || !isValidEvent(e, node, document)) {
+		if (pointerDownIntercepted === true || !isValidEvent(e, node, nodeOwnerDocument)) {
 			removeClickListener();
 			return;
 		}
@@ -91,25 +110,27 @@ export function onClickOutside<T extends Element = HTMLElement>(
 			});
 		} else {
 			/**
-			 * I
+			 * If the pointer type is not touch, we can directly call the callback function
+			 * as the interaction is likely a mouse or pen input which does not require
+			 * additional handling.
 			 */
 			callback(e);
 		}
 	}, 10);
 
-	function addPointerDownListeners() {
-		if (!nodeOwnerDocument) return noop;
+	function addListeners() {
+		if (!nodeOwnerDocument || !window || !node) return noop;
 		const events = [
 			/**
 			 * CAPTURE INTERACTION START
-			 * mark the pointerdown event as intercepted
+			 * Mark the pointerdown event as intercepted to indicate that an interaction
+			 * has started. This helps in distinguishing between valid and invalid events.
 			 */
 			addEventListener(
 				nodeOwnerDocument,
 				"pointerdown",
 				(e) => {
-					if (!node || !document) return;
-					if (isValidEvent(e, node, document)) {
+					if (isValidEvent(e, node, nodeOwnerDocument)) {
 						pointerDownIntercepted = true;
 					}
 				},
@@ -125,6 +146,24 @@ export function onClickOutside<T extends Element = HTMLElement>(
 				handleClickOutside(e);
 			}),
 		];
+		if (detectIframe) {
+			events.push(
+				/**
+				 * DETECT IFRAME INTERACTIONS
+				 *
+				 * We add a blur event listener to the window to detect when the user
+				 * interacts with an iframe. If the active element is an iframe and it
+				 * is not a descendant of the container, we call the callback function.
+				 */
+				addEventListener(window, "blur", async (e) => {
+					await sleep();
+					const activeElement = getActiveElement(nodeOwnerDocument);
+					if (activeElement?.tagName === "IFRAME" && !isOrContainsTarget(node, activeElement)) {
+						callback(e);
+					}
+				})
+			);
+		}
 		return () => {
 			for (const event of events) {
 				event();
@@ -136,13 +175,13 @@ export function onClickOutside<T extends Element = HTMLElement>(
 		pointerDownIntercepted = false;
 		handleClickOutside.cancel();
 		removeClickListener();
-		removePointerListeners();
+		removeListeners();
 	}
 
 	watch([() => enabled, () => node], ([enabled$, node$]) => {
 		if (enabled$ && node$) {
-			removePointerListeners();
-			removePointerListeners = addPointerDownListeners();
+			removeListeners();
+			removeListeners = addListeners();
 		} else {
 			cleanup();
 		}
@@ -154,22 +193,12 @@ export function onClickOutside<T extends Element = HTMLElement>(
 		};
 	});
 
-	/**
-	 * Stop listening for click events outside the container.
-	 */
-	const stop = () => (enabled = false);
-
-	/**
-	 * Start listening for click events outside the container.
-	 */
-	const start = () => (enabled = true);
-
 	return {
-		stop,
-		start,
-		/**
-		 * Whether the click outside handler is currently enabled or not.
-		 */
+		/** Stop listening for click events outside the container. */
+		stop: () => (enabled = false),
+		/** Start listening for click events outside the container. */
+		start: () => (enabled = true),
+		/** Whether the click outside handler is currently enabled or not. */
 		get enabled() {
 			return enabled;
 		},

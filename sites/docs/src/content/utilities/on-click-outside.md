@@ -7,6 +7,7 @@ category: Sensors
 <script>
 import Demo from '$lib/components/demos/on-click-outside.svelte';
 import DemoDialog from '$lib/components/demos/on-click-outside-dialog.svelte';
+import { PropField } from '@svecodocs/kit'
 </script>
 
 `onClickOutside` detects clicks that occur outside a specified element's boundaries and executes a
@@ -84,36 +85,57 @@ Here's an example of using `onClickOutside` with a `<dialog>`:
 
 ## Options
 
-### Immediate
+<PropField name="immediate" type="boolean" defaultValue="true">
 
-By default, `onClickOutside` will start listening for clicks outside the element immediately. You
-can opt to disabled this behavior by passing `{ immediate: false }` to the options argument.
+Whether the click outside handler is enabled by default or not. If set to `false`, the handler will
+not be active until enabled by calling the returned `start` function.
 
-```ts {4}
-const clickOutside = onClickOutside(
-	() => container,
-	() => console.log("clicked outside"),
-	{ immediate: false }
-);
+</PropField>
 
-// later when you want to start the listener
-clickOutside.start();
-```
+<PropField name="detectIframe" type="boolean" defaultValue="false">
+
+Controls whether focus events from iframes trigger the callback. Since iframe click events don't
+bubble to the parent document, you may want to enable this if you need to detect when users interact
+with iframe content.
+
+</PropField>
+
+<PropField name="document" type="Document" defaultValue="document">
+
+The document object to use, defaults to the global document.
+
+</PropField>
+
+<PropField name="window" type="Window" defaultValue="window">
+
+The window object to use, defaults to the global window.
+
+</PropField>
 
 ## Type Definitions
 
 ```ts
-export type OnClickOutsideOptions = ConfigurableDocument & {
-	/**
-	 * Whether the click outside handler is enabled by default or not.
-	 * If set to false, the handler will not be active until enabled by
-	 * calling the returned `start` function
-	 *
-	 * @default true
-	 */
-	immediate?: boolean;
-};
-
+export type OnClickOutsideOptions = ConfigurableWindow &
+	ConfigurableDocument & {
+		/**
+		 * Whether the click outside handler is enabled by default or not.
+		 * If set to false, the handler will not be active until enabled by
+		 * calling the returned `start` function
+		 *
+		 * @default true
+		 */
+		immediate?: boolean;
+		/**
+		 * Controls whether focus events from iframes trigger the callback.
+		 *
+		 * Since iframe click events don't bubble to the parent document,
+		 * you may want to enable this if you need to detect when users
+		 * interact with iframe content.
+		 *
+		 * @default false
+		 */
+		detectIframe?: boolean;
+	};
 /**
  * A utility that calls a given callback when a click event occurs outside of
  * a specified container element.
@@ -124,18 +146,20 @@ export type OnClickOutsideOptions = ConfigurableDocument & {
  * @param {OnClickOutsideOptions} [opts={}] - Optional configuration object.
  * @param {ConfigurableDocument} [opts.document=defaultDocument] - The document object to use, defaults to the global document.
  * @param {boolean} [opts.immediate=true] - Whether the click outside handler is enabled by default or not.
+ * @param {boolean} [opts.detectIframe=false] - Controls whether focus events from iframes trigger the callback.
+ *
  * @see {@link https://runed.dev/docs/utilities/on-click-outside}
  */
 export declare function onClickOutside<T extends Element = HTMLElement>(
 	container: MaybeElementGetter<T>,
-	callback: (event: PointerEvent) => void,
+	callback: (event: PointerEvent | FocusEvent) => void,
 	opts?: OnClickOutsideOptions
 ): {
+	/** Stop listening for click events outside the container. */
 	stop: () => boolean;
+	/** Start listening for click events outside the container. */
 	start: () => boolean;
-	/**
-	 * Whether the click outside handler is currently enabled or not.
-	 */
+	/** Whether the click outside handler is currently enabled or not. */
 	readonly enabled: boolean;
 };
 ```
