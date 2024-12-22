@@ -24,3 +24,4 @@ export * from "./useGeolocation/index.js";
 export * from "./Context/index.js";
 export * from "./IsInViewport/index.js";
 export * from "./useActiveElement/index.js";
+export * from "./onKeyStroke/index.js";
