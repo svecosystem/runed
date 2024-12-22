@@ -7,11 +7,11 @@
  * @param document A document or shadow root to get the active element from.
  * @returns The active element in the document or shadow root.
  */
-export function getActiveElement(document: DocumentOrShadowRoot): HTMLElement | null {
-	let activeElement = document.activeElement as HTMLElement | null;
+export function getActiveElement(document: DocumentOrShadowRoot): Element | null {
+	let activeElement = document.activeElement;
 
 	while (activeElement?.shadowRoot) {
-		const node = activeElement.shadowRoot.activeElement as HTMLElement | null;
+		const node = activeElement.shadowRoot.activeElement;
 		if (node === activeElement) break;
 		else activeElement = node;
 	}

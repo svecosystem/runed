@@ -1,29 +1,25 @@
-import { extract } from "../extract/extract.svelte.js";
 import type { MaybeElementGetter } from "$lib/internal/types.js";
-import {
-	type ConfigurableDocumentOrShadowRoot,
-	type ConfigurableWindow,
-} from "$lib/internal/configurable-globals.js";
-import { useActiveElement } from "../useActiveElement/useActiveElement.svelte.js";
+import { ActiveElement, type ActiveElementOptions } from "../ActiveElement/ActiveElement.svelte.js";
+import { extract } from "../extract/extract.svelte.js";
 
-type IsFocusWithinOptions = ConfigurableDocumentOrShadowRoot & ConfigurableWindow;
+export interface IsFocusWithinOptions extends ActiveElementOptions {}
 
 /**
  * Tracks whether the focus is within a target element.
  * @see {@link https://runed.dev/docs/utilities/is-focus-within}
  */
 export class IsFocusWithin {
-	#node: MaybeElementGetter;
-	#target = $derived.by(() => extract(this.#node));
-	#activeElement: ReturnType<typeof useActiveElement>;
+	readonly #node: MaybeElementGetter;
+	readonly #activeElement: ActiveElement;
 
 	constructor(node: MaybeElementGetter, options: IsFocusWithinOptions = {}) {
 		this.#node = node;
-		this.#activeElement = useActiveElement({ document: options.document, window: options.window });
+		this.#activeElement = new ActiveElement(options);
 	}
 
 	readonly current = $derived.by(() => {
-		if (!this.#target || !this.#activeElement.current) return false;
-		return this.#target.contains(this.#activeElement.current);
+		const node = extract(this.#node);
+		if (node == null) return false;
+		return node.contains(this.#activeElement.current);
 	});
 }
