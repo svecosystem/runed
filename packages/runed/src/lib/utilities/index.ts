@@ -1,4 +1,4 @@
-export * from "./ActiveElement/index.js";
+export * from "./activeElement/index.js";
 export * from "./onClickOutside/index.js";
 export * from "./useDebounce/index.js";
 export * from "./ElementSize/index.js";

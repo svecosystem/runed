@@ -1,5 +1,5 @@
 import type { MaybeElementGetter } from "$lib/internal/types.js";
-import { ActiveElement, type ActiveElementOptions } from "../ActiveElement/ActiveElement.svelte.js";
+import { ActiveElement, type ActiveElementOptions } from "../activeElement/activeElement.svelte.js";
 import { extract } from "../extract/extract.svelte.js";
 
 export interface IsFocusWithinOptions extends ActiveElementOptions {}
