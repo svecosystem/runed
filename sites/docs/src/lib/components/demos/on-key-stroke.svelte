@@ -1,7 +1,6 @@
-
 <script lang="ts">
-	import { onKeyStroke } from 'runed';
-	import { DemoContainer } from '@svecodocs/kit';
+	import { onKeyStroke } from "runed";
+	import { DemoContainer } from "@svecodocs/kit";
 </script>
 
 <DemoContainer>

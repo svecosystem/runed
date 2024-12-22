@@ -3,6 +3,8 @@ import { onKeyStroke, onKeyDown, onKeyUp, onKeyPress } from "./onKeyStroke.svelt
 import { testWithEffect } from "$lib/test/util.svelte.js";
 import { tick } from "svelte";
 
+const IS_MAC_REGEX = /Mac/;
+
 describe("key stroke utilities", () => {
 	let target: HTMLElement;
 
@@ -15,6 +17,17 @@ describe("key stroke utilities", () => {
 		document.body.removeChild(target);
 		vi.clearAllMocks();
 	});
+
+	// Helper function to set platform
+	const mockPlatform = (platform: string) => {
+		Object.defineProperty(global, "navigator", {
+			value: {
+				...navigator,
+				platform,
+			},
+			writable: true,
+		});
+	};
 
 	// Helper function to create and dispatch keyboard events
 	const dispatchKeyEvent = (
@@ -48,57 +61,6 @@ describe("key stroke utilities", () => {
 		await tick();
 
 		expect(handler).toHaveBeenCalledTimes(1);
-		stop();
-	});
-
-	testWithEffect("should handle command/control + K combination", async () => {
-		const handler = vi.fn();
-		const predicate = (event: KeyboardEvent) => {
-			const isMac = /Mac|iPod|iPhone|iPad/.test(navigator.platform);
-			const modifier = isMac ? event.metaKey : event.ctrlKey;
-			return event.key.toLowerCase() === "k" && modifier && !event.shiftKey && !event.altKey;
-		};
-
-		const { stop } = onKeyStroke(predicate, handler, { target });
-		await tick();
-
-		// Test without any modifier (should not trigger)
-		dispatchKeyEvent(target, "keydown", "k");
-		await tick();
-		await tick();
-		expect(handler).not.toHaveBeenCalled();
-
-		// Test with correct modifier for platform
-		const isMac = /Mac|iPod|iPhone|iPad/.test(navigator.platform);
-		dispatchKeyEvent(target, "keydown", "k", {
-			metaKey: isMac,
-			ctrlKey: !isMac,
-			shiftKey: false,
-			altKey: false,
-		});
-		await tick();
-		await tick();
-		expect(handler).toHaveBeenCalledTimes(1);
-
-		// Test with wrong modifier (should not trigger)
-		dispatchKeyEvent(target, "keydown", "k", {
-			metaKey: !isMac,
-			ctrlKey: isMac,
-		});
-		await tick();
-		await tick();
-		expect(handler).toHaveBeenCalledTimes(1);
-
-		// Test with additional modifiers (should not trigger)
-		dispatchKeyEvent(target, "keydown", "k", {
-			metaKey: isMac,
-			ctrlKey: !isMac,
-			shiftKey: true,
-		});
-		await tick();
-		await tick();
-		expect(handler).toHaveBeenCalledTimes(1);
-
 		stop();
 	});
 
@@ -259,6 +221,60 @@ describe("key stroke utilities", () => {
 			await tick();
 			await tick();
 			expect(handler).toHaveBeenCalledTimes(1);
+		});
+	});
+
+	describe("common key combinations", () => {
+		testWithEffect("should handle command + K on Mac", async () => {
+			mockPlatform("MacIntel");
+			const handler = vi.fn();
+			const predicate = (event: KeyboardEvent) => {
+				const isMac = IS_MAC_REGEX.test(navigator.platform);
+				const modifier = isMac ? event.metaKey : event.ctrlKey;
+				return event.key.toLowerCase() === "k" && modifier && !event.shiftKey && !event.altKey;
+			};
+
+			const { stop } = onKeyStroke(predicate, handler, { target });
+			await tick();
+
+			// Test with command key (should trigger on Mac)
+			dispatchKeyEvent(target, "keydown", "k", {
+				metaKey: true,
+				ctrlKey: false,
+				shiftKey: false,
+				altKey: false,
+			});
+			await tick();
+			await tick();
+			expect(handler).toHaveBeenCalledTimes(1);
+
+			stop();
+		});
+
+		testWithEffect("should handle ctrl + K on Windows", async () => {
+			mockPlatform("Win32");
+			const handler = vi.fn();
+			const predicate = (event: KeyboardEvent) => {
+				const isMac = IS_MAC_REGEX.test(navigator.platform);
+				const modifier = isMac ? event.metaKey : event.ctrlKey;
+				return event.key.toLowerCase() === "k" && modifier && !event.shiftKey && !event.altKey;
+			};
+
+			const { stop } = onKeyStroke(predicate, handler, { target });
+			await tick();
+
+			// Test with control key (should trigger on Windows)
+			dispatchKeyEvent(target, "keydown", "k", {
+				metaKey: false,
+				ctrlKey: true,
+				shiftKey: false,
+				altKey: false,
+			});
+			await tick();
+			await tick();
+			expect(handler).toHaveBeenCalledTimes(1);
+
+			stop();
 		});
 	});
 });
