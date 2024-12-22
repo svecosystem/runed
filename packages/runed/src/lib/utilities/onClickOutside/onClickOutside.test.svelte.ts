@@ -56,6 +56,8 @@ describe("onClickOutside", () => {
 	afterEach(() => {
 		document.body.removeChild(container);
 		document.body.removeChild(outsideButton);
+		// Remove any iframes that might have been added
+		document.querySelectorAll("iframe").forEach((iframe) => iframe.remove());
 		vi.clearAllMocks();
 		vi.useRealTimers();
 	});
@@ -236,5 +238,41 @@ describe("onClickOutside", () => {
 		expect(callbackFn).toHaveBeenCalledOnce();
 
 		dialog.remove();
+	});
+
+	testWithEffect("ignores iframe interactions by default (detectIframe: false)", async () => {
+		let iframe = document.createElement("iframe");
+		document.body.appendChild(iframe);
+
+		onClickOutside(() => container, callbackFn);
+		await tick();
+
+		window.dispatchEvent(new Event("blur", { bubbles: true }));
+		await tick();
+		vi.spyOn(document, "activeElement", "get").mockReturnValue(iframe);
+		await vi.runAllTimersAsync();
+
+		expect(callbackFn).not.toHaveBeenCalled();
+
+		document.body.removeChild(iframe);
+		vi.restoreAllMocks();
+	});
+
+	testWithEffect("detects iframe interactions when detectIframe is true", async () => {
+		let iframe = document.createElement("iframe");
+		document.body.appendChild(iframe);
+
+		onClickOutside(() => container, callbackFn, { detectIframe: true });
+		await tick();
+
+		window.dispatchEvent(new Event("blur", { bubbles: true }));
+		await tick();
+		vi.spyOn(document, "activeElement", "get").mockReturnValue(iframe);
+		await vi.runAllTimersAsync();
+
+		expect(callbackFn).toHaveBeenCalledOnce();
+
+		document.body.removeChild(iframe);
+		vi.restoreAllMocks();
 	});
 });
