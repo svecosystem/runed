@@ -15,6 +15,7 @@ similar to `document.activeElement` but with reactive updates.
 - Returns `null` when no element is focused
 - Safe to use with SSR (Server-Side Rendering)
 - Lightweight alternative to manual focus tracking
+- Searches through Shadow DOM boundaries for the true active element
 
 ## Demo
 
@@ -33,10 +34,10 @@ similar to `document.activeElement` but with reactive updates.
 </p>
 ```
 
-## Shadow DOM
+## Custom Document
 
-If you need to track focus within a shadow root, you can pass the shadow root to the `ActiveElement`
-constructor:
+If you wish to scope the focus tracking within a custom document or shadow root, you can pass a
+`DocumentOrShadowRoot` to the `ActiveElement` options:
 
 ```svelte
 <script lang="ts">
