@@ -3,6 +3,7 @@ import {
 	type ConfigurableDocumentOrShadowRoot,
 	type ConfigurableWindow,
 } from "$lib/internal/configurable-globals.js";
+import { getActiveElement } from "$lib/internal/utils/dom.js";
 import { on } from "svelte/events";
 import { createSubscriber } from "svelte/reactivity";
 
@@ -16,9 +17,7 @@ export class ActiveElement {
 
 	constructor(options: ActiveElementOptions = {}) {
 		const { window = defaultWindow, document = window?.document } = options;
-		if (window === undefined) {
-			return;
-		}
+		if (window === undefined) return;
 
 		this.#document = document;
 		this.#subscribe = createSubscriber((update) => {
@@ -33,7 +32,8 @@ export class ActiveElement {
 
 	get current(): Element | null {
 		this.#subscribe?.();
-		return this.#document?.activeElement ?? null;
+		if (!this.#document) return null;
+		return getActiveElement(this.#document);
 	}
 }
 
