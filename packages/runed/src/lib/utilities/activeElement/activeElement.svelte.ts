@@ -3,7 +3,6 @@ import {
 	type ConfigurableDocumentOrShadowRoot,
 	type ConfigurableWindow,
 } from "$lib/internal/configurable-globals.js";
-import { getActiveElement } from "$lib/internal/utils/dom.js";
 import { on } from "svelte/events";
 import { createSubscriber } from "svelte/reactivity";
 
@@ -12,26 +11,19 @@ export interface ActiveElementOptions
 		ConfigurableWindow {}
 
 export class ActiveElement {
-	#current: Element | null = null;
+	readonly #document?: DocumentOrShadowRoot;
 	readonly #subscribe?: () => void;
 
 	constructor(options: ActiveElementOptions = {}) {
 		const { window = defaultWindow, document = window?.document } = options;
-		if (window === undefined || document === undefined) {
+		if (window === undefined) {
 			return;
 		}
 
-		this.#current = getActiveElement(document);
+		this.#document = document;
 		this.#subscribe = createSubscriber((update) => {
-			this.#current = getActiveElement(document);
-
-			const onFocusInOrOut = () => {
-				this.#current = getActiveElement(document);
-				update();
-			};
-
-			const cleanupFocusIn = on(window, "focusin", onFocusInOrOut);
-			const cleanupFocusOut = on(window, "focusout", onFocusInOrOut);
+			const cleanupFocusIn = on(window, "focusin", update);
+			const cleanupFocusOut = on(window, "focusout", update);
 			return () => {
 				cleanupFocusIn();
 				cleanupFocusOut();
@@ -41,7 +33,7 @@ export class ActiveElement {
 
 	get current(): Element | null {
 		this.#subscribe?.();
-		return this.#current;
+		return this.#document?.activeElement ?? null;
 	}
 }
 
