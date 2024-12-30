@@ -5,7 +5,6 @@ export * from "./ElementSize/index.js";
 export * from "./useEventListener/index.js";
 export * from "./IsIdle/index.js";
 export * from "./IsMounted/index.js";
-export * from "./IsSupported/index.js";
 export * from "./StateHistory/index.js";
 export * from "./Previous/index.js";
 export * from "./watch/index.js";
