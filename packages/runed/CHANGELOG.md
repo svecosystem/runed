@@ -1,5 +1,25 @@
 # runed
 
+## 0.23.0
+
+### Minor Changes
+
+- feat: `onClickOutside` ([#190](https://github.com/svecosystem/runed/pull/190))
+
+- breaking: deprecate `Readable` in favor of `createSubscriber` from Svelte
+  ([#193](https://github.com/svecosystem/runed/pull/193))
+
+- breaking: replace `useActiveElement` with `ActiveElement` for custom `DocumentOrShadowRoot`
+  options ([#193](https://github.com/svecosystem/runed/pull/193))
+
+### Patch Changes
+
+- breaking: remove `IsSupported` ([#199](https://github.com/svecosystem/runed/pull/199))
+
+- internal: remove `addEventListener` in favor of
+  [on](https://svelte.dev/docs/svelte/svelte-events#on) from Svelte
+  ([#196](https://github.com/svecosystem/runed/pull/196))
+
 ## 0.22.0
 
 ### Minor Changes
