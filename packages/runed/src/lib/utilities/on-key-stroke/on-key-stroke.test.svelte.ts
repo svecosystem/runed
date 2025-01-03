@@ -1,5 +1,5 @@
 import { describe, expect, vi, beforeEach, afterEach } from "vitest";
-import { onKeyStroke, onKeyDown, onKeyUp, onKeyPress } from "./onKeyStroke.svelte.js";
+import { onKeyStroke, onKeyDown, onKeyUp, onKeyPress } from "./on-key-stroke.svelte.js";
 import { testWithEffect } from "$lib/test/util.svelte.js";
 import { tick } from "svelte";
 

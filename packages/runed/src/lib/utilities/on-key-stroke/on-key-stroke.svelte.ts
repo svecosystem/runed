@@ -1,7 +1,7 @@
 import { defaultDocument } from "$lib/internal/configurable-globals.js";
 import type { MaybeGetter } from "$lib/internal/types.js";
-import { addEventListener } from "$lib/internal/utils/event.js";
 import { noop } from "$lib/internal/utils/function.js";
+import { on } from "svelte/events";
 import { extract } from "../extract/extract.svelte.js";
 import { watch } from "../watch/watch.svelte.js";
 
@@ -100,7 +100,7 @@ export function onKeyStroke(...args: any[]) {
 		removeListener();
 		if (!target) return;
 		// @ts-expect-error - We know the event names are valid
-		removeListener = addEventListener(target, eventName, handleKeyStroke, passive);
+		removeListener = on(target, eventName, handleKeyStroke, passive);
 	}
 
 	function stop() {
