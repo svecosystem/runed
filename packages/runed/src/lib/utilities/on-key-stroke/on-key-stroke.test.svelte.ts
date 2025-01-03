@@ -5,7 +5,7 @@ import { tick } from "svelte";
 
 const IS_MAC_REGEX = /Mac/;
 
-describe("key stroke utilities", () => {
+describe("onKeyStroke", () => {
 	let target: HTMLElement;
 
 	beforeEach(() => {
@@ -70,16 +70,10 @@ describe("key stroke utilities", () => {
 		await tick();
 
 		dispatchKeyEvent(target, "keydown", "a");
-		await tick();
-		await tick();
 
 		dispatchKeyEvent(target, "keydown", "b");
-		await tick();
-		await tick();
 
 		dispatchKeyEvent(target, "keydown", "c");
-		await tick();
-		await tick();
 
 		expect(handler).toHaveBeenCalledTimes(2);
 		stop();
@@ -92,12 +86,8 @@ describe("key stroke utilities", () => {
 		await tick();
 
 		dispatchKeyEvent(target, "keydown", "a");
-		await tick();
-		await tick();
 
 		dispatchKeyEvent(target, "keydown", "Enter");
-		await tick();
-		await tick();
 
 		expect(handler).toHaveBeenCalledTimes(1);
 		stop();
@@ -109,13 +99,9 @@ describe("key stroke utilities", () => {
 		await tick();
 
 		dispatchKeyEvent(target, "keydown", "a", { repeat: true });
-		await tick();
-		await tick();
 		expect(handler).not.toHaveBeenCalled();
 
 		dispatchKeyEvent(target, "keydown", "a", { repeat: false });
-		await tick();
-		await tick();
 		expect(handler).toHaveBeenCalledTimes(1);
 
 		stop();
@@ -124,18 +110,12 @@ describe("key stroke utilities", () => {
 	testWithEffect("should handle immediate option", async () => {
 		const handler = vi.fn();
 		const { start, stop } = onKeyStroke("a", handler, { target, immediate: false });
-		await tick();
 
 		dispatchKeyEvent(target, "keydown", "a");
-		await tick();
-		await tick();
 		expect(handler).not.toHaveBeenCalled();
 
 		start();
-		await tick();
 		dispatchKeyEvent(target, "keydown", "a");
-		await tick();
-		await tick();
 		expect(handler).toHaveBeenCalledTimes(1);
 
 		stop();
@@ -148,8 +128,6 @@ describe("key stroke utilities", () => {
 			await tick();
 
 			dispatchKeyEvent(target, "keydown", "a");
-			await tick();
-			await tick();
 			expect(handler).toHaveBeenCalledTimes(1);
 
 			stop();
@@ -161,8 +139,6 @@ describe("key stroke utilities", () => {
 			await tick();
 
 			dispatchKeyEvent(target, "keyup", "a");
-			await tick();
-			await tick();
 			expect(handler).toHaveBeenCalledTimes(1);
 
 			stop();
@@ -174,8 +150,6 @@ describe("key stroke utilities", () => {
 			await tick();
 
 			dispatchKeyEvent(target, "keypress", "a");
-			await tick();
-			await tick();
 			expect(handler).toHaveBeenCalledTimes(1);
 
 			stop();
@@ -189,10 +163,7 @@ describe("key stroke utilities", () => {
 			await tick();
 
 			stop();
-			await tick();
 			dispatchKeyEvent(target, "keydown", "a");
-			await tick();
-			await tick();
 			expect(handler).not.toHaveBeenCalled();
 		});
 
@@ -202,24 +173,15 @@ describe("key stroke utilities", () => {
 			await tick();
 
 			stop();
-			await tick();
 			dispatchKeyEvent(target, "keydown", "a");
-			await tick();
-			await tick();
 			expect(handler).not.toHaveBeenCalled();
 
 			start();
-			await tick();
 			dispatchKeyEvent(target, "keydown", "a");
-			await tick();
-			await tick();
 			expect(handler).toHaveBeenCalledTimes(1);
 
 			stop();
-			await tick();
 			dispatchKeyEvent(target, "keydown", "a");
-			await tick();
-			await tick();
 			expect(handler).toHaveBeenCalledTimes(1);
 		});
 	});
@@ -244,8 +206,6 @@ describe("key stroke utilities", () => {
 				shiftKey: false,
 				altKey: false,
 			});
-			await tick();
-			await tick();
 			expect(handler).toHaveBeenCalledTimes(1);
 
 			stop();
@@ -270,8 +230,6 @@ describe("key stroke utilities", () => {
 				shiftKey: false,
 				altKey: false,
 			});
-			await tick();
-			await tick();
 			expect(handler).toHaveBeenCalledTimes(1);
 
 			stop();
