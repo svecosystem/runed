@@ -5,10 +5,10 @@ import {
 } from "$lib/internal/configurable-globals.js";
 import type { MaybeElementGetter } from "$lib/internal/types.js";
 import { getActiveElement, getOwnerDocument, isOrContainsTarget } from "$lib/internal/utils/dom.js";
-import { addEventListener } from "$lib/internal/utils/event.js";
 import { noop } from "$lib/internal/utils/function.js";
 import { isElement } from "$lib/internal/utils/is.js";
 import { sleep } from "$lib/internal/utils/sleep.js";
+import { on } from "svelte/events";
 import { extract } from "../extract/extract.svelte.js";
 import { useDebounce } from "../use-debounce/use-debounce.svelte.js";
 import { watch } from "../watch/watch.svelte.js";
@@ -105,7 +105,7 @@ export function onClickOutside<T extends Element = HTMLElement>(
 			 * scrolling or dragging the page.
 			 */
 			removeClickListener();
-			removeClickListener = addEventListener(nodeOwnerDocument, "click", () => callback(e), {
+			removeClickListener = on(nodeOwnerDocument, "click", () => callback(e), {
 				once: true,
 			});
 		} else {
@@ -126,7 +126,7 @@ export function onClickOutside<T extends Element = HTMLElement>(
 			 * Mark the pointerdown event as intercepted to indicate that an interaction
 			 * has started. This helps in distinguishing between valid and invalid events.
 			 */
-			addEventListener(
+			on(
 				nodeOwnerDocument,
 				"pointerdown",
 				(e) => {
@@ -134,14 +134,14 @@ export function onClickOutside<T extends Element = HTMLElement>(
 						pointerDownIntercepted = true;
 					}
 				},
-				true
+				{ capture: true }
 			),
 			/**
 			 * BUBBLE INTERACTION START
 			 * Mark the pointerdown event as non-intercepted. Debounce `handleClickOutside` to
 			 * avoid prematurely checking if other events were intercepted.
 			 */
-			addEventListener(nodeOwnerDocument, "pointerdown", (e) => {
+			on(nodeOwnerDocument, "pointerdown", (e) => {
 				pointerDownIntercepted = false;
 				handleClickOutside(e);
 			}),
@@ -155,7 +155,7 @@ export function onClickOutside<T extends Element = HTMLElement>(
 				 * interacts with an iframe. If the active element is an iframe and it
 				 * is not a descendant of the container, we call the callback function.
 				 */
-				addEventListener(window, "blur", async (e) => {
+				on(window, "blur", async (e) => {
 					await sleep();
 					const activeElement = getActiveElement(nodeOwnerDocument);
 					if (activeElement?.tagName === "IFRAME" && !isOrContainsTarget(node, activeElement)) {
