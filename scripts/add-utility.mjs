@@ -11,13 +11,13 @@ const contentDir = "./sites/docs/src/content/utilities";
 const demosDir = "./sites/docs/src/lib/components/demos";
 
 const utilName = readlineSync.question("What is the name of the utility? ");
-
-const utilDir = `${utilsDir}/${utilName}`;
+const kebabUtil = toKebabCase(utilName);
+const utilDir = `${utilsDir}/${kebabUtil}`;
 const utilIndexFile = `${utilDir}/index.ts`;
-const utilMainFile = `${utilDir}/${utilName}.svelte.ts`;
+const utilMainFile = `${utilDir}/${kebabUtil}.svelte.ts`;
 const utilsBarrelFile = `${utilsDir}/index.ts`;
-const contentFile = `${contentDir}/${toKebabCase(utilName)}.md`;
-const demoFile = `${demosDir}/${toKebabCase(utilName)}.svelte`;
+const contentFile = `${contentDir}/${kebabUtil}.md`;
+const demoFile = `${demosDir}/${kebabUtil}.svelte`;
 
 fs.mkdirSync(utilDir, { recursive: true });
 fs.writeFileSync(utilIndexFile, `export * from "./${utilName}.svelte.js";`);
@@ -34,7 +34,7 @@ category: New
 ---
 
 <script>
-import Demo from '$lib/components/demos/${toKebabCase(utilName)}.svelte';
+import Demo from '$lib/components/demos/${kebabUtil}.svelte';
 </script>
 
 ## Demo
