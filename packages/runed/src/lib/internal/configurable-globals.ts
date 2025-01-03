@@ -28,7 +28,7 @@ export type ConfigurableLocation = {
 	location?: Location;
 };
 
-export const defaultWindow = /* #__PURE__ */ BROWSER ? window : undefined;
-export const defaultDocument = /* #__PURE__ */ BROWSER ? window.document : undefined;
-export const defaultNavigator = /* #__PURE__ */ BROWSER ? window.navigator : undefined;
-export const defaultLocation = /* #__PURE__ */ BROWSER ? window.location : undefined;
+export const defaultWindow = BROWSER ? window : undefined;
+export const defaultDocument = BROWSER ? window.document : undefined;
+export const defaultNavigator = BROWSER ? window.navigator : undefined;
+export const defaultLocation = BROWSER ? window.location : undefined;
