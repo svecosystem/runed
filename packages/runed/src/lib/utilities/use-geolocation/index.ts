@@ -1,1 +1,1 @@
-export * from "./useGeolocation.svelte.js";
+export * from "./use-geolocation.svelte.js";

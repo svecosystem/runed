@@ -1,1 +1,1 @@
-export * from "./IsInViewport.svelte.js";
+export * from "./is-in-viewport.svelte.js";

@@ -1,1 +1,1 @@
-export { ElementRect } from "./ElementRect.svelte.js";
+export { ElementRect } from "./element-rect.svelte.js";

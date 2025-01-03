@@ -1,1 +1,1 @@
-export * from "./IsMounted.svelte.js";
+export * from "./is-mounted.svelte.js";

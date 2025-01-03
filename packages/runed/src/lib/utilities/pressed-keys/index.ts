@@ -1,1 +1,1 @@
-export { PressedKeys } from "./PressedKeys.svelte.js";
+export { PressedKeys } from "./pressed-keys.svelte.js";
