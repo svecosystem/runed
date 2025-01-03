@@ -1,7 +1,7 @@
 ---
 title: onKeyStroke
-description: N/A
-category: New
+description: Listen for key strokes and handle them.
+category: Sensors
 ---
 
 <script>
