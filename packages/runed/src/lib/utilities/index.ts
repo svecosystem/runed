@@ -5,7 +5,6 @@ export * from "./element-size/index.js";
 export * from "./use-event-listener/index.js";
 export * from "./is-idle/index.js";
 export * from "./is-mounted/index.js";
-export * from "./is-supported/index.js";
 export * from "./state-history/index.js";
 export * from "./previous/index.js";
 export * from "./watch/index.js";
