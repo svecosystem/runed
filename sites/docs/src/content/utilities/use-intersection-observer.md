@@ -49,6 +49,34 @@ intersection changes of the target element.
 </div>
 ```
 
+### One-time Detection
+
+You can use the `once` option to automatically stop observing after the first intersection:
+
+```svelte
+<script lang="ts">
+	import { useIntersectionObserver } from "runed";
+
+	let target = $state<HTMLElement | null>(null);
+	let hasBeenSeen = $state(false);
+
+	useIntersectionObserver(
+		() => target,
+		(entries) => {
+			const entry = entries[0];
+			if (entry?.isIntersecting) {
+				hasBeenSeen = true;
+			}
+		},
+		{ once: true }
+	);
+</script>
+
+<div bind:this={target} class="transition" class="transition-opacity {hasBeenSeen ? 'opacity-100' : 'opacity-0'}">
+	I'll fade in once when first visible, then stop observing
+</div>
+```
+
 ### Pause
 
 You can pause the intersection observer at any point by calling the `pause` method.
