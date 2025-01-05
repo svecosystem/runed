@@ -59,22 +59,24 @@ export function useIntersectionObserver(
 			if (!targets.size || !isActive || !window) return;
 
 			const wrappedCallback: IntersectionObserverCallback = (entries, observer) => {
-				callback(entries, observer);
-				// Checking for isIntersecting and intersectionRatio >= threshold bc of firefox bug
-				// @see https://github.com/w3c/IntersectionObserver/issues/432
-				const inThreshold = entries.some((entry) => {
-					if (Array.isArray(threshold)) {
-						return entry.isIntersecting && threshold.some((t) => entry.intersectionRatio >= t);
-					}
-					return entry.isIntersecting && entry.intersectionRatio >= threshold;
-				});
+				entries.forEach((entry) => {
+					// Checking for isIntersecting and intersectionRatio >= threshold bc of a firefox bug
+					// @see https://github.com/w3c/IntersectionObserver/issues/432
+					const isThresholdMet = Array.isArray(threshold)
+						? threshold.some((t) => entry.intersectionRatio >= t)
+						: entry.intersectionRatio >= threshold;
 
-				if (once && inThreshold) {
-					isActive = false;
-					return () => {
-						observer?.disconnect();
-					};
-				}
+					const inView = entry.isIntersecting && isThresholdMet;
+
+					callback([entry], observer);
+
+					if (once && inView) {
+						isActive = false;
+						return () => {
+							observer?.disconnect();
+						};
+					}
+				});
 			};
 
 			observer = new window.IntersectionObserver(wrappedCallback, {
