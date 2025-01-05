@@ -50,7 +50,9 @@ one-time animations or loading content when it becomes visible:
 	});
 </script>
 
-<div bind:this={targetNode} class="transition" class="transition-opacity {inViewport.current ? 'opacity-100' : 'opacity-0'}">
+<div bind:this={targetNode} class="transition" class="transition-opacity {hasBeenSeen ? 'opacity-100' : 'opacity-0'}">
+	I'll fade in once when first visible, then stop observing
+</div>
 ```
 
 ### Observer Controls
