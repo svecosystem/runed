@@ -31,14 +31,45 @@ export type Action<StatesT> = StatesT | ActionFn<StatesT>;
 
 // State handlers are objects that map events to actions
 // or lifecycle functions to handlers
-export type StateHandler<StatesT extends string, EventsT extends string> = {
+export type StateHandler<
+	StatesT extends string,
+	EventsT extends string,
+	EventsMapT extends { [K in string]: unknown[] },
+> = {
 	[e in EventsT]?: Action<StatesT>;
 } & {
-	[k in FSMLifecycle]?: FSMLifecycleFn<StatesT, EventsT>;
+	[e in keyof EventsMapT]?: (...args: EventsMapT[e]) => StatesT | void;
+} & {
+	[k in FSMLifecycle]?: <E extends null | Event | keyof EventsMapT>(
+		meta: E extends null
+			? {
+					from: StatesT | null;
+					to: StatesT;
+					event: null;
+				}
+			: E extends Event
+				? {
+						from: StatesT | null;
+						to: StatesT;
+						event: E;
+					}
+				: E extends keyof EventsMapT
+					? {
+							from: StatesT | null;
+							to: StatesT;
+							event: E;
+							args: EventsMapT[E];
+						}
+					: never
+	) => void;
 };
 
-export type Transition<StatesT extends string, EventsT extends string> = {
-	[s in StatesT]: StateHandler<StatesT, EventsT>;
+export type Transition<
+	StatesT extends string,
+	EventsT extends string,
+	EventsMapT extends { [K in string]: unknown[] },
+> = {
+	[s in StatesT]?: StateHandler<StatesT, EventsT, EventsMapT>;
 } & {
 	// '*' is a special fallback handler state.
 	// If no handler is found on the current state and the '*' state exists,
@@ -46,7 +77,7 @@ export type Transition<StatesT extends string, EventsT extends string> = {
 	// We can't put the '*' in the same object, has to be an intersection or
 	// the typescript compiler will complain about mapped types not being
 	// able to declare properties or methods
-	"*"?: StateHandler<StatesT, EventsT>;
+	"*"?: StateHandler<StatesT, EventsT, EventsMapT>;
 };
 
 /**
@@ -54,12 +85,16 @@ export type Transition<StatesT extends string, EventsT extends string> = {
  *
  * @see {@link https://runed.dev/docs/utilities/finite-state-machine}
  */
-export class FiniteStateMachine<StatesT extends string, EventsT extends string> {
+export class FiniteStateMachine<
+	StatesT extends string,
+	EventsT extends string,
+	EventsMapT extends { [K in string]: unknown[] },
+> {
 	#current: StatesT = $state()!;
-	readonly states: Transition<StatesT, EventsT>;
-	#timeout: Partial<Record<EventsT, NodeJS.Timeout>> = {};
+	readonly states: Transition<StatesT, EventsT, EventsMapT>;
+	#timeout: Partial<Record<EventsT | keyof EventsMapT, NodeJS.Timeout>> = {};
 
-	constructor(initial: StatesT, states: Transition<StatesT, EventsT>) {
+	constructor(initial: StatesT, states: Transition<StatesT, EventsT, EventsMapT>) {
 		this.#current = initial;
 		this.states = states;
 
@@ -70,14 +105,14 @@ export class FiniteStateMachine<StatesT extends string, EventsT extends string> 
 		this.#dispatch("_enter", { from: null, to: initial, event: null, args: [] });
 	}
 
-	#transition(newState: StatesT, event: EventsT, args: unknown[]) {
+	#transition(newState: StatesT, event: EventsT | keyof EventsMapT, args: unknown[]) {
 		const metadata = { from: this.#current, to: newState, event, args };
 		this.#dispatch("_exit", metadata);
 		this.#current = newState;
 		this.#dispatch("_enter", metadata);
 	}
 
-	#dispatch(event: EventsT | FSMLifecycle, ...args: unknown[]): StatesT | void {
+	#dispatch(event: EventsT | keyof EventsMapT | FSMLifecycle, ...args: unknown[]): StatesT | void {
 		const action = this.states[this.#current]?.[event] ?? this.states["*"]?.[event];
 		if (action instanceof Function) {
 			if (event === "_enter" || event === "_exit") {
@@ -97,7 +132,10 @@ export class FiniteStateMachine<StatesT extends string, EventsT extends string> 
 	}
 
 	/** Triggers a new event and returns the new state. */
-	send(event: EventsT, ...args: unknown[]): StatesT {
+	send<E extends EventsT | keyof EventsMapT>(
+		event: E,
+		...args: E extends keyof EventsMapT ? EventsMapT[E] : never[]
+	): StatesT {
 		const newState = this.#dispatch(event, ...args);
 		if (newState && newState !== this.#current) {
 			this.#transition(newState as StatesT, event, args);
@@ -106,7 +144,11 @@ export class FiniteStateMachine<StatesT extends string, EventsT extends string> 
 	}
 
 	/** Debounces the triggering of an event. */
-	async debounce(wait: number = 500, event: EventsT, ...args: unknown[]): Promise<StatesT> {
+	async debounce<E extends EventsT | keyof EventsMapT>(
+		wait: number = 500,
+		event: E,
+		...args: E extends keyof EventsMapT ? EventsMapT[E] : never[]
+	): Promise<StatesT> {
 		if (this.#timeout[event]) {
 			clearTimeout(this.#timeout[event]);
 		}
