@@ -15,7 +15,7 @@ describe("box", () => {
 		expect(box.current).toBe(0);
 
 		function set() {
-			// @ts-expect-error
+			// @ts-expect-error It's readonly
 			box.current = 1;
 		}
 
@@ -68,7 +68,7 @@ describe("Derived", () => {
 		expect(box.current).toBe(0);
 
 		function set() {
-			// @ts-expect-error
+			// @ts-expect-error It's readonly
 			box.current = 1;
 		}
 
