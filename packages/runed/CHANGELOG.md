@@ -1,5 +1,11 @@
 # runed
 
+## 0.23.1
+
+### Patch Changes
+
+- fix: remove `PURE` from global exports ([#200](https://github.com/svecosystem/runed/pull/200))
+
 ## 0.23.0
 
 ### Minor Changes
