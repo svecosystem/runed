@@ -27,7 +27,7 @@ export type IsIdleOptions = ConfigurableDocument &
 		/**
 		 * Detect document visibility changes
 		 *
-		 * @default true
+		 * @default false
 		 */
 		detectVisibilityChanges?: MaybeGetter<boolean>;
 		/**
