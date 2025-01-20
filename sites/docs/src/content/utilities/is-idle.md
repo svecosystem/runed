@@ -49,7 +49,7 @@ interface IsIdleOptions {
 	/**
 	 * Detect document visibility changes
 	 *
-	 * @default true
+	 * @default false
 	 */
 	detectVisibilityChanges?: MaybeGetter<boolean>;
 	/**
