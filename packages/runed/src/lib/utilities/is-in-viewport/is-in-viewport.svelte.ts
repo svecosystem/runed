@@ -14,9 +14,10 @@ export type IsInViewportOptions = ConfigurableWindow & UseIntersectionObserverOp
  */
 export class IsInViewport {
 	#isInViewport = $state(false);
+	#observer;
 
 	constructor(node: MaybeElementGetter, options?: IsInViewportOptions) {
-		useIntersectionObserver(
+		this.#observer = useIntersectionObserver(
 			node,
 			(intersectionObserverEntries) => {
 				let isIntersecting = this.#isInViewport;
@@ -32,8 +33,36 @@ export class IsInViewport {
 			options
 		);
 	}
-
+	/** Current viewport intersection state */
 	get current() {
 		return this.#isInViewport;
+	}
+
+	/**
+	 * Stop observing the element.
+	 */
+	stop() {
+		this.#observer.stop();
+	}
+
+	/**
+	 * Pause the intersection observer.
+	 */
+	pause() {
+		this.#observer.pause();
+	}
+
+	/**
+	 * Resume the intersection observer.
+	 */
+	resume() {
+		this.#observer.resume();
+	}
+
+	/**
+	 * Whether the intersection observer is currently active.
+	 */
+	get isActive() {
+		return this.#observer.isActive;
 	}
 }
