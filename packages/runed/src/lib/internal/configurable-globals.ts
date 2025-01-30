@@ -1,4 +1,3 @@
-// configurable-globals.ts
 import { BROWSER } from "esm-env";
 
 export type ConfigurableWindow = {
@@ -28,7 +27,10 @@ export type ConfigurableLocation = {
 	location?: Location;
 };
 
-export const defaultWindow = BROWSER ? window : undefined;
-export const defaultDocument = BROWSER ? window.document : undefined;
-export const defaultNavigator = BROWSER ? window.navigator : undefined;
-export const defaultLocation = BROWSER ? window.location : undefined;
+export const defaultWindow = BROWSER && typeof window !== "undefined" ? window : undefined;
+export const defaultDocument =
+	BROWSER && typeof window !== "undefined" ? window.document : undefined;
+export const defaultNavigator =
+	BROWSER && typeof window !== "undefined" ? window.navigator : undefined;
+export const defaultLocation =
+	BROWSER && typeof window !== "undefined" ? window.location : undefined;
