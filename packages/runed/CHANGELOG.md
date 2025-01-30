@@ -1,5 +1,12 @@
 # runed
 
+## 0.23.2
+
+### Patch Changes
+
+- patch: add defined checks in addition to browser for `window`
+  ([#212](https://github.com/svecosystem/runed/pull/212))
+
 ## 0.23.1
 
 ### Patch Changes
