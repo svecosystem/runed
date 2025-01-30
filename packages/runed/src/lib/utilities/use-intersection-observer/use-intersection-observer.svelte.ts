@@ -18,6 +18,12 @@ export interface UseIntersectionObserverOptions
 	 * The root document/element to use as the bounding box for the intersection.
 	 */
 	root?: MaybeElementGetter;
+
+	/**
+	 * If true, will automatically stop observing after the first intersection.
+	 * @default false
+	 */
+	once?: boolean;
 }
 
 /**
@@ -37,6 +43,7 @@ export function useIntersectionObserver(
 		threshold = 0.1,
 		immediate = true,
 		window = defaultWindow,
+		once = false,
 	} = options;
 
 	let isActive = $state(immediate);
@@ -50,11 +57,34 @@ export function useIntersectionObserver(
 	const stop = $effect.root(() => {
 		$effect(() => {
 			if (!targets.size || !isActive || !window) return;
-			observer = new window.IntersectionObserver(callback, {
+
+			const wrappedCallback: IntersectionObserverCallback = (entries, observer) => {
+				entries.forEach((entry) => {
+					// Checking for isIntersecting and intersectionRatio >= threshold bc of a firefox bug
+					// @see https://github.com/w3c/IntersectionObserver/issues/432
+					const isThresholdMet = Array.isArray(threshold)
+						? threshold.some((t) => entry.intersectionRatio >= t)
+						: entry.intersectionRatio >= threshold;
+
+					const inView = entry.isIntersecting && isThresholdMet;
+
+					callback([entry], observer);
+
+					if (once && inView) {
+						isActive = false;
+						return () => {
+							observer?.disconnect();
+						};
+					}
+				});
+			};
+
+			observer = new window.IntersectionObserver(wrappedCallback, {
 				rootMargin,
 				root: get(root),
 				threshold,
 			});
+
 			for (const el of targets) observer.observe(el);
 
 			return () => {
