@@ -32,7 +32,7 @@ components.
 	);
 </script>
 
-<div bind:this={el}>
+<div bind:this={container}>
 	<!-- Container content -->
 </div>
 <button>I'm outside the container</button>
