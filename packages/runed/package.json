@@ -1,6 +1,6 @@
 {
 	"name": "runed",
-	"version": "0.23.2",
+	"version": "0.23.3",
 	"type": "module",
 	"svelte": "./dist/index.js",
 	"types": "./dist/index.d.ts",
