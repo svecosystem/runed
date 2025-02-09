@@ -1,5 +1,12 @@
 # runed
 
+## 0.23.3
+
+### Patch Changes
+
+- fix default export
+  ([`09f37b3`](https://github.com/svecosystem/runed/commit/09f37b33927eb9a2e9c3a1d351c64d5b16b1fdbf))
+
 ## 0.23.2
 
 ### Patch Changes
