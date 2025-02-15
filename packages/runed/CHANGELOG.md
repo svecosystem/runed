@@ -1,5 +1,11 @@
 # runed
 
+## 0.23.4
+
+### Patch Changes
+
+- fix: package.json default exports ([#220](https://github.com/svecosystem/runed/pull/220))
+
 ## 0.23.3
 
 ### Patch Changes
