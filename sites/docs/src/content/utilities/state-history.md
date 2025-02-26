@@ -35,10 +35,6 @@ Besides `log`, the returned object contains `undo` and `redo` functionality.
 
 	let count = $state(0);
 	const history = new StateHistory(() => count, (c) => (count = c));
-
-	function format(ts: number) {
-		return new Date(ts).toLocaleString();
-	}
 </script>
 
 <p>{count}</p>
