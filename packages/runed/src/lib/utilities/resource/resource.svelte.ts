@@ -20,9 +20,9 @@ export type ResourceOptions<Data> = {
 /**
  * Core state of a resource
  */
-export type ResourceState<Data> = {
+export type ResourceState<Data, HasInitialValue extends boolean = false> = {
 	/** Current value of the resource */
-	current: Data | undefined;
+	current: HasInitialValue extends true ? Data : Data | undefined;
 	/** Whether the resource is currently loading */
 	loading: boolean;
 	/** Error if the fetch failed */
@@ -32,7 +32,11 @@ export type ResourceState<Data> = {
 /**
  * Return type of the resource function, extends ResourceState with additional methods
  */
-export type ResourceReturn<Data, RefetchInfo = unknown> = ResourceState<Data> & {
+export type ResourceReturn<
+	Data,
+	RefetchInfo = unknown,
+	HasInitialValue extends boolean = false,
+> = ResourceState<Data, HasInitialValue> & {
 	/** Update the resource value directly */
 	mutate: (value: Data) => void;
 	/** Re-run the fetcher with current values */
@@ -132,7 +136,7 @@ function runResource<
 		) => void | VoidFunction,
 		options?: { lazy?: boolean }
 	) => void
-): ResourceReturn<Awaited<ReturnType<Fetcher>>, RefetchInfo> {
+): ResourceReturn<Awaited<ReturnType<Fetcher>>, RefetchInfo, boolean> {
 	const {
 		lazy = false,
 		once = false,
@@ -224,6 +228,9 @@ function runResource<
 		{ lazy }
 	);
 
+	// Use 'as const' to treat !!initialValue as a literal boolean
+	const hasInitialValue = !!initialValue as const;
+
 	return {
 		get current() {
 			return current;
@@ -245,7 +252,7 @@ function runResource<
 				info ?? true
 			);
 		},
-	};
+	} as ResourceReturn<Awaited<ReturnType<Fetcher>>, RefetchInfo, typeof hasInitialValue>;
 }
 
 /**
@@ -296,7 +303,7 @@ function runResource<
  * );
  * ```
  */
-// For single source
+// For single source with initialValue
 export function resource<
 	Source,
 	RefetchInfo = unknown,
@@ -308,10 +315,27 @@ export function resource<
 >(
 	source: Getter<Source>,
 	fetcher: Fetcher,
-	options?: ResourceOptions<Awaited<ReturnType<Fetcher>>>
-): ResourceReturn<Awaited<ReturnType<Fetcher>>, RefetchInfo>;
+	options: ResourceOptions<Awaited<ReturnType<Fetcher>>> & {
+		initialValue: Awaited<ReturnType<Fetcher>>;
+	}
+): ResourceReturn<Awaited<ReturnType<Fetcher>>, RefetchInfo, true>;
 
-// For array of sources
+// For single source without initialValue
+export function resource<
+	Source,
+	RefetchInfo = unknown,
+	Fetcher extends ResourceFetcher<
+		Source,
+		Awaited<ReturnType<Fetcher>>,
+		RefetchInfo
+	> = ResourceFetcher<Source, any, RefetchInfo>,
+>(
+	source: Getter<Source>,
+	fetcher: Fetcher,
+	options?: Omit<ResourceOptions<Awaited<ReturnType<Fetcher>>>, "initialValue">
+): ResourceReturn<Awaited<ReturnType<Fetcher>>, RefetchInfo, false>;
+
+// For array of sources with initialValue
 export function resource<
 	Sources extends Array<unknown>,
 	RefetchInfo = unknown,
@@ -323,9 +347,27 @@ export function resource<
 >(
 	sources: { [K in keyof Sources]: Getter<Sources[K]> },
 	fetcher: Fetcher,
-	options?: ResourceOptions<Awaited<ReturnType<Fetcher>>>
-): ResourceReturn<Awaited<ReturnType<Fetcher>>, RefetchInfo>;
+	options: ResourceOptions<Awaited<ReturnType<Fetcher>>> & {
+		initialValue: Awaited<ReturnType<Fetcher>>;
+	}
+): ResourceReturn<Awaited<ReturnType<Fetcher>>, RefetchInfo, true>;
 
+// For array of sources without initialValue
+export function resource<
+	Sources extends Array<unknown>,
+	RefetchInfo = unknown,
+	Fetcher extends ResourceFetcher<
+		Sources,
+		Awaited<ReturnType<Fetcher>>,
+		RefetchInfo
+	> = ResourceFetcher<Sources, any, RefetchInfo>,
+>(
+	sources: { [K in keyof Sources]: Getter<Sources[K]> },
+	fetcher: Fetcher,
+	options?: Omit<ResourceOptions<Awaited<ReturnType<Fetcher>>>, "initialValue">
+): ResourceReturn<Awaited<ReturnType<Fetcher>>, RefetchInfo, false>;
+
+// Implementation
 export function resource<
 	Source,
 	RefetchInfo = unknown,
@@ -338,7 +380,7 @@ export function resource<
 	source: Getter<Source> | Array<Getter<Source>>,
 	fetcher: Fetcher,
 	options?: ResourceOptions<Awaited<ReturnType<Fetcher>>>
-): ResourceReturn<Awaited<ReturnType<Fetcher>>, RefetchInfo> {
+): ResourceReturn<Awaited<ReturnType<Fetcher>>, RefetchInfo, boolean> {
 	return runResource<Source, RefetchInfo, Fetcher>(source, fetcher, options, (fn, options) => {
 		const sources = Array.isArray(source) ? source : [source];
 		const getters = () => sources.map((s) => s());
@@ -369,7 +411,7 @@ export function resource<
  * );
  * ```
  */
-// For single source
+// For single source with initialValue
 export function resourcePre<
 	Source,
 	RefetchInfo = unknown,
@@ -381,10 +423,27 @@ export function resourcePre<
 >(
 	source: Getter<Source>,
 	fetcher: Fetcher,
-	options?: ResourceOptions<Awaited<ReturnType<Fetcher>>>
-): ResourceReturn<Awaited<ReturnType<Fetcher>>, RefetchInfo>;
+	options: ResourceOptions<Awaited<ReturnType<Fetcher>>> & {
+		initialValue: Awaited<ReturnType<Fetcher>>;
+	}
+): ResourceReturn<Awaited<ReturnType<Fetcher>>, RefetchInfo, true>;
 
-// For array of sources
+// For single source without initialValue
+export function resourcePre<
+	Source,
+	RefetchInfo = unknown,
+	Fetcher extends ResourceFetcher<
+		Source,
+		Awaited<ReturnType<Fetcher>>,
+		RefetchInfo
+	> = ResourceFetcher<Source, any, RefetchInfo>,
+>(
+	source: Getter<Source>,
+	fetcher: Fetcher,
+	options?: Omit<ResourceOptions<Awaited<ReturnType<Fetcher>>>, "initialValue">
+): ResourceReturn<Awaited<ReturnType<Fetcher>>, RefetchInfo, false>;
+
+// For array of sources with initialValue
 export function resourcePre<
 	Sources extends Array<unknown>,
 	RefetchInfo = unknown,
@@ -398,9 +457,29 @@ export function resourcePre<
 		[K in keyof Sources]: Getter<Sources[K]>;
 	},
 	fetcher: Fetcher,
-	options?: ResourceOptions<Awaited<ReturnType<Fetcher>>>
-): ResourceReturn<Awaited<ReturnType<Fetcher>>, RefetchInfo>;
+	options: ResourceOptions<Awaited<ReturnType<Fetcher>>> & {
+		initialValue: Awaited<ReturnType<Fetcher>>;
+	}
+): ResourceReturn<Awaited<ReturnType<Fetcher>>, RefetchInfo, true>;
 
+// For array of sources without initialValue
+export function resourcePre<
+	Sources extends Array<unknown>,
+	RefetchInfo = unknown,
+	Fetcher extends ResourceFetcher<
+		Sources,
+		Awaited<ReturnType<Fetcher>>,
+		RefetchInfo
+	> = ResourceFetcher<Sources, any, RefetchInfo>,
+>(
+	sources: {
+		[K in keyof Sources]: Getter<Sources[K]>;
+	},
+	fetcher: Fetcher,
+	options?: Omit<ResourceOptions<Awaited<ReturnType<Fetcher>>>, "initialValue">
+): ResourceReturn<Awaited<ReturnType<Fetcher>>, RefetchInfo, false>;
+
+// Implementation
 export function resourcePre<
 	Source,
 	RefetchInfo = unknown,
@@ -413,7 +492,7 @@ export function resourcePre<
 	source: Getter<Source> | Array<Getter<Source>>,
 	fetcher: Fetcher,
 	options?: ResourceOptions<Awaited<ReturnType<Fetcher>>>
-): ResourceReturn<Awaited<ReturnType<Fetcher>>, RefetchInfo> {
+): ResourceReturn<Awaited<ReturnType<Fetcher>>, RefetchInfo, boolean> {
 	return runResource<Source, RefetchInfo, Fetcher>(source, fetcher, options, (fn, options) => {
 		const sources = Array.isArray(source) ? source : [source];
 		const getter = () => sources.map((s) => s());
