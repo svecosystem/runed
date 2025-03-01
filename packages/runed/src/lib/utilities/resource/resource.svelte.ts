@@ -71,6 +71,7 @@ export type ResourceFetcher<Source, Data, RefetchInfo = unknown> = (
 ) => Promise<Data>;
 
 // Helper functions for debounce and throttle
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 function debounce<T extends (...args: any[]) => Promise<any>>(
 	fn: T,
 	delay: number
@@ -97,6 +98,7 @@ function debounce<T extends (...args: any[]) => Promise<any>>(
 	};
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 function throttle<T extends (...args: any[]) => Promise<any>>(
 	fn: T,
 	delay: number
@@ -124,6 +126,7 @@ function runResource<
 		Source,
 		Awaited<ReturnType<Fetcher>>,
 		RefetchInfo
+		// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	> = ResourceFetcher<Source, any, RefetchInfo>,
 >(
 	source: Getter<Source> | Array<Getter<Source>>,
@@ -177,6 +180,7 @@ function runResource<
 			const controller = new AbortController();
 			onCleanup(() => controller.abort());
 
+			// eslint-disable-next-line @typescript-eslint/no-explicit-any
 			const result = await fetcher(value as any, previousValue as any, {
 				data: current,
 				refetching,
@@ -228,9 +232,6 @@ function runResource<
 		{ lazy }
 	);
 
-	// Use 'as const' to treat !!initialValue as a literal boolean
-	const hasInitialValue = !!initialValue as const;
-
 	return {
 		get current() {
 			return current;
@@ -252,7 +253,7 @@ function runResource<
 				info ?? true
 			);
 		},
-	} as ResourceReturn<Awaited<ReturnType<Fetcher>>, RefetchInfo, typeof hasInitialValue>;
+	} as ResourceReturn<Awaited<ReturnType<Fetcher>>, RefetchInfo, boolean>;
 }
 
 /**
@@ -311,6 +312,7 @@ export function resource<
 		Source,
 		Awaited<ReturnType<Fetcher>>,
 		RefetchInfo
+		// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	> = ResourceFetcher<Source, any, RefetchInfo>,
 >(
 	source: Getter<Source>,
@@ -328,6 +330,7 @@ export function resource<
 		Source,
 		Awaited<ReturnType<Fetcher>>,
 		RefetchInfo
+		// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	> = ResourceFetcher<Source, any, RefetchInfo>,
 >(
 	source: Getter<Source>,
@@ -343,6 +346,7 @@ export function resource<
 		Sources,
 		Awaited<ReturnType<Fetcher>>,
 		RefetchInfo
+		// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	> = ResourceFetcher<Sources, any, RefetchInfo>,
 >(
 	sources: { [K in keyof Sources]: Getter<Sources[K]> },
@@ -360,6 +364,7 @@ export function resource<
 		Sources,
 		Awaited<ReturnType<Fetcher>>,
 		RefetchInfo
+		// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	> = ResourceFetcher<Sources, any, RefetchInfo>,
 >(
 	sources: { [K in keyof Sources]: Getter<Sources[K]> },
@@ -375,6 +380,7 @@ export function resource<
 		Source,
 		Awaited<ReturnType<Fetcher>>,
 		RefetchInfo
+		// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	> = ResourceFetcher<Source, any, RefetchInfo>,
 >(
 	source: Getter<Source> | Array<Getter<Source>>,
@@ -419,6 +425,7 @@ export function resourcePre<
 		Source,
 		Awaited<ReturnType<Fetcher>>,
 		RefetchInfo
+		// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	> = ResourceFetcher<Source, any, RefetchInfo>,
 >(
 	source: Getter<Source>,
@@ -436,6 +443,7 @@ export function resourcePre<
 		Source,
 		Awaited<ReturnType<Fetcher>>,
 		RefetchInfo
+		// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	> = ResourceFetcher<Source, any, RefetchInfo>,
 >(
 	source: Getter<Source>,
@@ -451,6 +459,7 @@ export function resourcePre<
 		Sources,
 		Awaited<ReturnType<Fetcher>>,
 		RefetchInfo
+		// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	> = ResourceFetcher<Sources, any, RefetchInfo>,
 >(
 	sources: {
@@ -470,6 +479,7 @@ export function resourcePre<
 		Sources,
 		Awaited<ReturnType<Fetcher>>,
 		RefetchInfo
+		// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	> = ResourceFetcher<Sources, any, RefetchInfo>,
 >(
 	sources: {
@@ -487,6 +497,7 @@ export function resourcePre<
 		Source,
 		Awaited<ReturnType<Fetcher>>,
 		RefetchInfo
+		// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	> = ResourceFetcher<Source, any, RefetchInfo>,
 >(
 	source: Getter<Source> | Array<Getter<Source>>,

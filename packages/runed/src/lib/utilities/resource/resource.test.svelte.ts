@@ -291,7 +291,7 @@ describe("resource", () => {
 			await sleep(100);
 			expect(fetchCount).toBe(1);
 			expect(searchResource.loading).toBe(false);
-			expect(searchResource.current?.results[0].title).toContain("abcd");
+			expect(searchResource.current?.results[0]?.title).toContain("abcd");
 
 			// Single change after delay should trigger immediately
 			searchQuery = "final";
@@ -327,7 +327,7 @@ describe("resource", () => {
 			await sleep(200);
 
 			// Check time between fetches
-			const timeDiffs = fetchTimes.slice(1).map((time, i) => time - fetchTimes[i]);
+			const timeDiffs = fetchTimes.slice(1).map((time, i) => time - (fetchTimes[i] || 0));
 			const allThrottled = timeDiffs.every((diff) => diff >= 95); // Allow small margin of error
 			expect(allThrottled).toBe(true);
 
