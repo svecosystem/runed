@@ -34,6 +34,31 @@ describe("PersistedState", () => {
 			expect(persistedState.current).toBe(newValue);
 			expect(localStorage.getItem(key)).toBe(JSON.stringify(newValue));
 		});
+
+		testWithEffect("updates localStorage when a nested property in current value changes", () => {
+			const propValue = "test"
+			const initialValue = { prop: { nested: propValue } }; 
+			const newPropValue = "new test"
+			const newValue = { prop: { nested: newPropValue } }; 
+			const persistedState = new PersistedState(key, initialValue);
+			expect(persistedState.current).toEqual(initialValue);
+
+			persistedState.current.prop.nested = newPropValue;
+			expect(persistedState.current).toEqual(newValue);
+			expect(localStorage.getItem(key)).toBe(JSON.stringify(newValue));
+		});
+
+		testWithEffect("updates current value when localStorage changes", () => {
+			const propValue = "test"
+			const initialValue = { prop: { nested: propValue } }; 
+			const newPropValue = "new test"
+			const newValue = { prop: { nested: newPropValue } }; 
+			const persistedState = new PersistedState(key, initialValue);
+			expect(persistedState.current).toEqual(initialValue);
+			localStorage.setItem(key, JSON.stringify(newValue))
+			expect(persistedState.current).toEqual(newValue);
+		});
+
 	});
 
 	describe("sessionStorage", () => {
@@ -73,7 +98,7 @@ describe("PersistedState", () => {
 			const iso2024FebFirst = "2024-02-01T00:00:00.000Z";
 			const date2024FebFirst = new Date(iso2024FebFirst);
 			persistedState.current = date2024FebFirst;
-			expect(persistedState.current).toBe(date2024FebFirst);
+			expect(persistedState.current).toEqual(date2024FebFirst);
 			expect(localStorage.getItem(key)).toBe(iso2024FebFirst);
 		});
 	});
