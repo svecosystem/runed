@@ -2,7 +2,7 @@
 title: useStickToBottom
 description:
   Tracks if a scrollable container is at the bottom and provides functionality to stick to the
-  bottom as content changes
+  bottom as content changes with customizable animations
 category: Elements
 ---
 
@@ -26,7 +26,7 @@ message interfaces where you want to automatically scroll to new content.
 
 	let contentToTrack: HTMLElement | null = $state(null);
 
-	const { state, scrollToBottom } = useStickToBottom(() => contentToTrack);
+	const stickToBottom = useStickToBottom(() => contentToTrack);
 </script>
 
 <div class="relative overflow-auto">
@@ -37,7 +37,45 @@ message interfaces where you want to automatically scroll to new content.
 	</div>
 </div>
 
-{#if !$state.isAtBottom}
-	<button onclick={() => scrollToBottom()}>Scroll to bottom</button>
+{#if !stickToBottom.isNearBottom}
+	<button onclick={() => stickToBottom.scrollToBottom()}>Scroll to bottom</button>
 {/if}
 ```
+
+## Customizing Animations
+
+The utility supports both standard scroll behaviors (`"smooth"` or `"instant"`) and spring-based
+physics animations for more natural scrolling effects:
+
+```svelte
+<script>
+	// Spring animation for smoother scrolling
+	const { scrollToBottom } = useStickToBottom(() => contentEl, {
+		// Spring animation properties
+		damping: 0.8, // Higher value means more damping (0-1)
+		stiffness: 0.04, // Stiffness of the spring
+		mass: 1.5, // Higher means heavier/slower
+
+		// Different animation for initial scroll vs resize events
+		initial: "instant", // Use instant animation for first scroll
+		resize: {
+			// Use spring animation for resize events
+			damping: 0.6,
+			stiffness: 0.05
+		}
+	});
+
+	// Advanced scroll control
+	function scrollWithOptions() {
+		scrollToBottom({
+			animation: "smooth", // or spring options
+			ignoreEscapes: true, // prevent user from scrolling away
+			wait: 200, // wait before starting animation
+			duration: 500 // extra duration after completing scroll
+		});
+	}
+</script>
+```
+
+The `scrollToBottom` function returns a Promise that resolves when the scroll animation completes,
+allowing you to sequence animations or perform actions after scrolling.
