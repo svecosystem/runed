@@ -1,5 +1,12 @@
 # runed
 
+## 0.24.0
+
+### Minor Changes
+
+- feat: add `resource` that watches dependencies and runs async data fetching
+  ([#218](https://github.com/svecosystem/runed/pull/218))
+
 ## 0.23.4
 
 ### Patch Changes
