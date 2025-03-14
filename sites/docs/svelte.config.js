@@ -1,7 +1,13 @@
 import { mdsx } from "mdsx";
-import adapter from "@sveltejs/adapter-cloudflare";
+import adapterCf from "@sveltejs/adapter-cloudflare";
+import adapterAuto from "@sveltejs/adapter-auto";
 import { vitePreprocess } from "@sveltejs/vite-plugin-svelte";
 import mdsxConfig from "./mdsx.config.js";
+
+const isDev = process.env.NODE_ENV === "development";
+
+// Cloudflare sucks and won't let me run locally
+const adapter = isDev ? adapterAuto : adapterCf;
 
 /** @type {import('@sveltejs/kit').Config} */
 const config = {

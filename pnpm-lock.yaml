@@ -138,6 +138,9 @@ importers:
       '@svecodocs/kit':
         specifier: ^0.1.4
         version: 0.1.4(@sveltejs/kit@2.9.0(@sveltejs/vite-plugin-svelte@4.0.2(svelte@5.11.0)(vite@5.4.11(@types/node@20.17.9)(lightningcss@1.28.2)(terser@5.36.0)))(svelte@5.11.0)(vite@5.4.11(@types/node@20.17.9)(lightningcss@1.28.2)(terser@5.36.0)))(bits-ui@1.0.0-next.65(svelte@5.11.0))(svelte@5.11.0)(tailwindcss@4.0.0-beta.5)(vite@5.4.11(@types/node@20.17.9)(lightningcss@1.28.2)(terser@5.36.0))
+      '@sveltejs/adapter-auto':
+        specifier: ^4.0.0
+        version: 4.0.0(@sveltejs/kit@2.9.0(@sveltejs/vite-plugin-svelte@4.0.2(svelte@5.11.0)(vite@5.4.11(@types/node@20.17.9)(lightningcss@1.28.2)(terser@5.36.0)))(svelte@5.11.0)(vite@5.4.11(@types/node@20.17.9)(lightningcss@1.28.2)(terser@5.36.0)))
       '@sveltejs/adapter-cloudflare':
         specifier: ^4.8.0
         version: 4.8.0(@sveltejs/kit@2.9.0(@sveltejs/vite-plugin-svelte@4.0.2(svelte@5.11.0)(vite@5.4.11(@types/node@20.17.9)(lightningcss@1.28.2)(terser@5.36.0)))(svelte@5.11.0)(vite@5.4.11(@types/node@20.17.9)(lightningcss@1.28.2)(terser@5.36.0)))(wrangler@3.91.0(@cloudflare/workers-types@4.20241127.0))
@@ -1147,6 +1150,11 @@ packages:
       bits-ui: ^1.0.0-next.65
       svelte: ^5.0.0
       tailwindcss: 4.0.0-beta.6
+
+  '@sveltejs/adapter-auto@4.0.0':
+    resolution: {integrity: sha512-kmuYSQdD2AwThymQF0haQhM8rE5rhutQXG4LNbnbShwhMO4qQGnKaaTy+88DuNSuoQDi58+thpq8XpHc1+oEKQ==}
+    peerDependencies:
+      '@sveltejs/kit': ^2.0.0
 
   '@sveltejs/adapter-cloudflare@4.8.0':
     resolution: {integrity: sha512-stt72ZXDmRoLBqqj2fAdMXyOZ0vDUoAiNe/GRKkfxb1wW5Smp/jBGhKVBwhlAIi7aeE0xEMehN1SBxId9QMh5g==}
@@ -4580,6 +4588,11 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
       - vite
+
+  '@sveltejs/adapter-auto@4.0.0(@sveltejs/kit@2.9.0(@sveltejs/vite-plugin-svelte@4.0.2(svelte@5.11.0)(vite@5.4.11(@types/node@20.17.9)(lightningcss@1.28.2)(terser@5.36.0)))(svelte@5.11.0)(vite@5.4.11(@types/node@20.17.9)(lightningcss@1.28.2)(terser@5.36.0)))':
+    dependencies:
+      '@sveltejs/kit': 2.9.0(@sveltejs/vite-plugin-svelte@4.0.2(svelte@5.11.0)(vite@5.4.11(@types/node@20.17.9)(lightningcss@1.28.2)(terser@5.36.0)))(svelte@5.11.0)(vite@5.4.11(@types/node@20.17.9)(lightningcss@1.28.2)(terser@5.36.0))
+      import-meta-resolve: 4.1.0
 
   '@sveltejs/adapter-cloudflare@4.8.0(@sveltejs/kit@2.9.0(@sveltejs/vite-plugin-svelte@4.0.2(svelte@5.11.0)(vite@5.4.11(@types/node@20.17.9)(lightningcss@1.28.2)(terser@5.36.0)))(svelte@5.11.0)(vite@5.4.11(@types/node@20.17.9)(lightningcss@1.28.2)(terser@5.36.0)))(wrangler@3.91.0(@cloudflare/workers-types@4.20241127.0))':
     dependencies:
