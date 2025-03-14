@@ -22,3 +22,5 @@ export * from "./use-geolocation/index.js";
 export * from "./context/index.js";
 export * from "./is-in-viewport/index.js";
 export * from "./resource/index.js";
+export * from "./textarea-autosize/index.js";
+

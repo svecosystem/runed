@@ -37,7 +37,7 @@
 		"format": "prettier --write .",
 		"check": "pnpm -r check",
 		"sync": "pnpm -r sync",
-		"new": "node ./scripts/add-utility.mjs"
+		"add": "node ./scripts/add-utility.mjs"
 	},
 	"license": "MIT",
 	"devDependencies": {
