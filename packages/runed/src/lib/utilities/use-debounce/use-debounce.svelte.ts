@@ -1,4 +1,5 @@
 import type { MaybeGetter } from "$lib/internal/types.js";
+import { extract } from "../extract/extract.svelte.js";
 
 type UseDebounceReturn<Args extends unknown[], Return> = ((
 	this: unknown,
@@ -36,9 +37,10 @@ type DebounceContext<Return> = {
  */
 export function useDebounce<Args extends unknown[], Return>(
 	callback: (...args: Args) => Return,
-	wait: MaybeGetter<number> = 250
+	wait?: MaybeGetter<number | undefined>
 ): UseDebounceReturn<Args, Return> {
 	let context = $state<DebounceContext<Return> | null>(null);
+	const wait$ = $derived(extract(wait, 250));
 
 	function debounced(this: unknown, ...args: Args) {
 		if (context) {
@@ -79,7 +81,7 @@ export function useDebounce<Args extends unknown[], Return>(
 			}
 		};
 
-		context.timeout = setTimeout(context.runner, typeof wait === "function" ? wait() : wait);
+		context.timeout = setTimeout(context.runner, wait$);
 
 		return context.promise;
 	}
