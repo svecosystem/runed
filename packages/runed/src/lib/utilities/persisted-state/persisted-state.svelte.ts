@@ -41,7 +41,7 @@ export class PersistedState<T> {
 	#serializer: Serializer<T>;
 	#storage?: Storage;
 	#subscribe?: VoidFunction;
-	#version = $state(0)
+	#version = $state(0);
 
 	constructor(key: string, initialValue: T, options: PersistedStateOptions<T> = {}) {
 		const {
@@ -64,7 +64,7 @@ export class PersistedState<T> {
 		if (existingValue !== null) {
 			this.#current = this.#deserialize(existingValue);
 		} else {
-			this.#serialize(initialValue)
+			this.#serialize(initialValue);
 		}
 
 		if (syncTabs && storageType === "local") {
@@ -76,10 +76,11 @@ export class PersistedState<T> {
 
 	get current(): T {
 		this.#subscribe?.();
-		const root = this.#deserialize(this.#storage?.getItem(this.#key) as string) ?? this.#current
+		this.#version;
+		const root = this.#deserialize(this.#storage?.getItem(this.#key) as string) ?? this.#current;
 		const proxies = new WeakMap();
 		const proxy = (value: unknown) => {
-			if (value === null || value?.constructor.name === 'Date' || typeof value !== 'object') {
+			if (value === null || value?.constructor.name === "Date" || typeof value !== "object") {
 				return value;
 			}
 			let p = proxies.get(value);
@@ -92,14 +93,14 @@ export class PersistedState<T> {
 					set: (target, property, value) => {
 						this.#version += 1;
 						Reflect.set(target, property, value);
-						this.#serialize(root)
+						this.#serialize(root);
 						return true;
-					}
+					},
 				});
 				proxies.set(value, p);
 			}
 			return p;
-		}
+		};
 		return proxy(root);
 	}
 
@@ -111,6 +112,7 @@ export class PersistedState<T> {
 	#handleStorageEvent = (event: StorageEvent): void => {
 		if (event.key !== this.#key || event.newValue === null) return;
 		this.#current = this.#deserialize(event.newValue);
+		this.#version += 1;
 	};
 
 	#deserialize(value: string): T | undefined {
@@ -118,7 +120,7 @@ export class PersistedState<T> {
 			return this.#serializer.deserialize(value);
 		} catch (error) {
 			console.error(`Error when parsing "${value}" from persisted store "${this.#key}"`, error);
-			return
+			return;
 		}
 	}
 
