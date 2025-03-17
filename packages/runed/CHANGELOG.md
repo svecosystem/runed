@@ -1,5 +1,12 @@
 # runed
 
+## 0.24.1
+
+### Patch Changes
+
+- fix(persisted-state): write state to storage even if only a nested property is changed. fixes #224
+  ([#225](https://github.com/svecosystem/runed/pull/225))
+
 ## 0.24.0
 
 ### Minor Changes
