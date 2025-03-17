@@ -4,7 +4,7 @@ import { createSubscriber } from "svelte/reactivity";
 
 type Serializer<T> = {
 	serialize: (value: T) => string;
-	deserialize: (value: string) => T;
+	deserialize: (value: string) => T | undefined;
 };
 
 type StorageType = "local" | "session";
@@ -36,11 +36,12 @@ type PersistedStateOptions<T> = {
  * @see {@link https://runed.dev/docs/utilities/persisted-state}
  */
 export class PersistedState<T> {
-	#current: T = $state()!;
+	#current: T | undefined;
 	#key: string;
 	#serializer: Serializer<T>;
 	#storage?: Storage;
 	#subscribe?: VoidFunction;
+	#version = $state(0)
 
 	constructor(key: string, initialValue: T, options: PersistedStateOptions<T> = {}) {
 		const {
@@ -61,7 +62,9 @@ export class PersistedState<T> {
 
 		const existingValue = storage.getItem(key);
 		if (existingValue !== null) {
-			this.#deserialize(existingValue);
+			this.#current = this.#deserialize(existingValue);
+		} else {
+			this.#serialize(initialValue)
 		}
 
 		if (syncTabs && storageType === "local") {
@@ -73,31 +76,57 @@ export class PersistedState<T> {
 
 	get current(): T {
 		this.#subscribe?.();
-		return this.#current;
+		const root = this.#deserialize(this.#storage?.getItem(this.#key) as string) ?? this.#current
+		const proxies = new WeakMap();
+		const proxy = (value: unknown) => {
+			if (value === null || value?.constructor.name === 'Date' || typeof value !== 'object') {
+				return value;
+			}
+			let p = proxies.get(value);
+			if (!p) {
+				p = new Proxy(value, {
+					get: (target, property) => {
+						this.#version;
+						return proxy(Reflect.get(target, property));
+					},
+					set: (target, property, value) => {
+						this.#version += 1;
+						Reflect.set(target, property, value);
+						this.#serialize(root)
+						return true;
+					}
+				});
+				proxies.set(value, p);
+			}
+			return p;
+		}
+		return proxy(root);
 	}
 
 	set current(newValue: T) {
-		this.#current = newValue;
 		this.#serialize(newValue);
+		this.#version += 1;
 	}
 
 	#handleStorageEvent = (event: StorageEvent): void => {
 		if (event.key !== this.#key || event.newValue === null) return;
-
-		this.#deserialize(event.newValue);
+		this.#current = this.#deserialize(event.newValue);
 	};
 
-	#deserialize(value: string): void {
+	#deserialize(value: string): T | undefined {
 		try {
-			this.#current = this.#serializer.deserialize(value);
+			return this.#serializer.deserialize(value);
 		} catch (error) {
 			console.error(`Error when parsing "${value}" from persisted store "${this.#key}"`, error);
+			return
 		}
 	}
 
-	#serialize(value: T): void {
+	#serialize(value: T | undefined): void {
 		try {
-			this.#storage?.setItem(this.#key, this.#serializer.serialize(value));
+			if (value != undefined) {
+				this.#storage?.setItem(this.#key, this.#serializer.serialize(value));
+			}
 		} catch (error) {
 			console.error(
 				`Error when writing value from persisted store "${this.#key}" to ${this.#storage}`,
