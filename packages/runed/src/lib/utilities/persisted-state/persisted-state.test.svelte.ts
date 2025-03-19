@@ -36,10 +36,10 @@ describe("PersistedState", () => {
 		});
 
 		testWithEffect("updates localStorage when a nested property in current value changes", () => {
-			const propValue = "test"
-			const initialValue = { prop: { nested: propValue } }; 
-			const newPropValue = "new test"
-			const newValue = { prop: { nested: newPropValue } }; 
+			const propValue = "test";
+			const initialValue = { prop: { nested: propValue } };
+			const newPropValue = "new test";
+			const newValue = { prop: { nested: newPropValue } };
 			const persistedState = new PersistedState(key, initialValue);
 			expect(persistedState.current).toEqual(initialValue);
 
@@ -49,16 +49,15 @@ describe("PersistedState", () => {
 		});
 
 		testWithEffect("updates current value when localStorage changes", () => {
-			const propValue = "test"
-			const initialValue = { prop: { nested: propValue } }; 
-			const newPropValue = "new test"
-			const newValue = { prop: { nested: newPropValue } }; 
+			const propValue = "test";
+			const initialValue = { prop: { nested: propValue } };
+			const newPropValue = "new test";
+			const newValue = { prop: { nested: newPropValue } };
 			const persistedState = new PersistedState(key, initialValue);
 			expect(persistedState.current).toEqual(initialValue);
-			localStorage.setItem(key, JSON.stringify(newValue))
+			localStorage.setItem(key, JSON.stringify(newValue));
 			expect(persistedState.current).toEqual(newValue);
 		});
-
 	});
 
 	describe("sessionStorage", () => {
