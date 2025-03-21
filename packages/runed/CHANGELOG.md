@@ -1,5 +1,17 @@
 # runed
 
+## 0.25.0
+
+### Minor Changes
+
+- previous: allow passing initial value
+  ([`3bbcb9e`](https://github.com/svecosystem/runed/commit/3bbcb9e0185bb40fdb8d38b31876f0e297bee544))
+
+### Patch Changes
+
+- fix: Fix issues with `PersistedState` in runes mode.
+  ([#236](https://github.com/svecosystem/runed/pull/236))
+
 ## 0.24.1
 
 ### Patch Changes
