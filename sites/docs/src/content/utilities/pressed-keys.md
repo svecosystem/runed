@@ -27,5 +27,14 @@ Or get all of the currently pressed keys:
 
 ```ts
 const keys = new PressedKeys();
-console.log(keys.all());
+console.log(keys.all);
+```
+
+Or register a callback to execute when specified key combination is pressed:
+
+```ts
+const keys = new PressedKeys();
+keys.onKeys(["meta", "k"], () => {
+	console.log("open command palette");
+});
 ```
