@@ -93,7 +93,7 @@ export class ScrollState {
 	#options!: ScrollStateOptions;
 	element = $derived(extract(this.#options.element));
 	// throttle = $derived(extract(this.#options.throttle, 0));
-	idle = $derived(extract(this.#options.idle, 200));
+	idle = $derived.by(() => extract(this.#options?.idle, 200));
 	offset = $derived(
 		extract(this.#options.offset, {
 			left: 0,
@@ -200,8 +200,10 @@ export class ScrollState {
 		const directionMultipler = direction === "rtl" ? -1 : 1;
 
 		const scrollLeft = el.scrollLeft;
-		this.directions.left = scrollLeft < this.internalX;
-		this.directions.right = scrollLeft > this.internalX;
+		if (scrollLeft !== this.internalX) {
+			this.directions.left = scrollLeft < this.internalX;
+			this.directions.right = scrollLeft > this.internalX;
+		}
 
 		const left = scrollLeft * directionMultipler <= (this.offset.left || 0);
 		const right =
@@ -223,8 +225,10 @@ export class ScrollState {
 		// patch for mobile compatible
 		if (this.element === window.document && !scrollTop) scrollTop = window.document.body.scrollTop;
 
-		this.directions.top = scrollTop < this.internalY;
-		this.directions.bottom = scrollTop > this.internalY;
+		if (scrollTop !== this.internalY) {
+			this.directions.top = scrollTop < this.internalY;
+			this.directions.bottom = scrollTop > this.internalY;
+		}
 		const top = scrollTop <= (this.offset.top || 0);
 		const bottom =
 			scrollTop + el.clientHeight >=
