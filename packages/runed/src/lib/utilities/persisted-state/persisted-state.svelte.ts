@@ -48,8 +48,8 @@ export class PersistedState<T> {
 			storage: storageType = "local",
 			serializer = { serialize: JSON.stringify, deserialize: JSON.parse },
 			syncTabs = true,
-			window = defaultWindow,
 		} = options;
+		const window = "window" in options ? options.window : defaultWindow; // window is not mockable to be undefined without this, because JavaScript will fill undefined with `= default`
 
 		this.#current = initialValue;
 		this.#key = key;
@@ -77,7 +77,10 @@ export class PersistedState<T> {
 	get current(): T {
 		this.#subscribe?.();
 		this.#version;
-		const root = this.#deserialize(this.#storage?.getItem(this.#key) as string) ?? this.#current;
+
+		const storageItem = this.#storage?.getItem(this.#key);
+		const root = storageItem ? this.#deserialize(storageItem) : this.#current;
+
 		const proxies = new WeakMap();
 		const proxy = (value: unknown) => {
 			if (value === null || value?.constructor.name === "Date" || typeof value !== "object") {
