@@ -8,10 +8,24 @@ const initialValue = "test-value";
 const existingValue = "test-existing-value";
 const newValue = "test-new-value";
 
-describe("PersistedState", () => {
+vi.spyOn(console, "error").mockImplementation((...args: unknown[]) => {
+	console.log("args:", args);
+	const m = `console.error was called with args ${args.concat(", ")}`;
+	console.log(m);
+	throw new Error(m);
+});
+
+describe("PersistedState", async () => {
 	beforeEach(() => {
 		localStorage.clear();
 		sessionStorage.clear();
+	});
+
+	testWithEffect("it does not console.error if window is not defined", () => {
+		const persistedState = new PersistedState(key, initialValue, {
+			window: undefined,
+		});
+		expect(persistedState.current).toBe(initialValue);
 	});
 
 	describe("localStorage", () => {
@@ -62,18 +76,24 @@ describe("PersistedState", () => {
 
 	describe("sessionStorage", () => {
 		testWithEffect("uses initial value if no persisted value is found", () => {
-			const persistedState = new PersistedState(key, initialValue, { storage: "session" });
+			const persistedState = new PersistedState(key, initialValue, {
+				storage: "session",
+			});
 			expect(persistedState.current).toBe(initialValue);
 		});
 
 		testWithEffect("uses persisted value if it is found", () => {
 			sessionStorage.setItem(key, JSON.stringify(existingValue));
-			const persistedState = new PersistedState(key, initialValue, { storage: "session" });
+			const persistedState = new PersistedState(key, initialValue, {
+				storage: "session",
+			});
 			expect(persistedState.current).toBe(existingValue);
 		});
 
 		testWithEffect("updates sessionStorage when current value changes", () => {
-			const persistedState = new PersistedState(key, initialValue, { storage: "session" });
+			const persistedState = new PersistedState(key, initialValue, {
+				storage: "session",
+			});
 			expect(persistedState.current).toBe(initialValue);
 
 			persistedState.current = newValue;
@@ -91,7 +111,9 @@ describe("PersistedState", () => {
 				serialize: (value: Date) => value.toISOString(),
 				deserialize: (value: string) => new Date(value),
 			};
-			const persistedState = new PersistedState(key, new Date(), { serializer });
+			const persistedState = new PersistedState(key, new Date(), {
+				serializer,
+			});
 			expect(persistedState.current).toEqual(date2024JanFirst);
 
 			const iso2024FebFirst = "2024-02-01T00:00:00.000Z";
@@ -124,7 +146,9 @@ describe("PersistedState", () => {
 			"does not update persisted value when local storage changes independently if syncTabs is false",
 			() => {
 				$effect(() => {
-					const persistedState = new PersistedState(key, initialValue, { syncTabs: false });
+					const persistedState = new PersistedState(key, initialValue, {
+						syncTabs: false,
+					});
 					expect(persistedState.current).toBe(initialValue);
 
 					localStorage.setItem(key, JSON.stringify(newValue));
@@ -142,7 +166,9 @@ describe("PersistedState", () => {
 
 		testWithEffect("does not handle the storage event when 'session' storage is used", () => {
 			$effect(() => {
-				const persistedState = new PersistedState(key, initialValue, { storage: "session" });
+				const persistedState = new PersistedState(key, initialValue, {
+					storage: "session",
+				});
 				expect(persistedState.current).toBe(initialValue);
 
 				sessionStorage.setItem(key, JSON.stringify(newValue));
