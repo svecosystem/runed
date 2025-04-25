@@ -218,11 +218,6 @@ function runResource<
 				return;
 			}
 
-			// Skip if values haven't changed
-			if (prevValues && JSON.stringify(values) === JSON.stringify(prevValues)) {
-				return;
-			}
-
 			prevValues = values;
 			runFetcher(
 				Array.isArray(source) ? values : values[0]!,
