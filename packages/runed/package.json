@@ -4,6 +4,7 @@
 	"type": "module",
 	"svelte": "./dist/index.js",
 	"types": "./dist/index.d.ts",
+	"license": "MIT",
 	"contributors": [
 		{
 			"name": "Thomas G. Lopes",
