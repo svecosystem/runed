@@ -32,7 +32,7 @@
 		"@svecodocs/kit": "^0.2.1",
 		"@sveltejs/adapter-auto": "^4.0.0",
 		"@sveltejs/adapter-cloudflare": "^4.8.0",
-		"@sveltejs/kit": "^2.9.0",
+		"@sveltejs/kit": "^2.20.7",
 		"@sveltejs/vite-plugin-svelte": "^5.0.3",
 		"@tailwindcss/vite": "4.1.4",
 		"mdsx": "^0.0.6",
@@ -44,7 +44,7 @@
 		"typescript": "^5.7.2",
 		"velite": "^0.2.1",
 		"vite": "^6.3.3",
-		"vitest": "^1.6.0"
+		"vitest": "^3.1.2"
 	},
 	"type": "module"
 }
