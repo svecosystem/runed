@@ -2,4 +2,4 @@
 "runed": minor
 ---
 
-add textarea autosize
+New utility: `TextareaAutosize`

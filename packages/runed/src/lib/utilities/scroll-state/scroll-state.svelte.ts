@@ -6,28 +6,29 @@ import { noop } from "$lib/internal/utils/function.js";
 
 export interface ScrollStateOptions {
 	/**
-	 * The target element.
+	 * The scroll container.
+	 *
+	 * Can be an HTMLElement, Window, or Document, or a getter returning one of these.
 	 */
 	element: MaybeGetter<HTMLElement | Window | Document | null | undefined>;
 
 	// /**
-	//  * Throttle time for scroll event, it’s disabled by default.
+	//  * Throttle time for scroll event, it's disabled by default.
 	//  *
 	//  * @default 0
 	//  */
 	// throttle?: MaybeGetter<number | undefined>;
 
 	/**
-	 * The check time when scrolling ends.
-	 * This configuration will be setting to (throttle + idle) when the `throttle` is configured.
+	 * Debounce timeout (ms) after scrolling ends.
+	 * If `throttle` is provided, final delay = `throttle + idle`.
 	 *
 	 * @default 200
 	 */
 	idle?: MaybeGetter<number | undefined>;
 
 	/**
-	 * Offset arrived states by x pixels
-	 *
+	 * Pixel offset thresholds for determining "arrived" state on each scroll edge.
 	 */
 	offset?: MaybeGetter<
 		| {
@@ -40,36 +41,33 @@ export interface ScrollStateOptions {
 	>;
 
 	/**
-	 * Trigger it when scrolling.
-	 *
+	 * Called during scroll events.
 	 */
 	onScroll?: (e: Event) => void;
 
 	/**
-	 * Trigger it when scrolling ends.
-	 *
+	 * Called after scroll ends (after debounce).
 	 */
 	onStop?: (e: Event) => void;
 
 	/**
-	 * Listener options for scroll event.
+	 * Scroll event listener options.
 	 *
-	 * @default {capture: false, passive: true}
+	 * @default { capture: false, passive: true }
 	 */
 	eventListenerOptions?: AddEventListenerOptions;
 
 	/**
-	 * Optionally specify a scroll behavior of `auto` (default, not smooth scrolling) or
-	 * `smooth` (for smooth scrolling) which takes effect when changing the `x` or `y` refs.
+	 * Scroll behavior when using `scrollTo`, `scrollToTop`, or `scrollToBottom`,
 	 *
 	 * @default 'auto'
 	 */
 	behavior?: MaybeGetter<ScrollBehavior | undefined>;
 
 	/**
-	 * On error callback
+	 * Optional error handler.
 	 *
-	 * Default log error to `console.error`
+	 * @default console.error
 	 */
 	onError?: (error: unknown) => void;
 }
@@ -83,7 +81,8 @@ export interface ScrollStateOptions {
 const ARRIVED_STATE_THRESHOLD_PIXELS = 1;
 
 /**
- * Reactive scroll.
+ * A reactive utility for tracking scroll position, direction,
+ * and edge arrival states, while supporting programmatic scrolling.
  *
  * @see https://vueuse.org/useScroll for the inspiration behind this utility.
  * @param element
@@ -189,6 +188,10 @@ export class ScrollState {
 		new AnimationFrames(() => this.setArrivedState());
 	}
 
+	/**
+	 * Updates direction and edge arrival states based on the current scroll position.
+	 * Takes into account writing mode, flex direction, and RTL layouts.
+	 */
 	setArrivedState = () => {
 		if (!window || !this.element) return;
 
@@ -197,7 +200,7 @@ export class ScrollState {
 			(this.element as HTMLElement | SVGElement)) as Element;
 
 		const { display, flexDirection, direction } = getComputedStyle(el);
-		const directionMultipler = direction === "rtl" ? -1 : 1;
+		const directionMultiplier = direction === "rtl" ? -1 : 1;
 
 		const scrollLeft = el.scrollLeft;
 		if (scrollLeft !== this.internalX) {
@@ -205,9 +208,9 @@ export class ScrollState {
 			this.directions.right = scrollLeft > this.internalX;
 		}
 
-		const left = scrollLeft * directionMultipler <= (this.offset.left || 0);
+		const left = scrollLeft * directionMultiplier <= (this.offset.left || 0);
 		const right =
-			scrollLeft * directionMultipler + el.clientWidth >=
+			scrollLeft * directionMultiplier + el.clientWidth >=
 			el.scrollWidth - (this.offset.right || 0) - ARRIVED_STATE_THRESHOLD_PIXELS;
 
 		if (display === "flex" && flexDirection === "row-reverse") {
@@ -259,6 +262,9 @@ export class ScrollState {
 		this.onScroll(e);
 	};
 
+	/**
+	 * Programmatically scroll to a specific position.
+	 */
 	scrollTo(x: number | undefined, y: number | undefined) {
 		if (!window) return;
 
@@ -275,10 +281,16 @@ export class ScrollState {
 		if (y != null) this.internalY = scrollContainer.scrollTop;
 	}
 
+	/**
+	 * Scrolls to the top of the element.
+	 */
 	scrollToTop() {
 		this.scrollTo(undefined, 0);
 	}
 
+	/**
+	 * Scrolls to the bottom of the element.
+	 */
 	scrollToBottom() {
 		if (!window) return;
 

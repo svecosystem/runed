@@ -2,4 +2,4 @@
 "runed": minor
 ---
 
-add extract
+New utility: `extract`

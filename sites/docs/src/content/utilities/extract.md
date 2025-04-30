@@ -4,8 +4,8 @@ description: Resolve the value of a getter or static variable
 category: Reactivity
 ---
 
-As you'll see throughout Runed and other libraries, a common way of passing reactive state through
-boundaries is using getters.
+In libraries like Runed, it's common to pass state reactively using getters (functions that return a
+value), a common pattern to pass reactivity across boundaries.
 
 ```ts
 // For example...
@@ -15,7 +15,7 @@ let count = $state(0);
 const previous = new Previous(() => count);
 ```
 
-Sometimes though, these functions accept a value that can also be static, or even `undefined`.
+However, some APIs accept either a reactive getter or a static value (including `undefined`):
 
 ```ts
 let search = $state("");
@@ -34,7 +34,7 @@ const d2 = new Debounced(() => search, 500);
 const d3 = new Debounced(() => search);
 ```
 
-It can be a bit troublesome to deal with these values inside utility functions.
+When writing utility functions, dealing with both types can lead to verbose and repetitive logic:
 
 ```ts
 setTimeout(
@@ -47,26 +47,38 @@ This is where `extract` comes in.
 
 ## Usage
 
-When receiving a `Getter` or `MaybeGetter`, `extract` is best used in the following way:
+The `extract` utility resolves either a getter or static value to a plain value. This helps you
+write cleaner, safer utilities.
 
 ```ts
 import { extract } from "runed";
+
 /**
- * @param intervalProp the wait in ms between confetti. Defaults to 100
+ * Triggers confetti at a given interval.
+ * @param intervalProp Time between confetti bursts, in ms. Defaults to 100.
  */
 function throwConfetti(intervalProp?: MaybeGetter<number | undefined>) {
-	const interval = $derived(extract(prop, 100));
+	const interval = $derived(extract(intervalProp, 100));
 	// ...
 }
 ```
 
-Here's how it works.
+## Behavior
 
-- If `intervalProp` is a `number`, `interval` will be equal to `intervalProp`
-- If `intervalProp` is `undefined`, `interval` will be equal to `100`
-- If `intervalProp` is a function that returns a `number`, `interval` will be equal to the returned
-  value of `intervalProp`
-- If `intervalProp` is a function that returns `undefined`, `interval` will be equal to `100`
+Given a `MaybeGetter<T>`, `extract(input, fallback)` resolves as follows:
 
-The default value is optional, however. In this case, if you omitted it, `interval` would be typed
-as `number | undefined`. Otherwise, its typed as `number`.
+| Case                                        | Result                      |
+| ------------------------------------------- | --------------------------- |
+| `input` is a value                          | Returns the value           |
+| `input` is `undefined`                      | Returns the fallback        |
+| `input` is a function returning a value     | Returns the function result |
+| `input` is a function returning `undefined` | Returns the fallback        |
+
+The fallback is _optional_. If you omit it, `extract()` returns `T | undefined`.
+
+## Types
+
+```ts
+function extract<T>(input: MaybeGetter<T | undefined>, fallback: T): T;
+function extract<T>(input: MaybeGetter<T | undefined>): T | undefined;
+```

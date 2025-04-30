@@ -2,4 +2,4 @@
 "runed": minor
 ---
 
-export getter and maybegetter types
+feat: export `Getter` and `MaybeGetter` types

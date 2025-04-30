@@ -2,4 +2,4 @@
 "runed": minor
 ---
 
-add scroll state
+New utility: `ScrollState`

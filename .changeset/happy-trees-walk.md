@@ -2,4 +2,4 @@
 "runed": patch
 ---
 
-change extract types
+change: `extract` types
