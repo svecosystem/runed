@@ -95,6 +95,29 @@ describe("resource", () => {
 			await sleep(50);
 			expect(searchResource.current?.results[0].id).toBe(2);
 		});
+
+		testWithEffect("re-fetches when promise source changes", async () => {
+			let promiseState = $state<Promise<number>>(Promise.resolve(1));
+			let fetchedValues = $state<number[]>([]);
+			const promiseResource = resource(
+				() => promiseState,
+				async (promise) => {
+					const val = await promise;
+					fetchedValues.push(val);
+					return val;
+				}
+			);
+			// Initial fetch
+			await sleep(50);
+			expect(fetchedValues).toEqual([1]);
+			expect(promiseResource.current).toBe(1);
+
+			// Update promise reference
+			promiseState = Promise.resolve(2);
+			await sleep(50);
+			expect(fetchedValues).toEqual([1, 2]);
+			expect(promiseResource.current).toBe(2);
+		});
 	});
 
 	describe("error handling", () => {
