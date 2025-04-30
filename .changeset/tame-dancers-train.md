@@ -2,4 +2,4 @@
 "runed": patch
 ---
 
-fix(Resource): remove redundant equality comparison
+fix(resource): remove redundant equality comparison
