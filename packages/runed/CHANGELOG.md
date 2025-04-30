@@ -1,5 +1,25 @@
 # runed
 
+## 0.26.0
+
+### Minor Changes
+
+- feat(PressedKeys): add the ability to register a callback to execute when a specified key
+  combination is pressed. ([#239](https://github.com/svecosystem/runed/pull/239))
+
+### Patch Changes
+
+- chore: add license field to package.json ([#238](https://github.com/svecosystem/runed/pull/238))
+
+- fix(PersistedState): prevent console errors if `typeof window === undefined`
+  ([#244](https://github.com/svecosystem/runed/pull/244))
+
+- fix(resource): remove redundant equality comparison
+  ([#248](https://github.com/svecosystem/runed/pull/248))
+
+- fix(PressedKeys): keys are not cleared after key combination is pressed
+  ([#239](https://github.com/svecosystem/runed/pull/239))
+
 ## 0.25.0
 
 ### Minor Changes
