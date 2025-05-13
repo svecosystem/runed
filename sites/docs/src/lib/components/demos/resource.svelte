@@ -30,7 +30,7 @@
 				</div>
 			{/if}
 			<div class="flex w-[400px] flex-col gap-1 overflow-scroll">
-				{#each searchResource.current ?? [] as result}
+				{#each searchResource.current ?? [] as result, i (`result-${i}`)}
 					<pre>{JSON.stringify(result, null, 2)}</pre>
 				{/each}
 			</div>

@@ -30,7 +30,7 @@
 
 <DemoContainer>
 	<div bind:this={el} class={className} {style}>
-		{#each messages as text}
+		{#each messages as text, i (`${text}-${i}`)}
 			<div>
 				Mutation Attribute: {text}
 			</div>
