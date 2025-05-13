@@ -1,5 +1,22 @@
 # runed
 
+## 0.27.0
+
+### Minor Changes
+
+- New utility: `TextareaAutosize` ([#233](https://github.com/svecosystem/runed/pull/233))
+
+- New utility: `extract` ([#233](https://github.com/svecosystem/runed/pull/233))
+
+- New utility: `ScrollState` ([#233](https://github.com/svecosystem/runed/pull/233))
+
+- feat: export `Getter` and `MaybeGetter` types
+  ([#233](https://github.com/svecosystem/runed/pull/233))
+
+### Patch Changes
+
+- change: `extract` types ([#233](https://github.com/svecosystem/runed/pull/233))
+
 ## 0.26.0
 
 ### Minor Changes
