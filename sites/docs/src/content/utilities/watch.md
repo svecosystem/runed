@@ -28,9 +28,8 @@ import { watch } from "runed";
 
 let count = $state(0);
 watch(() => count, () => {
-		console.log(count);
-	}
-);
+	console.log(count);
+});
 ```
 
 The callback receives two arguments: The current value of the sources, and the previous value.
@@ -39,9 +38,8 @@ The callback receives two arguments: The current value of the sources, and the p
 ```ts
 let count = $state(0);
 watch(() => count, (curr, prev) => {
-		console.log(`count is ${curr}, was ${prev}`);
-	}
-);
+	console.log(`count is ${curr}, was ${prev}`);
+});
 ```
 
 You can also send in an array of sources:
@@ -51,8 +49,8 @@ You can also send in an array of sources:
 let age = $state(20);
 let name = $state("bob");
 watch([() => age, () => name], ([age, name], [prevAge, prevName]) => {
-  // ...
-}
+	// ...
+});
 ```
 
 `watch` also accepts an `options` object.
