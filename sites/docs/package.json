@@ -38,7 +38,7 @@
 		"mdsx": "^0.0.6",
 		"phosphor-svelte": "^3.0.1",
 		"runed": "workspace:^",
-		"svelte": "^5.28.2",
+		"svelte": "^5.28.6",
 		"svelte-check": "^4.1.6",
 		"tailwindcss": "4.1.4",
 		"typescript": "^5.7.2",
