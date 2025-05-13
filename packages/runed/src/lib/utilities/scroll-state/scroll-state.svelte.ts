@@ -147,7 +147,12 @@ export class ScrollState {
 	constructor(options: ScrollStateOptions) {
 		this.#options = options;
 
-		useEventListener(() => this.element, "scroll", this.onScrollHandler, this.eventListenerOptions);
+		useEventListener(
+			() => this.element,
+			"scroll",
+			this.#onScrollHandler,
+			this.eventListenerOptions
+		);
 
 		useEventListener(
 			() => this.element,
@@ -228,7 +233,7 @@ export class ScrollState {
 		this.internalY = scrollTop;
 	};
 
-	onScrollHandler = (e: Event) => {
+	#onScrollHandler = (e: Event) => {
 		if (!window) return;
 
 		this.setArrivedState();
@@ -274,6 +279,7 @@ export class ScrollState {
 			(this.element as Window)?.document?.documentElement ||
 			(this.element as Document)?.documentElement ||
 			(this.element as Element);
+		if (!scrollContainer) return;
 		this.scrollTo(undefined, scrollContainer.scrollHeight);
 	}
 

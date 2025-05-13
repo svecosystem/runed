@@ -1,5 +1,5 @@
 import type { Getter } from "$lib/internal/types.js";
-import { useResizeObserver, watch } from "runed";
+import { useResizeObserver, watch, type MaybeGetter } from "runed";
 import { tick } from "svelte";
 import { extract } from "$lib/utilities/extract/index.js";
 
@@ -32,7 +32,7 @@ export interface TextareaAutosizeOptions {
 	/**
 	 * The textarea element to autosize.
 	 */
-	element: Getter<HTMLElement | undefined>;
+	element: MaybeGetter<HTMLElement | undefined>;
 
 	/**
 	 * The current text value of the textarea.
