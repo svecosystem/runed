@@ -63,7 +63,7 @@
 		"msw": "^2.7.0",
 		"publint": "^0.1.9",
 		"resize-observer-polyfill": "^1.5.1",
-		"svelte": "^5.11.0",
+		"svelte": "^5.28.6",
 		"svelte-check": "^4.1.1",
 		"tslib": "^2.4.1",
 		"typescript": "^5.0.0",
