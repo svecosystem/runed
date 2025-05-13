@@ -35,3 +35,4 @@ jobs:
           projectName: runed
           deploymentName: Preview
           directory: ${{ steps.preview-build-artifact.outputs.download-path }}
+          wranglerVersion: "4"
