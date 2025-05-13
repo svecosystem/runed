@@ -24,6 +24,7 @@
 		}
 	);
 
+	// eslint-disable-next-line svelte/no-inspect
 	$inspect(guessedCorrectly);
 </script>
 
@@ -40,7 +41,7 @@
 				<RunedIcon class="size-12" />
 			</div>
 		{/if}
-		{#each toPress as key}
+		{#each toPress as key, i (`key-${i}`)}
 			<!-- svelte-ignore a11y_click_events_have_key_events -->
 			<!-- svelte-ignore a11y_no_static_element_interactions -->
 			<div

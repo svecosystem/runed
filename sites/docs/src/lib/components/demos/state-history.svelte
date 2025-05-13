@@ -31,7 +31,7 @@
 	<div class="mt-4">
 		<p class="text-muted-foreground m-0 select-none">History (limited to 10 records for demo)</p>
 		<div class="bg-background-secondary mt-2 rounded-md border px-3 py-2">
-			{#each history.log.toReversed() as event}
+			{#each history.log.toReversed() as event, i (`${event}-${i}`)}
 				<div class="flex items-center gap-4 font-mono">
 					<span class="text-muted-foreground/75">{format(event.timestamp)}</span>
 					<span>{`{ value: ${event.snapshot} }`}</span>
