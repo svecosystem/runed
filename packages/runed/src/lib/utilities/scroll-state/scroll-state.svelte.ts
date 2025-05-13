@@ -12,16 +12,8 @@ export interface ScrollStateOptions {
 	 */
 	element: MaybeGetter<HTMLElement | Window | Document | null | undefined>;
 
-	// /**
-	//  * Throttle time for scroll event, it's disabled by default.
-	//  *
-	//  * @default 0
-	//  */
-	// throttle?: MaybeGetter<number | undefined>;
-
 	/**
 	 * Debounce timeout (ms) after scrolling ends.
-	 * If `throttle` is provided, final delay = `throttle + idle`.
 	 *
 	 * @default 200
 	 */
@@ -91,7 +83,6 @@ const ARRIVED_STATE_THRESHOLD_PIXELS = 1;
 export class ScrollState {
 	#options!: ScrollStateOptions;
 	element = $derived(extract(this.#options.element));
-	// throttle = $derived(extract(this.#options.throttle, 0));
 	idle = $derived.by(() => extract(this.#options?.idle, 200));
 	offset = $derived(
 		extract(this.#options.offset, {
@@ -156,13 +147,7 @@ export class ScrollState {
 	constructor(options: ScrollStateOptions) {
 		this.#options = options;
 
-		useEventListener(
-			() => this.element,
-			"scroll",
-			// throttle ? useThrottleFn(onScrollHandler, throttle, true, false) : onScrollHandler,
-			this.onScrollHandler,
-			this.eventListenerOptions
-		);
+		useEventListener(() => this.element, "scroll", this.onScrollHandler, this.eventListenerOptions);
 
 		useEventListener(
 			() => this.element,
@@ -174,15 +159,6 @@ export class ScrollState {
 		onMount(() => {
 			this.setArrivedState();
 		});
-
-		// useResizeObserver(
-		// 	() => (isHtmlElement(this.element) ? this.element : null),
-		// 	() => {
-		// 		setTimeout(() => {
-		// 			this.setArrivedState();
-		// 		}, 100);
-		// 	}
-		// );
 
 		// overkill?
 		new AnimationFrames(() => this.setArrivedState());
