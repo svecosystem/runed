@@ -31,3 +31,4 @@ jobs:
         with:
           name: preview-build
           path: sites/docs/.svelte-kit
+          include-hidden-files: true
