@@ -33,4 +33,4 @@ jobs:
           directory: ./.svelte-kit/cloudflare
           workingDirectory: sites/docs
           deploymentName: Production
-          wranglerVersion: "4"
+          wranglerVersion: "" # uses the local version of wrangler
