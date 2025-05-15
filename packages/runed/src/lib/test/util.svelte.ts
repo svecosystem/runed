@@ -20,7 +20,7 @@ export function effectRootScope(fn: () => void | Promise<void>): void | Promise<
 export function vitestSetTimeoutWrapper(fn: () => void, timeout: number): void {
 	setTimeout(() => {
 		fn();
-	}, timeout + 1);
+	}, timeout);
 
 	vi.advanceTimersByTime(timeout);
 }
