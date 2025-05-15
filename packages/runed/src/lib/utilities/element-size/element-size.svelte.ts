@@ -25,7 +25,7 @@ export class ElementSize {
 		height: 0,
 	};
 
-	#updated = false;
+	#observed = false;
 
 	#options: ElementSizeOptions;
 
@@ -54,7 +54,7 @@ export class ElementSize {
 		return createSubscriber((update) => {
 			if (!this.#window) return;
 			const observer = new this.#window.ResizeObserver((entries) => {
-				this.#updated = true;
+				this.#observed = true;
 				for (const entry of entries) {
 					const boxSize =
 						this.#options.box === "content-box" ? entry.contentBoxSize : entry.borderBoxSize;
@@ -67,7 +67,7 @@ export class ElementSize {
 			observer.observe(node$);
 
 			return () => {
-				this.#updated = false;
+				this.#observed = false;
 				observer.disconnect();
 			};
 		});
@@ -87,7 +87,7 @@ export class ElementSize {
 	calculateSize() {
 		const element = get(this.#node);
 
-		// no element or no window, return undefined, we will return the initial size
+		// no element or no window, return undefined, we will return 0x0 in the getSize method
 		if (!element || !this.#window) {
 			return;
 		}
@@ -123,7 +123,7 @@ export class ElementSize {
 	getSize() {
 		// if the resize observer already run we can just return the size
 		// otherwise we calculate the size if possible or we return the initial size
-		return this.#updated ? this.#size : (this.calculateSize() ?? this.#size);
+		return this.#observed ? this.#size : (this.calculateSize() ?? this.#size);
 	}
 
 	get current(): { width: number; height: number } {
