@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { type Action, FiniteStateMachine } from "./finite-state-machine.svelte.js";
 
 describe("FiniteStateMachine", () => {
