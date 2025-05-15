@@ -4,10 +4,6 @@ import { get } from "$lib/internal/utils/get.js";
 import { createSubscriber } from "svelte/reactivity";
 
 export type ElementSizeOptions = ConfigurableWindow & {
-	initialSize?: {
-		width: number;
-		height: number;
-	};
 	box?: "content-box" | "border-box";
 };
 
@@ -29,6 +25,8 @@ export class ElementSize {
 		height: 0,
 	};
 
+	#observed = false;
+
 	#options: ElementSizeOptions;
 
 	#node: MaybeElementGetter;
@@ -39,14 +37,14 @@ export class ElementSize {
 	// which we would get if we would just use a getter since the version of the subscriber will be changing
 	#width = $derived.by(() => {
 		this.#subscribe?.();
-		return this.#size.width;
+		return this.getSize().width;
 	});
 
 	// we use a derived here to extract the height so that if the height doesn't change we don't get a state update
 	// which we would get if we would just use a getter since the version of the subscriber will be changing
 	#height = $derived.by(() => {
 		this.#subscribe?.();
-		return this.#size.height;
+		return this.getSize().height;
 	});
 
 	// we need to use a derived here because the class will be created before the node is bound to the ref
@@ -56,6 +54,7 @@ export class ElementSize {
 		return createSubscriber((update) => {
 			if (!this.#window) return;
 			const observer = new this.#window.ResizeObserver((entries) => {
+				this.#observed = true;
 				for (const entry of entries) {
 					const boxSize =
 						this.#options.box === "content-box" ? entry.contentBoxSize : entry.borderBoxSize;
@@ -68,6 +67,7 @@ export class ElementSize {
 			observer.observe(node$);
 
 			return () => {
+				this.#observed = false;
 				observer.disconnect();
 			};
 		});
@@ -79,14 +79,56 @@ export class ElementSize {
 		this.#node = node;
 
 		this.#size = {
-			width: options.initialSize?.width ?? 0,
-			height: options.initialSize?.height ?? 0,
+			width: 0,
+			height: 0,
 		};
+	}
+
+	calculateSize() {
+		const element = get(this.#node);
+
+		// no element or no window, return undefined, we will return 0x0 in the getSize method
+		if (!element || !this.#window) {
+			return;
+		}
+
+		const offsetWidth = element.offsetWidth;
+		const offsetHeight = element.offsetHeight;
+
+		// easy mode, just return offsets
+		if (this.#options.box === "border-box") {
+			return {
+				width: offsetWidth,
+				height: offsetHeight,
+			};
+		}
+
+		// hard mode, we need to calculate the content size
+		const style = this.#window.getComputedStyle(element);
+
+		const paddingWidth = parseFloat(style.paddingLeft) + parseFloat(style.paddingRight);
+		const paddingHeight = parseFloat(style.paddingTop) + parseFloat(style.paddingBottom);
+		const borderWidth = parseFloat(style.borderLeftWidth) + parseFloat(style.borderRightWidth);
+		const borderHeight = parseFloat(style.borderTopWidth) + parseFloat(style.borderBottomWidth);
+
+		const contentWidth = offsetWidth - paddingWidth - borderWidth;
+		const contentHeight = offsetHeight - paddingHeight - borderHeight;
+
+		return {
+			width: contentWidth,
+			height: contentHeight,
+		};
+	}
+
+	getSize() {
+		// if the resize observer already run we can just return the size
+		// otherwise we calculate the size if possible or we return the initial size
+		return this.#observed ? this.#size : (this.calculateSize() ?? this.#size);
 	}
 
 	get current(): { width: number; height: number } {
 		this.#subscribe?.();
-		return this.#size;
+		return this.getSize();
 	}
 
 	get width(): number {
