@@ -1,5 +1,17 @@
 # runed
 
+## 0.28.0
+
+### Minor Changes
+
+- breaking: remove `initialSize` and calculate size before first resize
+  ([#262](https://github.com/svecosystem/runed/pull/262))
+
+### Patch Changes
+
+- fix: use `createSubscriber` for `ElementSize` util
+  ([#254](https://github.com/svecosystem/runed/pull/254))
+
 ## 0.27.0
 
 ### Minor Changes
