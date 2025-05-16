@@ -1,6 +1,7 @@
 import { testWithEffect } from "$lib/test/util.svelte.js";
 import { describe, expect, beforeEach, afterEach } from "vitest";
 import { ElementSize } from "./index.js";
+import { flushSync } from "svelte";
 
 const waitForFrame = () =>
 	new Promise<void>((resolve) => {
@@ -104,6 +105,46 @@ describe(ElementSize, () => {
 		expect(instance.current).toEqual({
 			width: 200,
 			height: 50,
+		});
+	});
+
+	describe("observed resizes", () => {
+		testWithEffect("default", async () => {
+			const instance = new ElementSize(node);
+			const changes: Array<{ width: number; height: number }> = [];
+			$effect(() => {
+				changes.push(instance.current);
+			});
+			flushSync();
+			await waitForFrame();
+			node.style.width = "100px";
+			node.style.height = "50px";
+			node.style.border = "10px solid";
+			flushSync();
+			await waitForFrame();
+			expect(instance.current).toEqual({
+				width: 120,
+				height: 70,
+			});
+		});
+
+		testWithEffect("default", async () => {
+			const instance = new ElementSize(node, { box: "content-box" });
+			const changes: Array<{ width: number; height: number }> = [];
+			$effect(() => {
+				changes.push(instance.current);
+			});
+			flushSync();
+			await waitForFrame();
+			node.style.width = "100px";
+			node.style.height = "50px";
+			node.style.border = "10px solid";
+			flushSync();
+			await waitForFrame();
+			expect(instance.current).toEqual({
+				width: 100,
+				height: 50,
+			});
 		});
 	});
 });
