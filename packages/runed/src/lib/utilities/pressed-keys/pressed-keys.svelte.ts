@@ -3,6 +3,8 @@ import { createSubscriber } from "svelte/reactivity";
 import { watch } from "$lib/utilities/watch/index.js";
 import { defaultWindow, type ConfigurableWindow } from "$lib/internal/configurable-globals.js";
 
+const modifierKeys = ["meta", "control", "alt", "shift"];
+
 export type PressedKeysOptions = ConfigurableWindow;
 /**
  * Tracks which keys are currently pressed.
@@ -34,13 +36,11 @@ export class PressedKeys {
 				// Special handling for modifier keys (meta, control, alt, shift)
 				// This addresses issues with OS/browser intercepting certain key combinations
 				// where non-modifier keyup events might not fire properly
-				if (["meta", "control", "alt", "shift"].includes(key)) {
+				if (modifierKeys.includes(key)) {
 					// When a modifier key is released, clear all non-modifier keys
 					// but keep other modifier keys that might still be pressed
 					// This prevents keys from getting "stuck" in the pressed state
-					this.#pressedKeys = this.#pressedKeys.filter((k) =>
-						["meta", "control", "alt", "shift"].includes(k)
-					);
+					this.#pressedKeys = this.#pressedKeys.filter((k) => modifierKeys.includes(k));
 				}
 
 				// Regular key removal
