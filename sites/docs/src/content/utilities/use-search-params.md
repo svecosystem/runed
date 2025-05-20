@@ -4,27 +4,14 @@ description: Reactive, schema-validated URL search params for Svelte/SvelteKit
 category: Reactivity
 ---
 
-<script>
-import Demo from '$lib/components/demos/search-params.svelte';
-import { Callout } from '@svecodocs/kit';
-</script>
+## Requirements
+
+- **@sveltejs/kit** must be installed in your project (peer dependency).
+- Uses [Standard Schema](https://standardschema.dev/) for schema validation and type inference.
 
 `useSearchParams` provides a reactive, type-safe, and schema-driven way to manage URL search
 parameters in Svelte/SvelteKit apps. It supports validation, default values, compression,
 debouncing, and history control.
-
-## Demo
-
-<Demo />
-<Callout>
-	You can refresh this page and/or open it in another tab to see the count state being persisted
-	and synchronized across sessions and tabs.
-</Callout>
-
-## Requirements
-
-- **`@sveltejs/kit`** must be installed in your project.
-- Uses [Standard Schema](https://standardschema.dev/) for schema validation and type inference.
 
 ## Usage
 
@@ -46,7 +33,6 @@ In your svelte code:
 
 ```svelte
 <script lang="ts">
-import { useSearchParams } from "runed/kit";
 import { productSearchSchema } from './schemas';
 
 const params = useSearchParams(productSearchSchema);
@@ -78,7 +64,7 @@ params.toURLSearchParams();
 In your load function:
 
 ```ts
-import { validateSearchParams } from "runed/kit";
+import { validateSearchParams } from "runed";
 import { productSearchSchema } from "./schemas";
 
 export const load = ({ url, fetch }) => {
@@ -270,7 +256,7 @@ Handles both standard URL parameters and compressed parameters (when compression
 Example with SvelteKit page or layout load function:
 
 ```ts
-import { validateSearchParams } from "runed/kit";
+import { validateSearchParams } from "runed";
 import { productSchema } from "./schemas";
 
 export const load = ({ url, fetch }) => {
