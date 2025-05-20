@@ -26,3 +26,4 @@ export * from "./use-resize-observer/index.js";
 export * from "./watch/index.js";
 
 export * from "./scroll-state/index.js";
+export * from "./use-search-params/index.js";
