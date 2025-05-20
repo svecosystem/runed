@@ -32,6 +32,9 @@ importers:
       globals:
         specifier: ^16.0.0
         version: 16.0.0
+      playwright:
+        specifier: ^1.52.0
+        version: 1.52.0
       prettier:
         specifier: ^3.3.3
         version: 3.4.1
