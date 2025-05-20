@@ -708,7 +708,7 @@ class SearchParams<Schema extends StandardSchemaV1> {
             const validParams = Object.fromEntries(
                 Object.entries(paramsObject).filter(([key]) => !result.issues?.some((issue) => issue.path?.includes(key)))
             );
-            return { ...defaultValues, ...validParams }[key] as StandardSchemaV1.InferOutput<Schema>[K];
+            return { ...(typeof defaultValues === 'object' && defaultValues !== null ? defaultValues : {}), ...validParams }[key] as StandardSchemaV1.InferOutput<Schema>[K];
         }
 
         // If validation failed, return undefined
@@ -1256,7 +1256,6 @@ export function useSearchParams<Schema extends StandardSchemaV1>(
     if (browser && options.updateURL !== false) {
         const currentParams = extractParamValues(page.url.searchParams);
         const validationResult = schema['~standard'].validate(currentParams);
-        console.log(validationResult);
         if (validationResult && 'issues' in validationResult && Array.isArray(validationResult.issues) && validationResult.issues.length > 0) {
             // Find all incorrect param keys
             const invalidKeys = validationResult.issues
