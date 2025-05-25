@@ -1,5 +1,6 @@
 import { describe, it, expect } from "vitest";
 import { createSearchParamsSchema } from "./use-search-params.svelte";
+import type { StandardSchemaV1 } from "./use-search-params.svelte";
 
 describe("createSearchParamsSchema", () => {
 	it("applies default values for all schema types", () => {
@@ -59,11 +60,11 @@ describe("createSearchParamsSchema", () => {
 			bar: "not-a-number",
 			baz: "not-array",
 			qux: "not-object",
-		} as any);
+		}) as StandardSchemaV1.FailureResult;
 
 		expect("issues" in invalidResult).toBe(true);
-		expect(Array.isArray((invalidResult as any).issues)).toBe(true);
-		expect((invalidResult as any).issues).toEqual(
+		expect(Array.isArray(invalidResult.issues)).toBe(true);
+		expect(invalidResult.issues).toEqual(
 			expect.arrayContaining([
 				expect.objectContaining({
 					message: expect.stringContaining("Invalid number"),
@@ -91,10 +92,10 @@ describe("createSearchParamsSchema", () => {
 		expect("value" in valid && valid.value).toEqual({ page: 2 });
 
 		// Invalid input
-		const invalid = schema["~standard"].validate({ page: "abc" });
+		const invalid = schema["~standard"].validate({ page: "abc" }) as StandardSchemaV1.FailureResult;
 		expect("issues" in invalid).toBe(true);
-		expect((invalid as any).issues[0].message).toMatch(/Invalid number/);
-		expect((invalid as any).issues[0].path).toEqual(["page"]);
+		expect(invalid.issues?.[0]?.message ?? "").toMatch(/Invalid number/);
+		expect(invalid.issues?.[0]?.path ?? []).toEqual(["page"]);
 	});
 
 	it("handles missing defaults as null", () => {
