@@ -4,6 +4,7 @@ import * as lzString from "lz-string";
 import { browser } from "$app/environment";
 import { goto } from "$app/navigation";
 import { page } from "$app/state";
+import { IsMounted } from "../is-mounted/is-mounted.svelte.js";
 
 /**
  * Configuration options for useSearchParams
@@ -1267,81 +1268,89 @@ export function useSearchParams<Schema extends StandardSchemaV1>(
 	// This is the core class that implements the actual functionality
 	const searchParams = new SearchParams(schema, options);
 
-	// Remove incorrect params on initialization
-	if (browser && options.updateURL !== false) {
-		const currentParams = extractParamValues(page.url.searchParams);
-		const validationResult = schema["~standard"].validate(currentParams);
-		if (
-			validationResult &&
-			"issues" in validationResult &&
-			Array.isArray(validationResult.issues) &&
-			validationResult.issues.length > 0
-		) {
-			// Find all incorrect param keys
-			const invalidKeys = validationResult.issues
-				.map((issue) => (Array.isArray(issue.path) && issue.path.length > 0 ? issue.path[0] : null))
-				.filter(Boolean);
-			if (invalidKeys.length > 0) {
-				const newSearchParams = new URLSearchParams(page.url.searchParams.toString());
-				for (const key of invalidKeys) {
-					newSearchParams.delete(String(key));
-				}
-				goto("?" + newSearchParams.toString(), { replaceState: true });
-			}
-		}
-	}
+	// Wait for hydration to complete before executing browser-specific initialization
+	const isMounted = new IsMounted();
 
-	// If showDefaults is true, we need to initialize the URL with all default values
-	if (options.showDefaults) {
-		// Get all the default values (by validating an empty object)
-		const validationResult = schema["~standard"].validate({});
+	// Only run initialization logic after hydration is complete
+	$effect(() => {
+		if (!isMounted.current || !browser) return;
 
-		if (validationResult && "value" in validationResult) {
-			// If compression is enabled, use SearchParams.update() method which handles compression
-			if (options.compress) {
-				// Call the update method with the default values to properly handle compression
-				searchParams.update(
-					validationResult.value as Partial<StandardSchemaV1.InferOutput<Schema>>
-				);
-			} else {
-				// For non-compressed mode, use the original approach
-				const defaultValues = validationResult.value as Record<string, unknown>;
-				const currentParams = extractParamValues(page.url.searchParams);
-				const newSearchParams = new URLSearchParams(page.url.searchParams.toString());
-				let needsUpdate = false;
-
-				// For each default value, add it to the URL if not already present
-				for (const [key, defaultValue] of Object.entries(defaultValues)) {
-					// Skip if the parameter is already in the URL (don't override user values)
-					if (key in currentParams) continue;
-
-					needsUpdate = true;
-
-					if (defaultValue === null || defaultValue === undefined) {
-						continue;
+		// Remove incorrect params on initialization (only after hydration)
+		if (options.updateURL !== false) {
+			const currentParams = extractParamValues(page.url.searchParams);
+			const validationResult = schema["~standard"].validate(currentParams);
+			if (
+				validationResult &&
+				"issues" in validationResult &&
+				Array.isArray(validationResult.issues) &&
+				validationResult.issues.length > 0
+			) {
+				// Find all incorrect param keys
+				const invalidKeys = validationResult.issues
+					.map((issue) => (Array.isArray(issue.path) && issue.path.length > 0 ? issue.path[0] : null))
+					.filter(Boolean);
+				if (invalidKeys.length > 0) {
+					const newSearchParams = new URLSearchParams(page.url.searchParams.toString());
+					for (const key of invalidKeys) {
+						newSearchParams.delete(String(key));
 					}
-
-					let stringValue: string;
-					if (Array.isArray(defaultValue)) {
-						stringValue = JSON.stringify(defaultValue);
-					} else if (typeof defaultValue === "object" && defaultValue !== null) {
-						stringValue = JSON.stringify(defaultValue);
-					} else {
-						stringValue = String(defaultValue);
-					}
-
-					newSearchParams.set(key, stringValue);
-				}
-
-				// Only update the URL if we added parameters
-				if (needsUpdate) {
-					// Always use replaceState: true for initialization to avoid creating a new history entry
-					// Don't use debouncing for initialization as this is a one-time operation
 					goto("?" + newSearchParams.toString(), { replaceState: true });
 				}
 			}
 		}
-	}
+
+		// If showDefaults is true, we need to initialize the URL with all default values (only after hydration)
+		if (options.showDefaults) {
+			// Get all the default values (by validating an empty object)
+			const validationResult = schema["~standard"].validate({});
+
+			if (validationResult && "value" in validationResult) {
+				// If compression is enabled, use SearchParams.update() method which handles compression
+				if (options.compress) {
+					// Call the update method with the default values to properly handle compression
+					searchParams.update(
+						validationResult.value as Partial<StandardSchemaV1.InferOutput<Schema>>
+					);
+				} else {
+					// For non-compressed mode, use the original approach
+					const defaultValues = validationResult.value as Record<string, unknown>;
+					const currentParams = extractParamValues(page.url.searchParams);
+					const newSearchParams = new URLSearchParams(page.url.searchParams.toString());
+					let needsUpdate = false;
+
+					// For each default value, add it to the URL if not already present
+					for (const [key, defaultValue] of Object.entries(defaultValues)) {
+						// Skip if the parameter is already in the URL (don't override user values)
+						if (key in currentParams) continue;
+
+						needsUpdate = true;
+
+						if (defaultValue === null || defaultValue === undefined) {
+							continue;
+						}
+
+						let stringValue: string;
+						if (Array.isArray(defaultValue)) {
+							stringValue = JSON.stringify(defaultValue);
+						} else if (typeof defaultValue === "object" && defaultValue !== null) {
+							stringValue = JSON.stringify(defaultValue);
+						} else {
+							stringValue = String(defaultValue);
+						}
+
+						newSearchParams.set(key, stringValue);
+					}
+
+					// Only update the URL if we added parameters
+					if (needsUpdate) {
+						// Always use replaceState: true for initialization to avoid creating a new history entry
+						// Don't use debouncing for initialization as this is a one-time operation
+						goto("?" + newSearchParams.toString(), { replaceState: true });
+					}
+				}
+			}
+		}
+	});
 
 	// Only run this logic in the browser and if debounce is enabled
 	if (browser && options.debounce && options.debounce > 0) {
