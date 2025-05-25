@@ -36,8 +36,9 @@ const scenarios: Scenario[] = [
 	{ name: "memory", route: "/test-search/memory", memory: true },
 ];
 
-const pageCount = (page: Page) => page.locator("[data-testid=page]");
-const filterText = (page: Page) => page.locator("[data-testid=filter]");
+// Consistent helper functions using getByTestId
+const pageCount = (page: Page) => page.getByTestId("page");
+const filterText = (page: Page) => page.getByTestId("filter");
 
 function getExpectedURL(s: Scenario, action: "mount" | "inc" | "reset"): string | RegExp {
 	if (action === "mount") {
@@ -56,11 +57,13 @@ function getExpectedURL(s: Scenario, action: "mount" | "inc" | "reset"): string 
 	return s.route;
 }
 
-test.describe.parallel("useSearchParams scenarios", () => {
+test.describe("useSearchParams scenarios", () => {
+	test.describe.configure({ mode: "parallel" });
 	for (const s of scenarios) {
 		test.describe(s.name, () => {
 			test.beforeEach(async ({ page }) => {
 				await page.goto(s.route);
+				await page.waitForTimeout(300);
 			});
 
 			test("mount initial state", async ({ page }) => {
@@ -72,7 +75,7 @@ test.describe.parallel("useSearchParams scenarios", () => {
 			});
 
 			test("inc & history behavior", async ({ page }) => {
-				await page.click("[data-testid=inc]");
+				await page.getByTestId("inc").click();
 				await expect(page).toHaveURL(getExpectedURL(s, "inc"));
 				await expect(pageCount(page)).toHaveText("2");
 				if (!s.memory && !s.compress && !s.noHistory) {
@@ -86,17 +89,21 @@ test.describe.parallel("useSearchParams scenarios", () => {
 			});
 
 			test("reset restores defaults", async ({ page }) => {
-				await page.click("[data-testid=inc]");
-				await page.click("[data-testid=reset]");
+				await page.getByTestId("inc").click();
+				await page.getByTestId("reset").click();
 				await expect(page).toHaveURL(getExpectedURL(s, "reset"));
 				await expect(pageCount(page)).toHaveText("1");
 			});
 
 			test("batch update sets both", async ({ page }) => {
-				await page.click("[data-testid=setBoth]");
+				await page.getByTestId("setBoth").click();
 				if (s.memory) {
 					await expect(page).toHaveURL(s.route);
 				} else if (s.compress) {
+					// Wait for URL to contain compressed data
+					await page.waitForFunction(() => window.location.search.includes("_data="), {
+						timeout: 5000,
+					});
 					await expect(page.url()).toMatch(/_data=/);
 					const url = new URL(page.url());
 					const data = url.searchParams.get("_data")!;
@@ -112,7 +119,7 @@ test.describe.parallel("useSearchParams scenarios", () => {
 			});
 
 			test("filter input updates", async ({ page }) => {
-				await page.fill("[data-testid=filter-input]", "foo");
+				await page.getByTestId("filter-input").fill("foo");
 				if (s.debounce) {
 					await expect(filterText(page)).toHaveText("");
 					await page.waitForTimeout(250);
@@ -135,8 +142,8 @@ test.describe.parallel("useSearchParams scenarios", () => {
 
 			if (s.debounce) {
 				test("debounced inc only updates once", async ({ page }) => {
-					await page.click("[data-testid=inc]");
-					await page.click("[data-testid=inc]");
+					await page.getByTestId("inc").click();
+					await page.getByTestId("inc").click();
 					// should not update immediately due to debounce
 					await expect(pageCount(page)).toHaveText("1");
 					await page.waitForTimeout(250);
@@ -152,7 +159,7 @@ test.describe.parallel("useSearchParams scenarios", () => {
 					await page.waitForTimeout(250);
 					await expect(page).toHaveURL(/filter=foo/);
 					await expect(page).not.toHaveURL(/page=abc/);
-					await expect(page.locator("[data-testid=page]")).toHaveText("1");
+					await expect(pageCount(page)).toHaveText("1");
 				});
 			}
 		});
