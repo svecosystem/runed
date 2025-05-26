@@ -40,6 +40,11 @@
 			"types": "./dist/index.d.ts",
 			"svelte": "./dist/index.js",
 			"default": "./dist/index.js"
+		},
+		"./kit": {
+			"types": "./dist/kit/index.d.ts",
+			"svelte": "./dist/kit/index.js",
+			"default": "./dist/kit/index.js"
 		}
 	},
 	"files": [
@@ -50,6 +55,11 @@
 	"peerDependencies": {
 		"svelte": "^5.7.0",
 		"@sveltejs/kit": "^2.21.0"
+	},
+	"peerDependenciesMeta": {
+		"@sveltejs/kit": {
+			"optional": true
+		}
 	},
 	"devDependencies": {
 		"@playwright/test": "^1.52.0",
