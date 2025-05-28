@@ -32,13 +32,13 @@ watch(() => count, () => {
 });
 ```
 
-You can deeply watch a source using $state.snapshot().
+You can deeply watch an entire object using $state.snapshot().
 
 <!-- prettier-ignore -->
 ```ts
-let countBox = $state({ value: 0 });
-watch(() => $state.snapshot(countBox), () => {
-	console.log(countBox.value);
+let user = $state({ name: 'bob', age: 20 });
+watch(() => $state.snapshot(user), () => {
+	console.log(`${user.name} is ${user.age} years old`);
 });
 ```
 
