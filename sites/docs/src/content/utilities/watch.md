@@ -32,6 +32,16 @@ watch(() => count, () => {
 });
 ```
 
+You can deeply watch a source using $state.snapshot().
+
+<!-- prettier-ignore -->
+```ts
+let countBox = $state({ value: 0 });
+watch(() => $state.snapshot(countBox), () => {
+	console.log(countBox.value);
+});
+```
+
 The callback receives two arguments: The current value of the sources, and the previous value.
 
 <!-- prettier-ignore -->
