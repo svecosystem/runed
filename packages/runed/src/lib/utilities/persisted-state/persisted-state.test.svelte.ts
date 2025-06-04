@@ -122,6 +122,22 @@ describe("PersistedState", async () => {
 			expect(persistedState.current).toEqual(date2024FebFirst);
 			expect(localStorage.getItem(key)).toBe(iso2024FebFirst);
 		});
+
+		testWithEffect("can serialize complex objects (Set)", () => {
+			const initialSet = new Set([1, 2, 3]);
+			const serializer = {
+				serialize: (value: Set<number>) => JSON.stringify(Array.from(value)),
+				deserialize: (value: string) => new Set<number>(JSON.parse(value)),
+			};
+			const persistedState = new PersistedState(key, initialSet, {
+				serializer,
+			});
+			expect(persistedState.current).toEqual(initialSet);
+			const newSet = new Set([4, 5, 6]);
+			persistedState.current = newSet;
+			expect(persistedState.current).toEqual(newSet);
+			expect(localStorage.getItem(key)).toBe(serializer.serialize(newSet));
+		});
 	});
 
 	describe("syncTabs", () => {
@@ -182,5 +198,64 @@ describe("PersistedState", async () => {
 				expect(persistedState.current).toBe(initialValue);
 			});
 		});
+	});
+
+	testWithEffect("makes plain objects reactive", () => {
+		const initialValue = { prop: "value" };
+		const persistedState = new PersistedState(key, initialValue);
+		expect(persistedState.current).toEqual(initialValue);
+
+		persistedState.current.prop = "new value";
+		expect(persistedState.current.prop).toBe("new value");
+		expect(localStorage.getItem(key)).toBe(JSON.stringify({ prop: "new value" }));
+	});
+
+	testWithEffect("makes complex sub-objects reactive", () => {
+		const initialValue = {
+			foo: {
+				prop: 303,
+			},
+		};
+		const persistedState = new PersistedState(key, initialValue);
+		expect(persistedState.current).toEqual(initialValue);
+
+		persistedState.current.foo.prop = 808;
+		expect(persistedState.current.foo.prop).toBe(808);
+		expect(localStorage.getItem(key)).toBe(JSON.stringify({ foo: { prop: 808 } }));
+	});
+
+	testWithEffect("does not make complex sub-objects reactive", () => {
+		const testClass = class {
+			prop = 303;
+		};
+		const initialValue = {
+			foo: new testClass(),
+		};
+		const serializer = {
+			serialize: (value: typeof initialValue) => {
+				const toSerialize = {
+					foo: {
+						prop: value.foo.prop,
+					},
+				};
+				return JSON.stringify(toSerialize);
+			},
+			deserialize: (value: string) => {
+				const parsed = JSON.parse(value);
+				const result = {
+					foo: new testClass(),
+				};
+				result.foo.prop = parsed.foo.prop;
+				return result;
+			},
+		};
+		const persistedState = new PersistedState(key, initialValue, {
+			serializer,
+		});
+		expect(persistedState.current).toEqual(initialValue);
+
+		persistedState.current.foo.prop = 808;
+		expect(persistedState.current.foo.prop).toBe(303);
+		expect(localStorage.getItem(key)).toBe(JSON.stringify({ foo: { prop: 303 } }));
 	});
 });
