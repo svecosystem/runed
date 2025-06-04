@@ -83,7 +83,11 @@ export class PersistedState<T> {
 
 		const proxies = new WeakMap();
 		const proxy = (value: unknown) => {
-			if (value === null || value?.constructor.name === "Date" || typeof value !== "object") {
+			if (value === null || typeof value !== "object") {
+				return value;
+			}
+			const proto = Object.getPrototypeOf(value);
+			if (proto !== null && proto !== Object.prototype) {
 				return value;
 			}
 			let p = proxies.get(value);
