@@ -51,10 +51,13 @@ export class PersistedState<T> {
 	constructor(key: string, initialValue: T, options: PersistedStateOptions<T> = {}) {
 		const {
 			storage: storageType = "local",
-			serializer = { serialize: JSON.stringify, deserialize: (val) => {
-				if (val === "undefined") return undefined; // JSON.parse can't parse "undefined", but JSON.stringify will serialize undefined to "undefined"
-				return JSON.parse(val);
-			} },
+			serializer = {
+				serialize: JSON.stringify,
+				deserialize: (val) => {
+					if (val === "undefined") return undefined; // JSON.parse can't parse "undefined", but JSON.stringify will serialize undefined to "undefined"
+					return JSON.parse(val);
+				},
+			},
 			syncTabs = true,
 		} = options;
 		const window = "window" in options ? options.window : defaultWindow; // window is not mockable to be undefined without this, because JavaScript will fill undefined with `= default`
