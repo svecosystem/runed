@@ -28,6 +28,15 @@ describe("PersistedState", async () => {
 		expect(persistedState.current).toBe(initialValue);
 	});
 
+	testWithEffect("setting null or undefined should update it", () => {
+		const persistedState = new PersistedState<string | null | undefined>(key, initialValue);
+		const derivedVal = $derived(persistedState.current); // this makes sure that signals are fired
+		persistedState.current = null;
+		expect(derivedVal).toBe(null);
+		persistedState.current = undefined;
+		expect(derivedVal).toBe(undefined);
+	});
+
 	describe("localStorage", () => {
 		testWithEffect("uses initial value if no persisted value is found", () => {
 			const persistedState = new PersistedState(key, initialValue);
@@ -49,18 +58,24 @@ describe("PersistedState", async () => {
 			expect(localStorage.getItem(key)).toBe(JSON.stringify(newValue));
 		});
 
-		testWithEffect("updates localStorage when a nested property in current value changes", () => {
-			const propValue = "test";
-			const initialValue = { prop: { nested: propValue } };
-			const newPropValue = "new test";
-			const newValue = { prop: { nested: newPropValue } };
-			const persistedState = new PersistedState(key, initialValue);
-			expect(persistedState.current).toEqual(initialValue);
+		testWithEffect(
+			"updates localStorage when a nested property in current value changes",
+			() => {
+				const propValue = "test";
+				const initialValue = { prop: { nested: propValue } };
+				const newPropValue = "new test";
+				const newValue = { prop: { nested: newPropValue } };
+				const persistedState = new PersistedState<{ prop: { nested: string } }>(
+					key,
+					initialValue,
+				);
+				expect(persistedState.current).toEqual(initialValue);
 
-			persistedState.current.prop.nested = newPropValue;
-			expect(persistedState.current).toEqual(newValue);
-			expect(localStorage.getItem(key)).toBe(JSON.stringify(newValue));
-		});
+				persistedState.current.prop.nested = newPropValue;
+				expect(persistedState.current).toEqual(newValue);
+				expect(localStorage.getItem(key)).toBe(JSON.stringify(newValue));
+			},
+		);
 
 		testWithEffect("updates current value when localStorage changes", () => {
 			const propValue = "test";
@@ -125,22 +140,25 @@ describe("PersistedState", async () => {
 	});
 
 	describe("syncTabs", () => {
-		testWithEffect("updates persisted value when local storage changes independently", () => {
-			$effect(() => {
-				const persistedState = new PersistedState(key, initialValue);
-				expect(persistedState.current).toBe(initialValue);
+		testWithEffect(
+			"updates persisted value when local storage changes independently",
+			() => {
+				$effect(() => {
+					const persistedState = new PersistedState(key, initialValue);
+					expect(persistedState.current).toBe(initialValue);
 
-				localStorage.setItem(key, JSON.stringify(newValue));
-				window.dispatchEvent(
-					new StorageEvent("storage", {
-						key,
-						oldValue: null,
-						newValue: JSON.stringify(newValue),
-					})
-				);
-				expect(persistedState.current).toBe(newValue);
-			});
-		});
+					localStorage.setItem(key, JSON.stringify(newValue));
+					window.dispatchEvent(
+						new StorageEvent("storage", {
+							key,
+							oldValue: null,
+							newValue: JSON.stringify(newValue),
+						}),
+					);
+					expect(persistedState.current).toBe(newValue);
+				});
+			},
+		);
 
 		testWithEffect(
 			"does not update persisted value when local storage changes independently if syncTabs is false",
@@ -157,30 +175,33 @@ describe("PersistedState", async () => {
 							key,
 							oldValue: null,
 							newValue: JSON.stringify(newValue),
-						})
+						}),
 					);
 					expect(persistedState.current).toBe(initialValue);
 				});
-			}
+			},
 		);
 
-		testWithEffect("does not handle the storage event when 'session' storage is used", () => {
-			$effect(() => {
-				const persistedState = new PersistedState(key, initialValue, {
-					storage: "session",
-				});
-				expect(persistedState.current).toBe(initialValue);
+		testWithEffect(
+			"does not handle the storage event when 'session' storage is used",
+			() => {
+				$effect(() => {
+					const persistedState = new PersistedState(key, initialValue, {
+						storage: "session",
+					});
+					expect(persistedState.current).toBe(initialValue);
 
-				sessionStorage.setItem(key, JSON.stringify(newValue));
-				window.dispatchEvent(
-					new StorageEvent("storage", {
-						key,
-						oldValue: null,
-						newValue: JSON.stringify(newValue),
-					})
-				);
-				expect(persistedState.current).toBe(initialValue);
-			});
-		});
+					sessionStorage.setItem(key, JSON.stringify(newValue));
+					window.dispatchEvent(
+						new StorageEvent("storage", {
+							key,
+							oldValue: null,
+							newValue: JSON.stringify(newValue),
+						}),
+					);
+					expect(persistedState.current).toBe(initialValue);
+				});
+			},
+		);
 	});
 });
