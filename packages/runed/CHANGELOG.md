@@ -1,5 +1,12 @@
 # runed
 
+## 0.29.0
+
+### Minor Changes
+
+- feat(Debounced): Expose pending state from useDebounce
+  ([#272](https://github.com/svecosystem/runed/pull/272))
+
 ## 0.28.0
 
 ### Minor Changes
