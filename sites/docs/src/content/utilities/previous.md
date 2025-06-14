@@ -38,6 +38,6 @@ effects.
 class Previous<T> {
 	constructor(getter: () => T);
 
-	readonly current: T; // Previous value
+	readonly current: T | undefined; // Previous value
 }
 ```
