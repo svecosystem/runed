@@ -101,7 +101,11 @@ export class PersistedState<T> {
 		if (syncTabs && storageType === "local") {
 			this.#subscribe = createSubscriber((update) => {
 				this.#update = update;
-				return on(window, "storage", this.#handleStorageEvent);
+				const cleanup = on(window, "storage", this.#handleStorageEvent);
+				return () => {
+					cleanup();
+					this.#update = undefined;
+				};
 			});
 		}
 	}
