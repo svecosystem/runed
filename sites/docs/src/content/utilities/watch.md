@@ -5,8 +5,8 @@ category: Reactivity
 ---
 
 Runes provide a handy way of running a callback when reactive values change:
-[`$effect`](https://svelte-5-preview.vercel.app/docs/runes#$effect). It automatically detects when
-inner values change, and re-runs the callback.
+[`$effect`](https://svelte.dev/docs/svelte/$effect). It automatically detects when inner values
+change, and re-runs the callback.
 
 `$effect` is great, but sometimes you want to manually specify which values should trigger the
 callback. Svelte provides an `untrack` function, allowing you to specify that a dependency
@@ -86,7 +86,7 @@ watch(sources, callback, {
 ### watch.pre
 
 `watch.pre` is similar to `watch`, but it uses
-[`$effect.pre`](https://svelte-5-preview.vercel.app/docs/runes#$effect-pre) under the hood.
+[`$effect.pre`](https://svelte.dev/docs/svelte/$effect#$effect.pre) under the hood.
 
 ### watchOnce
 
