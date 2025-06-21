@@ -28,6 +28,15 @@ describe("PersistedState", async () => {
 		expect(persistedState.current).toBe(initialValue);
 	});
 
+	testWithEffect("setting null or undefined should update it", () => {
+		const persistedState = new PersistedState<string | null | undefined>(key, initialValue);
+		const derivedVal = $derived(persistedState.current); // this makes sure that signals are fired
+		persistedState.current = null;
+		expect(derivedVal).toBe(null);
+		persistedState.current = undefined;
+		expect(derivedVal).toBe(undefined);
+	});
+
 	describe("localStorage", () => {
 		testWithEffect("uses initial value if no persisted value is found", () => {
 			const persistedState = new PersistedState(key, initialValue);
@@ -54,7 +63,7 @@ describe("PersistedState", async () => {
 			const initialValue = { prop: { nested: propValue } };
 			const newPropValue = "new test";
 			const newValue = { prop: { nested: newPropValue } };
-			const persistedState = new PersistedState(key, initialValue);
+			const persistedState = new PersistedState<{ prop: { nested: string } }>(key, initialValue);
 			expect(persistedState.current).toEqual(initialValue);
 
 			persistedState.current.prop.nested = newPropValue;
