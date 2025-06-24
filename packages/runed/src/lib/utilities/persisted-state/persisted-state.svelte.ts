@@ -43,7 +43,7 @@ export class PersistedState<T> {
 	#subscribe?: VoidFunction;
 	#version = $state(0);
 
-	constructor(key: string, initialValue: T, options: PersistedStateOptions<T> = {}) {
+	constructor(key: string, initialValue: T | null, options: PersistedStateOptions<T> = {}) {
 		const {
 			storage: storageType = "local",
 			serializer = { serialize: JSON.stringify, deserialize: JSON.parse },
@@ -63,7 +63,7 @@ export class PersistedState<T> {
 		const existingValue = storage.getItem(key);
 		if (existingValue !== null) {
 			this.#current = this.#deserialize(existingValue);
-		} else {
+		} else if (initialValue !== null) {
 			this.#serialize(initialValue);
 		}
 
@@ -113,8 +113,12 @@ export class PersistedState<T> {
 	}
 
 	#handleStorageEvent = (event: StorageEvent): void => {
-		if (event.key !== this.#key || event.newValue === null) return;
-		this.#current = this.#deserialize(event.newValue);
+		if (event.key !== this.#key) return;
+		if (event.newValue === null) {
+			this.#current = null;
+		} else {
+			this.#current = this.#deserialize(event.newValue);
+		}
 		this.#version += 1;
 	};
 
@@ -138,5 +142,11 @@ export class PersistedState<T> {
 				error
 			);
 		}
+	}
+
+	remove(): void {
+		this.#storage?.removeItem(this.#key);
+		this.#current = null;
+		this.#version += 1;
 	}
 }
