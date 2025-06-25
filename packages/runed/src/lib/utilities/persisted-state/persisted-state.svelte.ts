@@ -4,10 +4,14 @@ import { createSubscriber } from "svelte/reactivity";
 
 type Serializer<T> = {
 	serialize: (value: T) => string;
-	deserialize: (value: string) => T | undefined;
+	deserialize: (value: string) => T;
 };
 
 type StorageType = "local" | "session";
+
+// use this on error instead of `undefined` to avoid false positives in the deserialization error check
+const DESERIALIZATION_ERROR = Symbol("[persisted-state] deserialization error");
+type DESERIALIZATION_ERROR = typeof DESERIALIZATION_ERROR;
 
 function getStorage(storageType: StorageType, window: Window & typeof globalThis): Storage {
 	switch (storageType) {
@@ -21,7 +25,7 @@ function getStorage(storageType: StorageType, window: Window & typeof globalThis
 type PersistedStateOptions<T> = {
 	/** The storage type to use. Defaults to `local`. */
 	storage?: StorageType;
-	/** The serializer to use. Defaults to `JSON.stringify` and `JSON.parse`. */
+	/** The serializer to use. Defaults to `JSON.stringify` and `JSON.parse` with slight modification. */
 	serializer?: Serializer<T>;
 	/** Whether to sync with the state changes from other tabs. Defaults to `true`. */
 	syncTabs?: boolean;
@@ -36,21 +40,29 @@ type PersistedStateOptions<T> = {
  * @see {@link https://runed.dev/docs/utilities/persisted-state}
  */
 export class PersistedState<T> {
-	#current: T | undefined;
+	#current: T;
 	#key: string;
 	#serializer: Serializer<T>;
 	#storage?: Storage;
 	#subscribe?: VoidFunction;
+	#initialValue: T;
 	#version = $state(0);
 
 	constructor(key: string, initialValue: T, options: PersistedStateOptions<T> = {}) {
 		const {
 			storage: storageType = "local",
-			serializer = { serialize: JSON.stringify, deserialize: JSON.parse },
+			serializer = {
+				serialize: JSON.stringify,
+				deserialize: (val) => {
+					if (val === "undefined") return undefined; // JSON.parse can't parse "undefined", but JSON.stringify will serialize undefined to "undefined"
+					return JSON.parse(val);
+				},
+			},
 			syncTabs = true,
 		} = options;
 		const window = "window" in options ? options.window : defaultWindow; // window is not mockable to be undefined without this, because JavaScript will fill undefined with `= default`
 
+		this.#initialValue = initialValue;
 		this.#current = initialValue;
 		this.#key = key;
 		this.#serializer = serializer;
@@ -62,7 +74,10 @@ export class PersistedState<T> {
 
 		const existingValue = storage.getItem(key);
 		if (existingValue !== null) {
-			this.#current = this.#deserialize(existingValue);
+			const deserialized = this.#deserialize(existingValue);
+			if (deserialized !== DESERIALIZATION_ERROR) {
+				this.#current = deserialized;
+			}
 		} else {
 			this.#serialize(initialValue);
 		}
@@ -79,7 +94,10 @@ export class PersistedState<T> {
 		this.#version;
 
 		const storageItem = this.#storage?.getItem(this.#key);
-		const root = storageItem ? this.#deserialize(storageItem) : this.#current;
+		let root = storageItem ? this.#deserialize(storageItem) : this.#current;
+		if (root === DESERIALIZATION_ERROR) {
+			root = this.#initialValue;
+		}
 
 		const proxies = new WeakMap();
 		const proxy = (value: unknown) => {
@@ -113,25 +131,27 @@ export class PersistedState<T> {
 	}
 
 	#handleStorageEvent = (event: StorageEvent): void => {
-		if (event.key !== this.#key || event.newValue === null) return;
-		this.#current = this.#deserialize(event.newValue);
-		this.#version += 1;
+		if (event.key !== this.#key) return;
+		if (event.newValue === null) return; // maybe PersistedStorage.current should also be deleted?
+		const newVal = this.#deserialize(event.newValue);
+		if (newVal !== DESERIALIZATION_ERROR) {
+			this.#current = newVal;
+			this.#version += 1;
+		}
 	};
 
-	#deserialize(value: string): T | undefined {
+	#deserialize(value: string): T | DESERIALIZATION_ERROR {
 		try {
 			return this.#serializer.deserialize(value);
 		} catch (error) {
 			console.error(`Error when parsing "${value}" from persisted store "${this.#key}"`, error);
-			return;
+			return DESERIALIZATION_ERROR;
 		}
 	}
 
-	#serialize(value: T | undefined): void {
+	#serialize(value: T): void {
 		try {
-			if (value != undefined) {
-				this.#storage?.setItem(this.#key, this.#serializer.serialize(value));
-			}
+			this.#storage?.setItem(this.#key, this.#serializer.serialize(value));
 		} catch (error) {
 			console.error(
 				`Error when writing value from persisted store "${this.#key}" to ${this.#storage}`,
