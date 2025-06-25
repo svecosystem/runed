@@ -53,6 +53,8 @@ You can now access:
 
 - `scroll.arrived` — whether the scroll has reached each edge
 
+- `scroll.progress` — percentage that the user has scrolled on the x/y axis
+
 - `scroll.scrollTo(x, y)` — programmatic scroll
 
 - `scroll.scrollToTop()` and `scroll.scrollToBottom()` — helpers
