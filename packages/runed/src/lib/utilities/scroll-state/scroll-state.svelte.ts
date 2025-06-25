@@ -143,6 +143,10 @@ export class ScrollState {
 		top: false,
 		bottom: false,
 	});
+	progress = $state({
+		x: 0,
+		y: 0,
+	});
 
 	constructor(options: ScrollStateOptions) {
 		this.#options = options;
@@ -229,6 +233,13 @@ export class ScrollState {
 			this.arrived.top = top;
 			this.arrived.bottom = bottom;
 		}
+
+		const height = el.scrollHeight - (this.offset.bottom || 0);
+		this.progress.y = (scrollTop / (height - el.clientHeight)) * 100;
+
+		const width = el.scrollWidth - (this.offset.left || 0);
+		// Math.abs for rtl support
+		this.progress.x = Math.abs((scrollLeft / (width - el.clientWidth)) * 100);
 
 		this.internalY = scrollTop;
 	};

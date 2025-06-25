@@ -18,6 +18,17 @@
 <div
 	class=" dark:bg-primary bg-background dark:ring-primary-hover dark:inset-shadow-muted/20 dark:inset-ring-muted/10 inset-ring-muted/20 ring-muted inset-shadow-muted/20 inset-ring inset-shadow-sm relative mb-4 mt-6 max-w-[760px] overflow-hidden rounded-xl ring"
 >
+	<!-- we can ditch these if you completely hate them if not remove this comment lol -->
+	<div class="absolute left-0 top-0 h-4 w-full bg-background border-b border-border">
+		<div class="relative w-full">
+			<div class="h-4 bg-[#F64A00]" style="width: {scroll.progress.y}%;"></div>
+		</div>
+	</div>
+	<div class="absolute left-0 top-0 w-4 h-full bg-background border-b border-border">
+		<div class="relative h-full">
+			<div class="w-4 bg-[#F64A00]" style="height: {scroll.progress.x}%;"></div>
+		</div>
+	</div>
 	<div class="h-[800px] overflow-scroll" bind:this={el}>
 		<div class="pattern size-[1200px]"></div>
 	</div>
@@ -65,6 +76,20 @@
 				/>
 			</Label>
 			{@render info("isScrolling", scroll.isScrolling)}
+		</div>
+
+		<hr class="border-foreground/10 mt-2 h-px border" />
+
+		<h3 class="mt-2 text-sm font-semibold">Progress</h3>
+		<div class="mt-2 grid grid-cols-5 items-center gap-4">
+			<div class="flex place-items-center gap-2">
+				<span class="text-sm font-medium leading-none">x</span>
+				<span class="text-xs text-white">{scroll.progress.x.toFixed(0)}%</span>
+			</div>
+			<div class="flex place-items-center gap-2">
+				<span class="text-sm font-medium leading-none">y</span>
+				<span class="text-xs text-white">{scroll.progress.y.toFixed(0)}%</span>
+			</div>
 		</div>
 
 		<hr class="border-foreground/10 mt-2 h-px border" />
