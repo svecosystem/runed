@@ -1,0 +1,9 @@
+{
+	"name": "runed-kit",
+	"private": true,
+	"type": "module",
+	"peerDependencies": {
+		"@sveltejs/kit": "^2.21.0",
+		"svelte": "^5.7.0"
+	}
+}
