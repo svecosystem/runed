@@ -1,5 +1,14 @@
 # runed
 
+## 0.29.1
+
+### Patch Changes
+
+- feat(ScrollState): Add `progress.(x|y)` api
+  ([#284](https://github.com/svecosystem/runed/pull/284))
+
+- fix: add `defaults` export to package.json ([#285](https://github.com/svecosystem/runed/pull/285))
+
 ## 0.29.0
 
 ### Minor Changes
