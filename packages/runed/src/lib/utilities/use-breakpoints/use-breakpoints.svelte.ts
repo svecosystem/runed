@@ -10,7 +10,7 @@ export const TAILWIND_BREAKPOINTS: Breakpoints<"sm" | "md" | "lg" | "xl" | "2xl"
 	lg: "64rem",
 	xl: "80rem",
 	"2xl": "96rem",
-} as const;
+};
 
 /** Dynamically creates media queries for the provided breakpoints allowing you to access them as `media.<name>`.
  *
