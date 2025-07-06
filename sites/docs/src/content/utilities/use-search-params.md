@@ -4,14 +4,27 @@ description: Reactive, schema-validated URL search params for Svelte/SvelteKit
 category: Reactivity
 ---
 
-## Requirements
-
-- **`@sveltejs/kit`** must be installed in your project.
-- Uses [Standard Schema](https://standardschema.dev/) for schema validation and type inference.
+<script>
+import Demo from '$lib/components/demos/search-params.svelte';
+import { Callout } from '@svecodocs/kit';
+</script>
 
 `useSearchParams` provides a reactive, type-safe, and schema-driven way to manage URL search
 parameters in Svelte/SvelteKit apps. It supports validation, default values, compression,
 debouncing, and history control.
+
+## Demo
+
+<Demo />
+<Callout>
+	You can refresh this page and/or open it in another tab to see the count state being persisted
+	and synchronized across sessions and tabs.
+</Callout>
+
+## Requirements
+
+- **`@sveltejs/kit`** must be installed in your project.
+- Uses [Standard Schema](https://standardschema.dev/) for schema validation and type inference.
 
 ## Usage
 
