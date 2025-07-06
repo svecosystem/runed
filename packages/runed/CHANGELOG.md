@@ -1,5 +1,12 @@
 # runed
 
+## 0.29.2
+
+### Patch Changes
+
+- fix: remove `#version` from persisted & don't recreate proxies
+  ([#279](https://github.com/svecosystem/runed/pull/279))
+
 ## 0.29.1
 
 ### Patch Changes
