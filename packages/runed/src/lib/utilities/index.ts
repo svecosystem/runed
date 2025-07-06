@@ -26,4 +26,3 @@ export * from "./use-intersection-observer/index.js";
 export * from "./use-mutation-observer/index.js";
 export * from "./use-resize-observer/index.js";
 export * from "./use-throttle/index.js";
-export * from "./watch/index.js";

@@ -13,7 +13,7 @@ concurrency:
 jobs:
   check:
     name: Run svelte-check
-    runs-on: ubuntu-latest
+    runs-on: macos-latest
     steps:
       - uses: actions/checkout@v4
       - uses: pnpm/action-setup@v4
@@ -35,7 +35,7 @@ jobs:
         run: pnpm check
 
   test:
-    runs-on: ubuntu-latest
+    runs-on: macos-latest
     name: Test
     steps:
       - uses: actions/checkout@v4
@@ -48,10 +48,12 @@ jobs:
       - name: Install dependencies
         run: pnpm install
 
+      - run: pnpm exec playwright install
+        working-directory: ./packages/runed
       - run: pnpm test
-    
+
   lint:
-    runs-on: ubuntu-latest
+    runs-on: macos-latest
     name: Lint
     steps:
       - uses: actions/checkout@v4
