@@ -1,9 +1,6 @@
 <script lang="ts">
 	import { Throttled } from "runed";
-
-	import { Label } from "../ui/label";
-	import DemoContainer from "$lib/components/demo-container.svelte";
-	import Input from "$lib/components/ui/input/input.svelte";
+	import { Label, Input, DemoContainer } from "@svecodocs/kit";
 
 	let search = $state("");
 	let durationMs = $state(1000);

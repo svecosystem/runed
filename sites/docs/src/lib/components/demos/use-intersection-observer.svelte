@@ -1,11 +1,9 @@
 <script lang="ts">
 	import { useIntersectionObserver } from "runed";
-	import Checkbox from "../ui/checkbox/checkbox.svelte";
-	import Label from "../ui/label/label.svelte";
-	import DemoContainer from "$lib/components/demo-container.svelte";
+	import { Checkbox, Label, DemoContainer } from "@svecodocs/kit";
 
-	let root = $state<HTMLElement | undefined>(undefined);
-	let target = $state<HTMLElement | undefined>(undefined);
+	let root = $state<HTMLElement>(null!);
+	let target = $state<HTMLElement>(null!);
 
 	let isVisible = $state(false);
 
@@ -30,7 +28,11 @@
 			id="enabled"
 			checked={observer.isActive}
 			onCheckedChange={(v) => {
-				v ? observer.resume() : observer.pause();
+				if (v) {
+					observer.resume();
+				} else {
+					observer.pause();
+				}
 			}}
 		/>
 		<Label for="enabled" class="pl-2">Enable</Label>
@@ -46,7 +48,9 @@
 	</div>
 	<div class="text-center">
 		Element
-		<span class="font-medium {isVisible ? 'text-success' : 'text-destructive'}">
+		<span
+			class="font-medium {isVisible ? 'text-green-600 dark:text-green-500' : 'text-destructive'}"
+		>
 			{isVisible ? "inside" : "outside"}
 		</span>
 		the viewport

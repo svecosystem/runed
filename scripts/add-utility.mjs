@@ -7,22 +7,22 @@ function toKebabCase(str) {
 }
 
 const utilsDir = "./packages/runed/src/lib/utilities";
-const contentDir = "./sites/docs/content/utilities";
+const contentDir = "./sites/docs/src/content/utilities";
 const demosDir = "./sites/docs/src/lib/components/demos";
 
 const utilName = readlineSync.question("What is the name of the utility? ");
-
-const utilDir = `${utilsDir}/${utilName}`;
+const kebabUtil = toKebabCase(utilName);
+const utilDir = `${utilsDir}/${kebabUtil}`;
 const utilIndexFile = `${utilDir}/index.ts`;
-const utilMainFile = `${utilDir}/${utilName}.svelte.ts`;
+const utilMainFile = `${utilDir}/${kebabUtil}.svelte.ts`;
 const utilsBarrelFile = `${utilsDir}/index.ts`;
-const contentFile = `${contentDir}/${toKebabCase(utilName)}.md`;
-const demoFile = `${demosDir}/${toKebabCase(utilName)}.svelte`;
+const contentFile = `${contentDir}/${kebabUtil}.md`;
+const demoFile = `${demosDir}/${kebabUtil}.svelte`;
 
 fs.mkdirSync(utilDir, { recursive: true });
-fs.writeFileSync(utilIndexFile, `export * from "./${utilName}.svelte.js";`);
+fs.writeFileSync(utilIndexFile, `export * from "./${kebabUtil}.svelte.js";`);
 fs.writeFileSync(utilMainFile, "");
-fs.appendFileSync(utilsBarrelFile, `export * from "./${utilName}/index.js";`);
+fs.appendFileSync(utilsBarrelFile, `export * from "./${kebabUtil}/index.js";`);
 
 // Write the boilerplate code for the docs content file
 fs.writeFileSync(
@@ -34,7 +34,7 @@ category: New
 ---
 
 <script>
-import Demo from '$lib/components/demos/${toKebabCase(utilName)}.svelte';
+import Demo from '$lib/components/demos/${kebabUtil}.svelte';
 </script>
 
 ## Demo
@@ -50,8 +50,8 @@ fs.writeFileSync(
 	demoFile,
 	`
 <script lang="ts">
-	import { ${utilName} } from 'runed'; 
-	import DemoContainer from '$lib/components/demo-container.svelte';
+	import { ${utilName} } from 'runed';
+	import { DemoContainer } from '@svecodocs/kit';
 </script>
 
 <DemoContainer>

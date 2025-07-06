@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { useMutationObserver } from "runed";
-	import DemoContainer from "$lib/components/demo-container.svelte";
+	import { DemoContainer } from "@svecodocs/kit";
 
 	let el = $state<HTMLElement | null>(null);
 	const messages = $state<string[]>([]);
@@ -30,7 +30,7 @@
 
 <DemoContainer>
 	<div bind:this={el} class={className} {style}>
-		{#each messages as text}
+		{#each messages as text, i (`${text}-${i}`)}
 			<div>
 				Mutation Attribute: {text}
 			</div>

@@ -1,77 +1,40 @@
+import { docs, type Doc } from "$content/index.js";
 import { error } from "@sveltejs/kit";
-import type { Doc } from "../../../.contentlayer/generated/index.js";
+import type { Component } from "svelte";
 
-export type FrontMatter = Pick<Doc, "title" | "description" | "tagline">;
-
-export type DocFile = {
-	default: import("svelte").SvelteComponent;
-	metadata: FrontMatter;
-};
-
-export type DocResolver = () => Promise<DocFile>;
-
-type TDoc = {
-	component: DocFile["default"];
-	metadata: DocFile["metadata"];
-	title: string;
-};
-
-export function slugFromPath(path: string) {
-	return path.replace("/content/", "").replace(".md", "");
+export function getDocMetadata(slug: string = "index") {
+	return docs.find((doc) => doc.slug === slug);
 }
 
-type Modules = Record<string, () => Promise<unknown>>;
+export function getAllDocs() {
+	return docs;
+}
 
-function findMatch(slug: string, modules: Modules) {
+function slugFromPath(path: string) {
+	return path.replace("/src/content/", "").replace(".md", "");
+}
+
+export type DocResolver = () => Promise<{ default: Component; metadata: Doc }>;
+
+export async function getDoc(slug: string = "index") {
+	const modules = import.meta.glob("/src/content/**/*.md");
+
 	let match: { path?: string; resolver?: DocResolver } = {};
 
 	for (const [path, resolver] of Object.entries(modules)) {
-		if (slugFromPath(path).toLowerCase() === slug.toLowerCase()) {
+		if (slugFromPath(path) === slug) {
 			match = { path, resolver: resolver as unknown as DocResolver };
 			break;
 		}
 	}
-	if (!match.path) {
-		match = getIndexDocIfExists(slug, modules);
-	}
-
-	return match;
-}
-
-function getIndexDocIfExists(slug: string, modules: Modules) {
-	let match: { path?: string; resolver?: DocResolver } = {};
-
-	for (const [path, resolver] of Object.entries(modules)) {
-		if (path.includes(`/${slug}/index.md`)) {
-			match = { path, resolver: resolver as unknown as DocResolver };
-			break;
-		}
-	}
-
-	return match;
-}
-
-export async function getDoc(slug: string): Promise<TDoc> {
-	const modules = import.meta.glob(`/content/**/*.md`);
-	const match = findMatch(slug, modules);
 	const doc = await match?.resolver?.();
-
-	if (!doc || !doc.metadata) {
-		error(404);
+	const metadata = getDocMetadata(slug);
+	if (!doc || !metadata) {
+		error(404, "Could not find the document.");
 	}
 
 	return {
 		component: doc.default,
-		metadata: doc.metadata,
-		title: doc.metadata.title,
+		metadata,
 	};
-}
-
-export function slugFromPathname(pathname: string) {
-	return pathname.split("/").pop() ?? "";
-}
-
-export function isTitleActive(currentSlug: string, title: string) {
-	const slugifiedTitle = title.toLowerCase().replaceAll(" ", "-");
-	return currentSlug === slugifiedTitle;
 }

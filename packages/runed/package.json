@@ -1,9 +1,10 @@
 {
 	"name": "runed",
-	"version": "0.15.0",
+	"version": "0.29.2",
 	"type": "module",
 	"svelte": "./dist/index.js",
 	"types": "./dist/index.d.ts",
+	"license": "MIT",
 	"contributors": [
 		{
 			"name": "Thomas G. Lopes",
@@ -36,7 +37,8 @@
 	"exports": {
 		".": {
 			"types": "./dist/index.d.ts",
-			"svelte": "./dist/index.js"
+			"svelte": "./dist/index.js",
+			"default": "./dist/index.js"
 		}
 	},
 	"files": [
@@ -45,28 +47,31 @@
 		"!dist/**/*.spec.*"
 	],
 	"peerDependencies": {
-		"svelte": "^5.0.0-next.1"
+		"svelte": "^5.7.0"
 	},
 	"devDependencies": {
 		"@sveltejs/kit": "^2.5.3",
 		"@sveltejs/package": "^2.3.0",
-		"@sveltejs/vite-plugin-svelte": "^3.1.1",
+		"@sveltejs/vite-plugin-svelte": "^5.0.3",
 		"@testing-library/dom": "^10.2.0",
 		"@testing-library/jest-dom": "^6.4.6",
 		"@testing-library/svelte": "^5.2.0",
 		"@testing-library/user-event": "^14.5.2",
 		"@types/node": "^20.10.6",
-		"@vitest/coverage-v8": "^1.5.1",
-		"@vitest/ui": "^1.6.0",
+		"@vitest/browser": "^3.1.3",
+		"@vitest/coverage-v8": "^3.1.3",
+		"@vitest/ui": "^3.1.3",
 		"jsdom": "^24.0.0",
+		"msw": "^2.7.0",
+		"playwright": "^1.52.0",
 		"publint": "^0.1.9",
 		"resize-observer-polyfill": "^1.5.1",
-		"svelte": "^5.0.0-next.200",
-		"svelte-check": "^3.6.0",
+		"svelte": "^5.28.6",
+		"svelte-check": "^4.1.1",
 		"tslib": "^2.4.1",
 		"typescript": "^5.0.0",
-		"vite": "^5.0.3",
-		"vitest": "^1.5.1"
+		"vite": "^6.3.5",
+		"vitest": "^3.1.3"
 	},
 	"dependencies": {
 		"esm-env": "^1.0.0"

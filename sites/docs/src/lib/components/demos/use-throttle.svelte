@@ -1,26 +1,15 @@
 <script lang="ts">
 	import { useThrottle } from "runed";
-
-	import { Label } from "../ui/label";
-	import DemoContainer from "$lib/components/demo-container.svelte";
-	import Input from "$lib/components/ui/input/input.svelte";
+	import { Label, Input, DemoContainer } from "@svecodocs/kit";
 
 	let search = $state("");
 	let throttledSearch = $state("");
 	let durationMs = $state(1000);
 
 	const setThrottledSearch = useThrottle(
-		() => {
-			throttledSearch = search;
-		},
+		() => (throttledSearch = search),
 		() => durationMs
 	);
-
-	$effect(() => {
-		// eslint-disable-next-line no-unused-expressions
-		search;
-		setThrottledSearch();
-	});
 </script>
 
 <DemoContainer class="flex flex-col gap-4">
@@ -31,7 +20,16 @@
 
 	<div class="flex flex-col gap-1.5">
 		<Label for="search">Search</Label>
-		<Input bind:value={search} placeholder="Search the best utilities for Svelte 5" />
+		<Input
+			bind:value={
+				() => search,
+				(v) => {
+					search = v;
+					setThrottledSearch();
+				}
+			}
+			placeholder="Search the best utilities for Svelte 5"
+		/>
 	</div>
 	<p>
 		{#if throttledSearch}
@@ -41,3 +39,6 @@
 		{/if}
 	</p>
 </DemoContainer>
+
+<!-- Hack to make it fill the container -->
+<div class="h-1 w-screen"></div>
