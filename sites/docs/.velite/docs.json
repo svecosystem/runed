@@ -271,6 +271,7 @@
     "slugFull": "/utilities/finite-state-machine"
   },
   {
+<<<<<<< HEAD
     "title": "Interval",
     "description": "A reactive counter that increases on every interval with controls for pausing and resuming.",
     "path": "utilities/interval",
@@ -318,6 +319,8 @@
     "slugFull": "/utilities/interval"
   },
   {
+=======
+>>>>>>> 7875862 (feat: Add `useThrottle` and `Throttled` (#115))
     "title": "IsFocusWithin",
     "description": "A utility that tracks whether any descendant element has focus within a specified container element.",
     "path": "utilities/is-focus-within",
@@ -899,6 +902,7 @@
     "slugFull": "/utilities/use-intersection-observer"
   },
   {
+<<<<<<< HEAD
     "title": "useInterval",
     "description": "A wrapper for setInterval with controls for pausing and resuming.",
     "path": "utilities/use-interval",
@@ -931,6 +935,8 @@
     "slugFull": "/utilities/use-interval"
   },
   {
+=======
+>>>>>>> 7875862 (feat: Add `useThrottle` and `Throttled` (#115))
     "title": "useMutationObserver",
     "description": "Observe changes in an element",
     "path": "utilities/use-mutation-observer",
