@@ -27,6 +27,36 @@ type PersistedStateOptions<T> = {
 	syncTabs?: boolean;
 } & ConfigurableWindow;
 
+function proxy<T>(
+	value: unknown,
+	root: T | undefined,
+	proxies: WeakMap<WeakKey, unknown>,
+	subscribe: VoidFunction | undefined,
+	update: VoidFunction | undefined,
+	serialize: (root?: T | undefined) => void
+): T {
+	if (value === null || value?.constructor.name === "Date" || typeof value !== "object") {
+		return value as T;
+	}
+	let p = proxies.get(value);
+	if (!p) {
+		p = new Proxy(value, {
+			get: (target, property) => {
+				subscribe?.();
+				return proxy(Reflect.get(target, property), root, proxies, subscribe, update, serialize);
+			},
+			set: (target, property, value) => {
+				update?.();
+				Reflect.set(target, property, value);
+				serialize(root);
+				return true;
+			},
+		});
+		proxies.set(value, p);
+	}
+	return p as T;
+}
+
 /**
  * Creates reactive state that is persisted and synchronized across browser sessions and tabs using Web Storage.
  * @param key The unique key used to store the state in the storage.
@@ -41,7 +71,8 @@ export class PersistedState<T> {
 	#serializer: Serializer<T>;
 	#storage?: Storage;
 	#subscribe?: VoidFunction;
-	#version = $state(0);
+	#update: VoidFunction | undefined;
+	#proxies = new WeakMap();
 
 	constructor(key: string, initialValue: T, options: PersistedStateOptions<T> = {}) {
 		const {
@@ -68,54 +99,41 @@ export class PersistedState<T> {
 		}
 
 		if (syncTabs && storageType === "local") {
-			this.#subscribe = createSubscriber(() => {
-				return on(window, "storage", this.#handleStorageEvent);
+			this.#subscribe = createSubscriber((update) => {
+				this.#update = update;
+				const cleanup = on(window, "storage", this.#handleStorageEvent);
+				return () => {
+					cleanup();
+					this.#update = undefined;
+				};
 			});
 		}
 	}
 
 	get current(): T {
 		this.#subscribe?.();
-		this.#version;
 
 		const storageItem = this.#storage?.getItem(this.#key);
 		const root = storageItem ? this.#deserialize(storageItem) : this.#current;
-
-		const proxies = new WeakMap();
-		const proxy = (value: unknown) => {
-			if (value === null || value?.constructor.name === "Date" || typeof value !== "object") {
-				return value;
-			}
-			let p = proxies.get(value);
-			if (!p) {
-				p = new Proxy(value, {
-					get: (target, property) => {
-						this.#version;
-						return proxy(Reflect.get(target, property));
-					},
-					set: (target, property, value) => {
-						this.#version += 1;
-						Reflect.set(target, property, value);
-						this.#serialize(root);
-						return true;
-					},
-				});
-				proxies.set(value, p);
-			}
-			return p;
-		};
-		return proxy(root);
+		return proxy(
+			root,
+			root,
+			this.#proxies,
+			this.#subscribe?.bind(this),
+			this.#update?.bind(this),
+			this.#serialize.bind(this)
+		);
 	}
 
 	set current(newValue: T) {
 		this.#serialize(newValue);
-		this.#version += 1;
+		this.#update?.();
 	}
 
 	#handleStorageEvent = (event: StorageEvent): void => {
 		if (event.key !== this.#key || event.newValue === null) return;
 		this.#current = this.#deserialize(event.newValue);
-		this.#version += 1;
+		this.#update?.();
 	};
 
 	#deserialize(value: string): T | undefined {
