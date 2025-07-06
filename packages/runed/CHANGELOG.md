@@ -1,5 +1,21 @@
 # runed
 
+## 0.29.2
+
+### Patch Changes
+
+- fix: remove `#version` from persisted & don't recreate proxies
+  ([#279](https://github.com/svecosystem/runed/pull/279))
+
+## 0.29.1
+
+### Patch Changes
+
+- feat(ScrollState): Add `progress.(x|y)` api
+  ([#284](https://github.com/svecosystem/runed/pull/284))
+
+- fix: add `defaults` export to package.json ([#285](https://github.com/svecosystem/runed/pull/285))
+
 ## 0.29.0
 
 ### Minor Changes

@@ -1,6 +1,6 @@
 {
 	"name": "runed",
-	"version": "0.29.0",
+	"version": "0.29.2",
 	"type": "module",
 	"svelte": "./dist/index.js",
 	"types": "./dist/index.d.ts",
@@ -37,7 +37,8 @@
 	"exports": {
 		".": {
 			"types": "./dist/index.d.ts",
-			"svelte": "./dist/index.js"
+			"svelte": "./dist/index.js",
+			"default": "./dist/index.js"
 		}
 	},
 	"files": [
