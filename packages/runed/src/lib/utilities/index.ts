@@ -15,8 +15,10 @@ export * from "./persisted-state/index.js";
 export * from "./pressed-keys/index.js";
 export * from "./previous/index.js";
 export * from "./resource/index.js";
+export * from "./scroll-state/index.js";
 export * from "./state-history/index.js";
 export * from "./textarea-autosize/index.js";
+export * from "./throttled/index.js";
 export * from "./use-breakpoints/index.js";
 export * from "./use-debounce/index.js";
 export * from "./use-event-listener/index.js";
@@ -24,6 +26,5 @@ export * from "./use-geolocation/index.js";
 export * from "./use-intersection-observer/index.js";
 export * from "./use-mutation-observer/index.js";
 export * from "./use-resize-observer/index.js";
+export * from "./use-throttle/index.js";
 export * from "./watch/index.js";
-
-export * from "./scroll-state/index.js";

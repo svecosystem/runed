@@ -1,5 +1,21 @@
 # runed
 
+## 0.30.0
+
+### Minor Changes
+
+- New Utilities: `useThrottle` and `Throttled`
+  ([#115](https://github.com/svecosystem/runed/pull/115))
+
+- Update Svelte to `5.0.0-next.200` ([#115](https://github.com/svecosystem/runed/pull/115))
+
+## 0.29.2
+
+### Patch Changes
+
+- fix: remove `#version` from persisted & don't recreate proxies
+  ([#279](https://github.com/svecosystem/runed/pull/279))
+
 ## 0.29.1
 
 ### Patch Changes
