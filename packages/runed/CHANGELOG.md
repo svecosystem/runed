@@ -1,5 +1,14 @@
 # runed
 
+## 0.30.0
+
+### Minor Changes
+
+- New Utilities: `useThrottle` and `Throttled`
+  ([#115](https://github.com/svecosystem/runed/pull/115))
+
+- Update Svelte to `5.0.0-next.200` ([#115](https://github.com/svecosystem/runed/pull/115))
+
 ## 0.29.2
 
 ### Patch Changes
