@@ -19,6 +19,7 @@ export * from "./scroll-state/index.js";
 export * from "./state-history/index.js";
 export * from "./textarea-autosize/index.js";
 export * from "./throttled/index.js";
+export * from "./use-breakpoints/index.js";
 export * from "./use-debounce/index.js";
 export * from "./use-event-listener/index.js";
 export * from "./use-geolocation/index.js";
