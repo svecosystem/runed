@@ -1,5 +1,44 @@
 # runed
 
+## 0.31.0
+
+### Minor Changes
+
+- feat: add interval utilities
+  ([`c7de088`](https://github.com/svecosystem/runed/commit/c7de088300fcbf7df1fd57a4f1245debd2bc06bb))
+
+## 0.30.0
+
+### Minor Changes
+
+- New Utilities: `useThrottle` and `Throttled`
+  ([#115](https://github.com/svecosystem/runed/pull/115))
+
+- Update Svelte to `5.0.0-next.200` ([#115](https://github.com/svecosystem/runed/pull/115))
+
+## 0.29.2
+
+### Patch Changes
+
+- fix: remove `#version` from persisted & don't recreate proxies
+  ([#279](https://github.com/svecosystem/runed/pull/279))
+
+## 0.29.1
+
+### Patch Changes
+
+- feat(ScrollState): Add `progress.(x|y)` api
+  ([#284](https://github.com/svecosystem/runed/pull/284))
+
+- fix: add `defaults` export to package.json ([#285](https://github.com/svecosystem/runed/pull/285))
+
+## 0.29.0
+
+### Minor Changes
+
+- feat(Debounced): Expose pending state from useDebounce
+  ([#272](https://github.com/svecosystem/runed/pull/272))
+
 ## 0.28.0
 
 ### Minor Changes

@@ -5,8 +5,8 @@ category: Reactivity
 ---
 
 Runes provide a handy way of running a callback when reactive values change:
-[`$effect`](https://svelte-5-preview.vercel.app/docs/runes#$effect). It automatically detects when
-inner values change, and re-runs the callback.
+[`$effect`](https://svelte.dev/docs/svelte/$effect). It automatically detects when inner values
+change, and re-runs the callback.
 
 `$effect` is great, but sometimes you want to manually specify which values should trigger the
 callback. Svelte provides an `untrack` function, allowing you to specify that a dependency
@@ -32,17 +32,27 @@ watch(() => count, () => {
 });
 ```
 
-The callback receives two arguments: The current value of the sources, and the previous value.
+You can deeply watch an entire object using $state.snapshot().
 
 <!-- prettier-ignore -->
 ```ts
-let count = $state(0);
-watch(() => count, (curr, prev) => {
-	console.log(`count is ${curr}, was ${prev}`);
+let user = $state({ name: 'bob', age: 20 });
+watch(() => $state.snapshot(user), () => {
+	console.log(`${user.name} is ${user.age} years old`);
 });
 ```
 
-You can also send in an array of sources:
+Or you can watch a specific deep value.
+
+<!-- prettier-ignore -->
+```ts
+let user = $state({ name: 'bob', age: 20 });
+watch(() => user.age), () => {
+	console.log(`User is now ${user.age} years old`);
+});
+```
+
+You can also send in an array of sources.
 
 <!-- prettier-ignore -->
 ```ts
@@ -50,6 +60,16 @@ let age = $state(20);
 let name = $state("bob");
 watch([() => age, () => name], ([age, name], [prevAge, prevName]) => {
 	// ...
+});
+```
+
+The callback receives two arguments: The current value of the sources, and the previous value.
+
+<!-- prettier-ignore -->
+```ts
+let count = $state(0);
+watch(() => count, (curr, prev) => {
+	console.log(`count is ${curr}, was ${prev}`);
 });
 ```
 
@@ -66,7 +86,7 @@ watch(sources, callback, {
 ### watch.pre
 
 `watch.pre` is similar to `watch`, but it uses
-[`$effect.pre`](https://svelte-5-preview.vercel.app/docs/runes#$effect-pre) under the hood.
+[`$effect.pre`](https://svelte.dev/docs/svelte/$effect#$effect.pre) under the hood.
 
 ### watchOnce
 

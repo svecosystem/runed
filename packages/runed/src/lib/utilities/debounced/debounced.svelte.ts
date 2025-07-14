@@ -49,11 +49,19 @@ export class Debounced<T> {
 		});
 	}
 
+	// isn't the name "current" slightly misleading? it sounds like the latest, raw value
 	/**
-	 * Get the current value.
+	 * Get the debounced value.
 	 */
 	get current(): T {
 		return this.#current;
+	}
+
+	/**
+	 * Whether a timer is currently pending.
+	 */
+	get pending(): boolean {
+		return this.#debounceFn.pending;
 	}
 
 	/**

@@ -2,6 +2,7 @@ import { describe, expect } from "vitest";
 
 import { testWithEffect } from "$lib/test/util.svelte.js";
 import { PersistedState } from "./persisted-state.svelte.js";
+import { flushSync } from "svelte";
 
 const key = "test-key";
 const initialValue = "test-value";
@@ -19,6 +20,60 @@ describe("PersistedState", async () => {
 	beforeEach(() => {
 		localStorage.clear();
 		sessionStorage.clear();
+	});
+
+	testWithEffect("is reactive", () => {
+		const values: string[] = [];
+		const persistedState = new PersistedState(key, initialValue);
+		$effect(() => {
+			values.push(persistedState.current);
+		});
+		flushSync();
+		expect(values).toStrictEqual([initialValue]);
+		flushSync(() => {
+			persistedState.current = newValue;
+		});
+		expect(values).toStrictEqual([initialValue, newValue]);
+	});
+
+	testWithEffect("is reactive when it's an object", () => {
+		const values: { value: string }[] = [];
+		const valuesOnly: string[] = [];
+		const persistedState = new PersistedState(key, { value: initialValue });
+		$effect(() => {
+			values.push(persistedState.current);
+		});
+		$effect(() => {
+			valuesOnly.push(persistedState.current.value);
+		});
+		flushSync();
+		expect(values).toStrictEqual([{ value: initialValue }]);
+		expect(valuesOnly).toStrictEqual([initialValue]);
+		flushSync(() => {
+			persistedState.current.value = newValue;
+		});
+		expect(values).toStrictEqual([{ value: initialValue }, { value: newValue }]);
+		expect(valuesOnly).toStrictEqual([initialValue, newValue]);
+	});
+
+	testWithEffect("is reactive when it's an array", () => {
+		const values: string[][] = [];
+		const valuesOnly: string[] = [];
+		const persistedState = new PersistedState(key, [initialValue]);
+		$effect(() => {
+			values.push(persistedState.current);
+		});
+		$effect(() => {
+			valuesOnly.push(persistedState.current.at(-1)!);
+		});
+		flushSync();
+		expect(values).toStrictEqual([[initialValue]]);
+		expect(valuesOnly).toStrictEqual([initialValue]);
+		flushSync(() => {
+			persistedState.current.push(newValue);
+		});
+		expect(values).toStrictEqual([[initialValue], [initialValue, newValue]]);
+		expect(valuesOnly).toStrictEqual([initialValue, newValue]);
 	});
 
 	testWithEffect("it does not console.error if window is not defined", () => {
