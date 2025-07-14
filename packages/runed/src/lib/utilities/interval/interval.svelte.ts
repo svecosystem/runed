@@ -1,4 +1,4 @@
-import { extract } from "../extract/index.js";
+import { useInterval } from "../use-interval/index.js";
 import type { MaybeGetter } from "$lib/internal/types.js";
 
 export type IntervalOptions = {
@@ -22,26 +22,18 @@ export type IntervalOptions = {
  */
 export class Interval {
 	#counter = $state(0);
-	#intervalId: ReturnType<typeof setInterval> | null = null;
-	#interval: MaybeGetter<number>;
 	#callback?: (count: number) => void;
+	#intervalControl: ReturnType<typeof useInterval>;
 
 	constructor(interval: MaybeGetter<number> = 1000, options: IntervalOptions = {}) {
 		const { immediate = true, callback } = options;
 		
-		this.#interval = interval;
 		this.#callback = callback;
 
-		if (immediate) {
-			this.resume();
-		}
-
-		// Cleanup on disposal
-		$effect(() => {
-			return () => {
-				this.pause();
-			};
-		});
+		this.#intervalControl = useInterval(() => {
+			this.#counter++;
+			this.#callback?.(this.#counter);
+		}, interval, { immediate });
 	}
 
 	/**
@@ -55,29 +47,21 @@ export class Interval {
 	 * Whether the interval is currently active
 	 */
 	get isActive(): boolean {
-		return this.#intervalId !== null;
+		return this.#intervalControl.isActive;
 	}
 
 	/**
 	 * Pause the interval
 	 */
 	pause(): void {
-		if (this.#intervalId === null) return;
-		clearInterval(this.#intervalId);
-		this.#intervalId = null;
+		this.#intervalControl.pause();
 	}
 
 	/**
 	 * Resume the interval
 	 */
 	resume(): void {
-		if (this.#intervalId !== null) return;
-
-		const currentInterval = extract(this.#interval);
-		this.#intervalId = setInterval(() => {
-			this.#counter++;
-			this.#callback?.(this.#counter);
-		}, currentInterval);
+		this.#intervalControl.resume();
 	}
 
 	/**
