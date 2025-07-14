@@ -265,7 +265,7 @@ describe("PersistedState", async () => {
 		expect(localStorage.getItem(key)).toBe(JSON.stringify({ prop: "new value" }));
 	});
 
-	testWithEffect("makes complex sub-objects reactive", () => {
+	testWithEffect("makes plain sub-objects reactive", () => {
 		const initialValue = {
 			foo: {
 				prop: 303,
