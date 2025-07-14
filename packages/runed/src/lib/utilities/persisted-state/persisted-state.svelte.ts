@@ -35,13 +35,13 @@ function proxy<T>(
 	update: VoidFunction | undefined,
 	serialize: (root?: T | undefined) => void
 ): T {
-  if (value === null || typeof value !== "object") {
-    return value as T;
-  }
-  const proto = Object.getPrototypeOf(value);
-  if (proto !== null && proto !== Object.prototype && !Array.isArray(value)) {
-    return value as T;
-  }
+	if (value === null || typeof value !== "object") {
+		return value as T;
+	}
+	const proto = Object.getPrototypeOf(value);
+	if (proto !== null && proto !== Object.prototype && !Array.isArray(value)) {
+		return value as T;
+	}
 	let p = proxies.get(value);
 	if (!p) {
 		p = new Proxy(value, {
