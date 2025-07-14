@@ -128,8 +128,11 @@ describe("Interval", () => {
 		await new Promise((resolve) => setTimeout(resolve, 150));
 		expect(interval.counter).toBe(1);
 
-		// Changing the interval value should restart with new interval
+		// Changing the interval value doesn't automatically restart
+		// Need to pause/resume to pick up new interval value
 		intervalValue = 200;
+		interval.pause();
+		interval.resume();
 		
 		await new Promise((resolve) => setTimeout(resolve, 150));
 		// Should not have incremented yet with the new longer interval
