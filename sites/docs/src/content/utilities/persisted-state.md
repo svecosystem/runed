@@ -41,6 +41,32 @@ Initialize `PersistedState` by providing a unique key and an initial value for t
 </div>
 ```
 
+### Complex objects
+
+When persisting complex objects, only plain structures are deeply reactive.
+
+This includes arrays, plain objects, and primitive values.
+
+For example:
+
+```ts
+const persistedArray = new PersistedState("foo", ["a", "b"]);
+persistedArray.current.push("c"); // This will persist the change
+
+const persistedObject = new PersistedState("bar", { name: "Bob" });
+persistedObject.current.name = "JG"; // This will persist the change
+
+class Person {
+	name: string;
+	constructor(name: string) {
+		this.name = name;
+	}
+}
+const persistedComplexObject = new PersistedState("baz", new Person("Bob"));
+persistedComplexObject.current.name = "JG"; // This will NOT persist the change
+persistedComplexObject.current = new Person("JG"); // This will persist the change
+```
+
 ## Configuration Options
 
 `PersistedState` includes an `options` object that allows you to customize the behavior of the state
