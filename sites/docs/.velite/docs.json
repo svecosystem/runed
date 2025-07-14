@@ -852,6 +852,38 @@
     "slugFull": "/utilities/use-intersection-observer"
   },
   {
+    "title": "useInterval",
+    "description": "A wrapper for setInterval with controls for pausing and resuming.",
+    "path": "utilities/use-interval",
+    "content": "<script>\n\timport Demo from '$lib/components/demos/use-interval.svelte';\n</script>\n<p><code>useInterval</code> is a utility function that provides a reactive wrapper around <code>setInterval</code> with\ncontrols for pausing and resuming the execution.</p>\n<h2>Demo</h2>\n<demo>\n<h2>Usage</h2>\n<pre><code class=\"language-svelte\">&#x3C;script lang=\"ts\">\n\timport { useInterval } from \"runed\";\n\n\tlet count = $state(0);\n\tlet intervalDelay = $state(1000);\n\n\tconst interval = useInterval(\n\t\t() => count++,\n\t\t() => intervalDelay\n\t);\n&#x3C;/script>\n\n&#x3C;p>Count: {count}&#x3C;/p>\n&#x3C;p>Interval delay: {intervalDelay}ms&#x3C;/p>\n&#x3C;p>Status: {isActive ? \"Running\" : \"Paused\"}&#x3C;/p>\n\n&#x3C;input type=\"number\" bind:value={intervalDelay} min=\"100\" step=\"100\" />\n\n&#x3C;button onclick={interval.pause} disabled={!interval.isActive}>Pause&#x3C;/button>\n&#x3C;button onclick={interval.resume} disabled={interval.isActive}>Resume&#x3C;/button>\n</code></pre>\n<h2>Options</h2>\n<p>The <code>useInterval</code> function accepts an optional third parameter with the following options:</p>\n<ul>\n<li><code>immediate</code> (default: <code>true</code>) - Whether to start the interval immediately</li>\n<li><code>immediateCallback</code> (default: <code>false</code>) - Whether to execute the callback immediately when resuming</li>\n</ul>\n<pre><code class=\"language-svelte\">&#x3C;script lang=\"ts\">\n\timport { useInterval } from \"runed\";\n\n\tlet count = $state(0);\n\n\tconst interval = useInterval(() => count++, 1000, {\n\t\timmediate: false, // Don't start automatically\n\t\timmediateCallback: true // Execute callback immediately on resume\n\t});\n&#x3C;/script>\n</code></pre>\n<h2>Reactive Interval</h2>\n<p>The interval delay can be reactive, and the timer will automatically restart with the new interval\nwhen it changes:</p>\n<pre><code class=\"language-svelte\">&#x3C;script lang=\"ts\">\n\timport { useInterval } from \"runed\";\n\n\tlet count = $state(0);\n\tlet speed = $state(1000);\n\n\t// The interval will update reactively when speed changes\n\tconst interval = useInterval(\n\t\t() => count++,\n\t\t() => speed\n\t);\n&#x3C;/script>\n</code></pre></demo>",
+    "raw": "<script>\n\timport Demo from '$lib/components/demos/use-interval.svelte';\n</script>\n\n`useInterval` is a utility function that provides a reactive wrapper around `setInterval` with\ncontrols for pausing and resuming the execution.\n\n## Demo\n\n<Demo />\n\n## Usage\n\n```svelte\n<script lang=\"ts\">\n\timport { useInterval } from \"runed\";\n\n\tlet count = $state(0);\n\tlet intervalDelay = $state(1000);\n\n\tconst interval = useInterval(\n\t\t() => count++,\n\t\t() => intervalDelay\n\t);\n</script>\n\n<p>Count: {count}</p>\n<p>Interval delay: {intervalDelay}ms</p>\n<p>Status: {isActive ? \"Running\" : \"Paused\"}</p>\n\n<input type=\"number\" bind:value={intervalDelay} min=\"100\" step=\"100\" />\n\n<button onclick={interval.pause} disabled={!interval.isActive}>Pause</button>\n<button onclick={interval.resume} disabled={interval.isActive}>Resume</button>\n```\n\n## Options\n\nThe `useInterval` function accepts an optional third parameter with the following options:\n\n- `immediate` (default: `true`) - Whether to start the interval immediately\n- `immediateCallback` (default: `false`) - Whether to execute the callback immediately when resuming\n\n```svelte\n<script lang=\"ts\">\n\timport { useInterval } from \"runed\";\n\n\tlet count = $state(0);\n\n\tconst interval = useInterval(() => count++, 1000, {\n\t\timmediate: false, // Don't start automatically\n\t\timmediateCallback: true // Execute callback immediately on resume\n\t});\n</script>\n```\n\n## Reactive Interval\n\nThe interval delay can be reactive, and the timer will automatically restart with the new interval\nwhen it changes:\n\n```svelte\n<script lang=\"ts\">\n\timport { useInterval } from \"runed\";\n\n\tlet count = $state(0);\n\tlet speed = $state(1000);\n\n\t// The interval will update reactively when speed changes\n\tconst interval = useInterval(\n\t\t() => count++,\n\t\t() => speed\n\t);\n</script>\n```",
+    "toc": [
+      {
+        "title": "Demo",
+        "url": "#demo",
+        "items": []
+      },
+      {
+        "title": "Usage",
+        "url": "#usage",
+        "items": []
+      },
+      {
+        "title": "Options",
+        "url": "#options",
+        "items": []
+      },
+      {
+        "title": "Reactive Interval",
+        "url": "#reactive-interval",
+        "items": []
+      }
+    ],
+    "category": "Utilities",
+    "slug": "utilities/use-interval",
+    "slugFull": "/utilities/use-interval"
+  },
+  {
     "title": "useMutationObserver",
     "description": "Observe changes in an element",
     "path": "utilities/use-mutation-observer",
