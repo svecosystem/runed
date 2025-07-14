@@ -1,5 +1,12 @@
 # runed
 
+## 0.31.0
+
+### Minor Changes
+
+- feat: add interval utilities
+  ([`c7de088`](https://github.com/svecosystem/runed/commit/c7de088300fcbf7df1fd57a4f1245debd2bc06bb))
+
 ## 0.30.0
 
 ### Minor Changes
