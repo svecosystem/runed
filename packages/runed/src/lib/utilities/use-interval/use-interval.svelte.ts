@@ -75,6 +75,15 @@ export function useInterval(
 		resume();
 	}
 
+	// Cleanup on disposal
+	$effect(() => {
+		return () => {
+			if (intervalId !== null) {
+				clearInterval(intervalId);
+			}
+		};
+	});
+
 	const isActive = $derived(intervalId !== null);
 
 	return {
@@ -85,4 +94,3 @@ export function useInterval(
 		},
 	};
 }
-

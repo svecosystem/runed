@@ -93,8 +93,6 @@ describe("useInterval", () => {
 		pause();
 	});
 
-
-
 	testWithEffect("Cleans up on effect disposal", async () => {
 		const callback = vi.fn();
 		let disposed = false;
@@ -112,7 +110,8 @@ describe("useInterval", () => {
 		dispose();
 		expect(disposed).toBe(true);
 
-		await new Promise((resolve) => setTimeout(resolve, 150));
+		await new Promise((resolve) => setTimeout(resolve, 300));
 		expect(callback).toHaveBeenCalledTimes(1); // Should not increase after disposal
 	});
 });
+
