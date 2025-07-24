@@ -102,7 +102,7 @@ export class PersistedState<T> {
 			this.#serialize(initialValue);
 		}
 
-		if (syncTabs && storageType === "local") {
+		if (syncTabs) {
 			this.#subscribe = createSubscriber((update) => {
 				this.#update = update;
 				const cleanup = on(window, "storage", this.#handleStorageEvent);

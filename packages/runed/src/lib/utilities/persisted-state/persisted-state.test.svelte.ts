@@ -36,6 +36,20 @@ describe("PersistedState", async () => {
 		expect(values).toStrictEqual([initialValue, newValue]);
 	});
 
+	testWithEffect("is reactive when using session storage", () => {
+		const values: string[] = [];
+		const persistedState = new PersistedState(key, initialValue, { storage: 'session' });
+		$effect(() => {
+			values.push(persistedState.current);
+		});
+		flushSync();
+		expect(values).toStrictEqual([initialValue]);
+		flushSync(() => {
+			persistedState.current = newValue;
+		});
+		expect(values).toStrictEqual([initialValue, newValue]);
+	});
+
 	testWithEffect("is reactive when it's an object", () => {
 		const values: { value: string }[] = [];
 		const valuesOnly: string[] = [];
