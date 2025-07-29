@@ -689,9 +689,8 @@ class SearchParams<Schema extends StandardSchemaV1> {
 		key: K & string
 	): StandardSchemaV1.InferOutput<Schema>[K] | undefined {
 		// Choose the appropriate search params source based on updateURL option and building state
-		const searchParams = (!building && this.#options.updateURL)
-			? page.url.searchParams
-			: this.#inMemorySearchParams;
+		const searchParams =
+			!building && this.#options.updateURL ? page.url.searchParams : this.#inMemorySearchParams;
 		const paramsObject = this.#extractParamValues(searchParams);
 		const result = this.validate(paramsObject);
 
@@ -1371,10 +1370,10 @@ export function useSearchParams<Schema extends StandardSchemaV1>(
 	// - Direct property access works: params.page, params.filter
 	// - Nested property changes require whole-object updates: params.fields = {...fields, newProp: value}
 	// - Arrays/objects are not granularly reactive: params.items[0].name = 'new' won't trigger URL updates
-	// 
+	//
 	// For granular nested reactivity, you would need:
 	// 1. Recursive proxy creation for nested objects/arrays
-	// 2. Path tracking system (e.g., "fields.0.name")  
+	// 2. Path tracking system (e.g., "fields.0.name")
 	// 3. Granular URL serialization instead of JSON
 	// 4. Complete rewrite of validation and type systems
 	// This would be a breaking change requiring a new major version
@@ -1454,11 +1453,11 @@ export function useSearchParams<Schema extends StandardSchemaV1>(
 			if (typeof prop === "string" && target.has(prop)) {
 				// Type assertion needed here because TypeScript can't infer that our runtime check
 				// with target.has() guarantees that prop is a valid key of our schema output type
-				
+
 				// NOTE: This returns the raw value (object/array/primitive) without nested proxification
 				// If the value is an object or array, changes to its nested properties won't trigger
 				// URL updates automatically. Users must reassign the entire object/array to trigger updates:
-				// ❌ Won't work: params.config.theme = 'dark' 
+				// ❌ Won't work: params.config.theme = 'dark'
 				// ✅ Works: params.config = {...params.config, theme: 'dark'}
 				// ❌ Won't work: params.items.push(newItem)
 				// ✅ Works: params.items = [...params.items, newItem]
@@ -1471,7 +1470,7 @@ export function useSearchParams<Schema extends StandardSchemaV1>(
 			if (typeof prop === "string" && target.has(prop)) {
 				// Same type assertion needed here to tell TypeScript that we've verified
 				// this string is a valid key in our schema through the target.has() check
-				
+
 				// NOTE: This triggers a complete re-serialization of the value to the URL
 				// For objects/arrays, the entire structure is JSON-stringified and stored
 				// This is why nested property mutations don't work - they don't trigger this setter
