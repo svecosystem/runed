@@ -1283,7 +1283,9 @@ export function useSearchParams<Schema extends StandardSchemaV1>(
 			) {
 				// Find all incorrect param keys
 				const invalidKeys = validationResult.issues
-					.map((issue) => (Array.isArray(issue.path) && issue.path.length > 0 ? issue.path[0] : null))
+					.map((issue) =>
+						Array.isArray(issue.path) && issue.path.length > 0 ? issue.path[0] : null
+					)
 					.filter(Boolean);
 				if (invalidKeys.length > 0) {
 					const newSearchParams = new URLSearchParams(page.url.searchParams.toString());
