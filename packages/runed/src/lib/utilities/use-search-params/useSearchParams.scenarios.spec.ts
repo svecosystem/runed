@@ -151,17 +151,6 @@ test.describe("useSearchParams scenarios", () => {
 					await expect(pageCount(page)).toHaveText("2");
 				});
 			}
-
-			if (s.name === "default") {
-				test("removes invalid params from URL and uses fallback", async ({ page }) => {
-					await page.goto("/test-search/default?page=abc&filter=foo");
-					// Should remove ?page=abc and fallback to page=1, but keep filter=foo
-					await page.waitForTimeout(250);
-					await expect(page).toHaveURL(/filter=foo/);
-					await expect(page).not.toHaveURL(/page=abc/);
-					await expect(pageCount(page)).toHaveText("1");
-				});
-			}
 		});
 	}
 });

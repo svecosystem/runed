@@ -5,7 +5,7 @@ category: Reactivity
 ---
 
 <script>
-import Demo from '$lib/components/demos/search-params.svelte';
+import Demo from '$lib/components/demos/use-search-params.svelte';
 import { Callout } from '@svecodocs/kit';
 </script>
 
@@ -213,6 +213,9 @@ Limitations:
 - For 'array' type: supports basic arrays, but doesn't validate array items
 - For 'object' type: supports generic objects, but doesn't validate nested properties
 - No custom validation rules or transformations
+- **No granular reactivity**: Changes to nested properties require reassigning the entire value
+  - ❌ `params.config.theme = 'dark'` (won't trigger URL update)
+  - ✅ `params.config = {...params.config, theme: 'dark'}` (will trigger URL update)
 
 For complex validation needs (nested validation, refined rules, etc.), use a dedicated validation
 library instead.
@@ -287,6 +290,53 @@ export const load = ({ url, fetch }) => {
 	};
 };
 ```
+
+## Reactivity Limitations
+
+### Understanding Reactivity Scope
+
+`useSearchParams` provides **top-level reactivity only**. This means:
+
+✅ **Works (Direct property assignment)**:
+
+```svelte
+<script>
+	const params = useSearchParams(schema);
+
+	// These trigger URL updates
+	params.page = 2;
+	params.filter = "active";
+	params.config = { theme: "dark", size: "large" };
+	params.items = [...params.items, newItem];
+</script>
+```
+
+❌ **Doesn't work (Nested property mutations)**:
+
+```svelte
+<script>
+	const params = useSearchParams(schema);
+
+	// These DON'T trigger URL updates
+	params.config.theme = "dark"; // Nested object property
+	params.items.push(newItem); // Array method
+	params.items[0].name = "updated"; // Array item property
+	delete params.config.oldProp; // Property deletion
+</script>
+```
+
+### Why This Design Choice
+
+`useSearchParams` was designed to prioritize **simplicity, type safety, and ease of use** over deep
+reactivity. This design choice offers several benefits:
+
+#### ✅ **What You Get**
+
+- **Simple, predictable API**: `params.page = 2` always works
+- **Full TypeScript support**: Perfect autocomplete and type checking
+- **Clean URLs**: Objects serialize to readable JSON strings
+- **Performance**: No overhead from tracking deep object changes
+- **Reliability**: No edge cases with complex nested proxy behaviors
 
 ## Type Definitions
 

@@ -1,7 +1,7 @@
 import { SvelteURLSearchParams } from "svelte/reactivity";
 import { dequal } from "dequal/lite";
 import * as lzString from "lz-string";
-import { browser } from "$app/environment";
+import { browser, building } from "$app/environment";
 import { goto } from "$app/navigation";
 import { page } from "$app/state";
 import { IsMounted } from "../is-mounted/is-mounted.svelte.js";
@@ -355,8 +355,8 @@ class SearchParams<Schema extends StandardSchemaV1> {
 			return; // No valid keys to update
 		}
 
-		// Choose the appropriate search params source based on updateURL option
-		const isInMemory = !this.#options.updateURL;
+		// Choose the appropriate search params source based on updateURL option and building state
+		const isInMemory = building || !this.#options.updateURL;
 		const searchParams = isInMemory ? this.#inMemorySearchParams : page.url.searchParams;
 		const paramsObject = this.#extractParamValues(searchParams);
 
@@ -446,7 +446,7 @@ class SearchParams<Schema extends StandardSchemaV1> {
 	 */
 	reset(showDefaults?: boolean): void {
 		const useShowDefaults = showDefaults !== undefined ? showDefaults : this.#options.showDefaults;
-		const isInMemory = !this.#options.updateURL;
+		const isInMemory = building || !this.#options.updateURL;
 
 		if (useShowDefaults) {
 			// Reuse the filtered default values for both URL and in-memory updates
@@ -688,8 +688,8 @@ class SearchParams<Schema extends StandardSchemaV1> {
 	#getTypedValue<K extends keyof StandardSchemaV1.InferOutput<Schema>>(
 		key: K & string
 	): StandardSchemaV1.InferOutput<Schema>[K] | undefined {
-		// Choose the appropriate search params source based on updateURL option
-		const searchParams = this.#options.updateURL
+		// Choose the appropriate search params source based on updateURL option and building state
+		const searchParams = (!building && this.#options.updateURL)
 			? page.url.searchParams
 			: this.#inMemorySearchParams;
 		const paramsObject = this.#extractParamValues(searchParams);
@@ -743,8 +743,8 @@ class SearchParams<Schema extends StandardSchemaV1> {
 			return;
 		}
 
-		// Choose the appropriate search params source based on updateURL option
-		const isInMemory = !this.#options.updateURL;
+		// Choose the appropriate search params source based on updateURL option and building state
+		const isInMemory = building || !this.#options.updateURL;
 		const searchParams = isInMemory ? this.#inMemorySearchParams : page.url.searchParams;
 		const paramsObject = this.#extractParamValues(searchParams);
 
@@ -832,6 +832,8 @@ export type SchemaTypeConfig<ArrayType = unknown, ObjectType = unknown> =
  * - For 'array' type: supports basic arrays, but doesn't validate array items
  * - For 'object' type: supports generic objects, but doesn't validate nested properties
  * - No custom validation rules or transformations
+ * - No granular reactivity: nested property changes require whole-value reassignment
+ *   (e.g., params.items = [...params.items, newItem] instead of params.items.push(newItem))
  *
  * For complex validation needs (nested validation, refined rules, etc.), use a dedicated
  * validation library instead.
@@ -1269,7 +1271,7 @@ export function useSearchParams<Schema extends StandardSchemaV1>(
 
 	// Only run initialization logic after hydration is complete
 	$effect(() => {
-		if (!isMounted.current || !browser) return;
+		if (!isMounted.current || !browser || building) return;
 
 		// Remove incorrect params on initialization (only after hydration)
 		if (options.updateURL !== false) {
@@ -1351,7 +1353,7 @@ export function useSearchParams<Schema extends StandardSchemaV1>(
 	});
 
 	// Only run this logic in the browser and if debounce is enabled
-	if (browser && options.debounce && options.debounce > 0) {
+	if (browser && !building && options.debounce && options.debounce > 0) {
 		$effect(() => {
 			// This effect runs once when the hook is initialized within a component.
 			// It has no dependencies, so it doesn't re-run.
@@ -1364,6 +1366,18 @@ export function useSearchParams<Schema extends StandardSchemaV1>(
 	// Create a proxy to intercept property access/assignment
 	// This enables the direct property syntax: params.page instead of params.get('page')
 	// The proxy pattern is what makes the API feel natural and type-safe
+	//
+	// IMPORTANT LIMITATION: This proxy only provides top-level reactivity
+	// - Direct property access works: params.page, params.filter
+	// - Nested property changes require whole-object updates: params.fields = {...fields, newProp: value}
+	// - Arrays/objects are not granularly reactive: params.items[0].name = 'new' won't trigger URL updates
+	// 
+	// For granular nested reactivity, you would need:
+	// 1. Recursive proxy creation for nested objects/arrays
+	// 2. Path tracking system (e.g., "fields.0.name")  
+	// 3. Granular URL serialization instead of JSON
+	// 4. Complete rewrite of validation and type systems
+	// This would be a breaking change requiring a new major version
 	const handler: ProxyHandler<SearchParams<Schema>> = {
 		get: (target, prop: string | symbol) => {
 			// Special methods we want to expose directly with proper binding
@@ -1440,6 +1454,14 @@ export function useSearchParams<Schema extends StandardSchemaV1>(
 			if (typeof prop === "string" && target.has(prop)) {
 				// Type assertion needed here because TypeScript can't infer that our runtime check
 				// with target.has() guarantees that prop is a valid key of our schema output type
+				
+				// NOTE: This returns the raw value (object/array/primitive) without nested proxification
+				// If the value is an object or array, changes to its nested properties won't trigger
+				// URL updates automatically. Users must reassign the entire object/array to trigger updates:
+				// ❌ Won't work: params.config.theme = 'dark' 
+				// ✅ Works: params.config = {...params.config, theme: 'dark'}
+				// ❌ Won't work: params.items.push(newItem)
+				// ✅ Works: params.items = [...params.items, newItem]
 				return target.get(prop as keyof StandardSchemaV1.InferOutput<Schema> & string);
 			}
 			return Reflect.get(target, prop);
@@ -1449,6 +1471,11 @@ export function useSearchParams<Schema extends StandardSchemaV1>(
 			if (typeof prop === "string" && target.has(prop)) {
 				// Same type assertion needed here to tell TypeScript that we've verified
 				// this string is a valid key in our schema through the target.has() check
+				
+				// NOTE: This triggers a complete re-serialization of the value to the URL
+				// For objects/arrays, the entire structure is JSON-stringified and stored
+				// This is why nested property mutations don't work - they don't trigger this setter
+				// Only direct assignment to the top-level property triggers URL updates
 				target.set(prop as keyof StandardSchemaV1.InferOutput<Schema> & string, value);
 				return true;
 			}

@@ -4,30 +4,33 @@
 	const params = useSearchParams(
 		createSearchParamsSchema({
 			fields: {
-				type: "array",
-				arrayType: {
-					key: "",
-					value: "",
-				},
-				default: [],
+				type: "object",
+				default: {},
+				objectType: {} as Record<string, string>,
 			},
 		})
 	);
 	const newField = $state({ key: "", value: "" });
 	function addField() {
-		// Should be able to use .push() here
-		params.fields = [...params.fields, $state.snapshot(newField)];
-		newField.key = "";
-		newField.value = "";
+		if (newField.key.trim() && newField.value.trim()) {
+			params.fields = { ...params.fields, [newField.key]: newField.value };
+			newField.key = "";
+			newField.value = "";
+		}
+	}
+	function removeField(key: string) {
+		const newFields = { ...params.fields };
+		delete newFields[key];
+		params.fields = newFields;
 	}
 </script>
 
 <DemoContainer class="flex flex-col gap-4">
-	{#each params.fields as _field, i (i)}
+	{#each Object.entries(params.fields) as [key, value] (key)}
 		<div class="flex items-center gap-3">
-			<Input class="flex-1" bind:value={params.fields[i]!.key} placeholder="Key" />
-			<Input class="flex-1" bind:value={params.fields[i]!.value} placeholder="Value" />
-			<Button class="shrink-0" variant="brand" onclick={() => params.fields.splice(i, 1)}
+			<Input class="flex-1" value={key} placeholder="Key" readonly />
+			<Input class="flex-1" bind:value={params.fields[key]} placeholder="Value" />
+			<Button class="shrink-0" variant="brand" onclick={() => removeField(key)}
 				>Remove</Button
 			>
 		</div>
