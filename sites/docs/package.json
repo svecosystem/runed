@@ -10,7 +10,7 @@
 		"build": "velite && pnpm build:search && vite build",
 		"build:search": "node ./scripts/update-velite-output.js && node ./scripts/build-search-data.js",
 		"preview": "vite preview",
-		"check": "velite && svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
+		"check": "velite && pnpm build:search && svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
 		"check:watch": "pnpm build:content && svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch"
 	},
 	"license": "MIT",
