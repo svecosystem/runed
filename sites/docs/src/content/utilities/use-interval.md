@@ -79,4 +79,3 @@ when it changes:
 	);
 </script>
 ```
-

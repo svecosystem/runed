@@ -114,4 +114,3 @@ describe("useInterval", () => {
 		expect(callback).toHaveBeenCalledTimes(1); // Should not increase after disposal
 	});
 });
-
