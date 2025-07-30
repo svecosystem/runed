@@ -26,13 +26,11 @@
 </script>
 
 <DemoContainer class="flex flex-col gap-4">
-	{#each Object.entries(params.fields) as [key, value] (key)}
+	{#each Object.entries(params.fields) as [key, _value] (key)}
 		<div class="flex items-center gap-3">
 			<Input class="flex-1" value={key} placeholder="Key" readonly />
 			<Input class="flex-1" bind:value={params.fields[key]} placeholder="Value" />
-			<Button class="shrink-0" variant="brand" onclick={() => removeField(key)}
-				>Remove</Button
-			>
+			<Button class="shrink-0" variant="brand" onclick={() => removeField(key)}>Remove</Button>
 		</div>
 	{/each}
 	<form

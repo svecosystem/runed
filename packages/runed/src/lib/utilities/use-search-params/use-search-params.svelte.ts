@@ -736,7 +736,7 @@ class SearchParams<Schema extends StandardSchemaV1> {
 	 * @param value The value to set
 	 * @private
 	 */
-	#setValue(key: string, value: any): void {
+	#setValue(key: string, value: unknown): void {
 		// Optimization: Skip if the key is not in schema
 		if (!this.has(key)) {
 			return;
@@ -912,12 +912,13 @@ export function createSearchParamsSchema<T extends Record<string, SchemaTypeConf
 
 				// Set default values first
 				for (const [key, config] of Object.entries(schema)) {
-					(output as any)[key] = config.default !== undefined ? config.default : null;
+					(output as Record<string, unknown>)[key] =
+						config.default !== undefined ? config.default : null;
 				}
 
 				if (input && typeof input === "object") {
 					for (const [key, config] of Object.entries(schema)) {
-						const inputValue = (input as any)[key];
+						const inputValue = (input as Record<string, unknown>)[key];
 						if (inputValue !== undefined) {
 							try {
 								switch (config.type) {
@@ -929,7 +930,7 @@ export function createSearchParamsSchema<T extends Record<string, SchemaTypeConf
 												path: [key],
 											});
 										} else {
-											(output as any)[key] = num;
+											(output as Record<string, unknown>)[key] = num;
 										}
 										break;
 									}
@@ -939,7 +940,7 @@ export function createSearchParamsSchema<T extends Record<string, SchemaTypeConf
 											inputValue === "true" ||
 											inputValue === "false"
 										) {
-											(output as any)[key] =
+											(output as Record<string, unknown>)[key] =
 												typeof inputValue === "boolean" ? inputValue : inputValue === "true";
 										} else {
 											issues.push({
@@ -951,7 +952,7 @@ export function createSearchParamsSchema<T extends Record<string, SchemaTypeConf
 									}
 									case "array": {
 										if (Array.isArray(inputValue)) {
-											(output as any)[key] = inputValue;
+											(output as Record<string, unknown>)[key] = inputValue;
 										} else {
 											issues.push({
 												message: `Invalid array for "${key}"`,
@@ -966,7 +967,7 @@ export function createSearchParamsSchema<T extends Record<string, SchemaTypeConf
 											inputValue !== null &&
 											!Array.isArray(inputValue)
 										) {
-											(output as any)[key] = inputValue;
+											(output as Record<string, unknown>)[key] = inputValue;
 										} else {
 											issues.push({
 												message: `Invalid object for "${key}"`,
@@ -977,7 +978,7 @@ export function createSearchParamsSchema<T extends Record<string, SchemaTypeConf
 									}
 									case "string":
 									default: {
-										(output as any)[key] = String(inputValue);
+										(output as Record<string, unknown>)[key] = String(inputValue);
 									}
 								}
 							} catch (e) {
