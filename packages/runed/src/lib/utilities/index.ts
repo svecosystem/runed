@@ -9,6 +9,7 @@ export * from "./finite-state-machine/index.js";
 export * from "./interval/index.js";
 export * from "./is-focus-within/index.js";
 export * from "./is-idle/index.js";
+export * from "./is-window-focus/index.js";
 export * from "./is-in-viewport/index.js";
 export * from "./is-mounted/index.js";
 export * from "./on-click-outside/index.js";
