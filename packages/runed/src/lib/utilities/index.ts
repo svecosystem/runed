@@ -11,6 +11,7 @@ export * from "./is-focus-within/index.js";
 export * from "./is-idle/index.js";
 export * from "./is-in-viewport/index.js";
 export * from "./is-mounted/index.js";
+export * from "./is-document-visible/index.js";
 export * from "./on-click-outside/index.js";
 export * from "./persisted-state/index.js";
 export * from "./pressed-keys/index.js";
