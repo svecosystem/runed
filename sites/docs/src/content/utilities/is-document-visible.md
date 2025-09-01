@@ -19,25 +19,25 @@ It listens to the `visibilitychange` event and updates automatically.
 
 ```svelte
 <script lang="ts">
-  import { IsDocumentVisible } from "runed";
+	import { IsDocumentVisible } from "runed";
 
-  const visible = new IsDocumentVisible();
+	const visible = new IsDocumentVisible();
 </script>
 
-<p>Document visible: {visible.current ? 'Yes' : 'No'}</p>
+<p>Document visible: {visible.current ? "Yes" : "No"}</p>
 ```
 
 ## Type Definition
 
 ```ts
 type IsDocumentVisibleOptions = {
-  window?: Window;
-  document?: Document;
+	window?: Window;
+	document?: Document;
 };
 
 class IsDocumentVisible {
-  constructor(options?: IsDocumentVisibleOptions)
-  readonly current: boolean; // true when document is visible, false when hidden
+	constructor(options?: IsDocumentVisibleOptions);
+	readonly current: boolean; // true when document is visible, false when hidden
 }
 ```
 
