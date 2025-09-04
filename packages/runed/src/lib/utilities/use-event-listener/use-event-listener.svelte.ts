@@ -1,7 +1,11 @@
 import { extract } from "../extract/extract.svelte.js";
 import type { MaybeGetter } from "$lib/internal/types.js";
 import { on } from "svelte/events";
-import type { EventHandler } from "svelte/elements";
+
+export type EventHandler<TEvent extends Event, TTarget extends EventTarget> = (
+	this: TTarget,
+	event: TEvent & { currentTarget: TTarget }
+) => unknown;
 
 /**
  * Adds an event listener to the specified target element for the given event(s), and returns a function to remove it.
