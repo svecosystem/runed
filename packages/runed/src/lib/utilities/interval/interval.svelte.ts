@@ -27,13 +27,17 @@ export class Interval {
 
 	constructor(interval: MaybeGetter<number> = 1000, options: IntervalOptions = {}) {
 		const { immediate = true, callback } = options;
-		
+
 		this.#callback = callback;
 
-		this.#intervalControl = useInterval(() => {
-			this.#counter++;
-			this.#callback?.(this.#counter);
-		}, interval, { immediate });
+		this.#intervalControl = useInterval(
+			() => {
+				this.#counter++;
+				this.#callback?.(this.#counter);
+			},
+			interval,
+			{ immediate }
+		);
 	}
 
 	/**

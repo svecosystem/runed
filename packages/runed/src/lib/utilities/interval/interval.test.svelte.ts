@@ -103,7 +103,7 @@ describe("Interval", () => {
 		const interval = new Interval(100);
 
 		expect(interval.isActive).toBe(true);
-		
+
 		await new Promise((resolve) => setTimeout(resolve, 50));
 		interval.resume(); // Should do nothing since already active
 
@@ -133,7 +133,7 @@ describe("Interval", () => {
 		intervalValue = 200;
 		interval.pause();
 		interval.resume();
-		
+
 		await new Promise((resolve) => setTimeout(resolve, 150));
 		// Should not have incremented yet with the new longer interval
 		expect(interval.counter).toBe(1);
@@ -169,7 +169,7 @@ describe("Interval", () => {
 		const interval = new Interval();
 
 		expect(interval.counter).toBe(0);
-		
+
 		// Should not increment in 500ms with default 1000ms interval
 		await new Promise((resolve) => setTimeout(resolve, 500));
 		expect(interval.counter).toBe(0);
