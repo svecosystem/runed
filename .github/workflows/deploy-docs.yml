@@ -1,10 +1,14 @@
 name: Deploy Docs
 on:
   workflow_dispatch:
+  pull_request:
+    types: [closed]
+    branches: [main]
 
 jobs:
   deploy-production:
     runs-on: macos-latest
+    if: github.event_name == 'workflow_dispatch' || (github.event.pull_request.merged == true && github.head_ref == 'changesets-release/main')
     permissions:
       contents: read
       deployments: write
