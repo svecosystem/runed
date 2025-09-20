@@ -13,6 +13,7 @@ export function buildDocsSearchIndex() {
 			href: `/docs/${doc.slug}`,
 			description: doc.description,
 			content: cleanMarkdown(doc.raw),
+			category: doc.category,
 		}))
 	);
 }
