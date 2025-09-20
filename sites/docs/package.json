@@ -8,7 +8,7 @@
 		"dev:content": "velite dev --watch",
 		"dev:svelte": "pnpm build:search && vite dev",
 		"build": "velite && pnpm build:search && vite build",
-		"build:search": "node ./scripts/update-velite-output.js && node ./scripts/build-search-data.js",
+		"build:search": "tsx ./scripts/update-velite-output.js && tsx ./scripts/build-search-data.js",
 		"preview": "vite preview",
 		"check": "velite && svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
 		"check:watch": "pnpm build:content && svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch"
@@ -41,6 +41,7 @@
 		"svelte": "catalog:",
 		"svelte-check": "catalog:",
 		"tailwindcss": "4.1.13",
+		"tsx": "^4.19.3",
 		"typescript": "catalog:",
 		"velite": "^0.2.1",
 		"vite": "catalog:"
