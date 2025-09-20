@@ -169,7 +169,8 @@
 				"no-var": "error",
 				"no-with": "off",
 				"prefer-rest-params": "error",
-				"prefer-spread": "error"
+				"prefer-spread": "error",
+				"no-unused-private-class-members": "off"
 			}
 		},
 		{

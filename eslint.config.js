@@ -34,6 +34,8 @@ export default ts.config(
 		rules: {
 			"prefer-const": "off",
 			"svelte/no-navigation-without-resolve": "off",
+			"svelte/prefer-svelte-reactivity": "off",
+			"no-unused-private-class-members": "off",
 		},
 	},
 	{
