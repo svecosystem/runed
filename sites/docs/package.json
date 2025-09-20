@@ -29,22 +29,21 @@
 		"url": "https://github.com/svecosystem/runed.git"
 	},
 	"devDependencies": {
-		"@svecodocs/kit": "^0.2.1",
+		"@svecodocs/kit": "^0.4.0",
 		"@sveltejs/adapter-auto": "^6.0.1",
 		"@sveltejs/adapter-cloudflare": "^7.0.3",
-		"@sveltejs/kit": "^2.20.7",
-		"@sveltejs/vite-plugin-svelte": "^5.0.3",
-		"@tailwindcss/vite": "4.1.4",
+		"@sveltejs/kit": "catalog:",
+		"@sveltejs/vite-plugin-svelte": "catalog:",
+		"@tailwindcss/vite": "4.1.13",
 		"mdsx": "^0.0.6",
 		"phosphor-svelte": "^3.0.1",
-		"runed": "workspace:^",
-		"svelte": "^5.28.6",
-		"svelte-check": "^4.1.6",
-		"tailwindcss": "4.1.4",
-		"typescript": "^5.7.2",
+		"runed": "workspace:*",
+		"svelte": "catalog:",
+		"svelte-check": "catalog:",
+		"tailwindcss": "4.1.13",
+		"typescript": "catalog:",
 		"velite": "^0.2.1",
-		"vite": "^6.3.5",
-		"vitest": "^3.1.3"
+		"vite": "catalog:"
 	},
 	"type": "module"
 }

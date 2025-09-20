@@ -5,6 +5,7 @@ import svelte from "eslint-plugin-svelte";
 import globals from "globals";
 import { fileURLToPath } from "node:url";
 import ts from "typescript-eslint";
+import oxlint from "eslint-plugin-oxlint";
 const gitignorePath = fileURLToPath(new URL("./.gitignore", import.meta.url));
 
 export default ts.config(
@@ -32,6 +33,7 @@ export default ts.config(
 		},
 		rules: {
 			"prefer-const": "off",
+			"svelte/no-navigation-without-resolve": "off",
 		},
 	},
 	{
@@ -58,5 +60,6 @@ export default ts.config(
 			"packages/runed/dist/**/*",
 			"packages/runed/.svelte-kit/**/*",
 		],
-	}
+	},
+	...oxlint.configs["flat/recommended"]
 );
