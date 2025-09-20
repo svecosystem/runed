@@ -1,6 +1,6 @@
-import { sleep } from "$lib/internal/utils/sleep.js";
 import { testWithEffect } from "$lib/test/util.svelte.js";
 import { describe } from "node:test";
+import { flushSync } from "svelte";
 import { expect } from "vitest";
 import { Previous } from "./previous.svelte.js";
 
@@ -15,17 +15,31 @@ describe("usePrevious", () => {
 		expect(previous.current).toBe(0);
 	});
 
-	testWithEffect("Should return previous value", async () => {
+	testWithEffect("Should return previous value", () => {
 		let count = $state(0);
 		const previous = new Previous(() => count);
 
-		await sleep(10);
+		const logs: (number | undefined)[] = [];
+
+		// test that the previous.current actually triggers reactivity
+		$effect.pre(() => {
+			logs.push(previous.current);
+		});
+
 		expect(previous.current).toBe(undefined);
+		flushSync();
+		expect(logs).toEqual([undefined]);
 		count = 1;
-		await sleep(10);
+		// check that the value is updated synchronously
 		expect(previous.current).toBe(0);
+		// then flushsync to check that the effect has run
+		flushSync();
+		expect(logs).toEqual([undefined, 0]);
 		count = 2;
-		await sleep(10);
+		// check that the value is updated synchronously
 		expect(previous.current).toBe(1);
+		// then flushsync to check that the effect has run
+		flushSync();
+		expect(logs).toEqual([undefined, 0, 1]);
 	});
 });
