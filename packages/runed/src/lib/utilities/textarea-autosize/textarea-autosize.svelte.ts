@@ -1,5 +1,6 @@
-import type { Getter } from "$lib/internal/types.js";
-import { useResizeObserver, watch, type MaybeGetter } from "runed";
+import type { Getter, MaybeGetter } from "$lib/internal/types.js";
+import { useResizeObserver } from "$lib/utilities/use-resize-observer/index.js";
+import { watch } from "$lib/utilities/watch/index.js";
 import { tick } from "svelte";
 import { extract } from "$lib/utilities/extract/index.js";
 

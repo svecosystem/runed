@@ -28,9 +28,10 @@
 		"dev": "pnpm sync && pnpm watch",
 		"build": "pnpm package",
 		"package": "svelte-kit sync && svelte-package && publint",
-		"test": "vitest --run",
+		"test": "vitest --run && playwright test",
 		"test:watch": "vitest --watch",
 		"test:ui": "vitest --watch --ui",
+		"test:integration": "playwright test",
 		"check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
 		"watch": "svelte-kit sync && svelte-package --watch"
 	},
@@ -39,6 +40,11 @@
 			"types": "./dist/index.d.ts",
 			"svelte": "./dist/index.js",
 			"default": "./dist/index.js"
+		},
+		"./kit": {
+			"types": "./dist/kit/index.d.ts",
+			"svelte": "./dist/kit/index.js",
+			"default": "./dist/kit/index.js"
 		}
 	},
 	"files": [
@@ -47,9 +53,16 @@
 		"!dist/**/*.spec.*"
 	],
 	"peerDependencies": {
-		"svelte": "^5.7.0"
+		"svelte": "^5.7.0",
+		"@sveltejs/kit": "^2.21.0"
+	},
+	"peerDependenciesMeta": {
+		"@sveltejs/kit": {
+			"optional": true
+		}
 	},
 	"devDependencies": {
+		"@playwright/test": "^1.55.0",
 		"@sveltejs/kit": "catalog:",
 		"@sveltejs/package": "^2.3.0",
 		"@sveltejs/vite-plugin-svelte": "catalog:",
@@ -63,7 +76,7 @@
 		"@vitest/ui": "^3.2.4",
 		"jsdom": "^24.0.0",
 		"msw": "^2.7.0",
-		"playwright": "^1.52.0",
+		"playwright": "^1.55.0",
 		"publint": "^0.1.9",
 		"resize-observer-polyfill": "^1.5.1",
 		"svelte": "catalog:",
@@ -74,6 +87,8 @@
 		"vitest": "^3.2.4"
 	},
 	"dependencies": {
-		"esm-env": "^1.0.0"
+		"dequal": "^2.0.3",
+		"esm-env": "^1.0.0",
+		"lz-string": "^1.5.0"
 	}
 }
