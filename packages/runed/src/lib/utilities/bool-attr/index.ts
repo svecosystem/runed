@@ -1,1 +1,1 @@
-export { boolAttr } from "./bool-attr.svelte.js";
+export { boolAttr } from "./bool-attr.js";
