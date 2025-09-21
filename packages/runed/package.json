@@ -62,6 +62,7 @@
 		}
 	},
 	"devDependencies": {
+		"@playwright/test": "^1.52.0",
 		"@sveltejs/kit": "catalog:",
 		"@sveltejs/package": "^2.3.0",
 		"@sveltejs/vite-plugin-svelte": "catalog:",
