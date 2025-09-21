@@ -29,7 +29,7 @@
 		"url": "https://github.com/svecosystem/runed.git"
 	},
 	"devDependencies": {
-		"@svecodocs/kit": "^0.4.0",
+		"@svecodocs/kit": "^0.4.1",
 		"@sveltejs/adapter-auto": "^6.0.1",
 		"@sveltejs/adapter-cloudflare": "^7.0.3",
 		"@sveltejs/kit": "catalog:",
