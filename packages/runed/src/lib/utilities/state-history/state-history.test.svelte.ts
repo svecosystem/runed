@@ -206,4 +206,33 @@ describe(StateHistory, () => {
 		expect(value).toBe(0);
 		expect(history.log).toEqual([{ snapshot: 0, timestamp: expect.any(Number) }]);
 	});
+
+	testWithEffect("clear resets history and redo stack", () => {
+		let value = $state(0);
+		const history = new StateHistory(
+			() => value,
+			(v) => {
+				value = v;
+			}
+		);
+
+		flushSync();
+		value = 1;
+		flushSync();
+		value = 2;
+		flushSync();
+
+		history.undo();
+		flushSync();
+
+		expect(history.log.length).toBe(2);
+		expect(history.canRedo).toBe(true);
+		expect(history.canUndo).toBe(true);
+
+		history.clear();
+
+		expect(history.log).toEqual([]);
+		expect(history.canRedo).toBe(false);
+		expect(history.canUndo).toBe(false);
+	});
 });
