@@ -1,0 +1,14 @@
+# Prevents PRs from being opened from a fork's `main` branch which causes annoyances
+# when maintainers try to make changes to the branch
+name: PR guard
+on:
+    pull_request_target:
+        types: [opened, reopened]
+
+permissions:
+    pull-requests: write
+    issues: write
+
+jobs:
+    guard:
+        uses: huntabyte/actions/.github/workflows/guard-fork-main.yml@main

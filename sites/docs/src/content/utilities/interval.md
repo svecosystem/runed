@@ -1,6 +1,7 @@
 ---
 title: Interval
-description: A reactive counter that increases on every interval with controls for pausing and resuming.
+description:
+  A reactive counter that increases on every interval with controls for pausing and resuming.
 category: Utilities
 ---
 
@@ -8,7 +9,8 @@ category: Utilities
 	import Demo from '$lib/components/demos/interval.svelte';
 </script>
 
-`Interval` is a class that provides a reactive counter that increases on every interval, similar to VueUse's `useInterval`. It offers controls for pausing, resuming, and resetting the counter.
+`Interval` is a class that provides a reactive counter that increases on every interval, similar to
+VueUse's `useInterval`. It offers controls for pausing, resuming, and resetting the counter.
 
 ## Demo
 
@@ -48,8 +50,7 @@ You can provide a callback that will be executed on every interval tick:
 	});
 </script>
 
-<p>Counter: {interval.counter}</p>
-<p>Message: {message}</p>
+<p>Counter: {interval.counter}</p><p>Message: {message}</p>
 ```
 
 ## Options
@@ -84,8 +85,7 @@ The interval delay can be reactive using a getter function:
 	const interval = new Interval(() => speed);
 </script>
 
-<input type="number" bind:value={speed} min="100" step="100" />
-<p>Counter: {interval.counter}</p>
+<input type="number" bind:value={speed} min="100" step="100" /><p>Counter: {interval.counter}</p>
 ```
 
 ## Properties

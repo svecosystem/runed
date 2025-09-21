@@ -36,4 +36,3 @@
 		<p><strong>Status:</strong> {interval.isActive ? "Running" : "Paused"}</p>
 	</div>
 </DemoContainer>
-

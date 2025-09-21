@@ -1,5 +1,12 @@
 # runed
 
+## 0.31.1
+
+### Patch Changes
+
+- fix(persisted-state): do not make complex objects reactive
+  ([#270](https://github.com/svecosystem/runed/pull/270))
+
 ## 0.31.0
 
 ### Minor Changes

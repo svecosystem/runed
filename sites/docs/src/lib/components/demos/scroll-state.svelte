@@ -120,7 +120,8 @@
 		--size: 1.5px;
 
 		background-color: var(--bg);
-		background-image: radial-gradient(var(--fg) var(--size), transparent var(--size)),
+		background-image:
+			radial-gradient(var(--fg) var(--size), transparent var(--size)),
 			radial-gradient(var(--fg) var(--size), var(--bg) var(--size));
 		background-size: 20px 20px;
 		background-position:
