@@ -1,5 +1,4 @@
 import type { Getter } from "$lib/internal/types.js";
-import { watch } from "../watch/watch.svelte.js";
 
 /**
  * Holds the previous value of a getter.
@@ -7,17 +6,20 @@ import { watch } from "../watch/watch.svelte.js";
  * @see {@link https://runed.dev/docs/utilities/previous}
  */
 export class Previous<T> {
-	#previous: T | undefined = $state(undefined);
+	#previousCallback: () => T | undefined = () => undefined;
+	#previous: T | undefined = $derived.by(() => this.#previousCallback());
 
 	constructor(getter: Getter<T>, initialValue?: T) {
-		if (initialValue !== undefined) this.#previous = initialValue;
+		let actualPrevious: T | undefined = undefined;
+		if (initialValue !== undefined) actualPrevious = initialValue;
 
-		watch(
-			() => getter(),
-			(_, v) => {
-				this.#previous = v;
+		this.#previousCallback = () => {
+			try {
+				return actualPrevious;
+			} finally {
+				actualPrevious = getter();
 			}
-		);
+		};
 	}
 
 	get current(): T | undefined {
