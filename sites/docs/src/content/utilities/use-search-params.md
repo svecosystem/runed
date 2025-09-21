@@ -1,7 +1,7 @@
 ---
 title: useSearchParams
 description: Reactive, schema-validated URL search params for Svelte/SvelteKit
-category: State
+category: Reactivity
 ---
 
 <script>
