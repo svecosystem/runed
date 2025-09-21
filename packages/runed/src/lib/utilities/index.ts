@@ -30,3 +30,4 @@ export * from "./use-interval/index.js";
 export * from "./use-throttle/index.js";
 export * from "./watch/index.js";
 export * from "./scroll-state/index.js";
+export * from "./bool-attr/index.js";
