@@ -62,7 +62,7 @@
 		}
 	},
 	"devDependencies": {
-		"@playwright/test": "^1.52.0",
+		"@playwright/test": "^1.55.0",
 		"@sveltejs/kit": "catalog:",
 		"@sveltejs/package": "^2.3.0",
 		"@sveltejs/vite-plugin-svelte": "catalog:",
@@ -76,7 +76,7 @@
 		"@vitest/ui": "^3.2.4",
 		"jsdom": "^24.0.0",
 		"msw": "^2.7.0",
-		"playwright": "^1.52.0",
+		"playwright": "^1.55.0",
 		"publint": "^0.1.9",
 		"resize-observer-polyfill": "^1.5.1",
 		"svelte": "catalog:",
