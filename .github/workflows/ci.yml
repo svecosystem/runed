@@ -57,12 +57,11 @@ jobs:
 
       - name: Install dependencies
         run: pnpm install
-      
+
       - name: Install Playwright Browsers
+        working-directory: ./packages/runed
         run: pnpm exec playwright install --with-deps
 
-      - run: pnpm exec playwright install
-        working-directory: ./packages/runed
       - run: pnpm test
 
   lint:
