@@ -81,3 +81,4 @@ sites/docs/.vercel
 packages/runed/doc
 sites/docs/.wrangler
 sites/docs/.velite
+sites/docs/.velite/docs.json
