@@ -98,6 +98,44 @@
     "slugFull": "/utilities/animation-frames"
   },
   {
+    "title": "boolAttr",
+    "description": "A utility that transforms any value into `\"\"` (empty string) or `undefined` for use with HTML attributes where presence indicates truth.",
+    "path": "utilities/bool-attr",
+    "content": "<p>The <code>boolAttr</code> utility transforms any value into either an empty string (<code>\"\"</code>) or <code>undefined</code> for\nuse with HTML attributes where presence indicates truth. This is essential for creating proper\nboolean attributes in HTML, where the presence of the attribute (regardless of value) indicates a\ntruthy state.</p>\n<h2>Problem</h2>\n<p>When using boolean values directly in Svelte attributes, they often render as string values:</p>\n<pre><code class=\"language-svelte\">&#x3C;!-- This renders as: &#x3C;div data-active=\"true\"> -->\n&#x3C;div data-active={true}>Content&#x3C;/div>\n\n&#x3C;!-- This renders as: &#x3C;div data-active=\"false\"> -->\n&#x3C;div data-active={false}>Content&#x3C;/div>\n</code></pre>\n<p>This creates issues with CSS selectors and attribute-based styling, as both cases result in the\nattribute being present.</p>\n<h2>Solution</h2>\n<p><code>boolAttr</code> ensures proper boolean attribute behavior:</p>\n<pre><code class=\"language-svelte\">&#x3C;script lang=\"ts\">\n\timport { boolAttr } from \"runed\";\n\n\tlet isActive = $state(true);\n\tlet isLoading = $state(false);\n&#x3C;/script>\n\n&#x3C;!-- Renders as: &#x3C;div data-active> -->\n&#x3C;div data-active={boolAttr(isActive)}>Active content&#x3C;/div>\n\n&#x3C;!-- Renders as: &#x3C;div> (no data-loading attribute) -->\n&#x3C;div data-loading={boolAttr(isLoading)}>Loading content&#x3C;/div>\n</code></pre>\n<h2>Type Definition</h2>\n<pre><code class=\"language-ts\">function boolAttr(value: unknown): \"\" | undefined;\n</code></pre>\n<h3>Parameters</h3>\n<ul>\n<li><strong><code>value</code></strong> (<code>unknown</code>) - Any value to be converted to a boolean attribute</li>\n</ul>\n<h3>Returns</h3>\n<ul>\n<li><strong><code>\"\"</code></strong> (empty string) - When <code>value</code> is truthy</li>\n<li><strong><code>undefined</code></strong> - When <code>value</code> is falsy</li>\n</ul>",
+    "raw": "The `boolAttr` utility transforms any value into either an empty string (`\"\"`) or `undefined` for\nuse with HTML attributes where presence indicates truth. This is essential for creating proper\nboolean attributes in HTML, where the presence of the attribute (regardless of value) indicates a\ntruthy state.\n\n## Problem\n\nWhen using boolean values directly in Svelte attributes, they often render as string values:\n\n```svelte\n<!-- This renders as: <div data-active=\"true\"> -->\n<div data-active={true}>Content</div>\n\n<!-- This renders as: <div data-active=\"false\"> -->\n<div data-active={false}>Content</div>\n```\n\nThis creates issues with CSS selectors and attribute-based styling, as both cases result in the\nattribute being present.\n\n## Solution\n\n`boolAttr` ensures proper boolean attribute behavior:\n\n```svelte\n<script lang=\"ts\">\n\timport { boolAttr } from \"runed\";\n\n\tlet isActive = $state(true);\n\tlet isLoading = $state(false);\n</script>\n\n<!-- Renders as: <div data-active> -->\n<div data-active={boolAttr(isActive)}>Active content</div>\n\n<!-- Renders as: <div> (no data-loading attribute) -->\n<div data-loading={boolAttr(isLoading)}>Loading content</div>\n```\n\n## Type Definition\n\n```ts\nfunction boolAttr(value: unknown): \"\" | undefined;\n```\n\n### Parameters\n\n- **`value`** (`unknown`) - Any value to be converted to a boolean attribute\n\n### Returns\n\n- **`\"\"`** (empty string) - When `value` is truthy\n- **`undefined`** - When `value` is falsy",
+    "toc": [
+      {
+        "title": "Problem",
+        "url": "#problem",
+        "items": []
+      },
+      {
+        "title": "Solution",
+        "url": "#solution",
+        "items": []
+      },
+      {
+        "title": "Type Definition",
+        "url": "#type-definition",
+        "items": [
+          {
+            "title": "Parameters",
+            "url": "#parameters",
+            "items": []
+          },
+          {
+            "title": "Returns",
+            "url": "#returns",
+            "items": []
+          }
+        ]
+      }
+    ],
+    "category": "Utilities",
+    "slug": "utilities/bool-attr",
+    "slugFull": "/utilities/bool-attr"
+  },
+  {
     "title": "Context",
     "description": "A wrapper around Svelte's Context API that provides type safety and improved ergonomics for sharing data between components.",
     "path": "utilities/context",
@@ -1099,7 +1137,7 @@
         "items": []
       }
     ],
-    "category": "State",
+    "category": "Reactivity",
     "slug": "utilities/use-search-params",
     "slugFull": "/utilities/use-search-params"
   },
