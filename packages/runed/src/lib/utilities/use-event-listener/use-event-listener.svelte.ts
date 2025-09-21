@@ -2,6 +2,11 @@ import { extract } from "../extract/extract.svelte.js";
 import type { MaybeGetter } from "$lib/internal/types.js";
 import { on } from "svelte/events";
 
+export type EventHandler<TEvent extends Event, TTarget extends EventTarget> = (
+	this: TTarget,
+	event: TEvent & { currentTarget: TTarget }
+) => unknown;
+
 /**
  * Adds an event listener to the specified target element for the given event(s), and returns a function to remove it.
  * @param target The target element to add the event listener to.
@@ -14,7 +19,7 @@ import { on } from "svelte/events";
 export function useEventListener<TEvent extends keyof WindowEventMap>(
 	target: MaybeGetter<Window | null | undefined>,
 	event: MaybeGetter<TEvent | TEvent[]>,
-	handler: (this: Window, event: WindowEventMap[TEvent]) => unknown,
+	handler: EventHandler<WindowEventMap[TEvent], Window>,
 	options?: AddEventListenerOptions
 ): void;
 
@@ -30,7 +35,7 @@ export function useEventListener<TEvent extends keyof WindowEventMap>(
 export function useEventListener<TEvent extends keyof DocumentEventMap>(
 	target: MaybeGetter<Document | null | undefined>,
 	event: MaybeGetter<TEvent | TEvent[]>,
-	handler: (this: Document, event: DocumentEventMap[TEvent]) => unknown,
+	handler: EventHandler<DocumentEventMap[TEvent], Document>,
 	options?: AddEventListenerOptions
 ): void;
 
@@ -49,7 +54,7 @@ export function useEventListener<
 >(
 	target: MaybeGetter<TElement | null | undefined>,
 	event: MaybeGetter<TEvent | TEvent[]>,
-	handler: (this: TElement, event: HTMLElementEventMap[TEvent]) => unknown,
+	handler: EventHandler<HTMLElementEventMap[TEvent], TElement>,
 	options?: AddEventListenerOptions
 ): void;
 
@@ -65,7 +70,7 @@ export function useEventListener<
 export function useEventListener<TEvent extends keyof MediaQueryListEventMap>(
 	target: MaybeGetter<MediaQueryList | null | undefined>,
 	event: MaybeGetter<TEvent | TEvent[]>,
-	handler: (this: MediaQueryList, event: MediaQueryListEventMap[TEvent]) => unknown,
+	handler: EventHandler<MediaQueryListEventMap[TEvent], MediaQueryList>,
 	options?: AddEventListenerOptions
 ): void;
 
@@ -93,9 +98,9 @@ export function useEventListener(
 ): void {
 	$effect(() => {
 		const target = extract(_target);
-		const events = extract(_events);
-		if (target === undefined || target === null) return;
+		if (target == null) return;
 
+		const events = extract(_events);
 		if (Array.isArray(events)) {
 			for (const event of events) {
 				$effect(() => on(target, event, handler, options));
