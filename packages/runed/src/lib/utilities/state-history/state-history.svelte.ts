@@ -81,5 +81,4 @@ export class StateHistory<T> {
 		this.log = [];
 		this.#redoStack = [];
 	}
-
 }
