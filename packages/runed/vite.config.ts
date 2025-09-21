@@ -16,13 +16,39 @@ const vitestBrowserConditionPlugin: Plugin = {
 export default defineConfig({
 	plugins: [vitestBrowserConditionPlugin, sveltekit(), svelteTesting()],
 	test: {
-		include: ["src/**/*.{test,test.svelte,spec}.{js,ts}"],
-		environment: "jsdom",
 		includeSource: ["src/**/*.{js,ts,svelte}"],
-		setupFiles: ["./setupTest.ts"],
 		globals: true,
 		coverage: {
 			exclude: ["./setupTest.ts"],
 		},
+		workspace: [
+			{
+				extends: true,
+				test: {
+					setupFiles: ["./setupTest.ts"],
+					include: ["src/**/*.{test,test.svelte}.{js,ts}"],
+					exclude: ["src/**/*.browser.{test,test.svelte}.{js,ts}"],
+					name: "unit",
+					environment: "jsdom",
+				},
+			},
+			{
+				extends: true,
+				test: {
+					include: ["src/**/*.browser.{test,test.svelte,spec}.{js,ts}"],
+					name: "browser",
+					browser: {
+						instances: [
+							{
+								browser: "chromium",
+							},
+						],
+						enabled: true,
+						provider: "playwright",
+						headless: true,
+					},
+				},
+			},
+		],
 	},
 });

@@ -20,9 +20,9 @@ const contentFile = `${contentDir}/${kebabUtil}.md`;
 const demoFile = `${demosDir}/${kebabUtil}.svelte`;
 
 fs.mkdirSync(utilDir, { recursive: true });
-fs.writeFileSync(utilIndexFile, `export * from "./${utilName}.svelte.js";`);
+fs.writeFileSync(utilIndexFile, `export * from "./${kebabUtil}.svelte.js";`);
 fs.writeFileSync(utilMainFile, "");
-fs.appendFileSync(utilsBarrelFile, `export * from "./${utilName}/index.js";`);
+fs.appendFileSync(utilsBarrelFile, `export * from "./${kebabUtil}/index.js";`);
 
 // Write the boilerplate code for the docs content file
 fs.writeFileSync(

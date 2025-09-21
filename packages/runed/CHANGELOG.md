@@ -1,5 +1,80 @@
 # runed
 
+## 0.31.1
+
+### Patch Changes
+
+- fix(persisted-state): do not make complex objects reactive
+  ([#270](https://github.com/svecosystem/runed/pull/270))
+
+## 0.31.0
+
+### Minor Changes
+
+- feat: add interval utilities
+  ([`c7de088`](https://github.com/svecosystem/runed/commit/c7de088300fcbf7df1fd57a4f1245debd2bc06bb))
+
+## 0.30.0
+
+### Minor Changes
+
+- New Utilities: `useThrottle` and `Throttled`
+  ([#115](https://github.com/svecosystem/runed/pull/115))
+
+- Update Svelte to `5.0.0-next.200` ([#115](https://github.com/svecosystem/runed/pull/115))
+
+## 0.29.2
+
+### Patch Changes
+
+- fix: remove `#version` from persisted & don't recreate proxies
+  ([#279](https://github.com/svecosystem/runed/pull/279))
+
+## 0.29.1
+
+### Patch Changes
+
+- feat(ScrollState): Add `progress.(x|y)` api
+  ([#284](https://github.com/svecosystem/runed/pull/284))
+
+- fix: add `defaults` export to package.json ([#285](https://github.com/svecosystem/runed/pull/285))
+
+## 0.29.0
+
+### Minor Changes
+
+- feat(Debounced): Expose pending state from useDebounce
+  ([#272](https://github.com/svecosystem/runed/pull/272))
+
+## 0.28.0
+
+### Minor Changes
+
+- breaking: remove `initialSize` and calculate size before first resize
+  ([#262](https://github.com/svecosystem/runed/pull/262))
+
+### Patch Changes
+
+- fix: use `createSubscriber` for `ElementSize` util
+  ([#254](https://github.com/svecosystem/runed/pull/254))
+
+## 0.27.0
+
+### Minor Changes
+
+- New utility: `TextareaAutosize` ([#233](https://github.com/svecosystem/runed/pull/233))
+
+- New utility: `extract` ([#233](https://github.com/svecosystem/runed/pull/233))
+
+- New utility: `ScrollState` ([#233](https://github.com/svecosystem/runed/pull/233))
+
+- feat: export `Getter` and `MaybeGetter` types
+  ([#233](https://github.com/svecosystem/runed/pull/233))
+
+### Patch Changes
+
+- change: `extract` types ([#233](https://github.com/svecosystem/runed/pull/233))
+
 ## 0.26.0
 
 ### Minor Changes

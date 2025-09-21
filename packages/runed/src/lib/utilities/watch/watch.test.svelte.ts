@@ -25,7 +25,7 @@ describe("watch", () => {
 	});
 
 	testWithEffect("watchers initially pass `undefined` as the previous value", () => {
-		return new Promise<void>((resolve) => {
+		return new Promise((resolve) => {
 			const count = $state(0);
 
 			watch(
@@ -42,7 +42,7 @@ describe("watch", () => {
 	testWithEffect(
 		"watchers with an array of sources initially pass an empty array as the previous value",
 		() => {
-			return new Promise<void>((resolve) => {
+			return new Promise((resolve) => {
 				const count = $state(1);
 				const doubled = $derived(count * 2);
 
