@@ -5,6 +5,7 @@ import { browser, building } from "$app/environment";
 import { goto } from "$app/navigation";
 import { page } from "$app/state";
 import { IsMounted } from "../is-mounted/is-mounted.svelte.js";
+import { BROWSER } from "esm-env";
 
 /**
  * Configuration options for useSearchParams
@@ -491,6 +492,7 @@ class SearchParams<Schema extends StandardSchemaV1> {
 				this.#inMemorySearchParams = new SvelteURLSearchParams();
 			} else {
 				// For URL updates, navigate to empty search
+				if (!BROWSER) return;
 				goto("?", { replaceState: true });
 			}
 		}
@@ -607,6 +609,7 @@ class SearchParams<Schema extends StandardSchemaV1> {
 	 */
 	#navigateWithParams(params: URLSearchParams) {
 		const navigateToNewUrl = () => {
+			if (!BROWSER) return;
 			// When pushHistory is false, use replaceState to avoid creating a browser history entry
 			const gotoOptions = !this.#options.pushHistory
 				? { replaceState: true, keepFocus: true }
@@ -738,9 +741,7 @@ class SearchParams<Schema extends StandardSchemaV1> {
 	 */
 	#setValue(key: string, value: unknown): void {
 		// Optimization: Skip if the key is not in schema
-		if (!this.has(key)) {
-			return;
-		}
+		if (!this.has(key)) return;
 
 		// Choose the appropriate search params source based on updateURL option and building state
 		const isInMemory = building || !this.#options.updateURL;
