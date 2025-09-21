@@ -3,9 +3,9 @@ packages:
   - sites/*
 
 catalog:
-  '@sveltejs/kit': ^2.42.0
-  '@sveltejs/vite-plugin-svelte': ^6.2.0
-  '@types/node': ^20.19.16
+  "@sveltejs/kit": ^2.42.0
+  "@sveltejs/vite-plugin-svelte": ^6.2.0
+  "@types/node": ^20.19.16
   svelte: ^5.39.3
   svelte-check: ^4.3.1
   typescript: ^5.9.2
@@ -13,6 +13,6 @@ catalog:
   vitest: ^3.2.4
 
 onlyBuiltDependencies:
-  - '@tailwindcss/oxide'
+  - "@tailwindcss/oxide"
   - msw
   - workerd
