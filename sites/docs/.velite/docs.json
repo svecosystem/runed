@@ -1099,7 +1099,7 @@
         "items": []
       }
     ],
-    "category": "Reactivity",
+    "category": "State",
     "slug": "utilities/use-search-params",
     "slugFull": "/utilities/use-search-params"
   },
