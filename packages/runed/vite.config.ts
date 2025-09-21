@@ -33,7 +33,7 @@ export default defineConfig({
 				},
 			},
 			{
-				plugins: [sveltekit(), svelteTesting()],
+				extends: true,
 				test: {
 					include: ["src/**/*.browser.{test,test.svelte,spec}.{js,ts}"],
 					name: "browser",

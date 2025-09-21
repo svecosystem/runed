@@ -4,7 +4,17 @@ on:
   push:
     branches:
       - main
+    paths-ignore:
+      - ".changeset/**"
+      - README.md
+      - ".vscode/**"
+      - packages/runed/CHANGELOG.md
   pull_request:
+    paths-ignore:
+      - ".changeset/**"
+      - README.md
+      - ".vscode/**"
+      - packages/runed/CHANGELOG.md
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.number || github.sha }}
@@ -48,6 +58,8 @@ jobs:
       - name: Install dependencies
         run: pnpm install
 
+      - run: pnpm exec playwright install
+        working-directory: ./packages/runed
       - run: pnpm test
 
   lint:

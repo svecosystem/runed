@@ -76,4 +76,9 @@ export class StateHistory<T> {
 		this.log.push(nextEvent);
 		this.#set(nextEvent.snapshot);
 	}
+
+	clear(): void {
+		this.log = [];
+		this.#redoStack = [];
+	}
 }
