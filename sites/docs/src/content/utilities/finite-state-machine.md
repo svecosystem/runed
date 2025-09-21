@@ -111,16 +111,24 @@ import { FiniteStateMachine } from "runed";
 type MyStates = "on" | "off";
 type MyEvents = "toggle";
 
-const f = new FiniteStateMachine<MyStates, MyEvents>('off', {
+const f = new FiniteStateMachine<MyStates, MyEvents>("off", {
 	off: {
-		toggle: 'on',
-		_enter: (meta) => { console.log('switch is off') },
-		_exit: (meta) => { console.log('switch is no longer off') }
+		toggle: "on",
+		_enter: (meta) => {
+			console.log("switch is off");
+		},
+		_exit: (meta) => {
+			console.log("switch is no longer off");
+		}
 	},
 	on: {
-		toggle: 'off',
-		_enter: (meta) => { console.log('switch is on') },
-		_exit: (meta) => { console.log('switch is no longer on') }
+		toggle: "off",
+		_enter: (meta) => {
+			console.log("switch is on");
+		},
+		_exit: (meta) => {
+			console.log("switch is no longer on");
+		}
 	}
 });
 ```
@@ -147,20 +155,20 @@ import { FiniteStateMachine } from "runed";
 type MyStates = "on" | "off";
 type MyEvents = "toggle" | "emergency";
 
-const f = new FiniteStateMachine<MyStates, MyEvents>('off', {
+const f = new FiniteStateMachine<MyStates, MyEvents>("off", {
 	off: {
-		toggle: 'on'
+		toggle: "on"
 	},
 	on: {
-		toggle: 'off'
+		toggle: "off"
 	},
-	'*': {
-		emergency: 'off'
+	"*": {
+		emergency: "off"
 	}
 });
 
 // will always result in the switch turning off.
-f.send('emergency');
+f.send("emergency");
 ```
 
 ### Debouncing
