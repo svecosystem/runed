@@ -8,18 +8,12 @@ Thanks for helping improve Runed. This repo is a pnpm workspace monorepo with th
 - Node >= 20
 - pnpm >= 10.12.1 (repo pins `pnpm@10.17.0`)
 
-We use pnpm to manage this monorepo. If you're new to pnpm, you can enable it with
-[corepack](https://nodejs.org/api/corepack.html), which is bundled with Node.js.
+We use pnpm to manage this monorepo. To install `pnpm` see
+[the pnpm docs](https://pnpm.io/installation).
 
 Optional but recommended:
 
 - Playwright browsers installed for integration tests
-
-```bash
-corepack enable
-corepack prepare pnpm@10.17.0 --activate
-pnpm -v
-```
 
 ### Clone & install
 
