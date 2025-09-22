@@ -1129,7 +1129,7 @@ export function validateSearchParams<Schema extends StandardSchemaV1>(
 	url: URL,
 	schema: Schema,
 	options: { compressedParamName?: string } = {}
-): URLSearchParams {
+): { params: URLSearchParams; data: StandardSchemaV1.InferOutput<Schema> } {
 	const compressedParamName = options.compressedParamName || "_data";
 	let validatedValue: Record<string, unknown> = {};
 
@@ -1233,7 +1233,7 @@ export function validateSearchParams<Schema extends StandardSchemaV1>(
 		newSearchParams.set(key, stringValue);
 	}
 
-	return newSearchParams;
+	return { params: newSearchParams, data: validatedValue as StandardSchemaV1.InferOutput<Schema> };
 }
 
 export type ReturnUseSearchParams<T extends StandardSchemaV1> = SearchParams<T> &
