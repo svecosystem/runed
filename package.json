@@ -26,18 +26,17 @@
 	"scripts": {
 		"dev": "pnpm sync && pnpm --parallel dev",
 		"test": "pnpm -r test",
-		"test:package": "pnpm -F \"./packages/**\" test",
+		"test:package": "pnpm -F \"./packages/**\" test --reporter append-only --color test",
 		"test:package:watch": "pnpm -F \"./packages/**\" test:watch",
 		"build": "pnpm -r build",
 		"build:packages": "pnpm -F \"./packages/**\" --parallel build",
 		"build:content": "pnpm -F \"./sites/**\" --parallel build:content",
 		"ci:publish": "pnpm build:packages && changeset publish",
 		"lint": "prettier --check . && oxlint . && eslint .",
-		"lint:fix": "prettier --write . && eslint . --fix",
 		"format": "prettier --write .",
 		"check": "pnpm -r check",
 		"sync": "pnpm -r sync",
-		"add": "node ./scripts/add-utility.mjs"
+		"new": "node ./scripts/add-utility.mjs"
 	},
 	"license": "MIT",
 	"devDependencies": {
