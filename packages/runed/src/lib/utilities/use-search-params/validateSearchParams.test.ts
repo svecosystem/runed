@@ -20,15 +20,15 @@ const expectedDefaultsString = "page=1&filter=&active=false&tags=%5B%5D&config=%
 describe("validateSearchParams", () => {
 	it("parses standard URL parameters correctly, including defaults for missing", () => {
 		const url = createURL("?page=3&filter=test&active=true");
-		const { params, data } = validateSearchParams(url, testSchema);
+		const { searchParams, data } = validateSearchParams(url, testSchema);
 
 		// Check URLSearchParams
-		expect(params.get("page")).toBe("3");
-		expect(params.get("filter")).toBe("test");
-		expect(params.get("active")).toBe("true");
+		expect(searchParams.get("page")).toBe("3");
+		expect(searchParams.get("filter")).toBe("test");
+		expect(searchParams.get("active")).toBe("true");
 		// Expect default values for parameters not provided in URL
-		expect(params.get("tags")).toBe("[]"); // Default [] stringified
-		expect(params.get("config")).toBe("{}"); // Default {} stringified
+		expect(searchParams.get("tags")).toBe("[]"); // Default [] stringified
+		expect(searchParams.get("config")).toBe("{}"); // Default {} stringified
 
 		// Check typed data object
 		expect(data.page).toBe(3); // number
@@ -40,10 +40,10 @@ describe("validateSearchParams", () => {
 
 	it("returns default values when parameters are missing", () => {
 		const url = createURL(""); // Empty search string
-		const { params, data } = validateSearchParams(url, testSchema);
+		const { searchParams, data } = validateSearchParams(url, testSchema);
 
 		// Check URLSearchParams - expect the string representation of all defaults
-		expect(params.toString()).toBe(expectedDefaultsString);
+		expect(searchParams.toString()).toBe(expectedDefaultsString);
 
 		// Check typed data object - expect default values
 		expect(data.page).toBe(1); // number default
@@ -55,14 +55,14 @@ describe("validateSearchParams", () => {
 
 	it("handles partially provided standard parameters, including defaults", () => {
 		const url = createURL("?filter=partial");
-		const { params, data } = validateSearchParams(url, testSchema);
+		const { searchParams, data } = validateSearchParams(url, testSchema);
 
 		// Check URLSearchParams - expect default values for missing parameters
-		expect(params.get("page")).toBe("1"); // Default value
-		expect(params.get("filter")).toBe("partial");
-		expect(params.get("active")).toBe("false"); // Default value
-		expect(params.get("tags")).toBe("[]");
-		expect(params.get("config")).toBe("{}");
+		expect(searchParams.get("page")).toBe("1"); // Default value
+		expect(searchParams.get("filter")).toBe("partial");
+		expect(searchParams.get("active")).toBe("false"); // Default value
+		expect(searchParams.get("tags")).toBe("[]");
+		expect(searchParams.get("config")).toBe("{}");
 
 		// Check typed data object
 		expect(data.page).toBe(1); // number default
@@ -76,15 +76,15 @@ describe("validateSearchParams", () => {
 		const dataToCompress = { page: 5, filter: "compressed", active: true, tags: ["a", "b"] };
 		const compressed = lzString.compressToEncodedURIComponent(JSON.stringify(dataToCompress));
 		const url = createURL(`?_data=${compressed}`);
-		const { params, data } = validateSearchParams(url, testSchema);
+		const { searchParams, data } = validateSearchParams(url, testSchema);
 
 		// Check URLSearchParams
-		expect(params.get("page")).toBe("5");
-		expect(params.get("filter")).toBe("compressed");
-		expect(params.get("active")).toBe("true");
-		expect(params.get("tags")).toBe(JSON.stringify(["a", "b"]));
+		expect(searchParams.get("page")).toBe("5");
+		expect(searchParams.get("filter")).toBe("compressed");
+		expect(searchParams.get("active")).toBe("true");
+		expect(searchParams.get("tags")).toBe(JSON.stringify(["a", "b"]));
 		// Expect default value for config, as it wasn't in compressed data
-		expect(params.get("config")).toBe("{}"); // Default {} stringified
+		expect(searchParams.get("config")).toBe("{}"); // Default {} stringified
 
 		// Check typed data object
 		expect(data.page).toBe(5); // number
@@ -98,17 +98,17 @@ describe("validateSearchParams", () => {
 		const dataToCompress = { page: 10, filter: "custom_key" };
 		const compressed = lzString.compressToEncodedURIComponent(JSON.stringify(dataToCompress));
 		const url = createURL(`?custom_comp=${compressed}`);
-		const { params, data } = validateSearchParams(url, testSchema, {
+		const { searchParams, data } = validateSearchParams(url, testSchema, {
 			compressedParamName: "custom_comp",
 		});
 
 		// Check URLSearchParams
-		expect(params.get("page")).toBe("10");
-		expect(params.get("filter")).toBe("custom_key");
+		expect(searchParams.get("page")).toBe("10");
+		expect(searchParams.get("filter")).toBe("custom_key");
 		// Expect defaults for others
-		expect(params.get("active")).toBe("false");
-		expect(params.get("tags")).toBe("[]");
-		expect(params.get("config")).toBe("{}");
+		expect(searchParams.get("active")).toBe("false");
+		expect(searchParams.get("tags")).toBe("[]");
+		expect(searchParams.get("config")).toBe("{}");
 
 		// Check typed data object
 		expect(data.page).toBe(10); // number
@@ -122,15 +122,15 @@ describe("validateSearchParams", () => {
 		const dataToCompress = { page: 20, filter: "compressed_priority" };
 		const compressed = lzString.compressToEncodedURIComponent(JSON.stringify(dataToCompress));
 		const url = createURL(`?page=1&filter=standard&_data=${compressed}`); // Both present
-		const { params, data } = validateSearchParams(url, testSchema);
+		const { searchParams, data } = validateSearchParams(url, testSchema);
 
 		// Check URLSearchParams - compressed values should win
-		expect(params.get("page")).toBe("20");
-		expect(params.get("filter")).toBe("compressed_priority");
+		expect(searchParams.get("page")).toBe("20");
+		expect(searchParams.get("filter")).toBe("compressed_priority");
 		// Defaults for others
-		expect(params.get("active")).toBe("false");
-		expect(params.get("tags")).toBe("[]");
-		expect(params.get("config")).toBe("{}");
+		expect(searchParams.get("active")).toBe("false");
+		expect(searchParams.get("tags")).toBe("[]");
+		expect(searchParams.get("config")).toBe("{}");
 
 		// Check typed data object - compressed values should win
 		expect(data.page).toBe(20); // number from compressed
@@ -144,7 +144,7 @@ describe("validateSearchParams", () => {
 		// Invalid compressed string - decompress returns null, should not log error
 		const urlInvalid = createURL("?_data=invalid%%%");
 		const consoleErrorSpy = vi.spyOn(console, "error").mockImplementation(() => {});
-		const { params: paramsInvalid, data: dataInvalid } = validateSearchParams(
+		const { searchParams: paramsInvalid, data: dataInvalid } = validateSearchParams(
 			urlInvalid,
 			testSchema
 		);
@@ -162,7 +162,7 @@ describe("validateSearchParams", () => {
 
 		// Missing compressed data (but key exists) - also should not log error
 		const urlMissing = createURL("?_data=");
-		const { params: paramsMissing, data: dataMissing } = validateSearchParams(
+		const { searchParams: paramsMissing, data: dataMissing } = validateSearchParams(
 			urlMissing,
 			testSchema
 		);
@@ -181,10 +181,10 @@ describe("validateSearchParams", () => {
 		const compressed = lzString.compressToEncodedURIComponent(invalidJson);
 		const url = createURL(`?_data=${compressed}`);
 		const consoleErrorSpy = vi.spyOn(console, "error").mockImplementation(() => {});
-		const { params, data } = validateSearchParams(url, testSchema);
+		const { searchParams, data } = validateSearchParams(url, testSchema);
 
 		// Check URLSearchParams - expect defaults string on parse error
-		expect(params.toString()).toBe(expectedDefaultsString);
+		expect(searchParams.toString()).toBe(expectedDefaultsString);
 		expect(consoleErrorSpy).toHaveBeenCalled();
 		consoleErrorSpy.mockRestore();
 
@@ -206,14 +206,14 @@ describe("validateSearchParams", () => {
 		};
 		const compressed = lzString.compressToEncodedURIComponent(JSON.stringify(testData));
 		const url = createURL(`?_data=${compressed}`);
-		const { params, data } = validateSearchParams(url, testSchema);
+		const { searchParams, data } = validateSearchParams(url, testSchema);
 
 		// Check URLSearchParams
-		expect(params.get("page")).toBe("99"); // Number -> String
-		expect(params.get("filter")).toBe("types"); // String -> String
-		expect(params.get("active")).toBe("false"); // Boolean -> String
-		expect(params.get("tags")).toBe(JSON.stringify([1, "two"])); // Array -> JSON String
-		expect(params.get("config")).toBe(JSON.stringify({ theme: "dark" })); // Object -> JSON String
+		expect(searchParams.get("page")).toBe("99"); // Number -> String
+		expect(searchParams.get("filter")).toBe("types"); // String -> String
+		expect(searchParams.get("active")).toBe("false"); // Boolean -> String
+		expect(searchParams.get("tags")).toBe(JSON.stringify([1, "two"])); // Array -> JSON String
+		expect(searchParams.get("config")).toBe(JSON.stringify({ theme: "dark" })); // Object -> JSON String
 
 		// Check typed data object - should have correct native types
 		expect(data.page).toBe(99); // number
@@ -229,15 +229,15 @@ describe("validateSearchParams", () => {
 			filter: { type: "string", default: "" },
 		});
 		const url = new URL("http://localhost:5173/?page=abc&filter=foo");
-		const { params, data } = validateSearchParams(url, schema);
+		const { searchParams, data } = validateSearchParams(url, schema);
 
 		// Check URLSearchParams
 		// page=abc is invalid, so should fallback to default
-		expect(params.get("page")).toBe("1");
+		expect(searchParams.get("page")).toBe("1");
 		// filter=foo is valid
-		expect(params.get("filter")).toBe("foo");
+		expect(searchParams.get("filter")).toBe("foo");
 		// Only valid/normalized params should be present
-		expect(Array.from(params.keys()).sort()).toEqual(["filter", "page"]);
+		expect(Array.from(searchParams.keys()).sort()).toEqual(["filter", "page"]);
 
 		// Check typed data object
 		expect(data.page).toBe(1); // number default (invalid "abc" -> 1)
@@ -275,7 +275,7 @@ describe("validateSearchParams", () => {
 				searchParams: mockSearchParams,
 			};
 
-			const { params, data } = validateSearchParams(url as unknown as URL, schema);
+			const { searchParams, data } = validateSearchParams(url as unknown as URL, schema);
 
 			// Should access schema parameters plus the compressed data check
 			expect(accessedParams).toEqual(new Set(["_data", "page", "filter"]));
@@ -285,8 +285,8 @@ describe("validateSearchParams", () => {
 			expect(mockSearchParams.entries).not.toHaveBeenCalled();
 
 			// Should return the correct values in URLSearchParams
-			expect(params.get("page")).toBe("2");
-			expect(params.get("filter")).toBe("test");
+			expect(searchParams.get("page")).toBe("2");
+			expect(searchParams.get("filter")).toBe("test");
 
 			// Should return the correct typed values
 			expect(data.page).toBe(2); // number (converted from string "2")
@@ -301,20 +301,20 @@ describe("validateSearchParams", () => {
 
 			// URL contains both schema and non-schema parameters
 			const url = createURL("?page=5&filter=hello&limit=10&sort=asc&other=value");
-			const { params, data } = validateSearchParams(url, schema);
+			const { searchParams, data } = validateSearchParams(url, schema);
 
 			// Check URLSearchParams - should only return schema-defined parameters
-			const paramKeys = Array.from(params.keys()).sort();
+			const paramKeys = Array.from(searchParams.keys()).sort();
 			expect(paramKeys).toEqual(["filter", "page"]);
 
 			// Should have correct values for schema parameters
-			expect(params.get("page")).toBe("5");
-			expect(params.get("filter")).toBe("hello");
+			expect(searchParams.get("page")).toBe("5");
+			expect(searchParams.get("filter")).toBe("hello");
 
 			// Should not include non-schema parameters
-			expect(params.get("limit")).toBeNull();
-			expect(params.get("sort")).toBeNull();
-			expect(params.get("other")).toBeNull();
+			expect(searchParams.get("limit")).toBeNull();
+			expect(searchParams.get("sort")).toBeNull();
+			expect(searchParams.get("other")).toBeNull();
 
 			// Check typed data object - should only have schema-defined properties
 			expect(Object.keys(data).sort()).toEqual(["filter", "page"]);
@@ -339,21 +339,21 @@ describe("validateSearchParams", () => {
 			const url = createURL(
 				'?count=42&enabled=true&items=["a","b"]&settings={"theme":"dark"}&extra=ignored&another=also-ignored'
 			);
-			const { params, data } = validateSearchParams(url, schema);
+			const { searchParams, data } = validateSearchParams(url, schema);
 
 			// Check URLSearchParams - should only contain schema parameters
-			const paramKeys = Array.from(params.keys()).sort();
+			const paramKeys = Array.from(searchParams.keys()).sort();
 			expect(paramKeys).toEqual(["count", "enabled", "items", "settings"]);
 
 			// Should have correct values
-			expect(params.get("count")).toBe("42");
-			expect(params.get("enabled")).toBe("true");
-			expect(params.get("items")).toBe('["a","b"]');
-			expect(params.get("settings")).toBe('{"theme":"dark"}');
+			expect(searchParams.get("count")).toBe("42");
+			expect(searchParams.get("enabled")).toBe("true");
+			expect(searchParams.get("items")).toBe('["a","b"]');
+			expect(searchParams.get("settings")).toBe('{"theme":"dark"}');
 
 			// Should not include non-schema parameters
-			expect(params.get("extra")).toBeNull();
-			expect(params.get("another")).toBeNull();
+			expect(searchParams.get("extra")).toBeNull();
+			expect(searchParams.get("another")).toBeNull();
 
 			// Check typed data object
 			expect(Object.keys(data).sort()).toEqual(["count", "enabled", "items", "settings"]);
