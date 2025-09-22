@@ -13,6 +13,7 @@ jobs:
       contents: write # to create release (changesets/action)
       pull-requests: write # to create pull request (changesets/action)
       deployments: write
+      id-token: write # Required for OIDC
     name: Release
     runs-on: macos-latest
     steps:
@@ -40,7 +41,6 @@ jobs:
           publish: pnpm ci:publish
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
 
       - name: Build site
         if: steps.changesets.outputs.published == 'true'
