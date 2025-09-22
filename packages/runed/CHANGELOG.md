@@ -1,5 +1,20 @@
 # runed
 
+## 0.33.0
+
+### Minor Changes
+
+- breaking(validateSearchParams): return an object with `searchParams` and `data`, `searchParams`
+  being the ([#329](https://github.com/svecosystem/runed/pull/329)) validated `URLSearchParams` and
+  `data` being the validated object
+
+- New Utility: `onCleanup` ([#318](https://github.com/svecosystem/runed/pull/318))
+
+### Patch Changes
+
+- fix(validateSearchParams): fine grained access
+  ([#329](https://github.com/svecosystem/runed/pull/329))
+
 ## 0.32.0
 
 ### Minor Changes
