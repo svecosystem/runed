@@ -277,8 +277,8 @@ describe("validateSearchParams", () => {
 
 			const { params, data } = validateSearchParams(url as unknown as URL, schema);
 
-			// Should only access parameters that are in the schema
-			expect(accessedParams).toEqual(new Set(["page", "filter"]));
+			// Should access schema parameters plus the compressed data check
+			expect(accessedParams).toEqual(new Set(["_data", "page", "filter"]));
 			// Should NOT access nonSchemaParam
 			expect(accessedParams).not.toContain("nonSchemaParam");
 			// Should NOT call entries()
