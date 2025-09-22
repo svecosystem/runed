@@ -90,7 +90,7 @@ export class IsIdle {
 
 		useEventListener(
 			() => window,
-			events,
+			() => events,
 			() => {
 				handleActivity();
 			},

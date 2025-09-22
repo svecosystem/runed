@@ -13,8 +13,10 @@ category: State
 <Demo />
 
 ```ts
+import { FiniteStateMachine } from "runed";
 type MyStates = "disabled" | "idle" | "running";
 type MyEvents = "toggleEnabled" | "start" | "stop";
+
 const f = new FiniteStateMachine<MyStates, MyEvents>("disabled", {
 	disabled: {
 		toggleEnabled: "idle"
@@ -74,7 +76,9 @@ parameters to dynamically choose which state should come next. It can also preve
 transition by returning nothing.
 
 ```ts
+import { FiniteStateMachine } from "runed";
 type MyStates = "on" | "off" | "cooldown";
+type MyEvents = "toggle";
 
 const f = new FiniteStateMachine<MyStates, MyEvents>("off", {
 	off: {
@@ -103,16 +107,28 @@ const f = new FiniteStateMachine<MyStates, MyEvents>("off", {
 You can define special handlers that are invoked whenever a state is entered or exited:
 
 ```ts
-const f = new FiniteStateMachine<MyStates, MyEvents>('off', {
+import { FiniteStateMachine } from "runed";
+type MyStates = "on" | "off";
+type MyEvents = "toggle";
+
+const f = new FiniteStateMachine<MyStates, MyEvents>("off", {
 	off: {
-		toggle: 'on'
-		_enter: (meta) => { console.log('switch is off') }
-		_exit: (meta) => { console.log('switch is no longer off') }
+		toggle: "on",
+		_enter: (meta) => {
+			console.log("switch is off");
+		},
+		_exit: (meta) => {
+			console.log("switch is no longer off");
+		}
 	},
 	on: {
-		toggle: 'off'
-		_enter: (meta) => { console.log('switch is on') }
-		_exit: (meta) => { console.log('switch is no longer on') }
+		toggle: "off",
+		_enter: (meta) => {
+			console.log("switch is on");
+		},
+		_exit: (meta) => {
+			console.log("switch is no longer on");
+		}
 	}
 });
 ```
@@ -135,20 +151,24 @@ to `send()` an event that is not handled by the current state, then it will try 
 for that event on the `*` state before discarding the event:
 
 ```ts
-const f = new FiniteStateMachine<MyStates, MyEvents>('off', {
+import { FiniteStateMachine } from "runed";
+type MyStates = "on" | "off";
+type MyEvents = "toggle" | "emergency";
+
+const f = new FiniteStateMachine<MyStates, MyEvents>("off", {
 	off: {
-		toggle: 'on'
+		toggle: "on"
 	},
 	on: {
-		toggle: 'off'
-	}
-	'*': {
-		emergency: 'off'
+		toggle: "off"
+	},
+	"*": {
+		emergency: "off"
 	}
 });
 
 // will always result in the switch turning off.
-f.send('emergency');
+f.send("emergency");
 ```
 
 ### Debouncing
