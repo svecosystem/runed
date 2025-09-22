@@ -84,7 +84,7 @@ import { productSearchSchema } from "./schemas";
 export const load = ({ url, fetch }) => {
 	// Get validated search params as URLSearchParams object
 	// If you use a custom compressedParamName in useSearchParams, provide it here too:
-	const searchParams = validateSearchParams(url, productSearchSchema);
+	const { searchParams } = validateSearchParams(url, productSearchSchema);
 
 	// Use URLSearchParams directly with fetch
 	const response = await fetch(`/api/products?${searchParams.toString()}`);
@@ -268,7 +268,8 @@ Handles both standard URL parameters and compressed parameters (when compression
 
 **Returns:**
 
-- URLSearchParams object with the validated values
+- An object with `searchParams` and `data` properties, `searchParams` being the validated
+  `URLSearchParams` and `data` being the validated object
 
 Example with SvelteKit page or layout load function:
 
@@ -279,7 +280,7 @@ import { productSchema } from "./schemas";
 export const load = ({ url, fetch }) => {
 	// Get validated search params as URLSearchParams object
 	// If you use a custom compressedParamName in useSearchParams, provide it here too:
-	const searchParams = validateSearchParams(url, productSchema, {
+	const { searchParams } = validateSearchParams(url, productSchema, {
 		compressedParamName: "_compressed"
 	});
 
