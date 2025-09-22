@@ -152,4 +152,103 @@ describe("validateSearchParams", () => {
 		// Only valid/normalized params should be present
 		expect(Array.from(params.keys()).sort()).toEqual(["filter", "page"]);
 	});
+
+	describe("fine-grained reactivity (selective parameter access)", () => {
+		it("only accesses parameters defined in the schema for fine-grained reactivity", () => {
+			// Create a mock URLSearchParams that tracks which parameters are accessed
+			const accessedParams = new Set<string>();
+			const mockSearchParams = {
+				has: vi.fn((key: string) => {
+					accessedParams.add(key);
+					return key === "page" || key === "filter" || key === "nonSchemaParam";
+				}),
+				get: vi.fn((key: string) => {
+					accessedParams.add(key);
+					if (key === "page") return "2";
+					if (key === "filter") return "test";
+					if (key === "nonSchemaParam") return "should-not-be-accessed";
+					return null;
+				}),
+				entries: vi.fn(() => {
+					// This should NOT be called for selective extraction
+					throw new Error("entries() should not be called for selective parameter access");
+				}),
+			};
+
+			const schema = createSearchParamsSchema({
+				page: { type: "number", default: 1 },
+				filter: { type: "string", default: "" },
+			});
+
+			const url = {
+				searchParams: mockSearchParams,
+			};
+
+			const params = validateSearchParams(url as unknown as URL, schema);
+
+			// Should only access parameters that are in the schema
+			expect(accessedParams).toEqual(new Set(["page", "filter"]));
+			// Should NOT access nonSchemaParam
+			expect(accessedParams).not.toContain("nonSchemaParam");
+			// Should NOT call entries()
+			expect(mockSearchParams.entries).not.toHaveBeenCalled();
+
+			// Should return the correct values
+			expect(params.get("page")).toBe("2");
+			expect(params.get("filter")).toBe("test");
+		});
+
+		it("ignores non-schema parameters in URL without accessing them", () => {
+			const schema = createSearchParamsSchema({
+				page: { type: "number", default: 1 },
+				filter: { type: "string", default: "" },
+			});
+
+			// URL contains both schema and non-schema parameters
+			const url = createURL("?page=5&filter=hello&limit=10&sort=asc&other=value");
+			const params = validateSearchParams(url, schema);
+
+			// Should only return schema-defined parameters
+			const paramKeys = Array.from(params.keys()).sort();
+			expect(paramKeys).toEqual(["filter", "page"]);
+
+			// Should have correct values for schema parameters
+			expect(params.get("page")).toBe("5");
+			expect(params.get("filter")).toBe("hello");
+
+			// Should not include non-schema parameters
+			expect(params.get("limit")).toBeNull();
+			expect(params.get("sort")).toBeNull();
+			expect(params.get("other")).toBeNull();
+		});
+
+		it("works with different schema types while maintaining selectivity", () => {
+			const schema = createSearchParamsSchema({
+				count: { type: "number", default: 0 },
+				enabled: { type: "boolean", default: false },
+				items: { type: "array", default: [], arrayType: "" },
+				settings: { type: "object", default: {}, objectType: { theme: "" } },
+			});
+
+			// URL with both schema and non-schema parameters
+			const url = createURL(
+				'?count=42&enabled=true&items=["a","b"]&settings={"theme":"dark"}&extra=ignored&another=also-ignored'
+			);
+			const params = validateSearchParams(url, schema);
+
+			// Should only contain schema parameters
+			const paramKeys = Array.from(params.keys()).sort();
+			expect(paramKeys).toEqual(["count", "enabled", "items", "settings"]);
+
+			// Should have correct values
+			expect(params.get("count")).toBe("42");
+			expect(params.get("enabled")).toBe("true");
+			expect(params.get("items")).toBe('["a","b"]');
+			expect(params.get("settings")).toBe('{"theme":"dark"}');
+
+			// Should not include non-schema parameters
+			expect(params.get("extra")).toBeNull();
+			expect(params.get("another")).toBeNull();
+		});
+	});
 });

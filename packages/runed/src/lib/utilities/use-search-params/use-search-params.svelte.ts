@@ -113,6 +113,86 @@ function extractParamValues(searchParams: URLSearchParams): Record<string, unkno
 	return params;
 }
 
+/**
+ * Extract schema keys by validating an empty object and getting the result keys.
+ * This works with any StandardSchemaV1-compatible schema (Zod, Valibot, Arktype, etc.)
+ *
+ * @param schema A StandardSchemaV1-compatible schema
+ * @returns Array of parameter keys defined in the schema
+ * @internal
+ */
+function extractSchemaKeys<Schema extends StandardSchemaV1>(schema: Schema): string[] {
+	const validationResult = schema["~standard"].validate({});
+
+	if (validationResult && "value" in validationResult) {
+		const value = validationResult.value as Record<string, unknown>;
+		return Object.keys(value);
+	}
+
+	return [];
+}
+
+/**
+ * Extract and pre-process values from URLSearchParams, but only for keys defined in the schema.
+ * This enables SvelteKit's fine-grained reactivity by only accessing specific parameters
+ * instead of all parameters via searchParams.entries().
+ *
+ * @param searchParams The URLSearchParams object to extract values from
+ * @param schemaKeys Array of parameter keys that are defined in the schema
+ * @returns An object with processed parameter values for schema-defined keys only
+ * @internal
+ */
+function extractSelectiveParamValues(
+	searchParams: URLSearchParams,
+	schemaKeys: string[]
+): Record<string, unknown> {
+	const params: Record<string, unknown> = {};
+
+	// Only access parameters that are defined in the schema
+	// This maintains SvelteKit's fine-grained reactivity
+	for (const key of schemaKeys) {
+		const value = searchParams.get(key);
+		if (value === null) continue;
+
+		try {
+			if (value === "[]") {
+				params[key] = [];
+				continue;
+			}
+
+			if (value === "{}") {
+				params[key] = {};
+				continue;
+			}
+
+			// Try to parse as JSON for complex objects/arrays
+			// This handles cases like ?obj={"foo":"bar"} or ?arr=[1,2,3]
+			if (value.startsWith("{") || value.startsWith("[")) {
+				params[key] = JSON.parse(value);
+			}
+			// Boolean values are stored as strings, convert them
+			else if (value === "true" || value === "false") {
+				params[key] = value === "true";
+			}
+
+			// Handle comma-separated values as arrays (fallback format)
+			else if (value.includes(",")) {
+				params[key] = value.split(",");
+			}
+			// Keep everything else as strings
+			else {
+				params[key] = value;
+			}
+		} catch {
+			// If JSON parsing fails, treat as regular string
+			// This ensures we don't throw errors during type conversion
+			params[key] = value;
+		}
+	}
+
+	return params;
+}
+
 /** The Standard Schema interface. */
 export interface StandardSchemaV1<Input = unknown, Output = Input> {
 	/** The Standard Schema properties. */
@@ -1013,6 +1093,10 @@ export function createSearchParamsSchema<T extends Record<string, SchemaTypeConf
  * Unlike useSearchParams, this function doesn't modify the URL - it only validates
  * parameters and returns them as a new URLSearchParams object.
  *
+ * **Important for SvelteKit fine-grained reactivity**: This function only accesses URL parameters
+ * that are defined in your schema, ensuring that load functions only re-run when schema-defined
+ * parameters change, not when any URL parameter changes.
+ *
  * Handles both standard URL parameters and compressed parameters (when compression is enabled).
  *
  * @param url The URL object from SvelteKit load function
@@ -1027,7 +1111,8 @@ export function createSearchParamsSchema<T extends Record<string, SchemaTypeConf
  *
  * export const load = ({ url }) => {
  *   // Get validated search params as URLSearchParams object
- *   // If you use a custom compressedParamName in useSearchParams, provide it here too:
+ *   // Only accesses 'page', 'filter', 'sort' parameters from the URL
+ *   // Load function will only re-run when these specific parameters change
  *   const searchParams = validateSearchParams(url, productSchema, {
  *     compressedParamName: '_compressed'
  *   });
@@ -1096,8 +1181,9 @@ export function validateSearchParams<Schema extends StandardSchemaV1>(
 			>;
 		}
 	} else {
-		// Normal (uncompressed) extraction
-		const paramsObject = extractParamValues(url.searchParams);
+		// Normal (uncompressed) extraction - use selective extraction for fine-grained reactivity
+		const schemaKeys = extractSchemaKeys(schema);
+		const paramsObject = extractSelectiveParamValues(url.searchParams, schemaKeys);
 
 		// Validate the parameters against the schema
 		let result = schema["~standard"].validate(paramsObject);
