@@ -1,9 +1,9 @@
-import { useEventListener } from "$lib/utilities/use-event-listener/use-event-listener.svelte.js";
 import {
 	defaultWindow,
 	type ConfigurableDocument,
 	type ConfigurableWindow,
 } from "$lib/internal/configurable-globals.js";
+import { on } from "svelte/events";
 
 export type IsDocumentVisibleOptions = ConfigurableWindow & ConfigurableDocument;
 
@@ -12,6 +12,7 @@ export type IsDocumentVisibleOptions = ConfigurableWindow & ConfigurableDocument
  * It listens to the "visibilitychange" event and updates reactively.
  *
  * @see {@link https://developer.mozilla.org/docs/Web/API/Document/visibilitychange_event}
+ * @see {@link https://runed.dev/docs/utilities/is-document-visible}
  */
 export class IsDocumentVisible {
 	#visible: boolean = $state(false);
@@ -24,7 +25,7 @@ export class IsDocumentVisible {
 
 		$effect(() => {
 			if (!document) return;
-			useEventListener(document, "visibilitychange", () => {
+			return on(document, "visibilitychange", () => {
 				this.#visible = !document.hidden;
 			});
 		});
