@@ -1,10 +1,9 @@
 <script lang="ts">
 	import { DocPage } from "@svecodocs/kit";
-	import { page } from "$app/state";
 	let { data } = $props();
 
 	const ogUrl = $derived(
-		`${page.url.origin}/og?title=${encodeURIComponent(data.metadata.title)}&description=${encodeURIComponent(data.metadata.description)}`
+		`https://runed.dev/og?title=${encodeURIComponent(data.metadata.title)}&description=${encodeURIComponent(data.metadata.description)}`
 	);
 </script>
 
