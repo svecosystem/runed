@@ -6,7 +6,10 @@ Thanks for helping improve Runed. This repo is a pnpm workspace monorepo with th
 ### Prerequisites
 
 - Node >= 20
-- pnpm >= 10.12 (repo pins `pnpm@10.17.0`)
+- pnpm >= 10.12.1 (repo pins `pnpm@10.17.0`)
+
+We use pnpm to manage this monorepo. If you're new to pnpm, you can enable it with
+[corepack](https://nodejs.org/api/corepack.html), which is bundled with Node.js.
 
 Optional but recommended:
 
@@ -43,8 +46,7 @@ pnpm test
 Use the generator. It scaffolds the library files, docs page, and demo stub.
 
 ```bash
-pnpm run add
-# Answer the prompt with the utility name
+pnpm new
 ```
 
 The generator will:
