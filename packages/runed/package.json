@@ -5,6 +5,18 @@
 	"svelte": "./dist/index.js",
 	"types": "./dist/index.d.ts",
 	"license": "MIT",
+	"keywords": [
+		"svelte",
+		"svelte5",
+		"sveltekit",
+		"svelte utilities",
+		"svelte helpers",
+		"sveltekit utilities",
+		"sveltekit helpers",
+		"svelte 5 runes",
+		"runes",
+		"typescript"
+	],
 	"contributors": [
 		{
 			"name": "Thomas G. Lopes",
