@@ -24,6 +24,7 @@ jobs:
   check:
     name: Run svelte-check
     runs-on: macos-latest
+    if: "!contains(github.event.head_commit.message, 'chore(release): version package')"
     steps:
       - uses: actions/checkout@v4
       - uses: pnpm/action-setup@v4
@@ -47,6 +48,7 @@ jobs:
   test:
     runs-on: macos-latest
     name: Test
+    if: "!contains(github.event.head_commit.message, 'chore(release): version package')"
     steps:
       - uses: actions/checkout@v4
       - uses: pnpm/action-setup@v4
@@ -67,6 +69,7 @@ jobs:
   lint:
     runs-on: macos-latest
     name: Lint
+    if: "!contains(github.event.head_commit.message, 'chore(release): version package')"
     steps:
       - uses: actions/checkout@v4
       - uses: pnpm/action-setup@v4
