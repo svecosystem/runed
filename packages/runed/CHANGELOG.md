@@ -1,5 +1,11 @@
 # runed
 
+## 0.34.0
+
+### Minor Changes
+
+- New Utility: `IsDocumentVisibile` ([#328](https://github.com/svecosystem/runed/pull/328))
+
 ## 0.33.0
 
 ### Minor Changes
