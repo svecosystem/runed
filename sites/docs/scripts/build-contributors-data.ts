@@ -69,6 +69,16 @@ async function getContributorsForPaths(
 		} catch (error) {
 			console.error(`Error fetching contributors for ${path}:`, error);
 		}
+		if (path === "packages/runed/src/lib/utilities/context") {
+			// manually adding because I renamed files and thus he doesn't get credit for creating
+			// this utility
+			contributorMap.set("abdel-17", {
+				login: "abdel-17",
+				name: "Abdelrahman",
+				avatar_url: "https://avatars.githubusercontent.com/u/88583085?v=4",
+				contributions: 10,
+			});
+		}
 	}
 
 	return Array.from(contributorMap.values()).sort((a, b) => b.contributions - a.contributions);
