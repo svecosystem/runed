@@ -48,6 +48,8 @@ jobs:
       - name: Build site
         if: steps.changesets.outputs.published == 'true'
         run: pnpm -F docs build
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Deploy to Cloudflare Pages
         if: steps.changesets.outputs.published == 'true'

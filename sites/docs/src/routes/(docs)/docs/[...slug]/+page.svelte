@@ -11,6 +11,7 @@
 	<title>{data.metadata.title}</title>
 	<meta name="description" content={data.metadata.description} />
 </svelte:head>
+
 <DocPage
 	component={data.component}
 	{...data.metadata}
