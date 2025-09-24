@@ -45,11 +45,15 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NPM_CONFIG_PROVENANCE: true
 
+
+      - name: Build contributors
+        run: pnpm build:contributors
+        env:
+          GITHUB_TOKEN: ${{ secrets.READONLY_CONTRIBUTORS_TOKEN }}
+
       - name: Build site
         if: steps.changesets.outputs.published == 'true'
         run: pnpm -F docs build
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Deploy to Cloudflare Pages
         if: steps.changesets.outputs.published == 'true'
