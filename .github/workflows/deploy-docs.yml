@@ -1,14 +1,10 @@
 name: Deploy Docs
 on:
   workflow_dispatch:
-  pull_request:
-    types: [closed]
-    branches: [main]
 
 jobs:
   deploy-production:
     runs-on: macos-latest
-    if: github.event_name == 'workflow_dispatch' || (github.event.pull_request.merged == true && github.head_ref == 'changesets-release/main')
     permissions:
       contents: read
       deployments: write
@@ -23,6 +19,11 @@ jobs:
 
       - name: Install dependencies
         run: pnpm install
+
+      - name: Build contributors
+        run: pnpm build:contributors
+        env:
+          GITHUB_TOKEN: ${{ secrets.READONLY_CONTRIBUTORS_TOKEN }}
 
       - name: Build package & site
         run: pnpm build
