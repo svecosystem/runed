@@ -2,15 +2,9 @@ import process from "node:process";
 import fs from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import type { Contributor } from "@svecodocs/kit";
 
 const __dirname = fileURLToPath(new URL(".", import.meta.url));
-
-interface Contributor {
-	login: string;
-	name?: string;
-	avatar_url: string;
-	contributions: number;
-}
 
 interface GitHubCommit {
 	author: {
@@ -35,11 +29,8 @@ async function getContributorsForPaths(
 	const headers: Record<string, string> = {
 		Accept: "application/vnd.github.v3+json",
 		"User-Agent": "runed-contributors-fetcher",
+		Authorization: `token ${process.env.GITHUB_TOKEN}`,
 	};
-
-	if (process.env.GITHUB_TOKEN) {
-		headers["Authorization"] = `token ${process.env.GITHUB_TOKEN}`;
-	}
 
 	const contributorMap = new Map<string, Contributor>();
 

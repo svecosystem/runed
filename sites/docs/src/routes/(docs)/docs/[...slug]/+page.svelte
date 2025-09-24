@@ -15,5 +15,6 @@
 <DocPage
 	component={data.component}
 	{...data.metadata}
+	contributors={data.contributors}
 	metadata={{ ogImage: { url: ogUrl, width: "1200", height: "630" } }}
 />
