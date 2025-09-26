@@ -1,7 +1,6 @@
 import { testWithEffect } from "$lib/test/util.svelte.js";
-import { describe } from "node:test";
 import { flushSync } from "svelte";
-import { expect } from "vitest";
+import { expect, describe } from "vitest";
 import { Previous } from "./previous.svelte.js";
 
 describe("usePrevious", () => {
