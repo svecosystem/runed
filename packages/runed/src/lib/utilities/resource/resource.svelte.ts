@@ -150,7 +150,7 @@ function runResource<
 
 	// Create state
 	let current = $state<Awaited<ReturnType<Fetcher>> | undefined>(initialValue);
-	let loading = $state(false);
+	let loading = $state(initialValue === undefined && !lazy);
 	let error = $state<Error | undefined>(undefined);
 	let cleanupFns = $state<Array<() => void>>([]);
 
