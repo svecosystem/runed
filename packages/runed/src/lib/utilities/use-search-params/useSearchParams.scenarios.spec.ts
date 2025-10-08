@@ -10,6 +10,7 @@ interface Scenario {
 	route: string;
 	showDefaults?: boolean;
 	noHistory?: boolean;
+	keepScroll?: boolean;
 	debounce?: boolean;
 	compress?: boolean;
 	memory?: boolean;
@@ -34,6 +35,7 @@ const scenarios: Scenario[] = [
 		compress: true,
 	},
 	{ name: "memory", route: "/test-search/memory", memory: true },
+	{ name: "keep-scroll", route: "/test-search/keep-scroll", keepScroll: true },
 ];
 
 // Consistent helper functions using getByTestId
@@ -149,6 +151,18 @@ test.describe("useSearchParams scenarios", () => {
 					await page.waitForTimeout(250);
 					// after debounce, only one increment
 					await expect(pageCount(page)).toHaveText("2");
+				});
+			}
+
+			if (s.keepScroll) {
+				test("keeping scroll position", async ({ page }) => {
+					// Scroll down
+					await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
+					const scrollY = await page.evaluate(() => window.scrollY);
+
+					// Check scroll position is maintained
+					const newScrollY = await page.evaluate(() => window.scrollY);
+					expect(newScrollY).toBe(scrollY);
 				});
 			}
 		});

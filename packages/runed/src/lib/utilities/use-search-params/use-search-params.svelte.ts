@@ -58,6 +58,13 @@ export interface SearchParamsOptions {
 	 * @default true
 	 */
 	updateURL?: boolean;
+
+	/**
+	 * If true, the page will not scroll to the top when the URL is updated.
+	 * This is useful if you want to maintain the user's scroll position during parameter changes.
+	 * @default false
+	 */
+	keepScroll?: boolean;
 }
 
 /**
@@ -320,6 +327,7 @@ class SearchParams<Schema extends StandardSchemaV1> {
 			compress: false,
 			compressedParamName: "_data",
 			updateURL: true,
+			keepScroll: false,
 			...options,
 		};
 
@@ -573,7 +581,7 @@ class SearchParams<Schema extends StandardSchemaV1> {
 			} else {
 				// For URL updates, navigate to empty search
 				if (!BROWSER) return;
-				goto("?", { replaceState: true });
+				goto("?", { replaceState: true, noScroll: this.#options.keepScroll });
 			}
 		}
 	}
@@ -691,10 +699,13 @@ class SearchParams<Schema extends StandardSchemaV1> {
 		const navigateToNewUrl = () => {
 			if (!BROWSER) return;
 			// When pushHistory is false, use replaceState to avoid creating a browser history entry
-			const gotoOptions = !this.#options.pushHistory
-				? { replaceState: true, keepFocus: true }
-				: { keepFocus: true };
+			const gotoOptions = {
+				replaceState: !this.#options.pushHistory,
+				noScroll: this.#options.keepScroll,
+				keepFocus: true
+			};
 			goto("?" + params.toString(), gotoOptions);
+
 		};
 
 		// If debounce is set, delay the URL update
