@@ -178,6 +178,220 @@ test.describe("useSearchParams scenarios", () => {
 						await expect(page).toHaveURL(/page=3/);
 					}
 				});
+
+				test("input binding updates immediately while URL debounces", async ({ page }) => {
+					const input = page.getByTestId("filter-input");
+
+					// Type into the input
+					await input.fill("test");
+
+					// Input value and display should update immediately
+					await expect(filterText(page)).toHaveText("test");
+					await expect(input).toHaveValue("test");
+
+					if (!s.memory) {
+						// URL should NOT be updated yet (still debouncing)
+						await expect(page).not.toHaveURL(/filter=test/);
+					}
+
+					// Wait for debounce
+					await page.waitForTimeout(250);
+
+					// Display should still show "test"
+					await expect(filterText(page)).toHaveText("test");
+
+					if (s.memory) {
+						await expect(page).toHaveURL(s.route);
+					} else if (s.compress) {
+						await expect(page.url()).toMatch(/_data=/);
+						const url = new URL(page.url());
+						const data = url.searchParams.get("_data")!;
+						const decompressed = decompress(data)!;
+						const obj = JSON.parse(decompressed);
+						expect(obj.filter).toBe("test");
+					} else {
+						// Now URL should be updated
+						await expect(page).toHaveURL(/filter=test/);
+					}
+				});
+
+				test("rapid typing debounces correctly", async ({ page }) => {
+					const input = page.getByTestId("filter-input");
+
+					// Type multiple characters rapidly
+					await input.fill("a");
+					await expect(filterText(page)).toHaveText("a");
+
+					await input.fill("ab");
+					await expect(filterText(page)).toHaveText("ab");
+
+					await input.fill("abc");
+					await expect(filterText(page)).toHaveText("abc");
+
+					if (!s.memory) {
+						// URL should still not be updated (debounce restarting)
+						await expect(page).not.toHaveURL(/filter=abc/);
+					}
+
+					// Wait for debounce
+					await page.waitForTimeout(250);
+
+					// URL should now reflect the final value
+					await expect(filterText(page)).toHaveText("abc");
+
+					if (s.memory) {
+						await expect(page).toHaveURL(s.route);
+					} else if (s.compress) {
+						await expect(page.url()).toMatch(/_data=/);
+						const url = new URL(page.url());
+						const data = url.searchParams.get("_data")!;
+						const decompressed = decompress(data)!;
+						const obj = JSON.parse(decompressed);
+						expect(obj.filter).toBe("abc");
+					} else {
+						await expect(page).toHaveURL(/filter=abc/);
+					}
+				});
+
+				test("preserves other params during debounced updates", async ({ page }) => {
+					const input = page.getByTestId("filter-input");
+
+					// Set page to 5 first
+					await page.getByTestId("inc").click();
+					await page.getByTestId("inc").click();
+					await page.getByTestId("inc").click();
+					await page.getByTestId("inc").click();
+
+					// Wait for debounce
+					await page.waitForTimeout(250);
+
+					// Verify page is 5 in displays
+					await expect(pageCount(page)).toHaveText("5");
+
+					if (!s.memory && !s.compress) {
+						await expect(page).toHaveURL(/page=5/);
+					}
+
+					// Now type in filter input
+					await input.fill("hello");
+
+					// Both displays should update immediately
+					await expect(pageCount(page)).toHaveText("5");
+					await expect(filterText(page)).toHaveText("hello");
+
+					if (!s.memory) {
+						// URL should still have page=5 but not filter yet
+						if (!s.compress) {
+							await expect(page).toHaveURL(/page=5/);
+							await expect(page).not.toHaveURL(/filter=hello/);
+						}
+					}
+
+					// Wait for debounce
+					await page.waitForTimeout(250);
+
+					// Displays should still be correct
+					await expect(pageCount(page)).toHaveText("5");
+					await expect(filterText(page)).toHaveText("hello");
+
+					if (s.memory) {
+						await expect(page).toHaveURL(s.route);
+					} else if (s.compress) {
+						await expect(page.url()).toMatch(/_data=/);
+						const url = new URL(page.url());
+						const data = url.searchParams.get("_data")!;
+						const decompressed = decompress(data)!;
+						const obj = JSON.parse(decompressed);
+						expect(obj.page).toBe(5);
+						expect(obj.filter).toBe("hello");
+					} else {
+						// URL should have BOTH params
+						await expect(page).toHaveURL(/page=5/);
+						await expect(page).toHaveURL(/filter=hello/);
+					}
+				});
+
+				test("multiple rapid updates to different params", async ({ page }) => {
+					const input = page.getByTestId("filter-input");
+
+					// Rapidly update both params
+					await page.getByTestId("inc").click();
+					await expect(pageCount(page)).toHaveText("2");
+
+					await input.fill("test");
+					await expect(filterText(page)).toHaveText("test");
+
+					await page.getByTestId("inc").click();
+					await expect(pageCount(page)).toHaveText("3");
+
+					if (!s.memory) {
+						// Neither should be in URL yet
+						if (!s.compress) {
+							await expect(page).not.toHaveURL(/page=3/);
+							await expect(page).not.toHaveURL(/filter=test/);
+						}
+					}
+
+					// Wait for debounce
+					await page.waitForTimeout(250);
+
+					// Displays should still be correct
+					await expect(pageCount(page)).toHaveText("3");
+					await expect(filterText(page)).toHaveText("test");
+
+					if (s.memory) {
+						await expect(page).toHaveURL(s.route);
+					} else if (s.compress) {
+						await expect(page.url()).toMatch(/_data=/);
+						const url = new URL(page.url());
+						const data = url.searchParams.get("_data")!;
+						const decompressed = decompress(data)!;
+						const obj = JSON.parse(decompressed);
+						expect(obj.page).toBe(3);
+						expect(obj.filter).toBe("test");
+					} else {
+						// URL should have both final values
+						await expect(page).toHaveURL(/page=3/);
+						await expect(page).toHaveURL(/filter=test/);
+					}
+				});
+
+				test("clearing input debounces correctly", async ({ page }) => {
+					const input = page.getByTestId("filter-input");
+
+					// Set a value first
+					await input.fill("test");
+					await page.waitForTimeout(250);
+
+					if (!s.memory && !s.compress) {
+						await expect(page).toHaveURL(/filter=test/);
+					}
+
+					// Clear the input
+					await input.fill("");
+
+					// Display should update immediately
+					await expect(filterText(page)).toHaveText("");
+					await expect(input).toHaveValue("");
+
+					if (!s.memory && !s.compress) {
+						// URL should still have filter=test (debouncing)
+						await expect(page).toHaveURL(/filter=test/);
+					}
+
+					// Wait for debounce
+					await page.waitForTimeout(250);
+
+					// Display should still be empty
+					await expect(filterText(page)).toHaveText("");
+
+					if (s.memory) {
+						await expect(page).toHaveURL(s.route);
+					} else {
+						// URL should no longer have filter param (empty = default, removed from URL)
+						await expect(page).not.toHaveURL(/filter=/);
+					}
+				});
 			}
 
 			if (s.noScroll) {
