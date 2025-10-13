@@ -595,8 +595,9 @@ class SearchParams<Schema extends StandardSchemaV1> {
 					this.#handleCompressedUpdate(validatedResult);
 				} else {
 					// Normal mode - update the URL
+					// Start from the current local cache to preserve all params
 					const urlParams = this.#updateParamsWithValidatedValues(
-						new URLSearchParams(),
+						this.#localCache,
 						filteredValues,
 						validatedResult,
 						false // use URLSearchParams for URL updates
@@ -960,8 +961,9 @@ class SearchParams<Schema extends StandardSchemaV1> {
 					this.#handleCompressedUpdate(validatedResult);
 				} else {
 					// Normal mode - update the URL
+					// Start from the current local cache to preserve all params
 					const urlParams = this.#updateParamsWithValidatedValues(
-						new URLSearchParams(),
+						this.#localCache,
 						updateObj,
 						validatedResult,
 						false // use URLSearchParams for URL updates
