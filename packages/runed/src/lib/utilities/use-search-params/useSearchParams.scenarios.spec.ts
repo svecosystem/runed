@@ -160,9 +160,53 @@ test.describe("useSearchParams scenarios", () => {
 					await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
 					const scrollY = await page.evaluate(() => window.scrollY);
 
+					// Trigger a parameter change
+					await page.getByTestId("inc").click();
+					await page.waitForTimeout(100);
+
 					// Check scroll position is maintained
 					const newScrollY = await page.evaluate(() => window.scrollY);
 					expect(newScrollY).toBe(scrollY);
+				});
+			}
+
+			// Test for issue #320: number params should parse from URL correctly
+			// Skip for memory mode since it doesn't read from URL
+			if (!s.memory) {
+				test("number params from URL are parsed as numbers", async ({ page }) => {
+					// Navigate to URL with number parameter
+					await page.goto(`${s.route}?page=42`);
+					await page.waitForTimeout(300);
+
+					// Verify the number is parsed correctly
+					await expect(pageCount(page)).toHaveText("42");
+
+					// Verify URL contains the number
+					// Note: compress mode doesn't compress on navigation, only on set
+					if (s.compress) {
+						// When navigating to uncompressed params, they stay uncompressed
+						await expect(page).toHaveURL(/page=42/);
+					} else {
+						await expect(page).toHaveURL(/page=42/);
+					}
+				});
+
+				test("negative numbers are parsed correctly", async ({ page }) => {
+					await page.goto(`${s.route}?page=-5`);
+					await page.waitForTimeout(300);
+					await expect(pageCount(page)).toHaveText("-5");
+				});
+
+				test("decimal numbers are parsed correctly", async ({ page }) => {
+					await page.goto(`${s.route}?page=3.14`);
+					await page.waitForTimeout(300);
+					await expect(pageCount(page)).toHaveText("3.14");
+				});
+
+				test("zero is parsed as number not string", async ({ page }) => {
+					await page.goto(`${s.route}?page=0`);
+					await page.waitForTimeout(300);
+					await expect(pageCount(page)).toHaveText("0");
 				});
 			}
 		});
