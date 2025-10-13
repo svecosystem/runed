@@ -139,6 +139,8 @@ access to URL search parameters through direct property access.
   is `_data`.
 - `updateURL` (boolean): When true (default), the URL is updated when parameters change. When false,
   only in-memory parameters are updated.
+- `noScroll` (boolean): When true, the scroll position is preserved when the URL is updated. This
+  prevents the page from jumping to the top on URL changes. Default is false.
 
 Example with [Zod](https://zod.dev/):
 
@@ -390,6 +392,13 @@ interface SearchParamsOptions {
 	 * @default true
 	 */
 	updateURL?: boolean;
+
+	/**
+	 * If true, the page will not scroll to the top when the URL is updated.
+	 * This is useful if you want to maintain the user's scroll position during parameter changes.
+	 * @default false
+	 */
+	noScroll?: boolean;
 }
 
 type ReturnUseSearchParams<Schema extends StandardSchemaV1> = {
