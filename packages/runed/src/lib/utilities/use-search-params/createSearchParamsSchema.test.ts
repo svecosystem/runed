@@ -113,4 +113,40 @@ describe("createSearchParamsSchema", () => {
 			qux: null,
 		});
 	});
+
+	it("preserves numeric strings as strings when schema expects string type", () => {
+		const schema = createSearchParamsSchema({
+			id: { type: "string", default: "" },
+			page: { type: "number", default: 1 },
+		});
+
+		// Test that a numeric string stays as string for string type
+		const result = schema["~standard"].validate({
+			id: "123",
+			page: 42,
+		});
+
+		expect("value" in result && result.value).toEqual({
+			id: "123", // should stay as string
+			page: 42, // should be number
+		});
+	});
+
+	it("converts numeric strings to numbers only for number type", () => {
+		const schema = createSearchParamsSchema({
+			id: { type: "string", default: "" },
+			count: { type: "number", default: 0 },
+		});
+
+		// When parsing from URL, numeric strings for number fields should be converted
+		const result = schema["~standard"].validate({
+			id: "789", // string field gets numeric string
+			count: "456", // number field gets numeric string
+		});
+
+		expect("value" in result && result.value).toEqual({
+			id: "789", // stays as string
+			count: 456, // converted to number
+		});
+	});
 });

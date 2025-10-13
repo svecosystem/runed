@@ -19,6 +19,7 @@
 		...(mode === "debounce" && { debounce: 200 }),
 		...(mode === "compress" && { compress: true }),
 		...(mode === "memory" && { updateURL: false }),
+		...(mode === "no-scroll" && { noScroll: true }),
 	};
 
 	const paramsObj = useSearchParams(schema, options);

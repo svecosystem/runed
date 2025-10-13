@@ -79,10 +79,14 @@ export interface SearchParamsOptions {
  * to ensure consistent conversion of URL string values to JavaScript types.
  *
  * @param searchParams The URLSearchParams object to extract values from
+ * @param numberFields Optional set of field names that should be treated as numbers
  * @returns An object with processed parameter values
  * @internal
  */
-function extractParamValues(searchParams: URLSearchParams): Record<string, unknown> {
+function extractParamValues(
+	searchParams: URLSearchParams,
+	numberFields: Set<string> = new Set()
+): Record<string, unknown> {
 	const params: Record<string, unknown> = {};
 
 	for (const [key, value] of searchParams.entries()) {
@@ -107,6 +111,15 @@ function extractParamValues(searchParams: URLSearchParams): Record<string, unkno
 			else if (value === "true" || value === "false") {
 				params[key] = value === "true";
 			}
+			// Only convert to number if it looks numeric AND the schema expects a number (if provided)
+			// This handles cases like ?page=2 or ?price=19.99
+			else if (
+				value.trim() !== "" &&
+				!isNaN(Number(value)) &&
+				(numberFields.size === 0 || numberFields.has(key))
+			) {
+				params[key] = Number(value);
+			}
 			// Handle comma-separated values as arrays (fallback format)
 			else if (value.includes(",")) {
 				params[key] = value.split(",");
@@ -126,22 +139,49 @@ function extractParamValues(searchParams: URLSearchParams): Record<string, unkno
 }
 
 /**
- * Extract schema keys by validating an empty object and getting the result keys.
- * This works with any StandardSchemaV1-compatible schema (Zod, Valibot, Arktype, etc.)
- *
- * @param schema A StandardSchemaV1-compatible schema
- * @returns Array of parameter keys defined in the schema
+ * Schema information extracted from validation
  * @internal
  */
-function extractSchemaKeys<Schema extends StandardSchemaV1>(schema: Schema): string[] {
+interface SchemaInfo {
+	/** Array of all field names defined in the schema */
+	keys: string[];
+	/** Set of field names that expect number types */
+	numberFields: Set<string>;
+	/** Default values for all fields */
+	defaultValues: Record<string, unknown>;
+}
+
+/**
+ * Extract schema information by validating an empty object.
+ * This consolidates multiple schema validation calls into one for efficiency.
+ * Works with any StandardSchemaV1-compatible schema (Zod, Valibot, Arktype, etc.)
+ *
+ * Note: This function expects schemas used with useSearchParams to have defaults for all fields,
+ * which is the recommended pattern since URL parameters are inherently optional.
+ *
+ * @param schema A StandardSchemaV1-compatible schema
+ * @returns Object containing schema keys, number fields, and default values
+ * @internal
+ */
+function extractSchemaInfo<Schema extends StandardSchemaV1>(schema: Schema): SchemaInfo {
 	const validationResult = schema["~standard"].validate({});
 
-	if (validationResult && "value" in validationResult) {
-		const value = validationResult.value as Record<string, unknown>;
-		return Object.keys(value);
+	if (!validationResult || !("value" in validationResult)) {
+		return { keys: [], numberFields: new Set(), defaultValues: {} };
 	}
 
-	return [];
+	const defaultValues = validationResult.value as Record<string, unknown>;
+	const keys = Object.keys(defaultValues);
+	const numberFields = new Set<string>();
+
+	// Determine which fields are number types by checking default value types
+	for (const [key, defaultValue] of Object.entries(defaultValues)) {
+		if (typeof defaultValue === "number") {
+			numberFields.add(key);
+		}
+	}
+
+	return { keys, numberFields, defaultValues };
 }
 
 /**
@@ -151,12 +191,14 @@ function extractSchemaKeys<Schema extends StandardSchemaV1>(schema: Schema): str
  *
  * @param searchParams The URLSearchParams object to extract values from
  * @param schemaKeys Array of parameter keys that are defined in the schema
+ * @param numberFields Set of field names that should be treated as numbers
  * @returns An object with processed parameter values for schema-defined keys only
  * @internal
  */
 function extractSelectiveParamValues(
 	searchParams: URLSearchParams,
-	schemaKeys: string[]
+	schemaKeys: string[],
+	numberFields: Set<string> = new Set()
 ): Record<string, unknown> {
 	const params: Record<string, unknown> = {};
 
@@ -186,7 +228,11 @@ function extractSelectiveParamValues(
 			else if (value === "true" || value === "false") {
 				params[key] = value === "true";
 			}
-
+			// Only convert to number if it looks numeric AND the schema expects a number
+			// This handles cases like ?page=2 or ?price=19.99
+			else if (numberFields.has(key) && value.trim() !== "" && !isNaN(Number(value))) {
+				params[key] = Number(value);
+			}
 			// Handle comma-separated values as arrays (fallback format)
 			else if (value.includes(",")) {
 				params[key] = value.split(",");
@@ -306,6 +352,12 @@ class SearchParams<Schema extends StandardSchemaV1> {
 	#defaultValues: Record<string, unknown>;
 
 	/**
+	 * Set of field names that expect number types based on schema validation
+	 * Used to intelligently convert URL string values to numbers only when appropriate
+	 */
+	#numberFields: Set<string>;
+
+	/**
 	 * Timer ID for debouncing URL updates
 	 * @private
 	 */
@@ -336,27 +388,21 @@ class SearchParams<Schema extends StandardSchemaV1> {
 			...options,
 		};
 
-		// Extract schema shape and default values by validating an empty object
-		const validationResult = this.validate({});
+		// Extract schema information (keys, number fields, defaults) in one pass
+		const schemaInfo = extractSchemaInfo(schema);
 
-		if (validationResult && "value" in validationResult) {
-			const value = validationResult.value as Record<string, unknown>;
+		// Store schema shape for property checking
+		this.#schemaShape = schemaInfo.keys.reduce(
+			(acc, key) => {
+				acc[key] = true;
+				return acc;
+			},
+			{} as Record<string, true>
+		);
 
-			// Store schema shape for property checking
-			this.#schemaShape = Object.keys(value).reduce(
-				(acc, key) => {
-					acc[key] = true;
-					return acc;
-				},
-				{} as Record<string, true>
-			);
-
-			// Store default values for comparing later
-			this.#defaultValues = { ...value };
-		} else {
-			this.#schemaShape = {};
-			this.#defaultValues = {};
-		}
+		// Store default values and number fields
+		this.#defaultValues = { ...schemaInfo.defaultValues };
+		this.#numberFields = schemaInfo.numberFields;
 	}
 
 	/**
@@ -765,8 +811,8 @@ class SearchParams<Schema extends StandardSchemaV1> {
 			return {};
 		}
 
-		// If not using compression, use the normal extraction
-		return extractParamValues(searchParams);
+		// If not using compression, use the normal extraction with number field detection
+		return extractParamValues(searchParams, this.#numberFields);
 	}
 
 	/**
@@ -1196,8 +1242,12 @@ export function validateSearchParams<Schema extends StandardSchemaV1>(
 		}
 	} else {
 		// Normal (uncompressed) extraction - use selective extraction for fine-grained reactivity
-		const schemaKeys = extractSchemaKeys(schema);
-		const paramsObject = extractSelectiveParamValues(url.searchParams, schemaKeys);
+		const schemaInfo = extractSchemaInfo(schema);
+		const paramsObject = extractSelectiveParamValues(
+			url.searchParams,
+			schemaInfo.keys,
+			schemaInfo.numberFields
+		);
 
 		// Validate the parameters against the schema
 		let result = schema["~standard"].validate(paramsObject);
@@ -1379,7 +1429,8 @@ export function useSearchParams<Schema extends StandardSchemaV1>(
 
 		// Remove incorrect params on initialization (only after hydration)
 		if (options.updateURL !== false) {
-			const currentParams = extractParamValues(page.url.searchParams);
+			const schemaInfo = extractSchemaInfo(schema);
+			const currentParams = extractParamValues(page.url.searchParams, schemaInfo.numberFields);
 			const validationResult = schema["~standard"].validate(currentParams);
 			if (
 				validationResult &&
@@ -1405,25 +1456,24 @@ export function useSearchParams<Schema extends StandardSchemaV1>(
 
 		// If showDefaults is true, we need to initialize the URL with all default values (only after hydration)
 		if (options.showDefaults) {
-			// Get all the default values (by validating an empty object)
-			const validationResult = schema["~standard"].validate({});
+			// Get all the schema information in one pass
+			const schemaInfo = extractSchemaInfo(schema);
 
-			if (validationResult && "value" in validationResult) {
+			if (schemaInfo.keys.length > 0) {
 				// If compression is enabled, use SearchParams.update() method which handles compression
 				if (options.compress) {
 					// Call the update method with the default values to properly handle compression
 					searchParams.update(
-						validationResult.value as Partial<StandardSchemaV1.InferOutput<Schema>>
+						schemaInfo.defaultValues as Partial<StandardSchemaV1.InferOutput<Schema>>
 					);
 				} else {
 					// For non-compressed mode, use the original approach
-					const defaultValues = validationResult.value as Record<string, unknown>;
-					const currentParams = extractParamValues(page.url.searchParams);
+					const currentParams = extractParamValues(page.url.searchParams, schemaInfo.numberFields);
 					const newSearchParams = new URLSearchParams(page.url.searchParams.toString());
 					let needsUpdate = false;
 
 					// For each default value, add it to the URL if not already present
-					for (const [key, defaultValue] of Object.entries(defaultValues)) {
+					for (const [key, defaultValue] of Object.entries(schemaInfo.defaultValues)) {
 						// Skip if the parameter is already in the URL (don't override user values)
 						if (key in currentParams) continue;
 

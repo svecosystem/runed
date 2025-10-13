@@ -367,4 +367,100 @@ describe("validateSearchParams", () => {
 			expect("another" in data).toBe(false);
 		});
 	});
+
+	describe("number field detection for type conversion (issue #320)", () => {
+		it("converts numeric strings to numbers for number fields but preserves them for string fields", () => {
+			const schema = createSearchParamsSchema({
+				id: { type: "string", default: "" }, // string field
+				page: { type: "number", default: 1 }, // number field
+				code: { type: "string", default: "" }, // another string field
+			});
+
+			// URL with numeric-looking values for both string and number fields
+			const url = createURL("?id=123&page=42&code=456");
+			const { searchParams, data } = validateSearchParams(url, schema);
+
+			// Check that values are preserved correctly in URLSearchParams
+			expect(searchParams.get("id")).toBe("123");
+			expect(searchParams.get("page")).toBe("42");
+			expect(searchParams.get("code")).toBe("456");
+
+			// Check typed data object - numbers should be converted, strings should stay strings
+			expect(typeof data.id).toBe("string");
+			expect(data.id).toBe("123"); // stays as string (even though it looks numeric)
+			expect(typeof data.page).toBe("number");
+			expect(data.page).toBe(42); // converted to number
+			expect(typeof data.code).toBe("string");
+			expect(data.code).toBe("456"); // stays as string
+		});
+
+		it("handles negative numbers correctly for number fields", () => {
+			const schema = createSearchParamsSchema({
+				temperature: { type: "number", default: 0 },
+				zipCode: { type: "string", default: "" },
+			});
+
+			const url = createURL("?temperature=-5&zipCode=-90210");
+			const { data } = validateSearchParams(url, schema);
+
+			// Check typed data
+			expect(data.temperature).toBe(-5); // negative number
+			expect(typeof data.temperature).toBe("number");
+			expect(data.zipCode).toBe("-90210"); // stays as string
+			expect(typeof data.zipCode).toBe("string");
+		});
+
+		it("handles decimal numbers correctly for number fields", () => {
+			const schema = createSearchParamsSchema({
+				price: { type: "number", default: 0 },
+				version: { type: "string", default: "" },
+			});
+
+			const url = createURL("?price=19.99&version=1.2.3");
+			const { data } = validateSearchParams(url, schema);
+
+			// Check typed data
+			expect(data.price).toBe(19.99); // decimal number
+			expect(typeof data.price).toBe("number");
+			expect(data.version).toBe("1.2.3"); // stays as string
+			expect(typeof data.version).toBe("string");
+		});
+
+		it("handles zero correctly for both number and string fields", () => {
+			const schema = createSearchParamsSchema({
+				count: { type: "number", default: 1 },
+				code: { type: "string", default: "" },
+			});
+
+			const url = createURL("?count=0&code=0");
+			const { searchParams, data } = validateSearchParams(url, schema);
+
+			// Check typed data
+			expect(data.count).toBe(0); // number zero
+			expect(typeof data.count).toBe("number");
+			expect(data.code).toBe("0"); // string zero
+			expect(typeof data.code).toBe("string");
+		});
+
+		it("preserves string IDs that look like numbers (common use case)", () => {
+			const schema = createSearchParamsSchema({
+				userId: { type: "string", default: "" },
+				postId: { type: "string", default: "" },
+				page: { type: "number", default: 1 },
+			});
+
+			// Common scenario: IDs from database might be numeric but should stay as strings
+			const url = createURL("?userId=12345&postId=67890&page=2");
+			const { data } = validateSearchParams(url, schema);
+
+			// Check that IDs stay as strings
+			expect(data.userId).toBe("12345");
+			expect(typeof data.userId).toBe("string");
+			expect(data.postId).toBe("67890");
+			expect(typeof data.postId).toBe("string");
+			// But page should be a number
+			expect(data.page).toBe(2);
+			expect(typeof data.page).toBe("number");
+		});
+	});
 });
