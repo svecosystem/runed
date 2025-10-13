@@ -1,6 +1,6 @@
 name: 🛠️ Request New Feature
 description: Let us know what you would like to see added.
-labels: ["enhancement"]
+labels: ["triage"]
 body:
     - type: textarea
       id: description
