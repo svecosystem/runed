@@ -1,6 +1,6 @@
 import { describe, it, expect } from "vitest";
-import { createSearchParamsSchema } from "./use-search-params.svelte";
-import type { StandardSchemaV1 } from "./use-search-params.svelte";
+import { createSearchParamsSchema } from "./use-search-params.svelte.js";
+import type { StandardSchemaV1 } from "./use-search-params.svelte.js";
 
 describe("createSearchParamsSchema", () => {
 	it("applies default values for all schema types", () => {
