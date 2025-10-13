@@ -85,7 +85,7 @@ describe("useInterval", () => {
 		const { resume, pause } = useInterval(callback, 100);
 
 		await new Promise((resolve) => setTimeout(resolve, 50));
-		resume(); // Should do nothing since already active
+		resume();
 
 		await new Promise((resolve) => setTimeout(resolve, 100));
 		expect(callback).toHaveBeenCalledTimes(1);
@@ -111,6 +111,51 @@ describe("useInterval", () => {
 		expect(disposed).toBe(true);
 
 		await new Promise((resolve) => setTimeout(resolve, 300));
-		expect(callback).toHaveBeenCalledTimes(1); // Should not increase after disposal
+		expect(callback).toHaveBeenCalledTimes(1);
+	});
+
+	testWithEffect("Increments counter on each tick", async () => {
+		const callback = vi.fn();
+		const result = useInterval(callback, 100);
+
+		expect(result.counter).toBe(0);
+
+		await new Promise((resolve) => setTimeout(resolve, 150));
+		expect(result.counter).toBe(1);
+
+		await new Promise((resolve) => setTimeout(resolve, 100));
+		expect(result.counter).toBe(2);
+
+		result.pause();
+	});
+
+	testWithEffect("Reset sets counter back to 0", async () => {
+		const callback = vi.fn();
+		const result = useInterval(callback, 100);
+
+		await new Promise((resolve) => setTimeout(resolve, 250));
+		expect(result.counter).toBe(2);
+
+		result.reset();
+		expect(result.counter).toBe(0);
+
+		result.pause();
+	});
+
+	testWithEffect("Reacts to interval changes", async () => {
+		const callback = vi.fn();
+		let intervalValue = $state(100);
+		const result = useInterval(callback, () => intervalValue);
+
+		await new Promise((resolve) => setTimeout(resolve, 150));
+		expect(callback).toHaveBeenCalledTimes(1);
+
+		intervalValue = 50;
+		await new Promise((resolve) => setTimeout(resolve, 10));
+
+		await new Promise((resolve) => setTimeout(resolve, 60));
+		expect(callback).toHaveBeenCalledTimes(2);
+
+		result.pause();
 	});
 });

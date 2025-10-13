@@ -2,17 +2,15 @@
 	import { useInterval } from "runed";
 	import { Input, Label, Button, DemoContainer } from "@svecodocs/kit";
 
-	let count = $state(0);
 	let intervalMs = $state(500);
 
 	const interval = useInterval(
-		() => count++,
-		() => intervalMs
+		() => {},
+		() => intervalMs,
+		{
+			callback: (count) => {},
+		}
 	);
-
-	function reset() {
-		count = 0;
-	}
 </script>
 
 <DemoContainer class="flex flex-col gap-6">
@@ -28,11 +26,11 @@
 		<Button variant="brand" size="sm" onclick={interval.resume} disabled={interval.isActive}
 			>Resume</Button
 		>
-		<Button variant="ghost" size="sm" onclick={reset}>Reset Count</Button>
+		<Button variant="ghost" size="sm" onclick={interval.reset}>Reset Counter</Button>
 	</div>
 
 	<div class="flex flex-col gap-2">
-		<p><strong>Count:</strong> {count}</p>
+		<p><strong>Counter:</strong> {interval.counter}</p>
 		<p><strong>Status:</strong> {interval.isActive ? "Running" : "Paused"}</p>
 	</div>
 </DemoContainer>

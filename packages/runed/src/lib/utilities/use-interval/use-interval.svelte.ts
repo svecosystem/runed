@@ -1,5 +1,6 @@
 import { extract } from "../extract/index.js";
 import type { MaybeGetter } from "$lib/internal/types.js";
+import { watch } from "../watch/watch.svelte.js";
 
 export type UseIntervalOptions = {
 	/**
@@ -29,9 +30,19 @@ export type UseIntervalReturn = {
 	resume: () => void;
 
 	/**
+	 * Reset the counter to 0
+	 */
+	reset: () => void;
+
+	/**
 	 * Whether the interval is currently active
 	 */
 	readonly isActive: boolean;
+
+	/**
+	 * The current counter value
+	 */
+	readonly counter: number;
 };
 
 /**
@@ -40,57 +51,69 @@ export type UseIntervalReturn = {
  * @see https://runed.dev/docs/utilities/use-interval
  *
  * @param callback - The function to execute repeatedly
- * @param interval - The interval in milliseconds between executions
+ * @param delay - The interval in milliseconds between executions
  * @param options - Configuration options
  * @returns Object with pause, resume methods and isActive state
  */
 export function useInterval(
 	callback: () => void,
-	interval: MaybeGetter<number>,
+	delay: MaybeGetter<number>,
 	options: UseIntervalOptions = {}
 ): UseIntervalReturn {
 	const { immediate = true, immediateCallback = false } = options;
 
 	let intervalId = $state<ReturnType<typeof setInterval> | null>(null);
+	let counter = $state(0);
+	const delay$ = $derived(extract(delay));
+	const isActive = $derived(intervalId !== null);
 
-	function pause(): void {
+	function runCallback(): void {
+		callback();
+		counter++;
+	}
+
+	function createInterval(): void {
+		intervalId = setInterval(runCallback, delay$);
+	}
+
+	const pause = (): void => {
 		if (intervalId === null) return;
 		clearInterval(intervalId);
 		intervalId = null;
-	}
+	};
 
-	function resume(): void {
+	const resume = (): void => {
 		if (intervalId !== null) return;
+		if (immediateCallback) runCallback();
+		createInterval();
+	};
 
-		if (immediateCallback) {
-			callback();
-		}
-
-		const currentInterval = extract(interval);
-		intervalId = setInterval(callback, currentInterval);
-	}
-
-	// Start immediately if requested
 	if (immediate) {
 		resume();
 	}
 
-	// Cleanup on disposal
-	$effect(() => {
-		return () => {
-			if (intervalId !== null) {
-				clearInterval(intervalId);
-			}
-		};
-	});
+	// Sync interval's delay with the prop
+	watch(
+		() => delay$,
+		() => {
+			if (!isActive) return;
+			pause();
+			createInterval();
+		}
+	);
 
-	const isActive = $derived(intervalId !== null);
+	// Cleanup on disposal
+	$effect(() => pause);
 
 	return {
 		pause,
 		resume,
+		reset: () => (counter = 0),
 		get isActive() {
 			return isActive;
+		},
+		get counter() {
+			return counter;
 		},
 	};
 }

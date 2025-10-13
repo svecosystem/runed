@@ -1,6 +1,6 @@
 ---
 title: useInterval
-description: A wrapper for setInterval with controls for pausing and resuming.
+description: A wrapper for setInterval with controls for pausing, resuming, and tracking ticks.
 category: Utilities
 ---
 
@@ -9,7 +9,7 @@ category: Utilities
 </script>
 
 `useInterval` is a utility function that provides a reactive wrapper around `setInterval` with
-controls for pausing and resuming the execution.
+controls for pausing and resuming the execution, as well as a built-in counter for tracking ticks.
 
 ## Demo
 
@@ -22,22 +22,42 @@ controls for pausing and resuming the execution.
 	import { useInterval } from "runed";
 
 	let count = $state(0);
-	let intervalDelay = $state(1000);
+	let delay = $state(1000);
 
 	const interval = useInterval(
 		() => count++,
-		() => intervalDelay
+		() => delay
 	);
 </script>
 
 <p>Count: {count}</p>
-<p>Interval delay: {intervalDelay}ms</p>
-<p>Status: {isActive ? "Running" : "Paused"}</p>
+<p>Counter: {interval.counter}</p>
+<p>Interval delay: {delay}ms</p>
+<p>Status: {interval.isActive ? "Running" : "Paused"}</p>
 
-<input type="number" bind:value={intervalDelay} min="100" step="100" />
+<input type="number" bind:value={delay} min="100" step="100" />
 
 <button onclick={interval.pause} disabled={!interval.isActive}>Pause</button>
 <button onclick={interval.resume} disabled={interval.isActive}>Resume</button>
+<button onclick={interval.reset}>Reset Counter</button>
+```
+
+## Counter
+
+`useInterval` includes a built-in `counter` property that tracks the number of times the interval
+has ticked:
+
+```svelte
+<script lang="ts">
+	import { useInterval } from "runed";
+
+	const interval = useInterval(() => {
+		console.log("Tick!");
+	}, 1000);
+</script>
+
+<p>Ticks: {interval.counter}</p>
+<button onclick={interval.reset}>Reset</button>
 ```
 
 ## Options
@@ -51,11 +71,9 @@ The `useInterval` function accepts an optional third parameter with the followin
 <script lang="ts">
 	import { useInterval } from "runed";
 
-	let count = $state(0);
-
-	const interval = useInterval(() => count++, 1000, {
-		immediate: false, // Don't start automatically
-		immediateCallback: true // Execute callback immediately on resume
+	const interval = useInterval(() => {}, 1000, {
+		immediate: false,
+		immediateCallback: true
 	});
 </script>
 ```
@@ -70,12 +88,13 @@ when it changes:
 	import { useInterval } from "runed";
 
 	let count = $state(0);
-	let speed = $state(1000);
+	let delay = $state(1000);
 
-	// The interval will update reactively when speed changes
 	const interval = useInterval(
 		() => count++,
-		() => speed
+		() => delay
 	);
 </script>
+
+<input type="range" bind:value={delay} min="100" max="2000" /><p>Delay: {delay}ms</p>
 ```
