@@ -10,7 +10,7 @@ interface Scenario {
 	route: string;
 	showDefaults?: boolean;
 	noHistory?: boolean;
-	keepScroll?: boolean;
+	noScroll?: boolean;
 	debounce?: boolean;
 	compress?: boolean;
 	memory?: boolean;
@@ -35,7 +35,7 @@ const scenarios: Scenario[] = [
 		compress: true,
 	},
 	{ name: "memory", route: "/test-search/memory", memory: true },
-	{ name: "keep-scroll", route: "/test-search/keep-scroll", keepScroll: true },
+	{ name: "no-scroll", route: "/test-search/no-scroll", noScroll: true },
 ];
 
 // Consistent helper functions using getByTestId
@@ -154,7 +154,7 @@ test.describe("useSearchParams scenarios", () => {
 				});
 			}
 
-			if (s.keepScroll) {
+			if (s.noScroll) {
 				test("keeping scroll position", async ({ page }) => {
 					// Scroll down
 					await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
