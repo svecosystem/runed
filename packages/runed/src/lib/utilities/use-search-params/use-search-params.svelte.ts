@@ -45,10 +45,10 @@ export interface SearchParamsOptions {
 	/**
 	 * The name of the parameter used to store compressed data when compression is enabled.
 	 * You can customize this to avoid conflicts with your schema parameters.
-	 * 
+	 *
 	 * For example, if your schema already uses '_data', you might want to use '_compressed'
 	 * or another unique name.
-	 * 
+	 *
 	 * @default '_data'
 	 */
 	compressedParamName?: string;
@@ -57,7 +57,7 @@ export interface SearchParamsOptions {
 	 * Controls whether to update the URL when parameters change.
 	 * If `true` (default), changes to parameters will update the URL.
 	 * If `false`, parameters will only be stored in memory without updating the URL.
-	 * 
+	 *
 	 * Note: When `false`, compress option will be ignored.
 	 * @default true
 	 */
@@ -65,7 +65,7 @@ export interface SearchParamsOptions {
 
 	/**
 	 * If `true`, the scroll position will be preserved when the URL is updated.
-	 * 
+	 *
 	 * If `false`, the scroll position will be reset to the top when the URL is updated.
 	 * @default false
 	 */
@@ -638,7 +638,7 @@ class SearchParams<Schema extends StandardSchemaV1> {
 
 		for (const key of Object.keys(updates)) {
 			// Skip keys not in schema
-			if (!this.has(key)) continue
+			if (!this.has(key)) continue;
 
 			const validatedValue = validatedValues[key];
 
@@ -704,12 +704,11 @@ class SearchParams<Schema extends StandardSchemaV1> {
 		const navigateToNewUrl = () => {
 			if (!BROWSER) return;
 			// When pushHistory is false, use replaceState to avoid creating a browser history entry
-			goto("?" + params.toString(), {
-				replaceState: !this.#options.pushHistory,
-				noScroll: this.#options.noScroll,
-				keepFocus: true
-			});
+			const gotoOptions = !this.#options.pushHistory
+				? { replaceState: true, keepFocus: true }
+				: { keepFocus: true };
 
+			goto("?" + params.toString(), { ...gotoOptions, noScroll: this.#options.noScroll });
 		};
 
 		// If debounce is set, delay the URL update
