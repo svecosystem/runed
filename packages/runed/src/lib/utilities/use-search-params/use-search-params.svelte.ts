@@ -111,13 +111,8 @@ function extractParamValues(
 			else if (value === "true" || value === "false") {
 				params[key] = value === "true";
 			}
-			// Only convert to number if it looks numeric AND the schema expects a number (if provided)
-			// This handles cases like ?page=2 or ?price=19.99
-			else if (
-				value.trim() !== "" &&
-				!isNaN(Number(value)) &&
-				(numberFields.size === 0 || numberFields.has(key))
-			) {
+			// Only convert to number if it looks numeric AND the schema expects a number
+			else if (numberFields.has(key) && value.trim() !== "" && !isNaN(Number(value))) {
 				params[key] = Number(value);
 			}
 			// Handle comma-separated values as arrays (fallback format)

@@ -444,8 +444,8 @@ describe("validateSearchParams", () => {
 
 		it("preserves string IDs that look like numbers (common use case)", () => {
 			const schema = createSearchParamsSchema({
-				userId: { type: "string", default: "" },
-				postId: { type: "string", default: "" },
+				userId: { type: "string", default: "455" },
+				postId: { type: "string", default: "123" },
 				page: { type: "number", default: 1 },
 			});
 
