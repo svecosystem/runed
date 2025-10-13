@@ -398,7 +398,7 @@ interface SearchParamsOptions {
 	 * This is useful if you want to maintain the user's scroll position during parameter changes.
 	 * @default false
 	 */
-	keepScroll?: boolean;
+	noScroll?: boolean;
 }
 
 type ReturnUseSearchParams<Schema extends StandardSchemaV1> = {
