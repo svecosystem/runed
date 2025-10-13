@@ -433,7 +433,7 @@ describe("validateSearchParams", () => {
 			});
 
 			const url = createURL("?count=0&code=0");
-			const { searchParams, data } = validateSearchParams(url, schema);
+			const { data } = validateSearchParams(url, schema);
 
 			// Check typed data
 			expect(data.count).toBe(0); // number zero
