@@ -122,14 +122,21 @@ test.describe("useSearchParams scenarios", () => {
 
 			test("filter input updates", async ({ page }) => {
 				await page.getByTestId("filter-input").fill("foo");
+				// local state should update immediately, even with debounce
+				await expect(filterText(page)).toHaveText("foo");
+
 				if (s.debounce) {
-					await expect(filterText(page)).toHaveText("");
+					// URL should NOT be updated yet (still debouncing)
+					if (!s.memory) {
+						await expect(page).not.toHaveURL(/filter=foo/);
+					}
 					await page.waitForTimeout(250);
 				}
+
+				// after debounce (or immediately if no debounce), URL should be updated
 				if (s.memory) {
 					await expect(page).toHaveURL(s.route);
 				} else if (s.compress) {
-					await page.waitForTimeout(250);
 					await expect(page.url()).toMatch(/_data=/);
 					const url = new URL(page.url());
 					const data = url.searchParams.get("_data")!;
@@ -143,14 +150,33 @@ test.describe("useSearchParams scenarios", () => {
 			});
 
 			if (s.debounce) {
-				test("debounced inc only updates once", async ({ page }) => {
+				test("debounced URL updates with immediate local state", async ({ page }) => {
 					await page.getByTestId("inc").click();
 					await page.getByTestId("inc").click();
-					// should not update immediately due to debounce
-					await expect(pageCount(page)).toHaveText("1");
+					// local state should update immediately showing both increments
+					await expect(pageCount(page)).toHaveText("3");
+
+					if (!s.memory && !s.compress) {
+						// URL should not be updated yet (still debouncing)
+						await expect(page).not.toHaveURL(/page=3/);
+					}
+
 					await page.waitForTimeout(250);
-					// after debounce, only one increment
-					await expect(pageCount(page)).toHaveText("2");
+					// after debounce, URL should reflect both increments
+					await expect(pageCount(page)).toHaveText("3");
+
+					if (s.memory) {
+						await expect(page).toHaveURL(s.route);
+					} else if (s.compress) {
+						await expect(page.url()).toMatch(/_data=/);
+						const url = new URL(page.url());
+						const data = url.searchParams.get("_data")!;
+						const decompressed = decompress(data)!;
+						const obj = JSON.parse(decompressed);
+						expect(obj.page).toBe(3);
+					} else {
+						await expect(page).toHaveURL(/page=3/);
+					}
 				});
 			}
 

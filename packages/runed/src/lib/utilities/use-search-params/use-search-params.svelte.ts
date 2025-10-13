@@ -359,10 +359,19 @@ class SearchParams<Schema extends StandardSchemaV1> {
 	#debounceTimer: ReturnType<typeof setTimeout> | null = null;
 
 	/**
-	 * In-memory search parameters when updateURL is false
+	 * Local cache for immediate reads/writes
+	 * Used regardless of updateURL setting to prevent input lag
+	 * When updateURL is true, this cache is synced to the URL (with optional debouncing)
+	 * When updateURL is false, this cache is the sole source of truth
 	 * @private
 	 */
-	#inMemorySearchParams = $state(new SvelteURLSearchParams());
+	#localCache = $state(new SvelteURLSearchParams());
+
+	/**
+	 * Flag to track if local cache has been initialized from URL
+	 * @private
+	 */
+	#cacheInitialized = false;
 
 	/**
 	 * Create a new SearchParams instance with the given schema and options
@@ -401,8 +410,54 @@ class SearchParams<Schema extends StandardSchemaV1> {
 	}
 
 	/**
+	 * Initialize the local cache from the URL on first access
+	 * @private
+	 */
+	#initializeCacheFromURL(): void {
+		if (this.#cacheInitialized) return;
+		this.#cacheInitialized = true;
+
+		// only initialize from URL if updateURL is true and we're in browser
+		if (!this.#options.updateURL || !BROWSER || building) return;
+
+		const urlParams = page.url.searchParams;
+		const compressedParamName = this.#options.compressedParamName || "_data";
+
+		// Handle compressed mode
+		if (this.#options.compress && urlParams.has(compressedParamName)) {
+			try {
+				const compressedData = urlParams.get(compressedParamName) || "";
+				const decompressed = lzString.decompressFromEncodedURIComponent(compressedData);
+
+				if (decompressed) {
+					const decompressedObj = JSON.parse(decompressed);
+					const newCache = new SvelteURLSearchParams();
+
+					// populate cache with decompressed values
+					for (const [key, value] of Object.entries(decompressedObj)) {
+						const stringValue = this.#serializeValue(value);
+						newCache.set(key, stringValue);
+					}
+
+					this.#localCache = newCache;
+					return;
+				}
+			} catch (e) {
+				console.error("Error initializing cache from compressed URL", e);
+			}
+		}
+
+		// Normal mode - copy current URL params to cache
+		const newCache = new SvelteURLSearchParams();
+		for (const [key, value] of urlParams.entries()) {
+			newCache.set(key, value);
+		}
+		this.#localCache = newCache;
+	}
+
+	/**
 	 * Get a typed parameter value by key
-	 * Retrieves the current value from the URL, runs it through schema validation,
+	 * Retrieves the current value from the local cache, runs it through schema validation,
 	 * and returns the validated, typed result
 	 *
 	 * @param key The parameter key to get
@@ -411,6 +466,7 @@ class SearchParams<Schema extends StandardSchemaV1> {
 	get<K extends keyof StandardSchemaV1.InferOutput<Schema>>(
 		key: K & string
 	): StandardSchemaV1.InferOutput<Schema>[K] {
+		this.#initializeCacheFromURL();
 		return this.#getTypedValue(key) as StandardSchemaV1.InferOutput<Schema>[K];
 	}
 
@@ -472,9 +528,9 @@ class SearchParams<Schema extends StandardSchemaV1> {
 	 * @param values An object containing parameter key-value pairs to update
 	 */
 	update(values: Partial<StandardSchemaV1.InferOutput<Schema>>): void {
-		if (!values || typeof values !== "object") {
-			return;
-		}
+		this.#initializeCacheFromURL();
+
+		if (!values || typeof values !== "object") return;
 
 		// Quick optimization: Filter out non-schema keys upfront
 		const filteredValues: Record<string, unknown> = {};
@@ -487,14 +543,11 @@ class SearchParams<Schema extends StandardSchemaV1> {
 			}
 		}
 
-		if (!anyValid) {
-			return; // No valid keys to update
-		}
+		// no valid keys to update
+		if (!anyValid) return;
 
-		// Choose the appropriate search params source based on updateURL option and building state
-		const isInMemory = building || !this.#options.updateURL;
-		const searchParams = isInMemory ? this.#inMemorySearchParams : page.url.searchParams;
-		const paramsObject = this.#extractParamValues(searchParams);
+		// Always use local cache for immediate state
+		const paramsObject = this.#extractParamValues(this.#localCache);
 
 		// Check if there are any actual changes
 		let hasChanges = false;
@@ -514,9 +567,8 @@ class SearchParams<Schema extends StandardSchemaV1> {
 			}
 		}
 
-		if (!hasChanges) {
-			return; // No changes, skip update
-		}
+		// no changes, skip update
+		if (!hasChanges) return;
 
 		// Create a new object with the updated values
 		const newParamsObject = { ...paramsObject, ...filteredValues };
@@ -527,35 +579,31 @@ class SearchParams<Schema extends StandardSchemaV1> {
 		if (result && "value" in result) {
 			const validatedResult = result.value as Record<string, unknown>;
 
-			// Handle in-memory only updates when updateURL is false
-			if (isInMemory) {
-				// Update the in-memory store using the helper method
-				const updatedParams = this.#updateParamsWithValidatedValues(
-					searchParams,
-					filteredValues,
-					validatedResult,
-					isInMemory
-				);
-				this.#inMemorySearchParams = updatedParams as SvelteURLSearchParams;
-				return;
-			}
-
-			// Handle the compression mode if enabled (only when updateURL is true)
-			if (this.#options.compress) {
-				this.#handleCompressedUpdate(validatedResult);
-				return;
-			}
-
-			// Normal mode handling - update the URL using the helper method
-			const newSearchParams = this.#updateParamsWithValidatedValues(
-				searchParams,
+			// Always update local cache immediately (for instant reads)
+			const updatedCache = this.#updateParamsWithValidatedValues(
+				this.#localCache,
 				filteredValues,
 				validatedResult,
-				isInMemory
+				true // always treat as in-memory for cache updates
 			);
+			this.#localCache = updatedCache as SvelteURLSearchParams;
 
-			// Update URL
-			this.#navigateWithParams(newSearchParams as URLSearchParams);
+			// If updateURL is true and we're in browser, sync to URL
+			if (this.#options.updateURL && BROWSER && !building) {
+				// Handle the compression mode if enabled
+				if (this.#options.compress) {
+					this.#handleCompressedUpdate(validatedResult);
+				} else {
+					// Normal mode - update the URL
+					const urlParams = this.#updateParamsWithValidatedValues(
+						new URLSearchParams(),
+						filteredValues,
+						validatedResult,
+						false // use URLSearchParams for URL updates
+					);
+					this.#navigateWithParams(urlParams as URLSearchParams);
+				}
+			}
 		}
 	}
 
@@ -581,11 +629,12 @@ class SearchParams<Schema extends StandardSchemaV1> {
 	 *                     If not provided, uses the instance's showDefaults option.
 	 */
 	reset(showDefaults?: boolean): void {
+		this.#initializeCacheFromURL();
+
 		const useShowDefaults = showDefaults !== undefined ? showDefaults : this.#options.showDefaults;
-		const isInMemory = building || !this.#options.updateURL;
 
 		if (useShowDefaults) {
-			// Reuse the filtered default values for both URL and in-memory updates
+			// Reuse the filtered default values for both cache and URL updates
 			const validDefaultValues: Record<string, unknown> = {};
 
 			// Filter out null/undefined values
@@ -595,39 +644,29 @@ class SearchParams<Schema extends StandardSchemaV1> {
 				}
 			}
 
-			if (isInMemory) {
-				// For in-memory store, create a new SvelteURLSearchParams
-				const newSearchParams = this.#createSearchParams(new SvelteURLSearchParams(), true);
+			// Always update local cache immediately
+			const newCache = new SvelteURLSearchParams();
+			for (const [key, value] of Object.entries(validDefaultValues)) {
+				const stringValue = this.#serializeValue(value);
+				newCache.set(key, stringValue);
+			}
+			this.#localCache = newCache;
 
-				// Set all valid default values
+			// If updateURL is true, sync to URL
+			if (this.#options.updateURL && BROWSER && !building) {
+				const urlParams = new URLSearchParams();
 				for (const [key, value] of Object.entries(validDefaultValues)) {
 					const stringValue = this.#serializeValue(value);
-					newSearchParams.set(key, stringValue);
+					urlParams.set(key, stringValue);
 				}
-
-				// Update in-memory store
-				this.#inMemorySearchParams = newSearchParams as SvelteURLSearchParams;
-			} else {
-				// For URL updates, create a new URLSearchParams
-				const newSearchParams = this.#createSearchParams(new URLSearchParams(), false);
-
-				// Set all valid default values
-				for (const [key, value] of Object.entries(validDefaultValues)) {
-					const stringValue = this.#serializeValue(value);
-					newSearchParams.set(key, stringValue);
-				}
-
-				// Use the shared navigation function
-				this.#navigateWithParams(newSearchParams as URLSearchParams);
+				this.#navigateWithParams(urlParams);
 			}
 		} else {
 			// Not showing defaults - just clear everything
-			if (isInMemory) {
-				// For in-memory store, create an empty SvelteURLSearchParams
-				this.#inMemorySearchParams = new SvelteURLSearchParams();
-			} else {
-				// For URL updates, navigate to empty search
-				if (!BROWSER) return;
+			this.#localCache = new SvelteURLSearchParams();
+
+			// If updateURL is true, clear the URL
+			if (this.#options.updateURL && BROWSER && !building) {
 				goto("?", { replaceState: true, noScroll: this.#options.noScroll });
 			}
 		}
@@ -811,10 +850,10 @@ class SearchParams<Schema extends StandardSchemaV1> {
 	}
 
 	/**
-	 * Get typed values from the URL params using schema validation
+	 * Get typed values from the local cache using schema validation
 	 *
 	 * This method:
-	 * 1. Gets the current search parameters (from URL or in-memory store)
+	 * 1. Gets the current search parameters from the local cache
 	 * 2. Extracts and processes parameter values
 	 * 3. Validates them against the schema
 	 * 4. Returns the typed value for the requested key
@@ -826,10 +865,8 @@ class SearchParams<Schema extends StandardSchemaV1> {
 	#getTypedValue<K extends keyof StandardSchemaV1.InferOutput<Schema>>(
 		key: K & string
 	): StandardSchemaV1.InferOutput<Schema>[K] | undefined {
-		// Choose the appropriate search params source based on updateURL option and building state
-		const searchParams =
-			!building && this.#options.updateURL ? page.url.searchParams : this.#inMemorySearchParams;
-		const paramsObject = this.#extractParamValues(searchParams);
+		// Always read from local cache for immediate state
+		const paramsObject = this.#extractParamValues(this.#localCache);
 		const result = this.validate(paramsObject);
 
 		if (result instanceof Promise) {
@@ -860,28 +897,28 @@ class SearchParams<Schema extends StandardSchemaV1> {
 	}
 
 	/**
-	 * Set a parameter value and update the URL or in-memory store
+	 * Set a parameter value and update the local cache and optionally the URL
 	 *
 	 * This method:
-	 * 1. Gets the current search parameters (from URL or in-memory store)
+	 * 1. Gets the current search parameters from the local cache
 	 * 2. Extracts and processes all current parameters
 	 * 3. Updates the parameter with the new value
 	 * 4. Validates the complete parameter object against the schema
-	 * 5. Serializes the validated value back to the URL or in-memory store
-	 * 6. Updates the browser URL if updateURL is true
+	 * 5. Updates the local cache immediately (for instant reads)
+	 * 6. Optionally updates the browser URL if updateURL is true
 	 *
 	 * @param key The parameter key to set
 	 * @param value The value to set
 	 * @private
 	 */
 	#setValue(key: string, value: unknown): void {
+		this.#initializeCacheFromURL();
+
 		// Optimization: Skip if the key is not in schema
 		if (!this.has(key)) return;
 
-		// Choose the appropriate search params source based on updateURL option and building state
-		const isInMemory = building || !this.#options.updateURL;
-		const searchParams = isInMemory ? this.#inMemorySearchParams : page.url.searchParams;
-		const paramsObject = this.#extractParamValues(searchParams);
+		// Always use local cache for immediate state
+		const paramsObject = this.#extractParamValues(this.#localCache);
 
 		// Check if the new value is the same as the current value
 		// Optimization: For primitives, use direct comparison; use dequal only for objects
@@ -905,43 +942,33 @@ class SearchParams<Schema extends StandardSchemaV1> {
 
 		if (result && "value" in result) {
 			const validatedResult = result.value as Record<string, unknown>;
-
-			// If updateURL is false, update in-memory store only
-			if (isInMemory) {
-				// Create a single key-value update object for this key
-				const updateObj = { [key]: value };
-
-				// Update the in-memory store using the helper method
-				const updatedParams = this.#updateParamsWithValidatedValues(
-					searchParams,
-					updateObj,
-					validatedResult,
-					isInMemory
-				);
-				this.#inMemorySearchParams = updatedParams as SvelteURLSearchParams;
-				return;
-			}
-
-			// Handle the compression mode if enabled (only when updateURL is true)
-			if (this.#options.compress) {
-				this.#handleCompressedUpdate(validatedResult);
-				return;
-			}
-
-			// Normal mode (non-compressed) handling
-			// Create a single key-value update object for this key
 			const updateObj = { [key]: value };
 
-			// Update the URL using the helper method
-			const newSearchParams = this.#updateParamsWithValidatedValues(
-				searchParams,
+			// Always update local cache immediately (for instant reads)
+			const updatedCache = this.#updateParamsWithValidatedValues(
+				this.#localCache,
 				updateObj,
 				validatedResult,
-				isInMemory
+				true // always treat as in-memory for cache updates
 			);
+			this.#localCache = updatedCache as SvelteURLSearchParams;
 
-			// Use the shared navigation function
-			this.#navigateWithParams(newSearchParams as URLSearchParams);
+			// If updateURL is true, sync to URL
+			if (this.#options.updateURL && BROWSER && !building) {
+				// Handle the compression mode if enabled
+				if (this.#options.compress) {
+					this.#handleCompressedUpdate(validatedResult);
+				} else {
+					// Normal mode - update the URL
+					const urlParams = this.#updateParamsWithValidatedValues(
+						new URLSearchParams(),
+						updateObj,
+						validatedResult,
+						false // use URLSearchParams for URL updates
+					);
+					this.#navigateWithParams(urlParams as URLSearchParams);
+				}
+			}
 		}
 	}
 }
@@ -1284,10 +1311,7 @@ export function validateSearchParams<Schema extends StandardSchemaV1>(
 
 	// Add each validated parameter to the URLSearchParams
 	for (const [key, value] of Object.entries(validatedValue)) {
-		if (value === undefined || value === null) {
-			continue;
-		}
-
+		if (value === undefined || value === null) continue;
 		const stringValue = serializeValue(value);
 		newSearchParams.set(key, stringValue);
 	}

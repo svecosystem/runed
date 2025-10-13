@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from "vitest";
-import { createSearchParamsSchema, validateSearchParams } from "./use-search-params.svelte";
+import { createSearchParamsSchema, validateSearchParams } from "./use-search-params.svelte.js";
 import * as lzString from "lz-string";
 
 // Reuse the schema from the test page

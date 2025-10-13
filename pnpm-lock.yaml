@@ -216,6 +216,9 @@ importers:
       typescript:
         specifier: 'catalog:'
         version: 5.9.2
+      valibot:
+        specifier: ^1.1.0
+        version: 1.1.0(typescript@5.9.2)
       velite:
         specifier: ^0.2.1
         version: 0.2.1(acorn@8.15.0)
@@ -3583,6 +3586,14 @@ packages:
 
   util-deprecate@1.0.2:
     resolution: {integrity: sha512-EPD5q1uXyFxJpCrLnCc1nHnq3gOa6DZBocAIiI2TaSCA7VCJ1UJDMagCzIkXNsUYfD1daK//LTEQ8xiIbrHtcw==}
+
+  valibot@1.1.0:
+    resolution: {integrity: sha512-Nk8lX30Qhu+9txPYTwM0cFlWLdPFsFr6LblzqIySfbZph9+BFsAHsNvHOymEviUepeIW6KFHzpX8TKhbptBXXw==}
+    peerDependencies:
+      typescript: '>=5'
+    peerDependenciesMeta:
+      typescript:
+        optional: true
 
   velite@0.2.1:
     resolution: {integrity: sha512-yhugij87X4v63c7Y4pODvDLrLc0HFU7v8BfNzPeqEnJRKxGbV6+EESNcOQehHt91crGfJVepfCvoH52Si2+zTQ==}
@@ -7547,6 +7558,10 @@ snapshots:
       requires-port: 1.0.0
 
   util-deprecate@1.0.2: {}
+
+  valibot@1.1.0(typescript@5.9.2):
+    optionalDependencies:
+      typescript: 5.9.2
 
   velite@0.2.1(acorn@8.15.0):
     dependencies:
