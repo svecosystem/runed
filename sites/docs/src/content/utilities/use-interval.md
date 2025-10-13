@@ -21,16 +21,15 @@ controls for pausing and resuming the execution, as well as a built-in counter f
 <script lang="ts">
 	import { useInterval } from "runed";
 
-	let count = $state(0);
 	let delay = $state(1000);
 
-	const interval = useInterval(
-		() => count++,
-		() => delay
-	);
+	const interval = useInterval(() => delay, {
+		callback: (count) => {
+			console.log(`Tick ${count}`);
+		}
+	});
 </script>
 
-<p>Count: {count}</p>
 <p>Counter: {interval.counter}</p>
 <p>Interval delay: {delay}ms</p>
 <p>Status: {interval.isActive ? "Running" : "Paused"}</p>
@@ -51,29 +50,46 @@ has ticked:
 <script lang="ts">
 	import { useInterval } from "runed";
 
-	const interval = useInterval(() => {
-		console.log("Tick!");
-	}, 1000);
+	const interval = useInterval(1000);
 </script>
 
 <p>Ticks: {interval.counter}</p>
 <button onclick={interval.reset}>Reset</button>
 ```
 
-## Options
+## Callback
 
-The `useInterval` function accepts an optional third parameter with the following options:
-
-- `immediate` (default: `true`) - Whether to start the interval immediately
-- `immediateCallback` (default: `false`) - Whether to execute the callback immediately when resuming
+You can provide an optional callback that will be called on each tick with the current counter
+value:
 
 ```svelte
 <script lang="ts">
 	import { useInterval } from "runed";
 
-	const interval = useInterval(() => {}, 1000, {
+	const interval = useInterval(1000, {
+		callback: (count) => {
+			console.log(`Tick number ${count}`);
+		}
+	});
+</script>
+```
+
+## Options
+
+The `useInterval` function accepts an optional second parameter with the following options:
+
+- `immediate` (default: `true`) - Whether to start the interval immediately
+- `immediateCallback` (default: `false`) - Whether to execute the callback immediately when resuming
+- `callback` - Optional callback function that receives the current counter value on each tick
+
+```svelte
+<script lang="ts">
+	import { useInterval } from "runed";
+
+	const interval = useInterval(1000, {
 		immediate: false,
-		immediateCallback: true
+		immediateCallback: true,
+		callback: (count) => console.log(count)
 	});
 </script>
 ```
@@ -87,13 +103,9 @@ when it changes:
 <script lang="ts">
 	import { useInterval } from "runed";
 
-	let count = $state(0);
 	let delay = $state(1000);
 
-	const interval = useInterval(
-		() => count++,
-		() => delay
-	);
+	const interval = useInterval(() => delay);
 </script>
 
 <input type="range" bind:value={delay} min="100" max="2000" /><p>Delay: {delay}ms</p>

@@ -16,6 +16,11 @@ export type UseIntervalOptions = {
 	 * @default false
 	 */
 	immediateCallback?: boolean;
+
+	/**
+	 * Callback to execute on every interval tick, receives the current counter value
+	 */
+	callback?: (count: number) => void;
 };
 
 export type UseIntervalReturn = {
@@ -50,17 +55,15 @@ export type UseIntervalReturn = {
  *
  * @see https://runed.dev/docs/utilities/use-interval
  *
- * @param callback - The function to execute repeatedly
  * @param delay - The interval in milliseconds between executions
  * @param options - Configuration options
- * @returns Object with pause, resume methods and isActive state
+ * @returns Object with pause, resume, reset methods, counter and isActive state
  */
 export function useInterval(
-	callback: () => void,
 	delay: MaybeGetter<number>,
 	options: UseIntervalOptions = {}
 ): UseIntervalReturn {
-	const { immediate = true, immediateCallback = false } = options;
+	const { immediate = true, immediateCallback = false, callback } = options;
 
 	let intervalId = $state<ReturnType<typeof setInterval> | null>(null);
 	let counter = $state(0);
@@ -68,8 +71,8 @@ export function useInterval(
 	const isActive = $derived(intervalId !== null);
 
 	function runCallback(): void {
-		callback();
 		counter++;
+		callback?.(counter);
 	}
 
 	function createInterval(): void {

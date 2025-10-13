@@ -4,13 +4,7 @@
 
 	let intervalMs = $state(500);
 
-	const interval = useInterval(
-		() => {},
-		() => intervalMs,
-		{
-			callback: (count) => {},
-		}
-	);
+	const interval = useInterval(() => intervalMs);
 </script>
 
 <DemoContainer class="flex flex-col gap-6">
