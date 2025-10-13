@@ -6,7 +6,6 @@ export * from "./element-rect/index.js";
 export * from "./element-size/index.js";
 export * from "./extract/index.js";
 export * from "./finite-state-machine/index.js";
-export * from "./interval/index.js";
 export * from "./is-focus-within/index.js";
 export * from "./is-idle/index.js";
 export * from "./is-in-viewport/index.js";
