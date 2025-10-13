@@ -139,8 +139,8 @@ access to URL search parameters through direct property access.
   is `_data`.
 - `updateURL` (boolean): When true (default), the URL is updated when parameters change. When false,
   only in-memory parameters are updated.
-- `keepScroll` (boolean): When true, the scroll position is preserved when the URL is updated.
-	This prevents the page from jumping to the top on URL changes. Default is false.
+- `noScroll` (boolean): When true, the scroll position is preserved when the URL is updated. This
+  prevents the page from jumping to the top on URL changes. Default is false.
 
 Example with [Zod](https://zod.dev/):
 
