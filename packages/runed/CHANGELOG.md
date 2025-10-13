@@ -1,12 +1,5 @@
 # runed
 
-## 0.35.0
-
-### Patch Changes
-
-- feat(useSearchParams): add `keepScroll` option to preserve scroll position during URL updates
-	([#347](https://github.com/svecosystem/runed/pull/347))
-
 ## 0.34.0
 
 ### Minor Changes

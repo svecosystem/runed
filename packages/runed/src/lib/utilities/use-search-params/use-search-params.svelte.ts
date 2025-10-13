@@ -45,26 +45,31 @@ export interface SearchParamsOptions {
 	/**
 	 * The name of the parameter used to store compressed data when compression is enabled.
 	 * You can customize this to avoid conflicts with your schema parameters.
-	 * For example, if your schema already uses '_data', you might want to use '_compressed' or another unique name.
+	 * 
+	 * For example, if your schema already uses '_data', you might want to use '_compressed'
+	 * or another unique name.
+	 * 
 	 * @default '_data'
 	 */
 	compressedParamName?: string;
 
 	/**
 	 * Controls whether to update the URL when parameters change.
-	 * If true (default), changes to parameters will update the URL.
-	 * If false, parameters will only be stored in memory without updating the URL.
-	 * Note: When false, compress option will be ignored.
+	 * If `true` (default), changes to parameters will update the URL.
+	 * If `false`, parameters will only be stored in memory without updating the URL.
+	 * 
+	 * Note: When `false`, compress option will be ignored.
 	 * @default true
 	 */
 	updateURL?: boolean;
 
 	/**
-	 * If true, the page will not scroll to the top when the URL is updated.
-	 * This is useful if you want to maintain the user's scroll position during parameter changes.
+	 * If `true`, the scroll position will be preserved when the URL is updated.
+	 * 
+	 * If `false`, the scroll position will be reset to the top when the URL is updated.
 	 * @default false
 	 */
-	keepScroll?: boolean;
+	noScroll?: boolean;
 }
 
 /**
@@ -327,7 +332,7 @@ class SearchParams<Schema extends StandardSchemaV1> {
 			compress: false,
 			compressedParamName: "_data",
 			updateURL: true,
-			keepScroll: false,
+			noScroll: false,
 			...options,
 		};
 
@@ -390,6 +395,7 @@ class SearchParams<Schema extends StandardSchemaV1> {
 	 *
 	 * Call this when the component unmounts to prevent memory leaks from debounce timers.
 	 *
+	 * @example
 	 * Example in a Svelte component with Svelte 5 runes:
 	 * ```svelte
 	 * <script>
@@ -581,7 +587,7 @@ class SearchParams<Schema extends StandardSchemaV1> {
 			} else {
 				// For URL updates, navigate to empty search
 				if (!BROWSER) return;
-				goto("?", { replaceState: true, noScroll: this.#options.keepScroll });
+				goto("?", { replaceState: true, noScroll: this.#options.noScroll });
 			}
 		}
 	}
@@ -631,9 +637,8 @@ class SearchParams<Schema extends StandardSchemaV1> {
 		const newSearchParams = this.#createSearchParams(searchParams, isInMemory);
 
 		for (const key of Object.keys(updates)) {
-			if (!this.has(key)) {
-				continue; // Skip keys not in schema
-			}
+			// Skip keys not in schema
+			if (!this.has(key)) continue
 
 			const validatedValue = validatedValues[key];
 
@@ -699,12 +704,11 @@ class SearchParams<Schema extends StandardSchemaV1> {
 		const navigateToNewUrl = () => {
 			if (!BROWSER) return;
 			// When pushHistory is false, use replaceState to avoid creating a browser history entry
-			const gotoOptions = {
+			goto("?" + params.toString(), {
 				replaceState: !this.#options.pushHistory,
-				noScroll: this.#options.keepScroll,
+				noScroll: this.#options.noScroll,
 				keepFocus: true
-			};
-			goto("?" + params.toString(), gotoOptions);
+			});
 
 		};
 
