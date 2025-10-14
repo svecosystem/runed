@@ -36,6 +36,18 @@ export type IsIdleOptions = ConfigurableDocument &
 		 * @default false
 		 */
 		initialState?: boolean;
+		/**
+		 * Whether to track the last active time.
+		 *
+		 * When `false`, the `lastActive` property will not update after
+		 * initialization and will always be the time of initialization.
+		 *
+		 * When `true`, the `lastActive` property will update with the current time
+		 * when activity occurs.
+		 *
+		 * @default true
+		 */
+		trackLastActive?: boolean;
 	};
 
 const DEFAULT_EVENTS = [
@@ -50,6 +62,7 @@ const DEFAULT_OPTIONS = {
 	events: DEFAULT_EVENTS,
 	initialState: false,
 	timeout: 60000,
+	trackLastActive: true,
 } satisfies IsIdleOptions;
 
 /**
@@ -71,6 +84,8 @@ export class IsIdle {
 		const timeout = $derived(extract(opts.timeout));
 		const events = $derived(extract(opts.events));
 		const detectVisibilityChanges = $derived(extract(opts.detectVisibilityChanges));
+		const trackLastActive = $derived(extract(opts.trackLastActive));
+
 		this.#current = opts.initialState;
 
 		const debouncedReset = useDebounce(
@@ -84,7 +99,9 @@ export class IsIdle {
 
 		const handleActivity = () => {
 			this.#current = false;
-			this.#lastActive = Date.now();
+			if (trackLastActive) {
+				this.#lastActive = Date.now();
+			}
 			debouncedReset();
 		};
 

@@ -51,6 +51,39 @@ describe("IsIdle", () => {
 			window.dispatchEvent(new Event("click"));
 			expect(idleState.lastActive).toBeGreaterThan(lastActive);
 		});
+
+		testWithEffect("updates when trackLastActive is true (default)", () => {
+			const idleState = new IsIdle({ trackLastActive: true });
+			flushSync();
+			const initialLastActive = idleState.lastActive;
+
+			vi.advanceTimersByTime(500);
+			window.dispatchEvent(new Event("click"));
+
+			expect(idleState.lastActive).toBeGreaterThan(initialLastActive);
+
+			const secondLastActive = idleState.lastActive;
+			vi.advanceTimersByTime(500);
+			window.dispatchEvent(new Event("mousemove"));
+
+			expect(idleState.lastActive).toBeGreaterThan(secondLastActive);
+		});
+
+		testWithEffect("does not update when trackLastActive is false", () => {
+			const idleState = new IsIdle({ trackLastActive: false });
+			flushSync();
+			const initialLastActive = idleState.lastActive;
+
+			vi.advanceTimersByTime(500);
+			window.dispatchEvent(new Event("click"));
+
+			expect(idleState.lastActive).toBe(initialLastActive);
+
+			vi.advanceTimersByTime(500);
+			window.dispatchEvent(new Event("mousemove"));
+
+			expect(idleState.lastActive).toBe(initialLastActive);
+		});
 	});
 
 	describe("Args", () => {
