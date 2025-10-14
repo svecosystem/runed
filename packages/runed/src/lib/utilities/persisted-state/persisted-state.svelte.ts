@@ -138,9 +138,7 @@ export class PersistedState<T> {
 			this.#serialize(initialValue);
 		}
 
-		if (connected && syncTabs && storageType === "local") {
-			this.#setupStorageListener();
-		}
+		this.#setupStorageListener();
 	}
 
 	get current(): T {
@@ -205,10 +203,14 @@ export class PersistedState<T> {
 	}
 
 	#setupStorageListener(): void {
-		if (!this.#window) return;
+		if (!this.#window || !this.#connected) return;
 		this.#subscribe = createSubscriber((update) => {
 			this.#update = update;
-			this.#storageCleanup = on(this.#window!, "storage", this.#handleStorageEvent);
+			this.#storageCleanup =
+				this.#connected && this.#syncTabs && this.#storageType === "local"
+					? on(this.#window!, "storage", this.#handleStorageEvent)
+					: undefined;
+
 			return () => {
 				this.#storageCleanup?.();
 				this.#storageCleanup = undefined;
@@ -264,8 +266,6 @@ export class PersistedState<T> {
 		if (this.#connected) return;
 		this.#connected = true;
 		this.#serialize(this.#current);
-		if (this.#syncTabs && this.#storageType === "local") {
-			this.#setupStorageListener();
-		}
+		this.#setupStorageListener();
 	}
 }
