@@ -365,7 +365,7 @@ class SearchParams<Schema extends StandardSchemaV1> {
 	 * When updateURL is false, this cache is the sole source of truth
 	 * @private
 	 */
-	#localCache = $state(new SvelteURLSearchParams());
+	#localCache = $state(new URLSearchParams());
 
 	/**
 	 * Flag to track if local cache has been initialized from URL
