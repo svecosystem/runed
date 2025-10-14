@@ -313,4 +313,181 @@ describe("PersistedState", async () => {
 		expect(persistedState.current.foo.prop).toBe(303);
 		expect(localStorage.getItem(key)).toBe(JSON.stringify({ foo: { prop: 303 } }));
 	});
+
+	describe("null handling", () => {
+		testWithEffect("allows null as a valid value", () => {
+			const persistedState = new PersistedState<string | null>(key, initialValue);
+			persistedState.current = null;
+			expect(persistedState.current).toBe(null);
+			expect(localStorage.getItem(key)).toBe(JSON.stringify(null));
+		});
+
+		testWithEffect("can retrieve null from localStorage", () => {
+			localStorage.setItem(key, JSON.stringify(null));
+			const persistedState = new PersistedState<string | null>(key, initialValue);
+			expect(persistedState.current).toBe(null);
+		});
+
+		testWithEffect("can set null then set a new value", () => {
+			const persistedState = new PersistedState<string | null>(key, initialValue);
+			persistedState.current = null;
+			expect(persistedState.current).toBe(null);
+
+			persistedState.current = newValue;
+			expect(persistedState.current).toBe(newValue);
+			expect(localStorage.getItem(key)).toBe(JSON.stringify(newValue));
+		});
+
+		testWithEffect("triggers reactivity when set to null", () => {
+			const values: (string | null)[] = [];
+			const persistedState = new PersistedState<string | null>(key, initialValue);
+			$effect(() => {
+				values.push(persistedState.current);
+			});
+			flushSync();
+			expect(values).toStrictEqual([initialValue]);
+
+			flushSync(() => {
+				persistedState.current = null;
+			});
+			expect(values).toStrictEqual([initialValue, null]);
+		});
+	});
+
+	describe("disconnect/connect", () => {
+		testWithEffect("disconnect prevents storage updates", () => {
+			const persistedState = new PersistedState(key, initialValue);
+			expect(localStorage.getItem(key)).toBe(JSON.stringify(initialValue));
+
+			persistedState.disconnect();
+			expect(localStorage.getItem(key)).toBeNull();
+
+			persistedState.current = newValue;
+			expect(persistedState.current).toBe(newValue);
+			expect(localStorage.getItem(key)).toBeNull();
+		});
+
+		testWithEffect("connect re-enables storage updates", () => {
+			const persistedState = new PersistedState(key, initialValue);
+			persistedState.disconnect();
+
+			persistedState.current = newValue;
+			expect(localStorage.getItem(key)).toBeNull();
+
+			persistedState.connect();
+			expect(localStorage.getItem(key)).toBe(JSON.stringify(newValue));
+		});
+
+		testWithEffect("connected getter returns correct state", () => {
+			const persistedState = new PersistedState(key, initialValue);
+			expect(persistedState.connected).toBe(true);
+
+			persistedState.disconnect();
+			expect(persistedState.connected).toBe(false);
+
+			persistedState.connect();
+			expect(persistedState.connected).toBe(true);
+		});
+
+		testWithEffect("disconnect stops cross-tab sync", () => {
+			const persistedState = new PersistedState(key, initialValue);
+			expect(persistedState.current).toBe(initialValue);
+
+			persistedState.disconnect();
+
+			localStorage.setItem(key, JSON.stringify(newValue));
+			window.dispatchEvent(
+				new StorageEvent("storage", {
+					key,
+					oldValue: null,
+					newValue: JSON.stringify(newValue),
+				})
+			);
+
+			expect(persistedState.current).toBe(initialValue);
+		});
+
+		testWithEffect("connect re-enables cross-tab sync", () => {
+			const persistedState = new PersistedState(key, initialValue);
+			persistedState.disconnect();
+			persistedState.connect();
+
+			localStorage.setItem(key, JSON.stringify(newValue));
+			window.dispatchEvent(
+				new StorageEvent("storage", {
+					key,
+					oldValue: null,
+					newValue: JSON.stringify(newValue),
+				})
+			);
+
+			expect(persistedState.current).toBe(newValue);
+		});
+
+		testWithEffect("can start disconnected via option", () => {
+			const persistedState = new PersistedState(key, initialValue, {
+				connected: false,
+			});
+			expect(persistedState.connected).toBe(false);
+			expect(localStorage.getItem(key)).toBeNull();
+
+			persistedState.current = newValue;
+			expect(localStorage.getItem(key)).toBeNull();
+		});
+
+		testWithEffect("works with sessionStorage", () => {
+			const persistedState = new PersistedState(key, initialValue, {
+				storage: "session",
+			});
+			expect(sessionStorage.getItem(key)).toBe(JSON.stringify(initialValue));
+
+			persistedState.disconnect();
+			expect(sessionStorage.getItem(key)).toBeNull();
+
+			persistedState.current = newValue;
+			expect(sessionStorage.getItem(key)).toBeNull();
+
+			persistedState.connect();
+			expect(sessionStorage.getItem(key)).toBe(JSON.stringify(newValue));
+		});
+
+		testWithEffect("disconnect is idempotent", () => {
+			const persistedState = new PersistedState(key, initialValue);
+			persistedState.disconnect();
+			persistedState.disconnect();
+			expect(persistedState.connected).toBe(false);
+		});
+
+		testWithEffect("connect is idempotent", () => {
+			const persistedState = new PersistedState(key, initialValue);
+			persistedState.connect();
+			persistedState.connect();
+			expect(persistedState.connected).toBe(true);
+		});
+
+		testWithEffect("value persists through disconnect/connect cycle", () => {
+			const persistedState = new PersistedState(key, initialValue);
+			persistedState.current = newValue;
+
+			persistedState.disconnect();
+			expect(persistedState.current).toBe(newValue);
+
+			persistedState.connect();
+			expect(persistedState.current).toBe(newValue);
+			expect(localStorage.getItem(key)).toBe(JSON.stringify(newValue));
+		});
+
+		testWithEffect("works when window is undefined", () => {
+			const persistedState = new PersistedState(key, initialValue, {
+				window: undefined,
+			});
+			expect(persistedState.connected).toBe(true);
+
+			persistedState.disconnect();
+			expect(persistedState.connected).toBe(false);
+
+			persistedState.connect();
+			expect(persistedState.connected).toBe(true);
+		});
+	});
 });
