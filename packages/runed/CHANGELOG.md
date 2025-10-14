@@ -1,5 +1,12 @@
 # runed
 
+## 0.35.1
+
+### Patch Changes
+
+- fix(useSearchParams): unsafe state mutation
+  ([#361](https://github.com/svecosystem/runed/pull/361))
+
 ## 0.35.0
 
 ### Minor Changes
