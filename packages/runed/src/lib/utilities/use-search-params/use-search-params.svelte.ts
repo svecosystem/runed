@@ -6,6 +6,7 @@ import { goto } from "$app/navigation";
 import { page } from "$app/state";
 import { IsMounted } from "../is-mounted/is-mounted.svelte.js";
 import { BROWSER } from "esm-env";
+import { untrack } from "svelte";
 
 /**
  * Configuration options for useSearchParams
@@ -365,7 +366,7 @@ class SearchParams<Schema extends StandardSchemaV1> {
 	 * When updateURL is false, this cache is the sole source of truth
 	 * @private
 	 */
-	#localCache = $state(new SvelteURLSearchParams());
+	#localCache = $state(new URLSearchParams());
 
 	/**
 	 * Flag to track if local cache has been initialized from URL
@@ -431,7 +432,7 @@ class SearchParams<Schema extends StandardSchemaV1> {
 
 				if (decompressed) {
 					const decompressedObj = JSON.parse(decompressed);
-					const newCache = new SvelteURLSearchParams();
+					const newCache = new URLSearchParams();
 
 					// populate cache with decompressed values
 					for (const [key, value] of Object.entries(decompressedObj)) {
@@ -439,7 +440,7 @@ class SearchParams<Schema extends StandardSchemaV1> {
 						newCache.set(key, stringValue);
 					}
 
-					this.#localCache = newCache;
+					untrack(() => (this.#localCache = newCache));
 					return;
 				}
 			} catch (e) {
@@ -452,7 +453,7 @@ class SearchParams<Schema extends StandardSchemaV1> {
 		for (const [key, value] of urlParams.entries()) {
 			newCache.set(key, value);
 		}
-		this.#localCache = newCache;
+		untrack(() => (this.#localCache = newCache));
 	}
 
 	/**
