@@ -1,5 +1,29 @@
 # runed
 
+## 0.35.0
+
+### Minor Changes
+
+- feat: add `noScroll` option to `useSearchParams`
+  ([#353](https://github.com/svecosystem/runed/pull/353))
+
+- BREAKING: remove Interval, consolidate features with useInterval
+  ([#350](https://github.com/svecosystem/runed/pull/350))
+
+### Patch Changes
+
+- fix: make useInterval's delay prop reactive
+  ([#350](https://github.com/svecosystem/runed/pull/350))
+
+- fix(useSearchParams): correctly handle number types
+  ([#354](https://github.com/svecosystem/runed/pull/354))
+
+- fix(PersistedState): move storage type and sync tab check into subscriber callback
+  ([#296](https://github.com/svecosystem/runed/pull/296))
+
+- fix(useSearchParams): resolve input lag/delay when binding the value to a param
+  ([#357](https://github.com/svecosystem/runed/pull/357))
+
 ## 0.34.0
 
 ### Minor Changes
