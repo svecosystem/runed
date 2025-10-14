@@ -104,7 +104,10 @@ export class PersistedState<T> {
 
 		this.#subscribe = createSubscriber((update) => {
 			this.#update = update;
-			const cleanup = syncTabs && storageType === "local" ? on(window, "storage", this.#handleStorageEvent) : null;
+			const cleanup =
+				syncTabs && storageType === "local"
+					? on(window, "storage", this.#handleStorageEvent)
+					: null;
 			return () => {
 				cleanup?.();
 				this.#update = undefined;

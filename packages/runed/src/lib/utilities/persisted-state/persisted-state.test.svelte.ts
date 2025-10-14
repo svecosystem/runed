@@ -38,7 +38,7 @@ describe("PersistedState", async () => {
 
 	testWithEffect("is reactive when using session storage", () => {
 		const values: string[] = [];
-		const persistedState = new PersistedState(key, initialValue, { storage: 'session' });
+		const persistedState = new PersistedState(key, initialValue, { storage: "session" });
 		$effect(() => {
 			values.push(persistedState.current);
 		});
