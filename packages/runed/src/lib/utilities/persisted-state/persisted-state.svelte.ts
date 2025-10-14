@@ -102,16 +102,17 @@ export class PersistedState<T> {
 			this.#serialize(initialValue);
 		}
 
-		if (syncTabs && storageType === "local") {
-			this.#subscribe = createSubscriber((update) => {
-				this.#update = update;
-				const cleanup = on(window, "storage", this.#handleStorageEvent);
-				return () => {
-					cleanup();
-					this.#update = undefined;
-				};
-			});
-		}
+		this.#subscribe = createSubscriber((update) => {
+			this.#update = update;
+			const cleanup =
+				syncTabs && storageType === "local"
+					? on(window, "storage", this.#handleStorageEvent)
+					: null;
+			return () => {
+				cleanup?.();
+				this.#update = undefined;
+			};
+		});
 	}
 
 	get current(): T {
