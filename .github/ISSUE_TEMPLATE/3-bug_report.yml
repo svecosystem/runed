@@ -1,5 +1,6 @@
 name: "🐛 Bug report"
 description: Report an issue with runed
+labels: ["triage"]
 body:
   - type: markdown
     attributes:

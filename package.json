@@ -26,42 +26,44 @@
 	"scripts": {
 		"dev": "pnpm sync && pnpm --parallel dev",
 		"test": "pnpm -r test",
-		"test:package": "pnpm -F \"./packages/**\" test",
+		"test:package": "pnpm -F \"./packages/**\" test --reporter append-only --color test",
 		"test:package:watch": "pnpm -F \"./packages/**\" test:watch",
 		"build": "pnpm -r build",
 		"build:packages": "pnpm -F \"./packages/**\" --parallel build",
 		"build:content": "pnpm -F \"./sites/**\" --parallel build:content",
+		"build:contributors": "pnpm -F docs build:contributors",
 		"ci:publish": "pnpm build:packages && changeset publish",
-		"lint": "prettier --check . && eslint .",
-		"lint:fix": "prettier --write . && eslint . --fix",
+		"lint": "prettier --check . && oxlint . && eslint .",
 		"format": "prettier --write .",
 		"check": "pnpm -r check",
 		"sync": "pnpm -r sync",
-		"add": "node ./scripts/add-utility.mjs"
+		"new": "node ./scripts/add-utility.mjs"
 	},
 	"license": "MIT",
 	"devDependencies": {
-		"@changesets/cli": "^2.27.10",
-		"@eslint/compat": "^1.2.8",
-		"@eslint/js": "^9.18.0",
+		"@changesets/cli": "^2.29.7",
+		"@eslint/compat": "^1.3.2",
+		"@eslint/js": "^9.36.0",
 		"@svitejs/changesets-changelog-github-compact": "^1.2.0",
-		"eslint": "^9.18.0",
-		"eslint-config-prettier": "^10.0.1",
-		"eslint-plugin-svelte": "^3.5.0",
-		"globals": "^16.0.0",
-		"prettier": "^3.3.3",
-		"prettier-plugin-svelte": "^3.3.3",
-		"prettier-plugin-tailwindcss": "^0.6.11",
+		"eslint": "^9.36.0",
+		"eslint-config-prettier": "^10.1.8",
+		"eslint-plugin-oxlint": "^1.16.0",
+		"eslint-plugin-svelte": "^3.12.3",
+		"globals": "^16.4.0",
+		"oxlint": "^1.16.0",
+		"prettier": "^3.6.2",
+		"prettier-plugin-svelte": "^3.4.0",
+		"prettier-plugin-tailwindcss": "^0.6.14",
 		"readline-sync": "^1.4.10",
-		"svelte": "^5.11.0",
-		"typescript": "^5.6.3",
-		"typescript-eslint": "^8.20.0",
-		"wrangler": "^4.15.0"
+		"svelte": "catalog:",
+		"typescript": "catalog:",
+		"typescript-eslint": "^8.44.0",
+		"wrangler": "^4.38.0"
 	},
 	"type": "module",
 	"engines": {
-		"pnpm": ">=9.0.0",
-		"node": ">=18"
+		"pnpm": ">=10.12.1",
+		"node": ">=20"
 	},
-	"packageManager": "pnpm@9.14.4"
+	"packageManager": "pnpm@10.17.0"
 }

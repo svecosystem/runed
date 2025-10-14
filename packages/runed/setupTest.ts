@@ -28,6 +28,8 @@ vi.mock("$app/navigation", (): typeof navigation => ({
 	onNavigate: () => {},
 	pushState: () => {},
 	replaceState: () => {},
+	// @ts-expect-error - testing
+	refreshAll: () => {},
 }));
 
 // Mock SvelteKit runtime module $app/stores
@@ -35,6 +37,7 @@ vi.mock("$app/stores", (): typeof stores => {
 	const getStores: typeof stores.getStores = () => {
 		const navigating = readable<Navigation | null>(null);
 		const page = readable<Page>({
+			// @ts-expect-error - shh
 			url: new URL("http://localhost"),
 			params: {},
 			route: {

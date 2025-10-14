@@ -1,5 +1,46 @@
 # runed
 
+## 0.34.0
+
+### Minor Changes
+
+- New Utility: `IsDocumentVisibile` ([#328](https://github.com/svecosystem/runed/pull/328))
+
+## 0.33.0
+
+### Minor Changes
+
+- breaking(validateSearchParams): return an object with `searchParams` and `data`, `searchParams`
+  being the ([#329](https://github.com/svecosystem/runed/pull/329)) validated `URLSearchParams` and
+  `data` being the validated object
+
+- New Utility: `onCleanup` ([#318](https://github.com/svecosystem/runed/pull/318))
+
+### Patch Changes
+
+- fix(validateSearchParams): fine grained access
+  ([#329](https://github.com/svecosystem/runed/pull/329))
+
+## 0.32.0
+
+### Minor Changes
+
+- New Utility: `useSearchParams` ([#266](https://github.com/svecosystem/runed/pull/266))
+
+- feat(StateHistory): add `clear` method to reset the stack
+  ([#293](https://github.com/svecosystem/runed/pull/293))
+
+- New Utility: `boolAttr` ([#251](https://github.com/svecosystem/runed/pull/251))
+
+### Patch Changes
+
+- fix(IsIdle): use reactive events ([#317](https://github.com/svecosystem/runed/pull/317))
+
+- fix: use a `$derived` in `Previous` ([#314](https://github.com/svecosystem/runed/pull/314))
+
+- fix: type of `event.currentTarget` for `useEventListener`
+  ([#311](https://github.com/svecosystem/runed/pull/311))
+
 ## 0.31.1
 
 ### Patch Changes

@@ -5,22 +5,24 @@ import { testWithEffect } from "$lib/test/util.svelte.js";
 describe("useInterval", () => {
 	testWithEffect("Calls callback at specified interval", async () => {
 		const callback = vi.fn();
-		const { pause } = useInterval(callback, 100);
+		const { pause } = useInterval(100, { callback });
 
 		expect(callback).not.toHaveBeenCalled();
 
 		await new Promise((resolve) => setTimeout(resolve, 150));
 		expect(callback).toHaveBeenCalledTimes(1);
+		expect(callback).toHaveBeenCalledWith(1);
 
 		await new Promise((resolve) => setTimeout(resolve, 100));
 		expect(callback).toHaveBeenCalledTimes(2);
+		expect(callback).toHaveBeenCalledWith(2);
 
 		pause();
 	});
 
 	testWithEffect("Does not start immediately when immediate is false", async () => {
 		const callback = vi.fn();
-		const { resume, pause } = useInterval(callback, 100, { immediate: false });
+		const { resume, pause } = useInterval(100, { immediate: false, callback });
 
 		await new Promise((resolve) => setTimeout(resolve, 150));
 		expect(callback).not.toHaveBeenCalled();
@@ -34,7 +36,7 @@ describe("useInterval", () => {
 
 	testWithEffect("Pause stops the interval", async () => {
 		const callback = vi.fn();
-		const { pause } = useInterval(callback, 100);
+		const { pause } = useInterval(100, { callback });
 
 		await new Promise((resolve) => setTimeout(resolve, 150));
 		expect(callback).toHaveBeenCalledTimes(1);
@@ -46,7 +48,7 @@ describe("useInterval", () => {
 
 	testWithEffect("Resume restarts the interval", async () => {
 		const callback = vi.fn();
-		const { pause, resume } = useInterval(callback, 100);
+		const { pause, resume } = useInterval(100, { callback });
 
 		await new Promise((resolve) => setTimeout(resolve, 150));
 		expect(callback).toHaveBeenCalledTimes(1);
@@ -64,9 +66,10 @@ describe("useInterval", () => {
 
 	testWithEffect("immediateCallback executes callback on resume", async () => {
 		const callback = vi.fn();
-		const { pause, resume } = useInterval(callback, 100, {
+		const { pause, resume } = useInterval(100, {
 			immediate: false,
 			immediateCallback: true,
+			callback,
 		});
 
 		expect(callback).not.toHaveBeenCalled();
@@ -82,10 +85,10 @@ describe("useInterval", () => {
 
 	testWithEffect("Resume does nothing if already active", async () => {
 		const callback = vi.fn();
-		const { resume, pause } = useInterval(callback, 100);
+		const { resume, pause } = useInterval(100, { callback });
 
 		await new Promise((resolve) => setTimeout(resolve, 50));
-		resume(); // Should do nothing since already active
+		resume();
 
 		await new Promise((resolve) => setTimeout(resolve, 100));
 		expect(callback).toHaveBeenCalledTimes(1);
@@ -98,7 +101,7 @@ describe("useInterval", () => {
 		let disposed = false;
 
 		const dispose = $effect.root(() => {
-			useInterval(callback, 100);
+			useInterval(100, { callback });
 			return () => {
 				disposed = true;
 			};
@@ -111,6 +114,49 @@ describe("useInterval", () => {
 		expect(disposed).toBe(true);
 
 		await new Promise((resolve) => setTimeout(resolve, 300));
-		expect(callback).toHaveBeenCalledTimes(1); // Should not increase after disposal
+		expect(callback).toHaveBeenCalledTimes(1);
+	});
+
+	testWithEffect("Increments counter on each tick", async () => {
+		const result = useInterval(100);
+
+		expect(result.counter).toBe(0);
+
+		await new Promise((resolve) => setTimeout(resolve, 150));
+		expect(result.counter).toBe(1);
+
+		await new Promise((resolve) => setTimeout(resolve, 100));
+		expect(result.counter).toBe(2);
+
+		result.pause();
+	});
+
+	testWithEffect("Reset sets counter back to 0", async () => {
+		const result = useInterval(100);
+
+		await new Promise((resolve) => setTimeout(resolve, 250));
+		expect(result.counter).toBe(2);
+
+		result.reset();
+		expect(result.counter).toBe(0);
+
+		result.pause();
+	});
+
+	testWithEffect("Reacts to interval changes", async () => {
+		const callback = vi.fn();
+		let intervalValue = $state(100);
+		const result = useInterval(() => intervalValue, { callback });
+
+		await new Promise((resolve) => setTimeout(resolve, 150));
+		expect(callback).toHaveBeenCalledTimes(1);
+
+		intervalValue = 50;
+		await new Promise((resolve) => setTimeout(resolve, 10));
+
+		await new Promise((resolve) => setTimeout(resolve, 60));
+		expect(callback).toHaveBeenCalledTimes(2);
+
+		result.pause();
 	});
 });

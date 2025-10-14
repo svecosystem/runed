@@ -20,6 +20,11 @@ jobs:
       - name: Install dependencies
         run: pnpm install
 
+      - name: Build contributors
+        run: pnpm build:contributors
+        env:
+          GITHUB_TOKEN: ${{ secrets.READONLY_CONTRIBUTORS_TOKEN }}
+
       - name: Build package & site
         run: pnpm build
 

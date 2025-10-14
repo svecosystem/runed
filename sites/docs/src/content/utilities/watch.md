@@ -47,7 +47,7 @@ Or you can watch a specific deep value.
 <!-- prettier-ignore -->
 ```ts
 let user = $state({ name: 'bob', age: 20 });
-watch(() => user.age), () => {
+watch(() => user.age, () => {
 	console.log(`User is now ${user.age} years old`);
 });
 ```

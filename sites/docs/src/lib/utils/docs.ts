@@ -16,7 +16,14 @@ function slugFromPath(path: string) {
 
 export type DocResolver = () => Promise<{ default: Component; metadata: Doc }>;
 
-export async function getDoc(slug: string = "index") {
+interface Contributor {
+	login: string;
+	name?: string;
+	avatar_url: string;
+	contributions: number;
+}
+
+export async function getDoc(slug: string = "index", fetch: typeof globalThis.fetch) {
 	const modules = import.meta.glob("/src/content/**/*.md");
 
 	let match: { path?: string; resolver?: DocResolver } = {};
@@ -33,8 +40,20 @@ export async function getDoc(slug: string = "index") {
 		error(404, "Could not find the document.");
 	}
 
+	let contributors: Contributor[] = [];
+
+	if (slug.includes("utilities/")) {
+		const utility = slug.split("/").pop();
+		if (utility) {
+			const res = await fetch(`/api/contributors.json`);
+			const data = await res.json();
+			contributors = data[utility] ?? [];
+		}
+	}
+
 	return {
 		component: doc.default,
 		metadata,
+		contributors,
 	};
 }

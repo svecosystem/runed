@@ -4,7 +4,17 @@ on:
   push:
     branches:
       - main
+    paths-ignore:
+      - ".changeset/**"
+      - README.md
+      - ".vscode/**"
+      - packages/runed/CHANGELOG.md
   pull_request:
+    paths-ignore:
+      - ".changeset/**"
+      - README.md
+      - ".vscode/**"
+      - packages/runed/CHANGELOG.md
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.number || github.sha }}
@@ -14,6 +24,7 @@ jobs:
   check:
     name: Run svelte-check
     runs-on: macos-latest
+    if: "!contains(github.event.head_commit.message, 'chore(release): version package')"
     steps:
       - uses: actions/checkout@v4
       - uses: pnpm/action-setup@v4
@@ -37,6 +48,7 @@ jobs:
   test:
     runs-on: macos-latest
     name: Test
+    if: "!contains(github.event.head_commit.message, 'chore(release): version package')"
     steps:
       - uses: actions/checkout@v4
       - uses: pnpm/action-setup@v4
@@ -48,13 +60,16 @@ jobs:
       - name: Install dependencies
         run: pnpm install
 
-      - run: pnpm exec playwright install
+      - name: Install Playwright Browsers
         working-directory: ./packages/runed
+        run: pnpm exec playwright install --with-deps
+
       - run: pnpm test
 
   lint:
     runs-on: macos-latest
     name: Lint
+    if: "!contains(github.event.head_commit.message, 'chore(release): version package')"
     steps:
       - uses: actions/checkout@v4
       - uses: pnpm/action-setup@v4
