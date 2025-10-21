@@ -11,6 +11,14 @@ const testSchema = createSearchParamsSchema({
 	config: { type: "object", default: {}, objectType: { theme: "" } },
 });
 
+// Schema with date support for testing
+const dateSchema = createSearchParamsSchema({
+	page: { type: "number", default: 1 },
+	filter: { type: "string", default: "" },
+	startDate: { type: "date", default: new Date("2023-01-01T00:00:00Z") },
+	endDate: { type: "date", default: new Date("2023-12-31T23:59:59Z") },
+});
+
 // Helper to create URL objects
 const createURL = (search: string) => new URL(`http://localhost:5173${search}`);
 
@@ -461,6 +469,99 @@ describe("validateSearchParams", () => {
 			// But page should be a number
 			expect(data.page).toBe(2);
 			expect(typeof data.page).toBe("number");
+		});
+	});
+
+	describe("Date parameter support", () => {
+		it("parses ISO8601 date strings from URL correctly", () => {
+			const url = createURL(
+				"?page=3&filter=test&startDate=2023-06-15T10:30:00.000Z&endDate=2023-06-20T18:00:00.000Z"
+			);
+			const { searchParams, data } = validateSearchParams(url, dateSchema);
+
+			// Check URLSearchParams
+			expect(searchParams.get("page")).toBe("3");
+			expect(searchParams.get("filter")).toBe("test");
+			expect(searchParams.get("startDate")).toBe("2023-06-15T10:30:00.000Z");
+			expect(searchParams.get("endDate")).toBe("2023-06-20T18:00:00.000Z");
+
+			// Check typed data object
+			expect(data.page).toBe(3); // number
+			expect(data.filter).toBe("test"); // string
+			expect(data.startDate).toBeInstanceOf(Date);
+			expect(data.endDate).toBeInstanceOf(Date);
+			expect(data.startDate.toISOString()).toBe("2023-06-15T10:30:00.000Z");
+			expect(data.endDate.toISOString()).toBe("2023-06-20T18:00:00.000Z");
+		});
+
+		it("returns default Date values when dates are missing from URL", () => {
+			const url = createURL("?page=5&filter=test"); // No date parameters
+			const { searchParams, data } = validateSearchParams(url, dateSchema);
+
+			// Check URLSearchParams - should include defaults
+			expect(searchParams.get("page")).toBe("5");
+			expect(searchParams.get("filter")).toBe("test");
+			expect(searchParams.get("startDate")).toBe("2023-01-01T00:00:00.000Z");
+			expect(searchParams.get("endDate")).toBe("2023-12-31T23:59:59.000Z");
+
+			// Check typed data object
+			expect(data.page).toBe(5);
+			expect(data.filter).toBe("test");
+			expect(data.startDate).toBeInstanceOf(Date);
+			expect(data.endDate).toBeInstanceOf(Date);
+			expect(data.startDate.toISOString()).toBe("2023-01-01T00:00:00.000Z");
+			expect(data.endDate.toISOString()).toBe("2023-12-31T23:59:59.000Z");
+		});
+
+		it("handles invalid date strings by falling back to defaults", () => {
+			const url = createURL("?startDate=invalid-date&endDate=2023-06-20T18:00:00.000Z");
+			const { searchParams, data } = validateSearchParams(url, dateSchema);
+
+			// Check URLSearchParams - invalid date should use default
+			expect(searchParams.get("page")).toBe("1"); // default
+			expect(searchParams.get("filter")).toBe(""); // default
+			expect(searchParams.get("startDate")).toBe("2023-01-01T00:00:00.000Z"); // default (invalid input)
+			expect(searchParams.get("endDate")).toBe("2023-06-20T18:00:00.000Z"); // valid input
+
+			// Check typed data object
+			expect(data.page).toBe(1);
+			expect(data.filter).toBe("");
+			expect(data.startDate).toBeInstanceOf(Date);
+			expect(data.endDate).toBeInstanceOf(Date);
+			expect(data.startDate.toISOString()).toBe("2023-01-01T00:00:00.000Z");
+			expect(data.endDate.toISOString()).toBe("2023-06-20T18:00:00.000Z");
+		});
+
+		it("handles compressed parameters with dates", () => {
+			const dataToCompress = {
+				page: 5,
+				filter: "compressed",
+				startDate: new Date("2023-06-15T10:30:00.000Z"),
+				endDate: new Date("2023-06-20T18:00:00.000Z"),
+			};
+			const compressed = lzString.compressToEncodedURIComponent(
+				JSON.stringify({
+					...dataToCompress,
+					startDate: dataToCompress.startDate.toISOString(), // Dates are serialized as ISO strings
+					endDate: dataToCompress.endDate.toISOString(),
+				})
+			);
+			const url = createURL(`?_data=${compressed}`);
+			const { searchParams, data } = validateSearchParams(url, dateSchema);
+
+			// Check URLSearchParams
+			expect(searchParams.get("page")).toBe("5");
+			expect(searchParams.get("filter")).toBe("compressed");
+			expect(searchParams.get("startDate")).toBe("2023-06-15T10:30:00.000Z");
+			expect(searchParams.get("endDate")).toBe("2023-06-20T18:00:00.000Z");
+
+			// Check typed data object
+			expect(data.page).toBe(5);
+			expect(data.filter).toBe("compressed");
+			expect(data.startDate).toBeInstanceOf(Date);
+			expect(data.endDate).toBeInstanceOf(Date);
+			expect(data.startDate.toISOString()).toBe("2023-06-15T10:30:00.000Z");
+			expect(data.endDate.toISOString()).toBe("2023-06-20T18:00:00.000Z");
 		});
 	});
 });

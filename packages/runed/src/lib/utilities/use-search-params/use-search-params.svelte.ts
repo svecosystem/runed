@@ -81,12 +81,14 @@ export interface SearchParamsOptions {
  *
  * @param searchParams The URLSearchParams object to extract values from
  * @param numberFields Optional set of field names that should be treated as numbers
+ * @param dateFields Optional set of field names that should be treated as dates
  * @returns An object with processed parameter values
  * @internal
  */
 function extractParamValues(
 	searchParams: URLSearchParams,
-	numberFields: Set<string> = new Set()
+	numberFields: Set<string> = new Set(),
+	dateFields: Set<string> = new Set()
 ): Record<string, unknown> {
 	const params: Record<string, unknown> = {};
 
@@ -116,6 +118,15 @@ function extractParamValues(
 			else if (numberFields.has(key) && value.trim() !== "" && !isNaN(Number(value))) {
 				params[key] = Number(value);
 			}
+			// Convert to Date if the schema expects a date and the value is a valid ISO8601 string
+			else if (dateFields.has(key) && value.trim() !== "") {
+				const dateValue = new Date(value);
+				if (!isNaN(dateValue.getTime())) {
+					params[key] = dateValue;
+				} else {
+					params[key] = value; // Keep as string if not a valid date
+				}
+			}
 			// Handle comma-separated values as arrays (fallback format)
 			else if (value.includes(",")) {
 				params[key] = value.split(",");
@@ -143,6 +154,8 @@ interface SchemaInfo {
 	keys: string[];
 	/** Set of field names that expect number types */
 	numberFields: Set<string>;
+	/** Set of field names that expect Date types */
+	dateFields: Set<string>;
 	/** Default values for all fields */
 	defaultValues: Record<string, unknown>;
 }
@@ -163,21 +176,24 @@ function extractSchemaInfo<Schema extends StandardSchemaV1>(schema: Schema): Sch
 	const validationResult = schema["~standard"].validate({});
 
 	if (!validationResult || !("value" in validationResult)) {
-		return { keys: [], numberFields: new Set(), defaultValues: {} };
+		return { keys: [], numberFields: new Set(), dateFields: new Set(), defaultValues: {} };
 	}
 
 	const defaultValues = validationResult.value as Record<string, unknown>;
 	const keys = Object.keys(defaultValues);
 	const numberFields = new Set<string>();
+	const dateFields = new Set<string>();
 
-	// Determine which fields are number types by checking default value types
+	// Determine which fields are number or date types by checking default value types
 	for (const [key, defaultValue] of Object.entries(defaultValues)) {
 		if (typeof defaultValue === "number") {
 			numberFields.add(key);
+		} else if (defaultValue instanceof Date) {
+			dateFields.add(key);
 		}
 	}
 
-	return { keys, numberFields, defaultValues };
+	return { keys, numberFields, dateFields, defaultValues };
 }
 
 /**
@@ -188,13 +204,15 @@ function extractSchemaInfo<Schema extends StandardSchemaV1>(schema: Schema): Sch
  * @param searchParams The URLSearchParams object to extract values from
  * @param schemaKeys Array of parameter keys that are defined in the schema
  * @param numberFields Set of field names that should be treated as numbers
+ * @param dateFields Set of field names that should be treated as dates
  * @returns An object with processed parameter values for schema-defined keys only
  * @internal
  */
 function extractSelectiveParamValues(
 	searchParams: URLSearchParams,
 	schemaKeys: string[],
-	numberFields: Set<string> = new Set()
+	numberFields: Set<string> = new Set(),
+	dateFields: Set<string> = new Set()
 ): Record<string, unknown> {
 	const params: Record<string, unknown> = {};
 
@@ -228,6 +246,15 @@ function extractSelectiveParamValues(
 			// This handles cases like ?page=2 or ?price=19.99
 			else if (numberFields.has(key) && value.trim() !== "" && !isNaN(Number(value))) {
 				params[key] = Number(value);
+			}
+			// Convert to Date if the schema expects a date and the value is a valid ISO8601 string
+			else if (dateFields.has(key) && value.trim() !== "") {
+				const dateValue = new Date(value);
+				if (!isNaN(dateValue.getTime())) {
+					params[key] = dateValue;
+				} else {
+					params[key] = value; // Keep as string if not a valid date
+				}
 			}
 			// Handle comma-separated values as arrays (fallback format)
 			else if (value.includes(",")) {
@@ -354,6 +381,12 @@ class SearchParams<Schema extends StandardSchemaV1> {
 	#numberFields: Set<string>;
 
 	/**
+	 * Set of field names that expect Date types based on schema validation
+	 * Used to intelligently convert URL string values to Dates only when appropriate
+	 */
+	#dateFields: Set<string>;
+
+	/**
 	 * Timer ID for debouncing URL updates
 	 * @private
 	 */
@@ -405,9 +438,10 @@ class SearchParams<Schema extends StandardSchemaV1> {
 			{} as Record<string, true>
 		);
 
-		// Store default values and number fields
+		// Store default values, number fields, and date fields
 		this.#defaultValues = { ...schemaInfo.defaultValues };
 		this.#numberFields = schemaInfo.numberFields;
+		this.#dateFields = schemaInfo.dateFields;
 	}
 
 	/**
@@ -810,11 +844,13 @@ class SearchParams<Schema extends StandardSchemaV1> {
 
 	/**
 	 * Converts a value to a URL-compatible string representation
-	 * Handles arrays, objects, and primitive values
+	 * Handles arrays, objects, dates, and primitive values
 	 * @private
 	 */
 	#serializeValue(value: unknown): string {
-		if (Array.isArray(value)) {
+		if (value instanceof Date) {
+			return value.toISOString();
+		} else if (Array.isArray(value)) {
 			return JSON.stringify(value);
 		} else if (typeof value === "object" && value !== null) {
 			return JSON.stringify(value);
@@ -847,8 +883,8 @@ class SearchParams<Schema extends StandardSchemaV1> {
 			return {};
 		}
 
-		// If not using compression, use the normal extraction with number field detection
-		return extractParamValues(searchParams, this.#numberFields);
+		// If not using compression, use the normal extraction with number and date field detection
+		return extractParamValues(searchParams, this.#numberFields, this.#dateFields);
 	}
 
 	/**
@@ -984,6 +1020,7 @@ export type SchemaTypeConfig<ArrayType = unknown, ObjectType = unknown> =
 	| { type: "string"; default?: string }
 	| { type: "number"; default?: number }
 	| { type: "boolean"; default?: boolean }
+	| { type: "date"; default?: Date }
 	| { type: "array"; default?: ArrayType[]; arrayType?: ArrayType }
 	| { type: "object"; default?: ObjectType; objectType?: ObjectType };
 
@@ -1010,6 +1047,7 @@ export type SchemaTypeConfig<ArrayType = unknown, ObjectType = unknown> =
  *   page: { type: 'number', default: 1 },
  *   filter: { type: 'string', default: '' },
  *   sort: { type: 'string', default: 'newest' },
+ *   createdAt: { type: 'date', default: new Date() },
  *
  *   // Array type with specific element type
  *   tags: {
@@ -1030,6 +1068,7 @@ export type SchemaTypeConfig<ArrayType = unknown, ObjectType = unknown> =
  * URL storage format:
  * - Arrays are stored as JSON strings: ?tags=["sale","featured"]
  * - Objects are stored as JSON strings: ?config={"theme":"dark","fontSize":14}
+ * - Dates are stored as ISO8601 strings: ?createdAt=2023-12-01T10:30:00.000Z
  * - Primitive values are stored directly: ?page=2&filter=red
  */
 export function createSearchParamsSchema<T extends Record<string, SchemaTypeConfig>>(
@@ -1041,15 +1080,17 @@ export function createSearchParamsSchema<T extends Record<string, SchemaTypeConf
 			? number
 			: T[K] extends { type: "boolean" }
 				? boolean
-				: T[K] extends { type: "array"; arrayType?: infer A }
-					? unknown extends A
-						? unknown[]
-						: A[]
-					: T[K] extends { type: "object"; objectType?: infer O }
-						? unknown extends O
-							? Record<string, unknown>
-							: O
-						: string;
+				: T[K] extends { type: "date" }
+					? Date
+					: T[K] extends { type: "array"; arrayType?: infer A }
+						? unknown extends A
+							? unknown[]
+							: A[]
+						: T[K] extends { type: "object"; objectType?: infer O }
+							? unknown extends O
+								? Record<string, unknown>
+								: O
+							: string;
 	}
 > {
 	type Output = {
@@ -1057,15 +1098,17 @@ export function createSearchParamsSchema<T extends Record<string, SchemaTypeConf
 			? number
 			: T[K] extends { type: "boolean" }
 				? boolean
-				: T[K] extends { type: "array"; arrayType?: infer A }
-					? unknown extends A
-						? unknown[]
-						: A[]
-					: T[K] extends { type: "object"; objectType?: infer O }
-						? unknown extends O
-							? Record<string, unknown>
-							: O
-						: string;
+				: T[K] extends { type: "date" }
+					? Date
+					: T[K] extends { type: "array"; arrayType?: infer A }
+						? unknown extends A
+							? unknown[]
+							: A[]
+						: T[K] extends { type: "object"; objectType?: infer O }
+							? unknown extends O
+								? Record<string, unknown>
+								: O
+							: string;
 	};
 
 	return {
@@ -1111,6 +1154,29 @@ export function createSearchParamsSchema<T extends Record<string, SchemaTypeConf
 										} else {
 											issues.push({
 												message: `Invalid boolean for "${key}"`,
+												path: [key],
+											});
+										}
+										break;
+									}
+									case "date": {
+										let dateValue: Date | null = null;
+
+										if (inputValue instanceof Date) {
+											dateValue = inputValue;
+										} else if (typeof inputValue === "string" && inputValue.trim() !== "") {
+											// Try to parse ISO8601 date strings
+											const parsed = new Date(inputValue);
+											if (!isNaN(parsed.getTime())) {
+												dateValue = parsed;
+											}
+										}
+
+										if (dateValue) {
+											(output as Record<string, unknown>)[key] = dateValue;
+										} else {
+											issues.push({
+												message: `Invalid date for "${key}"`,
 												path: [key],
 											});
 										}
@@ -1271,7 +1337,8 @@ export function validateSearchParams<Schema extends StandardSchemaV1>(
 		const paramsObject = extractSelectiveParamValues(
 			url.searchParams,
 			schemaInfo.keys,
-			schemaInfo.numberFields
+			schemaInfo.numberFields,
+			schemaInfo.dateFields
 		);
 
 		// Validate the parameters against the schema
@@ -1303,7 +1370,9 @@ export function validateSearchParams<Schema extends StandardSchemaV1>(
 
 	// Helper function to serialize values
 	const serializeValue = (value: unknown): string => {
-		if (Array.isArray(value)) {
+		if (value instanceof Date) {
+			return value.toISOString();
+		} else if (Array.isArray(value)) {
 			return JSON.stringify(value);
 		} else if (typeof value === "object" && value !== null) {
 			return JSON.stringify(value);
@@ -1452,7 +1521,11 @@ export function useSearchParams<Schema extends StandardSchemaV1>(
 		// Remove incorrect params on initialization (only after hydration)
 		if (options.updateURL !== false) {
 			const schemaInfo = extractSchemaInfo(schema);
-			const currentParams = extractParamValues(page.url.searchParams, schemaInfo.numberFields);
+			const currentParams = extractParamValues(
+				page.url.searchParams,
+				schemaInfo.numberFields,
+				schemaInfo.dateFields
+			);
 			const validationResult = schema["~standard"].validate(currentParams);
 			if (
 				validationResult &&
@@ -1490,7 +1563,11 @@ export function useSearchParams<Schema extends StandardSchemaV1>(
 					);
 				} else {
 					// For non-compressed mode, use the original approach
-					const currentParams = extractParamValues(page.url.searchParams, schemaInfo.numberFields);
+					const currentParams = extractParamValues(
+						page.url.searchParams,
+						schemaInfo.numberFields,
+						schemaInfo.dateFields
+					);
 					const newSearchParams = new URLSearchParams(page.url.searchParams.toString());
 					let needsUpdate = false;
 
@@ -1505,8 +1582,11 @@ export function useSearchParams<Schema extends StandardSchemaV1>(
 							continue;
 						}
 
+						// Use the same serialization logic as the rest of the system
 						let stringValue: string;
-						if (Array.isArray(defaultValue)) {
+						if (defaultValue instanceof Date) {
+							stringValue = defaultValue.toISOString();
+						} else if (Array.isArray(defaultValue)) {
 							stringValue = JSON.stringify(defaultValue);
 						} else if (typeof defaultValue === "object" && defaultValue !== null) {
 							stringValue = JSON.stringify(defaultValue);

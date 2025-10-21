@@ -41,6 +41,7 @@ const scenarios: Scenario[] = [
 // Consistent helper functions using getByTestId
 const pageCount = (page: Page) => page.getByTestId("page");
 const filterText = (page: Page) => page.getByTestId("filter");
+const createdAtText = (page: Page) => page.getByTestId("createdAt");
 
 function getExpectedURL(s: Scenario, action: "mount" | "inc" | "reset"): string | RegExp {
 	if (action === "mount") {
@@ -448,7 +449,53 @@ test.describe("useSearchParams scenarios", () => {
 					await page.waitForTimeout(300);
 					await expect(pageCount(page)).toHaveText("0");
 				});
+
+				test("date params from URL are parsed as Date objects", async ({ page }) => {
+					// Navigate to URL with date parameter
+					await page.goto(`${s.route}?createdAt=2023-06-15T10:30:00.000Z`);
+					await page.waitForTimeout(300);
+
+					// Verify the date is parsed and displayed correctly
+					await expect(createdAtText(page)).toHaveText("2023-06-15T10:30:00.000Z");
+
+					// Verify URL contains the date
+					// Note: compress mode doesn't compress on navigation, only on set
+					if (s.compress) {
+						// When navigating to uncompressed params, they stay uncompressed
+						await expect(page).toHaveURL(/createdAt=2023-06-15T10:30:00\.000Z/);
+					} else if (s.showDefaults) {
+						// Show-defaults encodes the URL and includes default params
+						await expect(page).toHaveURL(/createdAt=2023-06-15T10%3A30%3A00\.000Z/);
+					} else {
+						await expect(page).toHaveURL(/createdAt=2023-06-15T10:30:00\.000Z/);
+					}
+				});
 			}
+
+			test("date parameter updates correctly", async ({ page }) => {
+				await page.getByTestId("setDate").click();
+
+				// Display should update immediately
+				await expect(createdAtText(page)).toHaveText("2023-06-15T10:30:00.000Z");
+
+				if (s.debounce) {
+					await page.waitForTimeout(250);
+				}
+
+				// URL should be updated
+				if (s.memory) {
+					await expect(page).toHaveURL(s.route);
+				} else if (s.compress) {
+					await expect(page.url()).toMatch(/_data=/);
+					const url = new URL(page.url());
+					const data = url.searchParams.get("_data")!;
+					const decompressed = decompress(data)!;
+					const obj = JSON.parse(decompressed);
+					expect(obj.createdAt).toBe("2023-06-15T10:30:00.000Z");
+				} else {
+					await expect(page).toHaveURL(/createdAt=2023-06-15T10%3A30%3A00\.000Z/);
+				}
+			});
 		});
 	}
 });
