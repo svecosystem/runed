@@ -402,6 +402,188 @@ export const load = ({ url, fetch }) => {
 };
 ```
 
+### Advanced: Custom Serialization with Zod Codecs
+
+For advanced use cases where you need full control over how values are converted between URL strings
+and JavaScript types, you can use [Zod codecs](https://zod.dev/?id=codec) (Zod v4.1.0+). Codecs
+allow you to define custom bidirectional transformations that work seamlessly with URL parameters.
+
+#### Why Use Codecs?
+
+While the built-in `dateFormats` option works well for common cases, codecs give you complete
+control over serialization. Use codecs when you need to:
+
+- **Custom date formats**: Store dates as Unix timestamps, custom date strings, or other formats
+- **Complex type conversions**: Convert between incompatible types (e.g., number IDs ↔ full
+  objects)
+- **Data transformation**: Apply transformations during serialization (e.g., normalize, encrypt)
+- **Legacy API compatibility**: Match existing URL parameter formats from other systems
+- **Optimization**: Use more compact representations (e.g., `1234567890` instead of
+  `2009-02-13T23:31:30.000Z`)
+
+#### How Codecs Work
+
+A Zod codec defines two transformations:
+
+- **`decode`**: Converts URL string → JavaScript type (when reading from URL)
+- **`encode`**: Converts JavaScript type → URL string (when writing to URL)
+
+```ts
+import { z } from "zod";
+
+// Example 1: Unix timestamp codec (stores Date as number)
+const unixTimestampCodec = z.codec(
+	z.coerce.number(), // Input: number from URL string
+	z.date(), // Output: Date object in your app
+	{
+		decode: (timestamp) => new Date(timestamp * 1000), // number → Date
+		encode: (date) => Math.floor(date.getTime() / 1000) // Date → number
+	}
+);
+
+// Example 2: Date-only codec (stores Date as YYYY-MM-DD)
+const dateOnlyCodec = z.codec(
+	z.string(), // Input: string from URL
+	z.date(), // Output: Date object in your app
+	{
+		decode: (str) => new Date(str + "T00:00:00.000Z"), // "2025-01-15" → Date
+		encode: (date) => date.toISOString().split("T")[0] // Date → "2025-01-15"
+	}
+);
+
+// Example 3: Product ID codec (stores number as base36 string for shorter URLs)
+const compactIdCodec = z.codec(
+	z.string(), // Input: base36 string from URL
+	z.number(), // Output: number in your app
+	{
+		decode: (str) => parseInt(str, 36), // "abc123" → 225249695
+		encode: (num) => num.toString(36) // 225249695 → "abc123"
+	}
+);
+```
+
+#### Using Codecs in Your Schema
+
+```ts
+import { z } from "zod";
+
+const searchSchema = z.object({
+	// Regular fields work as before
+	query: z.string().default(""),
+	page: z.coerce.number().default(1),
+
+	// Unix timestamp - more compact than ISO datetime
+	createdAfter: unixTimestampCodec.default(new Date("2024-01-01")),
+
+	// Date-only format - cleaner for calendar dates
+	birthDate: dateOnlyCodec.default(new Date("1990-01-15")),
+
+	// Compact product IDs
+	productId: compactIdCodec.optional()
+});
+
+const params = useSearchParams(searchSchema);
+```
+
+#### Real-World Example: Event Search
+
+```svelte
+<script lang="ts">
+	import { z } from "zod";
+	import { useSearchParams } from "runed/kit";
+
+	// Define reusable codecs
+	const unixTimestamp = z.codec(z.coerce.number(), z.date(), {
+		decode: (ts) => new Date(ts * 1000),
+		encode: (date) => Math.floor(date.getTime() / 1000)
+	});
+
+	const dateOnly = z.codec(z.string(), z.date(), {
+		decode: (str) => new Date(str + "T00:00:00.000Z"),
+		encode: (date) => date.toISOString().split("T")[0]
+	});
+
+	// Schema with multiple codec types
+	const eventSearchSchema = z.object({
+		query: z.string().default(""),
+		// Date-only for event date (more readable in URL)
+		eventDate: dateOnly.default(new Date()),
+		// Unix timestamp for filters (more compact)
+		createdAfter: unixTimestamp.optional(),
+		updatedSince: unixTimestamp.optional()
+	});
+
+	const params = useSearchParams(eventSearchSchema);
+
+	// Work with Date objects in your app
+	$inspect(params.eventDate); // Date object
+	$inspect(params.createdAfter); // Date object or undefined
+</script>
+
+<!-- Bind to native date inputs -->
+<label>
+	Event Date:
+	<input
+		type="date"
+		value={params.eventDate.toISOString().split("T")[0]}
+		oninput={(e) => (params.eventDate = new Date(e.target.value))} />
+</label>
+
+<label>
+	Created After:
+	<input
+		type="date"
+		value={params.createdAfter?.toISOString().split("T")[0] ?? ""}
+		oninput={(e) =>
+			(params.createdAfter = e.target.value ? new Date(e.target.value) : undefined)} />
+</label>
+
+<!-- Clean URLs:
+     Without codecs: ?eventDate=2025-01-15T00:00:00.000Z&createdAfter=2024-01-01T00:00:00.000Z
+     With codecs:    ?eventDate=2025-01-15&createdAfter=1704067200
+-->
+```
+
+#### Codec Benefits Summary
+
+| Feature                   | Built-in dateFormats     | Zod Codecs                                        |
+| ------------------------- | ------------------------ | ------------------------------------------------- |
+| **Setup complexity**      | Simple                   | More configuration needed                         |
+| **Date formats**          | `date` and `datetime`    | Any custom format (Unix, relative, custom string) |
+| **URL size**              | Standard                 | Can be optimized (e.g., Unix timestamps)          |
+| **Type conversions**      | Date only                | Any type (numbers, objects, arrays, etc.)         |
+| **Validation**            | Basic                    | Full Zod validation + transformation              |
+| **Reusability**           | Per-field config         | Create reusable codec definitions                 |
+| **Legacy compatibility**  | Limited                  | Full control over format                          |
+| **Works with validators** | All (Zod, Valibot, etc.) | Zod only (v4.1.0+)                                |
+| **Server-side usage**     | Use `dateFormats` option | Automatic with `validateSearchParams`             |
+
+**When to use `dateFormats`**: Most applications with standard date handling needs
+
+**When to use codecs**: When you need custom formats, compact representations, or complex type
+conversions
+
+#### Server-Side Usage with Codecs
+
+Codecs work automatically with `validateSearchParams`:
+
+```ts
+// +page.server.ts
+import { validateSearchParams } from "runed/kit";
+import { eventSearchSchema } from "./schemas"; // Schema with codecs
+
+export const load = ({ url }) => {
+	// Codecs are automatically applied during validation
+	const { searchParams, data } = validateSearchParams(url, eventSearchSchema);
+
+	// data.eventDate is a Date object (decoded from URL string)
+	// searchParams contains properly encoded values for API calls
+	return {
+		events: await fetchEvents(searchParams)
+	};
+};
+```
+
 ## Reactivity Limitations
 
 ### Understanding Reactivity Scope

@@ -599,4 +599,184 @@ describe("validateSearchParams", () => {
 			expect(data.startDate.toISOString()).toBe("2023-06-15T10:30:00.000Z");
 		});
 	});
+
+	describe("Zod codec support", () => {
+		it("works with z.codec for date with YYYY-MM-DD format", async () => {
+			// Dynamically import Zod to make it optional
+			const { z } = await import("zod");
+
+			// Create a codec that converts between ISO date string and Date object
+			const stringToDate = z.codec(
+				z.iso.date(), // input schema: ISO date string
+				z.date(), // output schema: Date object
+				{
+					decode: (isoString) => new Date(isoString), // ISO string → Date
+					encode: (date) => date.toISOString().split("T")[0]!, // Date → YYYY-MM-DD
+				}
+			);
+
+			const zodSchema = z.object({
+				createdAt: stringToDate.default(() => new Date("2023-01-01T00:00:00Z")),
+			});
+
+			// Simulate URL with YYYY-MM-DD format
+			const url = createURL("?createdAt=2024-06-15");
+
+			const { searchParams, data } = validateSearchParams(url, zodSchema);
+
+			// Data should be parsed as Date object
+			expect(data.createdAt).toBeInstanceOf(Date);
+			expect(data.createdAt.toISOString()).toBe("2024-06-15T00:00:00.000Z");
+
+			// URL should be in YYYY-MM-DD format (not full ISO string)
+			expect(searchParams.get("createdAt")).toBe("2024-06-15");
+		});
+
+		it("works with z.codec for date with full ISO datetime format", async () => {
+			const { z } = await import("zod");
+
+			// Codec with full ISO datetime encoding - use z.iso.datetime() for full timestamps
+			const stringToDate = z.codec(
+				z.iso.datetime(), // Accepts full ISO datetime strings
+				z.date(),
+				{
+					decode: (isoString) => new Date(isoString),
+					encode: (date) => date.toISOString(), // Full ISO string
+				}
+			);
+
+			const zodSchema = z.object({
+				updatedAt: stringToDate.default(() => new Date("2023-12-31T23:59:59Z")),
+			});
+
+			const url = createURL("?updatedAt=2024-06-20T18:30:00.000Z");
+
+			const { searchParams, data } = validateSearchParams(url, zodSchema);
+
+			expect(data.updatedAt).toBeInstanceOf(Date);
+			expect(data.updatedAt.toISOString()).toBe("2024-06-20T18:30:00.000Z");
+
+			// Should preserve full ISO format
+			expect(searchParams.get("updatedAt")).toBe("2024-06-20T18:30:00.000Z");
+		});
+
+		it("works with z.codec for Unix timestamp format", async () => {
+			const { z } = await import("zod");
+
+			// Codec that uses Unix timestamps (seconds since epoch)
+			// Note: URL params are strings, so input schema should parse string to number
+			const unixTimestampCodec = z.codec(
+				z.string().transform((val) => parseInt(val, 10)), // input: string -> number
+				z.date(), // output: Date object
+				{
+					decode: (timestamp) => new Date(timestamp * 1000),
+					encode: (date) => Math.floor(date.getTime() / 1000),
+				}
+			);
+
+			const zodSchema = z.object({
+				timestamp: unixTimestampCodec.default(() => new Date("2023-01-01T00:00:00Z")),
+			});
+
+			// Unix timestamp for 2024-06-15T12:00:00Z is 1718452800
+			const url = createURL("?timestamp=1718452800");
+
+			const { searchParams, data } = validateSearchParams(url, zodSchema);
+
+			expect(data.timestamp).toBeInstanceOf(Date);
+			expect(data.timestamp.toISOString()).toBe("2024-06-15T12:00:00.000Z");
+
+			// Should serialize back to Unix timestamp
+			expect(searchParams.get("timestamp")).toBe("1718452800");
+		});
+
+		it("supports multiple codecs with different formats in same schema", async () => {
+			const { z } = await import("zod");
+
+			// Date-only codec (YYYY-MM-DD format)
+			const dateOnlyCodec = z.codec(
+				z.iso.date(), // Only accepts YYYY-MM-DD
+				z.date(),
+				{
+					decode: (isoString) => new Date(isoString),
+					encode: (date) => date.toISOString().split("T")[0]!, // Date → YYYY-MM-DD
+				}
+			);
+
+			// Full datetime codec (ISO 8601 with time)
+			const datetimeCodec = z.codec(
+				z.iso.datetime(), // Accepts full ISO datetime
+				z.date(),
+				{
+					decode: (isoString) => new Date(isoString),
+					encode: (date) => date.toISOString(),
+				}
+			);
+
+			const zodSchema = z.object({
+				birthDate: dateOnlyCodec.default(() => new Date("2000-01-01T00:00:00Z")),
+				lastLogin: datetimeCodec.default(() => new Date("2023-12-31T23:59:59Z")),
+			});
+
+			const url = createURL("?birthDate=1995-05-15&lastLogin=2024-06-20T14:30:00.000Z");
+
+			const { searchParams, data } = validateSearchParams(url, zodSchema);
+
+			// Both should be Date objects
+			expect(data.birthDate).toBeInstanceOf(Date);
+			expect(data.lastLogin).toBeInstanceOf(Date);
+
+			// But serialized differently
+			expect(searchParams.get("birthDate")).toBe("1995-05-15");
+			expect(searchParams.get("lastLogin")).toBe("2024-06-20T14:30:00.000Z");
+		});
+
+		it("codec decode is called automatically during validation", async () => {
+			const { z } = await import("zod");
+
+			const stringToDate = z.codec(z.iso.date(), z.date(), {
+				decode: (isoString) => new Date(isoString),
+				encode: (date) => date.toISOString().split("T")[0]!, // Date → YYYY-MM-DD
+			});
+
+			const zodSchema = z.object({
+				eventDate: stringToDate.default(() => new Date("2023-01-01T00:00:00Z")),
+			});
+
+			// URL provides string, codec.decode should convert to Date
+			const url = createURL("?eventDate=2024-10-21");
+
+			const { data } = validateSearchParams(url, zodSchema);
+
+			// Should be automatically decoded to Date by the codec
+			expect(data.eventDate).toBeInstanceOf(Date);
+			expect(data.eventDate.toISOString()).toBe("2024-10-21T00:00:00.000Z");
+		});
+
+		it("falls back to default value when codec receives invalid input", async () => {
+			const { z } = await import("zod");
+
+			const stringToDate = z.codec(z.iso.date(), z.date(), {
+				decode: (isoString) => new Date(isoString),
+				encode: (date) => date.toISOString().split("T")[0]!, // Date → YYYY-MM-DD
+			});
+
+			const defaultDate = new Date("2023-01-01T00:00:00Z");
+			const zodSchema = z.object({
+				validDate: stringToDate.default(() => defaultDate),
+			});
+
+			// Invalid date string
+			const url = createURL("?validDate=not-a-date");
+
+			const { searchParams, data } = validateSearchParams(url, zodSchema);
+
+			// Should fall back to default
+			expect(data.validDate).toBeInstanceOf(Date);
+			expect(data.validDate.toISOString()).toBe(defaultDate.toISOString());
+
+			// URL should have default serialized
+			expect(searchParams.get("validDate")).toBe("2023-01-01");
+		});
+	});
 });

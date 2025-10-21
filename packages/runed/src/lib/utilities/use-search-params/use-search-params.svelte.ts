@@ -92,16 +92,31 @@ export interface SearchParamsOptions {
 /**
  * Serialize a value to a URL-compatible string representation
  * @param value The value to serialize
- * @param key The field name (used to look up date format)
+ * @param key The field name (used to look up date format and codec encoder)
  * @param dateFormats Map of field names to date formats
+ * @param codecEncoders Map of field names to codec encoder functions
  * @returns String representation of the value
  * @internal
  */
 function serializeValue(
 	value: unknown,
 	key: string,
-	dateFormats: Map<string, "date" | "datetime"> | Record<string, "date" | "datetime"> = {}
+	dateFormats: Map<string, "date" | "datetime"> | Record<string, "date" | "datetime"> = {},
+	codecEncoders: Map<string, (value: unknown) => unknown> = new Map()
 ): string {
+	// First, check if there's a codec encoder for this field
+	const encoder = codecEncoders.get(key);
+	if (encoder) {
+		// Use the codec's encoder to transform the value first
+		const encodedValue = encoder(value);
+		// Then convert the encoded value to a string
+		if (typeof encodedValue === "string") {
+			return encodedValue;
+		}
+		// If encoder returns non-string, continue with normal serialization
+		value = encodedValue;
+	}
+
 	if (value instanceof Date) {
 		// Check if this field should use date-only format
 		const format = dateFormats instanceof Map ? dateFormats.get(key) : dateFormats[key];
@@ -132,13 +147,15 @@ function serializeValue(
  * @param searchParams The URLSearchParams object to extract values from
  * @param numberFields Optional set of field names that should be treated as numbers
  * @param dateFields Optional set of field names that should be treated as dates
+ * @param codecFields Optional set of field names that have codecs (skip automatic conversion for these)
  * @returns An object with processed parameter values
  * @internal
  */
 function extractParamValues(
 	searchParams: URLSearchParams,
 	numberFields: Set<string> = new Set(),
-	dateFields: Set<string> = new Set()
+	dateFields: Set<string> = new Set(),
+	codecFields: Set<string> = new Set()
 ): Record<string, unknown> {
 	const params: Record<string, unknown> = {};
 
@@ -168,8 +185,9 @@ function extractParamValues(
 			else if (numberFields.has(key) && value.trim() !== "" && !isNaN(Number(value))) {
 				params[key] = Number(value);
 			}
-			// Convert to Date if the schema expects a date and the value is a valid ISO8601 string
-			else if (dateFields.has(key) && value.trim() !== "") {
+			// Convert to Date if the schema expects a date, the value is a valid ISO8601 string,
+			// AND the field doesn't have a codec (codecs handle their own conversion)
+			else if (dateFields.has(key) && !codecFields.has(key) && value.trim() !== "") {
 				const dateValue = new Date(value);
 				if (!isNaN(dateValue.getTime())) {
 					params[key] = dateValue;
@@ -181,7 +199,7 @@ function extractParamValues(
 			else if (value.includes(",")) {
 				params[key] = value.split(",");
 			}
-			// Keep everything else as strings
+			// Keep everything else as strings (including codec fields)
 			else {
 				params[key] = value;
 			}
@@ -210,6 +228,49 @@ interface SchemaInfo {
 	dateFormats: Map<string, "date" | "datetime">;
 	/** Default values for all fields */
 	defaultValues: Record<string, unknown>;
+	/** Map of field names to their codec encode functions (for serialization) */
+	codecEncoders: Map<string, (value: unknown) => unknown>;
+	/** Set of field names that have codecs (used to skip automatic type conversion) */
+	codecFields: Set<string>;
+}
+
+/**
+ * Detect and extract codec encoder from a Zod schema field
+ * Returns the encoder function if available, otherwise undefined
+ * @internal
+ */
+function extractZodCodecEncoder(fieldSchema: unknown): ((value: unknown) => unknown) | undefined {
+	// Check if this looks like a Zod schema with def property
+	const zodLike = fieldSchema as {
+		def?: {
+			type?: string;
+			innerType?: {
+				def?: {
+					type?: string;
+					reverseTransform?: (value: unknown) => unknown;
+				};
+			};
+			reverseTransform?: (value: unknown) => unknown;
+		};
+	};
+
+	if (!zodLike.def) return undefined;
+
+	// Case 1: Direct codec (e.g., z.codec(...))
+	if (zodLike.def.type === "pipe" && typeof zodLike.def.reverseTransform === "function") {
+		return zodLike.def.reverseTransform;
+	}
+
+	// Case 2: Codec wrapped in .default() (e.g., z.codec(...).default(...))
+	if (
+		zodLike.def.type === "default" &&
+		zodLike.def.innerType?.def?.type === "pipe" &&
+		typeof zodLike.def.innerType.def.reverseTransform === "function"
+	) {
+		return zodLike.def.innerType.def.reverseTransform;
+	}
+
+	return undefined;
 }
 
 /**
@@ -234,6 +295,8 @@ function extractSchemaInfo<Schema extends StandardSchemaV1>(schema: Schema): Sch
 			dateFields: new Set(),
 			dateFormats: new Map(),
 			defaultValues: {},
+			codecEncoders: new Map(),
+			codecFields: new Set(),
 		};
 	}
 
@@ -242,6 +305,8 @@ function extractSchemaInfo<Schema extends StandardSchemaV1>(schema: Schema): Sch
 	const numberFields = new Set<string>();
 	const dateFields = new Set<string>();
 	const dateFormats = new Map<string, "date" | "datetime">();
+	const codecEncoders = new Map<string, (value: unknown) => unknown>();
+	const codecFields = new Set<string>();
 
 	// Determine which fields are number or date types by checking default value types
 	for (const [key, defaultValue] of Object.entries(defaultValues)) {
@@ -262,7 +327,28 @@ function extractSchemaInfo<Schema extends StandardSchemaV1>(schema: Schema): Sch
 		}
 	}
 
-	return { keys, numberFields, dateFields, dateFormats, defaultValues };
+	// Try to extract codec encoders from Zod schemas
+	// Check if the schema has a shape property (Zod object schema)
+	const zodObjectSchema = schema as { shape?: Record<string, unknown> };
+	if (zodObjectSchema.shape) {
+		for (const [key, fieldSchema] of Object.entries(zodObjectSchema.shape)) {
+			const encoder = extractZodCodecEncoder(fieldSchema);
+			if (encoder) {
+				codecEncoders.set(key, encoder);
+				codecFields.add(key);
+			}
+		}
+	}
+
+	return {
+		keys,
+		numberFields,
+		dateFields,
+		dateFormats,
+		defaultValues,
+		codecEncoders,
+		codecFields,
+	};
 }
 
 /**
@@ -274,6 +360,7 @@ function extractSchemaInfo<Schema extends StandardSchemaV1>(schema: Schema): Sch
  * @param schemaKeys Array of parameter keys that are defined in the schema
  * @param numberFields Set of field names that should be treated as numbers
  * @param dateFields Set of field names that should be treated as dates
+ * @param codecFields Set of field names that have codecs (skip automatic conversion for these)
  * @returns An object with processed parameter values for schema-defined keys only
  * @internal
  */
@@ -281,7 +368,8 @@ function extractSelectiveParamValues(
 	searchParams: URLSearchParams,
 	schemaKeys: string[],
 	numberFields: Set<string> = new Set(),
-	dateFields: Set<string> = new Set()
+	dateFields: Set<string> = new Set(),
+	codecFields: Set<string> = new Set()
 ): Record<string, unknown> {
 	const params: Record<string, unknown> = {};
 
@@ -316,8 +404,9 @@ function extractSelectiveParamValues(
 			else if (numberFields.has(key) && value.trim() !== "" && !isNaN(Number(value))) {
 				params[key] = Number(value);
 			}
-			// Convert to Date if the schema expects a date and the value is a valid ISO8601 string
-			else if (dateFields.has(key) && value.trim() !== "") {
+			// Convert to Date if the schema expects a date, the value is a valid ISO8601 string,
+			// AND the field doesn't have a codec (codecs handle their own conversion)
+			else if (dateFields.has(key) && !codecFields.has(key) && value.trim() !== "") {
 				const dateValue = new Date(value);
 				if (!isNaN(dateValue.getTime())) {
 					params[key] = dateValue;
@@ -329,7 +418,7 @@ function extractSelectiveParamValues(
 			else if (value.includes(",")) {
 				params[key] = value.split(",");
 			}
-			// Keep everything else as strings
+			// Keep everything else as strings (including codec fields)
 			else {
 				params[key] = value;
 			}
@@ -462,6 +551,18 @@ class SearchParams<Schema extends StandardSchemaV1> {
 	#dateFormats: Map<string, "date" | "datetime">;
 
 	/**
+	 * Map of field names to their codec encoder functions
+	 * Used to serialize values using custom codecs (e.g., Zod codecs)
+	 */
+	#codecEncoders: Map<string, (value: unknown) => unknown>;
+
+	/**
+	 * Set of field names that have codecs
+	 * Used to skip automatic type conversion for codec fields
+	 */
+	#codecFields: Set<string>;
+
+	/**
 	 * Timer ID for debouncing URL updates
 	 * @private
 	 */
@@ -525,6 +626,10 @@ class SearchParams<Schema extends StandardSchemaV1> {
 				this.#dateFormats.set(key, format);
 			}
 		}
+
+		// Store codec encoders
+		this.#codecEncoders = schemaInfo.codecEncoders;
+		this.#codecFields = schemaInfo.codecFields;
 	}
 
 	/**
@@ -688,8 +793,26 @@ class SearchParams<Schema extends StandardSchemaV1> {
 		// no changes, skip update
 		if (!hasChanges) return;
 
-		// Create a new object with the updated values
-		const newParamsObject = { ...paramsObject, ...filteredValues };
+		// Encode values for codec fields before validation
+		// Codecs expect INPUT types during validation (e.g., strings),
+		// but users provide OUTPUT types (e.g., Dates)
+		const valuesForValidation: Record<string, unknown> = {};
+		for (const [key, value] of Object.entries(filteredValues)) {
+			if (this.#codecEncoders.has(key)) {
+				const encoder = this.#codecEncoders.get(key)!;
+				try {
+					valuesForValidation[key] = encoder(value);
+				} catch (e) {
+					console.error(`Error encoding value for field "${key}"`, e);
+					valuesForValidation[key] = value; // Use original value if encoding fails
+				}
+			} else {
+				valuesForValidation[key] = value;
+			}
+		}
+
+		// Create a new object with the updated values (using encoded values for validation)
+		const newParamsObject = { ...paramsObject, ...valuesForValidation };
 
 		// Validate against schema
 		const result = this.validate(newParamsObject);
@@ -931,7 +1054,7 @@ class SearchParams<Schema extends StandardSchemaV1> {
 	 * @private
 	 */
 	#serializeValue(value: unknown, key?: string): string {
-		return serializeValue(value, key || "", this.#dateFormats);
+		return serializeValue(value, key || "", this.#dateFormats, this.#codecEncoders);
 	}
 
 	#extractParamValues(searchParams: URLSearchParams): Record<string, unknown> {
@@ -958,8 +1081,13 @@ class SearchParams<Schema extends StandardSchemaV1> {
 			return {};
 		}
 
-		// If not using compression, use the normal extraction with number and date field detection
-		return extractParamValues(searchParams, this.#numberFields, this.#dateFields);
+		// If not using compression, use the normal extraction with number, date, and codec field detection
+		return extractParamValues(
+			searchParams,
+			this.#numberFields,
+			this.#dateFields,
+			this.#codecFields
+		);
 	}
 
 	/**
@@ -1047,8 +1175,22 @@ class SearchParams<Schema extends StandardSchemaV1> {
 			return;
 		}
 
-		// Create a new object with the updated value
-		const newParamsObject = { ...paramsObject, [key]: value };
+		// If this field has a codec encoder, we need to encode the value before validation
+		// This is because codecs expect INPUT types (e.g., strings) during validation,
+		// but users set OUTPUT types (e.g., Dates) through the API
+		let valueForValidation = value;
+		if (this.#codecEncoders.has(key)) {
+			const encoder = this.#codecEncoders.get(key)!;
+			try {
+				valueForValidation = encoder(value);
+			} catch (e) {
+				console.error(`Error encoding value for field "${key}"`, e);
+				// If encoding fails, use the original value
+			}
+		}
+
+		// Create a new object with the updated value (using encoded value for validation)
+		const newParamsObject = { ...paramsObject, [key]: valueForValidation };
 
 		// Validate against schema to ensure type correctness
 		const result = this.validate(newParamsObject);
@@ -1389,6 +1531,10 @@ export function validateSearchParams<Schema extends StandardSchemaV1>(
 	const dateFormats = options.dateFormats || {};
 	let validatedValue: Record<string, unknown> = {};
 
+	// Extract codec encoders from the schema
+	const schemaInfo = extractSchemaInfo(schema);
+	const codecEncoders = schemaInfo.codecEncoders;
+
 	// Check if we're dealing with compressed data and handle appropriately
 	if (url.searchParams.has(compressedParamName)) {
 		try {
@@ -1443,7 +1589,8 @@ export function validateSearchParams<Schema extends StandardSchemaV1>(
 			url.searchParams,
 			schemaInfo.keys,
 			schemaInfo.numberFields,
-			schemaInfo.dateFields
+			schemaInfo.dateFields,
+			schemaInfo.codecFields
 		);
 
 		// Validate the parameters against the schema
@@ -1476,7 +1623,7 @@ export function validateSearchParams<Schema extends StandardSchemaV1>(
 	// Add each validated parameter to the URLSearchParams
 	for (const [key, value] of Object.entries(validatedValue)) {
 		if (value === undefined || value === null) continue;
-		const stringValue = serializeValue(value, key, dateFormats);
+		const stringValue = serializeValue(value, key, dateFormats, codecEncoders);
 		newSearchParams.set(key, stringValue);
 	}
 
@@ -1616,7 +1763,8 @@ export function useSearchParams<Schema extends StandardSchemaV1>(
 			const currentParams = extractParamValues(
 				page.url.searchParams,
 				schemaInfo.numberFields,
-				schemaInfo.dateFields
+				schemaInfo.dateFields,
+				schemaInfo.codecFields
 			);
 			const validationResult = schema["~standard"].validate(currentParams);
 			if (
@@ -1659,7 +1807,8 @@ export function useSearchParams<Schema extends StandardSchemaV1>(
 				const currentParams = extractParamValues(
 					page.url.searchParams,
 					schemaInfo.numberFields,
-					schemaInfo.dateFields
+					schemaInfo.dateFields,
+					schemaInfo.codecFields
 				);
 				const newSearchParams = new URLSearchParams(page.url.searchParams.toString());
 				let needsUpdate = false;

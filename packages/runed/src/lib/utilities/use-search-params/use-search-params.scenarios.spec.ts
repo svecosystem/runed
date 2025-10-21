@@ -624,4 +624,118 @@ test.describe("useSearchParams scenarios", () => {
 			await expect(page).not.toHaveURL(/createdAt=2023-06-15T/);
 		});
 	});
+
+	test.describe("zod-codec", () => {
+		const route = "/test-zod-codec";
+		const createdAtText = (page: Page) => page.getByTestId("createdAt");
+		const updatedAtText = (page: Page) => page.getByTestId("updatedAt");
+		const filterText = (page: Page) => page.getByTestId("filter");
+
+		test("loads with default values", async ({ page }) => {
+			await page.goto(route);
+			await page.waitForTimeout(300);
+
+			// Should load with defaults
+			await expect(createdAtText(page)).toHaveText("2023-01-01T00:00:00.000Z");
+			await expect(updatedAtText(page)).toHaveText("2023-12-31T23:59:59.000Z");
+			await expect(filterText(page)).toBeEmpty();
+
+			// URL should not have parameters with defaults
+			await expect(page).toHaveURL(route);
+		});
+
+		test("codec encodes dates to URL with correct formats", async ({ page }) => {
+			await page.goto(route);
+			await page.waitForTimeout(300);
+
+			// Click buttons to set dates
+			await page.getByTestId("setCreatedAt").click();
+			await page.waitForTimeout(100);
+			await page.getByTestId("setUpdatedAt").click();
+			await page.waitForTimeout(100);
+
+			// Dates should be parsed correctly
+			// Note: createdAt uses date-only codec, so time is stripped and defaults to midnight
+			await expect(createdAtText(page)).toHaveText("2024-06-15T00:00:00.000Z");
+			await expect(updatedAtText(page)).toHaveText("2024-06-20T18:00:00.000Z");
+
+			// createdAt should use YYYY-MM-DD format (date-only)
+			await expect(page).toHaveURL(/createdAt=2024-06-15/);
+			await expect(page).not.toHaveURL(/createdAt=2024-06-15T/);
+
+			// updatedAt should use full ISO datetime format
+			await expect(page).toHaveURL(/updatedAt=2024-06-20T18%3A00%3A00\.000Z/);
+		});
+
+		test("codec decodes URL parameters to Date objects", async ({ page }) => {
+			// Navigate with date parameters
+			await page.goto(`${route}?createdAt=2024-10-21&updatedAt=2024-12-31T15:30:00.000Z`);
+			await page.waitForTimeout(300);
+
+			// Should parse as Date objects and display as ISO strings
+			await expect(createdAtText(page)).toHaveText("2024-10-21T00:00:00.000Z");
+			await expect(updatedAtText(page)).toHaveText("2024-12-31T15:30:00.000Z");
+		});
+
+		test("codec handles invalid date formats gracefully", async ({ page }) => {
+			// Navigate with invalid date
+			await page.goto(`${route}?createdAt=invalid-date`);
+			await page.waitForTimeout(300);
+
+			// Should fall back to default
+			await expect(createdAtText(page)).toHaveText("2023-01-01T00:00:00.000Z");
+		});
+
+		test("codec preserves date format when updating other params", async ({ page }) => {
+			await page.goto(`${route}?createdAt=2024-06-15`);
+			await page.waitForTimeout(300);
+
+			// Update filter
+			await page.getByTestId("filter-input").fill("test");
+			await page.waitForTimeout(100);
+
+			// Date format should remain YYYY-MM-DD
+			await expect(page).toHaveURL(/createdAt=2024-06-15/);
+			await expect(page).not.toHaveURL(/createdAt=2024-06-15T/);
+			await expect(page).toHaveURL(/filter=test/);
+		});
+
+		test("reset restores codec default values", async ({ page }) => {
+			await page.goto(
+				`${route}?createdAt=2024-06-15&updatedAt=2024-06-20T18:00:00.000Z&filter=test`
+			);
+			await page.waitForTimeout(300);
+
+			// Click reset
+			await page.getByTestId("reset").click();
+			await page.waitForTimeout(100);
+
+			// Should restore defaults
+			await expect(createdAtText(page)).toHaveText("2023-01-01T00:00:00.000Z");
+			await expect(updatedAtText(page)).toHaveText("2023-12-31T23:59:59.000Z");
+			await expect(filterText(page)).toBeEmpty();
+			await expect(page).toHaveURL(route);
+		});
+
+		test("codec works with multiple date updates", async ({ page }) => {
+			await page.goto(route);
+			await page.waitForTimeout(300);
+
+			// Set createdAt
+			await page.getByTestId("setCreatedAt").click();
+			await page.waitForTimeout(100);
+			await expect(page).toHaveURL(/createdAt=2024-06-15/);
+
+			// Set updatedAt
+			await page.getByTestId("setUpdatedAt").click();
+			await page.waitForTimeout(100);
+			await expect(page).toHaveURL(/createdAt=2024-06-15/);
+			await expect(page).toHaveURL(/updatedAt=2024-06-20T18%3A00%3A00\.000Z/);
+
+			// Both dates should be correctly formatted
+			// Note: createdAt uses date-only codec, so time is stripped and becomes UTC midnight
+			await expect(createdAtText(page)).toHaveText("2024-06-15T00:00:00.000Z");
+			await expect(updatedAtText(page)).toHaveText("2024-06-20T18:00:00.000Z");
+		});
+	});
 });
