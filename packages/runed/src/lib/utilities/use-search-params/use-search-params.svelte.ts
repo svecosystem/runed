@@ -71,6 +71,56 @@ export interface SearchParamsOptions {
 	 * @default false
 	 */
 	noScroll?: boolean;
+
+	/**
+	 * Specifies which date fields should use date-only format (YYYY-MM-DD) instead of full ISO8601 datetime.
+	 *
+	 * Map field names to their desired format:
+	 * - 'date': Serializes as YYYY-MM-DD (e.g., "2025-10-21")
+	 * - 'datetime': Serializes as full ISO8601 (e.g., "2025-10-21T18:18:14.196Z")
+	 *
+	 * Example:
+	 * ```
+	 * { dateFormats: { birthDate: 'date', createdAt: 'datetime' } }
+	 * ```
+	 *
+	 * @default undefined (all dates use datetime format)
+	 */
+	dateFormats?: Record<string, "date" | "datetime">;
+}
+
+/**
+ * Serialize a value to a URL-compatible string representation
+ * @param value The value to serialize
+ * @param key The field name (used to look up date format)
+ * @param dateFormats Map of field names to date formats
+ * @returns String representation of the value
+ * @internal
+ */
+function serializeValue(
+	value: unknown,
+	key: string,
+	dateFormats: Map<string, "date" | "datetime"> | Record<string, "date" | "datetime"> = {}
+): string {
+	if (value instanceof Date) {
+		// Check if this field should use date-only format
+		const format = dateFormats instanceof Map ? dateFormats.get(key) : dateFormats[key];
+		if (format === "date") {
+			// Format as YYYY-MM-DD using UTC date components to avoid timezone issues
+			// This ensures consistent serialization regardless of local timezone
+			const iso = value.toISOString();
+			return iso.split("T")[0]!; // Extract YYYY-MM-DD portion (always present)
+		} else {
+			// Default to full ISO8601 datetime
+			return value.toISOString();
+		}
+	} else if (Array.isArray(value)) {
+		return JSON.stringify(value);
+	} else if (typeof value === "object" && value !== null) {
+		return JSON.stringify(value);
+	} else {
+		return String(value);
+	}
 }
 
 /**
@@ -156,6 +206,8 @@ interface SchemaInfo {
 	numberFields: Set<string>;
 	/** Set of field names that expect Date types */
 	dateFields: Set<string>;
+	/** Map of date field names to their format ('date' or 'datetime') */
+	dateFormats: Map<string, "date" | "datetime">;
 	/** Default values for all fields */
 	defaultValues: Record<string, unknown>;
 }
@@ -176,13 +228,20 @@ function extractSchemaInfo<Schema extends StandardSchemaV1>(schema: Schema): Sch
 	const validationResult = schema["~standard"].validate({});
 
 	if (!validationResult || !("value" in validationResult)) {
-		return { keys: [], numberFields: new Set(), dateFields: new Set(), defaultValues: {} };
+		return {
+			keys: [],
+			numberFields: new Set(),
+			dateFields: new Set(),
+			dateFormats: new Map(),
+			defaultValues: {},
+		};
 	}
 
 	const defaultValues = validationResult.value as Record<string, unknown>;
 	const keys = Object.keys(defaultValues);
 	const numberFields = new Set<string>();
 	const dateFields = new Set<string>();
+	const dateFormats = new Map<string, "date" | "datetime">();
 
 	// Determine which fields are number or date types by checking default value types
 	for (const [key, defaultValue] of Object.entries(defaultValues)) {
@@ -193,7 +252,17 @@ function extractSchemaInfo<Schema extends StandardSchemaV1>(schema: Schema): Sch
 		}
 	}
 
-	return { keys, numberFields, dateFields, defaultValues };
+	// Extract date formats from schema metadata if available (from createSearchParamsSchema)
+	const schemaWithMetadata = schema as Schema & {
+		__dateFormats?: Record<string, "date" | "datetime">;
+	};
+	if (schemaWithMetadata.__dateFormats) {
+		for (const [key, format] of Object.entries(schemaWithMetadata.__dateFormats)) {
+			dateFormats.set(key, format);
+		}
+	}
+
+	return { keys, numberFields, dateFields, dateFormats, defaultValues };
 }
 
 /**
@@ -387,6 +456,12 @@ class SearchParams<Schema extends StandardSchemaV1> {
 	#dateFields: Set<string>;
 
 	/**
+	 * Map of date field names to their format preference ('date' or 'datetime')
+	 * Determines serialization format for Date values in URLs
+	 */
+	#dateFormats: Map<string, "date" | "datetime">;
+
+	/**
 	 * Timer ID for debouncing URL updates
 	 * @private
 	 */
@@ -442,6 +517,14 @@ class SearchParams<Schema extends StandardSchemaV1> {
 		this.#defaultValues = { ...schemaInfo.defaultValues };
 		this.#numberFields = schemaInfo.numberFields;
 		this.#dateFields = schemaInfo.dateFields;
+
+		// Merge date formats from schema info and options
+		this.#dateFormats = new Map(schemaInfo.dateFormats);
+		if (options.dateFormats) {
+			for (const [key, format] of Object.entries(options.dateFormats)) {
+				this.#dateFormats.set(key, format);
+			}
+		}
 	}
 
 	/**
@@ -470,7 +553,7 @@ class SearchParams<Schema extends StandardSchemaV1> {
 
 					// populate cache with decompressed values
 					for (const [key, value] of Object.entries(decompressedObj)) {
-						const stringValue = this.#serializeValue(value);
+						const stringValue = this.#serializeValue(value, key);
 						newCache.set(key, stringValue);
 					}
 
@@ -683,7 +766,7 @@ class SearchParams<Schema extends StandardSchemaV1> {
 			// Always update local cache immediately
 			const newCache = new SvelteURLSearchParams();
 			for (const [key, value] of Object.entries(validDefaultValues)) {
-				const stringValue = this.#serializeValue(value);
+				const stringValue = this.#serializeValue(value, key);
 				newCache.set(key, stringValue);
 			}
 			this.#localCache = newCache;
@@ -692,7 +775,7 @@ class SearchParams<Schema extends StandardSchemaV1> {
 			if (this.#options.updateURL && BROWSER && !building) {
 				const urlParams = new URLSearchParams();
 				for (const [key, value] of Object.entries(validDefaultValues)) {
-					const stringValue = this.#serializeValue(value);
+					const stringValue = this.#serializeValue(value, key);
 					urlParams.set(key, stringValue);
 				}
 				this.#navigateWithParams(urlParams);
@@ -765,7 +848,7 @@ class SearchParams<Schema extends StandardSchemaV1> {
 			if (validatedValue === undefined || validatedValue === null || isDefaultValue) {
 				newSearchParams.delete(key);
 			} else {
-				const stringValue = this.#serializeValue(validatedValue);
+				const stringValue = this.#serializeValue(validatedValue, key);
 				newSearchParams.set(key, stringValue);
 			}
 		}
@@ -803,7 +886,7 @@ class SearchParams<Schema extends StandardSchemaV1> {
 					continue;
 				}
 
-				const stringValue = this.#serializeValue(value);
+				const stringValue = this.#serializeValue(value, key);
 				newSearchParams.set(key, stringValue);
 			}
 
@@ -847,16 +930,8 @@ class SearchParams<Schema extends StandardSchemaV1> {
 	 * Handles arrays, objects, dates, and primitive values
 	 * @private
 	 */
-	#serializeValue(value: unknown): string {
-		if (value instanceof Date) {
-			return value.toISOString();
-		} else if (Array.isArray(value)) {
-			return JSON.stringify(value);
-		} else if (typeof value === "object" && value !== null) {
-			return JSON.stringify(value);
-		} else {
-			return String(value);
-		}
+	#serializeValue(value: unknown, key?: string): string {
+		return serializeValue(value, key || "", this.#dateFormats);
 	}
 
 	#extractParamValues(searchParams: URLSearchParams): Record<string, unknown> {
@@ -1020,7 +1095,7 @@ export type SchemaTypeConfig<ArrayType = unknown, ObjectType = unknown> =
 	| { type: "string"; default?: string }
 	| { type: "number"; default?: number }
 	| { type: "boolean"; default?: boolean }
-	| { type: "date"; default?: Date }
+	| { type: "date"; default?: Date; dateFormat?: "date" | "datetime" }
 	| { type: "array"; default?: ArrayType[]; arrayType?: ArrayType }
 	| { type: "object"; default?: ObjectType; objectType?: ObjectType };
 
@@ -1233,7 +1308,36 @@ export function createSearchParamsSchema<T extends Record<string, SchemaTypeConf
 				output: {} as Output,
 			},
 		},
-	};
+		// Store date format metadata as a custom property
+		__dateFormats: Object.entries(schema).reduce(
+			(acc, [key, config]) => {
+				if (config.type === "date" && config.dateFormat) {
+					acc[key] = config.dateFormat;
+				}
+				return acc;
+			},
+			{} as Record<string, "date" | "datetime">
+		),
+	} as StandardSchemaV1<
+		unknown,
+		{
+			[K in keyof T]: T[K] extends { type: "number" }
+				? number
+				: T[K] extends { type: "boolean" }
+					? boolean
+					: T[K] extends { type: "date" }
+						? Date
+						: T[K] extends { type: "array"; arrayType?: infer A }
+							? unknown extends A
+								? unknown[]
+								: A[]
+							: T[K] extends { type: "object"; objectType?: infer O }
+								? unknown extends O
+									? Record<string, unknown>
+									: O
+								: string;
+		}
+	> & { __dateFormats?: Record<string, "date" | "datetime"> };
 }
 
 /**
@@ -1279,9 +1383,10 @@ export function createSearchParamsSchema<T extends Record<string, SchemaTypeConf
 export function validateSearchParams<Schema extends StandardSchemaV1>(
 	url: URL,
 	schema: Schema,
-	options: { compressedParamName?: string } = {}
+	options: { compressedParamName?: string; dateFormats?: Record<string, "date" | "datetime"> } = {}
 ): { searchParams: URLSearchParams; data: StandardSchemaV1.InferOutput<Schema> } {
 	const compressedParamName = options.compressedParamName || "_data";
+	const dateFormats = options.dateFormats || {};
 	let validatedValue: Record<string, unknown> = {};
 
 	// Check if we're dealing with compressed data and handle appropriately
@@ -1368,23 +1473,10 @@ export function validateSearchParams<Schema extends StandardSchemaV1>(
 	// Create a new URLSearchParams object with the validated values
 	const newSearchParams = new URLSearchParams();
 
-	// Helper function to serialize values
-	const serializeValue = (value: unknown): string => {
-		if (value instanceof Date) {
-			return value.toISOString();
-		} else if (Array.isArray(value)) {
-			return JSON.stringify(value);
-		} else if (typeof value === "object" && value !== null) {
-			return JSON.stringify(value);
-		} else {
-			return String(value);
-		}
-	};
-
 	// Add each validated parameter to the URLSearchParams
 	for (const [key, value] of Object.entries(validatedValue)) {
 		if (value === undefined || value === null) continue;
-		const stringValue = serializeValue(value);
+		const stringValue = serializeValue(value, key, dateFormats);
 		newSearchParams.set(key, stringValue);
 	}
 
@@ -1555,54 +1647,44 @@ export function useSearchParams<Schema extends StandardSchemaV1>(
 			const schemaInfo = extractSchemaInfo(schema);
 
 			if (schemaInfo.keys.length > 0) {
-				// If compression is enabled, use SearchParams.update() method which handles compression
-				if (options.compress) {
-					// Call the update method with the default values to properly handle compression
-					searchParams.update(
-						schemaInfo.defaultValues as Partial<StandardSchemaV1.InferOutput<Schema>>
-					);
-				} else {
-					// For non-compressed mode, use the original approach
-					const currentParams = extractParamValues(
-						page.url.searchParams,
-						schemaInfo.numberFields,
-						schemaInfo.dateFields
-					);
-					const newSearchParams = new URLSearchParams(page.url.searchParams.toString());
-					let needsUpdate = false;
+				// Merge date formats from schema and options
+				const dateFormats = new Map(schemaInfo.dateFormats);
+				if (options.dateFormats) {
+					for (const [key, format] of Object.entries(options.dateFormats)) {
+						dateFormats.set(key, format);
+					}
+				}
 
-					// For each default value, add it to the URL if not already present
-					for (const [key, defaultValue] of Object.entries(schemaInfo.defaultValues)) {
-						// Skip if the parameter is already in the URL (don't override user values)
-						if (key in currentParams) continue;
+				// For non-compressed mode, manually build the URL
+				const currentParams = extractParamValues(
+					page.url.searchParams,
+					schemaInfo.numberFields,
+					schemaInfo.dateFields
+				);
+				const newSearchParams = new URLSearchParams(page.url.searchParams.toString());
+				let needsUpdate = false;
 
-						needsUpdate = true;
+				// For each default value, add it to the URL if not already present
+				for (const [key, defaultValue] of Object.entries(schemaInfo.defaultValues)) {
+					// Skip if the parameter is already in the URL (don't override user values)
+					if (key in currentParams) continue;
 
-						if (defaultValue === null || defaultValue === undefined) {
-							continue;
-						}
+					needsUpdate = true;
 
-						// Use the same serialization logic as the rest of the system
-						let stringValue: string;
-						if (defaultValue instanceof Date) {
-							stringValue = defaultValue.toISOString();
-						} else if (Array.isArray(defaultValue)) {
-							stringValue = JSON.stringify(defaultValue);
-						} else if (typeof defaultValue === "object" && defaultValue !== null) {
-							stringValue = JSON.stringify(defaultValue);
-						} else {
-							stringValue = String(defaultValue);
-						}
-
-						newSearchParams.set(key, stringValue);
+					if (defaultValue === null || defaultValue === undefined) {
+						continue;
 					}
 
-					// Only update the URL if we added parameters
-					if (needsUpdate) {
-						// Always use replaceState: true for initialization to avoid creating a new history entry
-						// Don't use debouncing for initialization as this is a one-time operation
-						goto("?" + newSearchParams.toString(), { replaceState: true });
-					}
+					// Use shared serialization logic that respects date formats
+					const stringValue = serializeValue(defaultValue, key, dateFormats);
+					newSearchParams.set(key, stringValue);
+				}
+
+				// Only update the URL if we added parameters
+				if (needsUpdate) {
+					// Always use replaceState: true for initialization to avoid creating a new history entry
+					// Don't use debouncing for initialization as this is a one-time operation
+					goto("?" + newSearchParams.toString(), { replaceState: true });
 				}
 			}
 		}

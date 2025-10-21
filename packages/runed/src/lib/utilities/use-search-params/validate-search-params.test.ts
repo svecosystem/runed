@@ -1,6 +1,13 @@
-import { describe, it, expect, vi } from "vitest";
+import { describe, it, expect, vi, beforeAll } from "vitest";
 import { createSearchParamsSchema, validateSearchParams } from "./use-search-params.svelte.js";
 import * as lzString from "lz-string";
+
+// Set timezone to EDT (America/New_York) for consistent test results
+beforeAll(() => {
+	if (!process.env.TZ) {
+		process.env.TZ = "America/New_York";
+	}
+});
 
 // Reuse the schema from the test page
 const testSchema = createSearchParamsSchema({
@@ -9,12 +16,6 @@ const testSchema = createSearchParamsSchema({
 	active: { type: "boolean", default: false },
 	tags: { type: "array", default: [], arrayType: "" },
 	config: { type: "object", default: {}, objectType: { theme: "" } },
-});
-
-// Schema with date support for testing
-const dateSchema = createSearchParamsSchema({
-	page: { type: "number", default: 1 },
-	filter: { type: "string", default: "" },
 	startDate: { type: "date", default: new Date("2023-01-01T00:00:00Z") },
 	endDate: { type: "date", default: new Date("2023-12-31T23:59:59Z") },
 });
@@ -23,7 +24,8 @@ const dateSchema = createSearchParamsSchema({
 const createURL = (search: string) => new URL(`http://localhost:5173${search}`);
 
 // Define expected default string once
-const expectedDefaultsString = "page=1&filter=&active=false&tags=%5B%5D&config=%7B%7D";
+const expectedDefaultsString =
+	"page=1&filter=&active=false&tags=%5B%5D&config=%7B%7D&startDate=2023-01-01T00%3A00%3A00.000Z&endDate=2023-12-31T23%3A59%3A59.000Z";
 
 describe("validateSearchParams", () => {
 	it("parses standard URL parameters correctly, including defaults for missing", () => {
@@ -477,7 +479,7 @@ describe("validateSearchParams", () => {
 			const url = createURL(
 				"?page=3&filter=test&startDate=2023-06-15T10:30:00.000Z&endDate=2023-06-20T18:00:00.000Z"
 			);
-			const { searchParams, data } = validateSearchParams(url, dateSchema);
+			const { searchParams, data } = validateSearchParams(url, testSchema);
 
 			// Check URLSearchParams
 			expect(searchParams.get("page")).toBe("3");
@@ -496,7 +498,7 @@ describe("validateSearchParams", () => {
 
 		it("returns default Date values when dates are missing from URL", () => {
 			const url = createURL("?page=5&filter=test"); // No date parameters
-			const { searchParams, data } = validateSearchParams(url, dateSchema);
+			const { searchParams, data } = validateSearchParams(url, testSchema);
 
 			// Check URLSearchParams - should include defaults
 			expect(searchParams.get("page")).toBe("5");
@@ -514,14 +516,14 @@ describe("validateSearchParams", () => {
 		});
 
 		it("handles invalid date strings by falling back to defaults", () => {
-			const url = createURL("?startDate=invalid-date&endDate=2023-06-20T18:00:00.000Z");
-			const { searchParams, data } = validateSearchParams(url, dateSchema);
+			const url = createURL("?endDate=invalid-date");
+			const { searchParams, data } = validateSearchParams(url, testSchema);
 
 			// Check URLSearchParams - invalid date should use default
 			expect(searchParams.get("page")).toBe("1"); // default
 			expect(searchParams.get("filter")).toBe(""); // default
 			expect(searchParams.get("startDate")).toBe("2023-01-01T00:00:00.000Z"); // default (invalid input)
-			expect(searchParams.get("endDate")).toBe("2023-06-20T18:00:00.000Z"); // valid input
+			expect(searchParams.get("endDate")).toBe("2023-12-31T23:59:59.000Z"); // default (invalid input)
 
 			// Check typed data object
 			expect(data.page).toBe(1);
@@ -529,7 +531,7 @@ describe("validateSearchParams", () => {
 			expect(data.startDate).toBeInstanceOf(Date);
 			expect(data.endDate).toBeInstanceOf(Date);
 			expect(data.startDate.toISOString()).toBe("2023-01-01T00:00:00.000Z");
-			expect(data.endDate.toISOString()).toBe("2023-06-20T18:00:00.000Z");
+			expect(data.endDate.toISOString()).toBe("2023-12-31T23:59:59.000Z");
 		});
 
 		it("handles compressed parameters with dates", () => {
@@ -547,7 +549,7 @@ describe("validateSearchParams", () => {
 				})
 			);
 			const url = createURL(`?_data=${compressed}`);
-			const { searchParams, data } = validateSearchParams(url, dateSchema);
+			const { searchParams, data } = validateSearchParams(url, testSchema);
 
 			// Check URLSearchParams
 			expect(searchParams.get("page")).toBe("5");
@@ -562,6 +564,39 @@ describe("validateSearchParams", () => {
 			expect(data.endDate).toBeInstanceOf(Date);
 			expect(data.startDate.toISOString()).toBe("2023-06-15T10:30:00.000Z");
 			expect(data.endDate.toISOString()).toBe("2023-06-20T18:00:00.000Z");
+		});
+
+		it("respects dateFormats option for date-only serialization", () => {
+			// Use date-only format in URL (parsed as UTC midnight)
+			const url = createURL("?startDate=2023-06-15&endDate=2023-06-20T18:00:00.000Z");
+			const { searchParams, data } = validateSearchParams(url, testSchema, {
+				dateFormats: {
+					startDate: "date", // Date-only format
+					endDate: "datetime", // Full datetime format
+				},
+			});
+
+			// startDate should be serialized as YYYY-MM-DD (date-only format)
+			expect(searchParams.get("startDate")).toBe("2023-06-15");
+			// endDate should be serialized as full ISO8601 (datetime)
+			expect(searchParams.get("endDate")).toBe("2023-06-20T18:00:00.000Z");
+
+			// Check that startDate was parsed correctly
+			expect(data.startDate).toBeInstanceOf(Date);
+			// Date-only strings like "2023-06-15" are parsed as UTC midnight
+			expect(data.startDate.toISOString()).toBe("2023-06-15T00:00:00.000Z");
+		});
+
+		it("uses datetime format by default when dateFormats not specified", () => {
+			const url = createURL("?startDate=2023-06-15T10:30:00.000Z");
+			const { searchParams, data } = validateSearchParams(url, testSchema);
+
+			// Should use full ISO8601 by default (datetime format)
+			expect(searchParams.get("startDate")).toBe("2023-06-15T10:30:00.000Z");
+
+			// Check that the date was parsed correctly
+			expect(data.startDate).toBeInstanceOf(Date);
+			expect(data.startDate.toISOString()).toBe("2023-06-15T10:30:00.000Z");
 		});
 	});
 });

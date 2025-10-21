@@ -249,7 +249,106 @@ URL storage format:
 
 - Arrays are stored as JSON strings: `?tags=["sale","featured"]`
 - Objects are stored as JSON strings: `?config={"theme":"dark","fontSize":14}`
+- Dates are stored as ISO8601 strings: `?createdAt=2023-12-01T10:30:00.000Z` (or `YYYY-MM-DD` with
+  date-only format)
 - Primitive values are stored directly: `?page=2&filter=red`
+
+#### Date Format Support
+
+You can control how Date parameters are serialized in URLs using two approaches:
+
+**Option 1: Using `dateFormat` property in schema**
+
+```ts
+const schema = createSearchParamsSchema({
+	// Date-only format (YYYY-MM-DD) - great for birth dates, event dates
+	birthDate: {
+		type: "date",
+		default: new Date("1990-01-15"),
+		dateFormat: "date"
+	},
+
+	// Full datetime format (ISO8601) - great for timestamps
+	createdAt: {
+		type: "date",
+		default: new Date(),
+		dateFormat: "datetime"
+	},
+
+	// No format specified - defaults to 'datetime'
+	updatedAt: {
+		type: "date",
+		default: new Date()
+	}
+});
+
+const params = useSearchParams(schema);
+// URL: ?birthDate=1990-01-15&createdAt=2023-01-01T10:30:00.000Z&updatedAt=2023-12-25T18:30:00.000Z
+```
+
+**Option 2: Using `dateFormats` option (works with any validator)**
+
+```ts
+// Works with Zod, Valibot, Arktype, or createSearchParamsSchema
+const params = useSearchParams(zodSchema, {
+	dateFormats: {
+		birthDate: "date", // YYYY-MM-DD
+		createdAt: "datetime" // ISO8601
+	}
+});
+```
+
+**Date Format Details:**
+
+- **`'date'` format**: Serializes as `YYYY-MM-DD` (e.g., `2025-10-21`)
+  - More readable in URLs
+  - Perfect for calendar dates, birth dates, event dates
+  - Parsed as Date object with time set to midnight UTC
+- **`'datetime'` format** (default): Serializes as full ISO8601 (e.g., `2025-10-21T18:18:14.196Z`)
+  - Preserves exact time information
+  - Perfect for timestamps, created/updated times
+  - Full precision date and time
+
+**Practical Example:**
+
+```svelte
+<script lang="ts">
+	import { useSearchParams, createSearchParamsSchema } from "runed/kit";
+
+	const schema = createSearchParamsSchema({
+		eventDate: {
+			type: "date",
+			default: new Date("2025-01-01"),
+			dateFormat: "date"
+		},
+		createdAt: {
+			type: "date",
+			default: new Date(),
+			dateFormat: "datetime"
+		}
+	});
+
+	const params = useSearchParams(schema);
+</script>
+
+<label>
+	Event Date:
+	<input
+		type="date"
+		value={params.eventDate.toISOString().split("T")[0]}
+		oninput={(e) => (params.eventDate = new Date(e.target.value))} />
+</label>
+
+<label>
+	Created At:
+	<input
+		type="datetime-local"
+		value={params.createdAt.toISOString().slice(0, 16)}
+		oninput={(e) => (params.createdAt = new Date(e.target.value))} />
+</label>
+
+<!-- URL will be: ?eventDate=2025-01-01&createdAt=2025-10-21T18:18:14.196Z -->
+```
 
 ### `validateSearchParams`
 
@@ -266,12 +365,17 @@ Handles both standard URL parameters and compressed parameters (when compression
 
 - `url`: The URL object from SvelteKit load function
 - `schema`: A validation schema (createSearchParamsSchema, Zod, Valibot, etc.)
-- `options`: Optional configuration (like custom `compressedParamName`)
+- `options`: Optional configuration (like custom `compressedParamName` and `dateFormats`)
 
 **Returns:**
 
 - An object with `searchParams` and `data` properties, `searchParams` being the validated
   `URLSearchParams` and `data` being the validated object
+
+**Available options:**
+
+- `compressedParamName` (string): Custom name for compressed parameter (default: `_data`)
+- `dateFormats` (object): Map of field names to date formats (`'date'` or `'datetime'`)
 
 Example with SvelteKit page or layout load function:
 
@@ -283,7 +387,11 @@ export const load = ({ url, fetch }) => {
 	// Get validated search params as URLSearchParams object
 	// If you use a custom compressedParamName in useSearchParams, provide it here too:
 	const { searchParams } = validateSearchParams(url, productSchema, {
-		compressedParamName: "_compressed"
+		compressedParamName: "_compressed",
+		dateFormats: {
+			birthDate: "date", // Serialize as YYYY-MM-DD
+			createdAt: "datetime" // Serialize as ISO8601
+		}
 	});
 
 	// Use URLSearchParams directly with fetch
@@ -399,6 +507,20 @@ interface SearchParamsOptions {
 	 * @default false
 	 */
 	noScroll?: boolean;
+
+	/**
+	 * Specifies which date fields should use date-only format (YYYY-MM-DD) instead of full ISO8601 datetime.
+	 *
+	 * Map field names to their desired format:
+	 * - 'date': Serializes as YYYY-MM-DD (e.g., "2025-10-21")
+	 * - 'datetime': Serializes as full ISO8601 (e.g., "2025-10-21T18:18:14.196Z")
+	 *
+	 * Example:
+	 * { dateFormats: { birthDate: 'date', createdAt: 'datetime' } }
+	 *
+	 * @default undefined (all dates use datetime format)
+	 */
+	dateFormats?: Record<string, "date" | "datetime">;
 }
 
 type ReturnUseSearchParams<Schema extends StandardSchemaV1> = {
@@ -433,12 +555,13 @@ type ReturnUseSearchParams<Schema extends StandardSchemaV1> = {
 
 /**
  * Schema type for createSearchParamsSchema
- * Allows specifying more precise types for arrays and objects
+ * Allows specifying more precise types for arrays, objects, and dates
  */
 type SchemaTypeConfig<ArrayType = unknown, ObjectType = unknown> =
 	| { type: "string"; default?: string }
 	| { type: "number"; default?: number }
 	| { type: "boolean"; default?: boolean }
 	| { type: "array"; default?: ArrayType[]; arrayType?: ArrayType }
-	| { type: "object"; default?: ObjectType; objectType?: ObjectType };
+	| { type: "object"; default?: ObjectType; objectType?: ObjectType }
+	| { type: "date"; default?: Date; dateFormat?: "date" | "datetime" };
 ```

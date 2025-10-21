@@ -187,6 +187,27 @@ describe("createSearchParamsSchema", () => {
 			}
 		});
 
+		it("stores dateFormat metadata in schema", () => {
+			const schema = createSearchParamsSchema({
+				birthDate: { type: "date", default: new Date("1990-01-15T00:00:00Z"), dateFormat: "date" },
+				createdAt: {
+					type: "date",
+					default: new Date("2023-01-01T00:00:00Z"),
+					dateFormat: "datetime",
+				},
+				updatedAt: { type: "date", default: new Date("2023-01-01T00:00:00Z") }, // no format specified
+			});
+
+			// Check that dateFormat metadata is stored
+			const schemaWithMetadata = schema as typeof schema & {
+				__dateFormats?: Record<string, "date" | "datetime">;
+			};
+			expect(schemaWithMetadata.__dateFormats).toBeDefined();
+			expect(schemaWithMetadata.__dateFormats?.birthDate).toBe("date");
+			expect(schemaWithMetadata.__dateFormats?.createdAt).toBe("datetime");
+			expect(schemaWithMetadata.__dateFormats?.updatedAt).toBeUndefined(); // not specified
+		});
+
 		it("validates ISO8601 strings correctly (simulating URL parameters)", () => {
 			const schema = createSearchParamsSchema({
 				startDate: { type: "date", default: new Date("2023-01-01T00:00:00Z") },

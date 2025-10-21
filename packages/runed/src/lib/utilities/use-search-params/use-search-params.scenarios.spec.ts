@@ -42,6 +42,7 @@ const scenarios: Scenario[] = [
 const pageCount = (page: Page) => page.getByTestId("page");
 const filterText = (page: Page) => page.getByTestId("filter");
 const createdAtText = (page: Page) => page.getByTestId("createdAt");
+const updatedAtText = (page: Page) => page.getByTestId("updatedAt");
 
 function getExpectedURL(s: Scenario, action: "mount" | "inc" | "reset"): string | RegExp {
 	if (action === "mount") {
@@ -473,10 +474,11 @@ test.describe("useSearchParams scenarios", () => {
 			}
 
 			test("date parameter updates correctly", async ({ page }) => {
-				await page.getByTestId("setDate").click();
+				await page.getByTestId("setCreatedAt").click();
 
-				// Display should update immediately
-				await expect(createdAtText(page)).toHaveText("2023-06-15T10:30:00.000Z");
+				// createdAt has dateFormat: "date" in schema, so it's serialized as date-only
+				// and becomes UTC midnight when read back
+				await expect(createdAtText(page)).toHaveText("2023-06-15T00:00:00.000Z");
 
 				if (s.debounce) {
 					await page.waitForTimeout(250);
@@ -491,11 +493,135 @@ test.describe("useSearchParams scenarios", () => {
 					const data = url.searchParams.get("_data")!;
 					const decompressed = decompress(data)!;
 					const obj = JSON.parse(decompressed);
+					// Compressed data stores full ISO string, not date-only format
 					expect(obj.createdAt).toBe("2023-06-15T10:30:00.000Z");
 				} else {
-					await expect(page).toHaveURL(/createdAt=2023-06-15T10%3A30%3A00\.000Z/);
+					// createdAt uses date-only format from schema property
+					await expect(page).toHaveURL(/createdAt=2023-06-15/);
+					await expect(page).not.toHaveURL(/createdAt=2023-06-15T/);
 				}
 			});
 		});
 	}
+
+	// Test date format configuration (schema property and options)
+	test.describe("date-format-schema", () => {
+		const route = "/test-search/default";
+
+		test.beforeEach(async ({ page }) => {
+			await page.goto(route);
+			await page.waitForTimeout(300);
+		});
+
+		test("createdAt uses date-only format from schema property", async ({ page }) => {
+			const setCreatedAtButton = page.getByTestId("setCreatedAt");
+			await setCreatedAtButton.waitFor({ state: "visible" });
+			await setCreatedAtButton.click({ force: true });
+			await page.waitForTimeout(300);
+
+			// When date is serialized as date-only (2023-06-15) and read back,
+			// it becomes UTC midnight (2023-06-15T00:00:00.000Z)
+			await expect(createdAtText(page)).toHaveText("2023-06-15T00:00:00.000Z");
+
+			// URL should use date-only format (YYYY-MM-DD) because schema has dateFormat: "date"
+			await expect(page).toHaveURL(/createdAt=2023-06-15/);
+			await expect(page).not.toHaveURL(/createdAt=2023-06-15T/);
+		});
+
+		test("updatedAt uses datetime format by default", async ({ page }) => {
+			const setUpdatedAtButton = page.getByTestId("setUpdatedAt");
+			await setUpdatedAtButton.waitFor({ state: "visible" });
+			await setUpdatedAtButton.click({ force: true });
+			await page.waitForTimeout(300);
+
+			// Display should show full ISO string
+			await expect(updatedAtText(page)).toHaveText("2023-06-20T18:00:00.000Z");
+
+			// URL should use full datetime format (ISO8601) by default
+			await expect(page).toHaveURL(/updatedAt=2023-06-20T18%3A00%3A00\.000Z/);
+		});
+
+		test("date-only format from URL is parsed correctly", async ({ page }) => {
+			// Navigate with date-only format
+			await page.goto(`${route}?createdAt=2023-06-15`);
+			await page.waitForTimeout(300);
+
+			// Should parse as UTC midnight and display full ISO string
+			await expect(createdAtText(page)).toHaveText("2023-06-15T00:00:00.000Z");
+
+			// URL should preserve date-only format
+			await expect(page).toHaveURL(/createdAt=2023-06-15/);
+			await expect(page).not.toHaveURL(/createdAt=2023-06-15T/);
+		});
+	});
+
+	test.describe("date-format-options", () => {
+		const route = "/test-search/date-format-options";
+
+		test.beforeEach(async ({ page }) => {
+			await page.goto(route);
+			await page.waitForTimeout(300);
+		});
+
+		test("dateFormats option overrides schema property for createdAt", async ({ page }) => {
+			const setCreatedAtButton = page.getByTestId("setCreatedAt");
+			await setCreatedAtButton.waitFor({ state: "visible" });
+			await setCreatedAtButton.click({ force: true });
+			await page.waitForTimeout(300);
+
+			// When date is serialized as date-only (2023-06-15) and read back,
+			// it becomes UTC midnight (2023-06-15T00:00:00.000Z)
+			await expect(createdAtText(page)).toHaveText("2023-06-15T00:00:00.000Z");
+
+			// URL should use date-only format from options (overriding schema)
+			await expect(page).toHaveURL(/createdAt=2023-06-15/);
+			await expect(page).not.toHaveURL(/createdAt=2023-06-15T/);
+		});
+
+		test("dateFormats option sets datetime format for updatedAt", async ({ page }) => {
+			const setUpdatedAtButton = page.getByTestId("setUpdatedAt");
+			await setUpdatedAtButton.waitFor({ state: "visible" });
+			await setUpdatedAtButton.click({ force: true });
+			await page.waitForTimeout(300);
+
+			// Display should show full ISO string
+			await expect(updatedAtText(page)).toHaveText("2023-06-20T18:00:00.000Z");
+
+			// URL should use datetime format from options
+			await expect(page).toHaveURL(/updatedAt=2023-06-20T18%3A00%3A00\.000Z/);
+		});
+
+		test("mixed formats work correctly together", async ({ page }) => {
+			// Set both dates
+			await page.getByTestId("setCreatedAt").click();
+			await page.getByTestId("setUpdatedAt").click();
+			await page.waitForTimeout(300);
+
+			// createdAt serialized as date-only becomes UTC midnight when read back
+			await expect(createdAtText(page)).toHaveText("2023-06-15T00:00:00.000Z");
+			// updatedAt uses full datetime format
+			await expect(updatedAtText(page)).toHaveText("2023-06-20T18:00:00.000Z");
+
+			// createdAt should use date-only format
+			await expect(page).toHaveURL(/createdAt=2023-06-15/);
+			await expect(page).not.toHaveURL(/createdAt=2023-06-15T/);
+
+			// updatedAt should use datetime format
+			await expect(page).toHaveURL(/updatedAt=2023-06-20T18%3A00%3A00\.000Z/);
+		});
+
+		test("date-only format from URL remains date-only after updates", async ({ page }) => {
+			// Navigate with date-only format
+			await page.goto(`${route}?createdAt=2023-01-15`);
+			await page.waitForTimeout(300);
+
+			// Update the date
+			await page.getByTestId("setCreatedAt").click();
+			await page.waitForTimeout(100);
+
+			// Should still use date-only format in URL
+			await expect(page).toHaveURL(/createdAt=2023-06-15/);
+			await expect(page).not.toHaveURL(/createdAt=2023-06-15T/);
+		});
+	});
 });
