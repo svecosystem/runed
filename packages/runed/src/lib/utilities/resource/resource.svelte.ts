@@ -60,14 +60,14 @@ export type ResourceFetcher<Source, Data, RefetchInfo = unknown> = (
 	/** Current value of the source */
 	value: Source extends Array<unknown>
 		? {
-			[K in keyof Source]: Source[K];
-		}
+				[K in keyof Source]: Source[K];
+			}
 		: Source,
 	/** Previous value of the source */
 	previousValue: Source extends Array<unknown>
 		? {
-			[K in keyof Source]: Source[K];
-		}
+				[K in keyof Source]: Source[K];
+			}
 		: Source | undefined,
 	info: ResourceFetcherRefetchInfo<Data, RefetchInfo>
 ) => Promise<Data>;
@@ -128,7 +128,7 @@ function runResource<
 		Source,
 		Awaited<ReturnType<Fetcher>>,
 		RefetchInfo
-	// eslint-disable-next-line @typescript-eslint/no-explicit-any
+		// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	> = ResourceFetcher<Source, any, RefetchInfo>,
 >(
 	source: Getter<Source> | Array<Getter<Source>>,
@@ -152,7 +152,7 @@ function runResource<
 
 	// Create state
 	let current = $state<Awaited<ReturnType<Fetcher>> | undefined>(initialValue);
-	const loadings = new SvelteMap<number, boolean>()
+	const loadings = new SvelteMap<number, boolean>();
 	let fetchId = $state(0);
 	let error = $state<Error | undefined>(undefined);
 	let cleanupFns = $state<Array<() => void>>([]);
@@ -311,7 +311,7 @@ export function resource<
 		Source,
 		Awaited<ReturnType<Fetcher>>,
 		RefetchInfo
-	// eslint-disable-next-line @typescript-eslint/no-explicit-any
+		// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	> = ResourceFetcher<Source, any, RefetchInfo>,
 >(
 	source: Getter<Source>,
@@ -329,7 +329,7 @@ export function resource<
 		Source,
 		Awaited<ReturnType<Fetcher>>,
 		RefetchInfo
-	// eslint-disable-next-line @typescript-eslint/no-explicit-any
+		// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	> = ResourceFetcher<Source, any, RefetchInfo>,
 >(
 	source: Getter<Source>,
@@ -345,7 +345,7 @@ export function resource<
 		Sources,
 		Awaited<ReturnType<Fetcher>>,
 		RefetchInfo
-	// eslint-disable-next-line @typescript-eslint/no-explicit-any
+		// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	> = ResourceFetcher<Sources, any, RefetchInfo>,
 >(
 	sources: { [K in keyof Sources]: Getter<Sources[K]> },
@@ -363,7 +363,7 @@ export function resource<
 		Sources,
 		Awaited<ReturnType<Fetcher>>,
 		RefetchInfo
-	// eslint-disable-next-line @typescript-eslint/no-explicit-any
+		// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	> = ResourceFetcher<Sources, any, RefetchInfo>,
 >(
 	sources: { [K in keyof Sources]: Getter<Sources[K]> },
@@ -379,7 +379,7 @@ export function resource<
 		Source,
 		Awaited<ReturnType<Fetcher>>,
 		RefetchInfo
-	// eslint-disable-next-line @typescript-eslint/no-explicit-any
+		// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	> = ResourceFetcher<Source, any, RefetchInfo>,
 >(
 	source: Getter<Source> | Array<Getter<Source>>,
@@ -424,7 +424,7 @@ export function resourcePre<
 		Source,
 		Awaited<ReturnType<Fetcher>>,
 		RefetchInfo
-	// eslint-disable-next-line @typescript-eslint/no-explicit-any
+		// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	> = ResourceFetcher<Source, any, RefetchInfo>,
 >(
 	source: Getter<Source>,
@@ -442,7 +442,7 @@ export function resourcePre<
 		Source,
 		Awaited<ReturnType<Fetcher>>,
 		RefetchInfo
-	// eslint-disable-next-line @typescript-eslint/no-explicit-any
+		// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	> = ResourceFetcher<Source, any, RefetchInfo>,
 >(
 	source: Getter<Source>,
@@ -458,7 +458,7 @@ export function resourcePre<
 		Sources,
 		Awaited<ReturnType<Fetcher>>,
 		RefetchInfo
-	// eslint-disable-next-line @typescript-eslint/no-explicit-any
+		// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	> = ResourceFetcher<Sources, any, RefetchInfo>,
 >(
 	sources: {
@@ -478,7 +478,7 @@ export function resourcePre<
 		Sources,
 		Awaited<ReturnType<Fetcher>>,
 		RefetchInfo
-	// eslint-disable-next-line @typescript-eslint/no-explicit-any
+		// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	> = ResourceFetcher<Sources, any, RefetchInfo>,
 >(
 	sources: {
@@ -496,7 +496,7 @@ export function resourcePre<
 		Source,
 		Awaited<ReturnType<Fetcher>>,
 		RefetchInfo
-	// eslint-disable-next-line @typescript-eslint/no-explicit-any
+		// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	> = ResourceFetcher<Source, any, RefetchInfo>,
 >(
 	source: Getter<Source> | Array<Getter<Source>>,

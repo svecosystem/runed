@@ -127,22 +127,21 @@ describe("resource", () => {
 				async (input, _, { signal }): Promise<number> => {
 					return new Promise((resolve, reject) => {
 						signal.onabort = () => {
-							reject(new Error("Aborted " + input))
+							reject(new Error("Aborted " + input));
 						};
 						sleep(300).then(() => resolve(input));
-					})
+					});
 				}
-			)
+			);
 			for (let i = 0; i < 5; i++) {
 				await sleep(50);
 				expect(dataRaceResource.loading).toBe(true);
-				input += 1
-
+				input += 1;
 			}
 
 			await sleep(500);
 			expect(dataRaceResource.loading).toBe(false);
-		})
+		});
 	});
 
 	describe("error handling", () => {
