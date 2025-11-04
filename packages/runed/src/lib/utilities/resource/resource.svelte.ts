@@ -1,5 +1,7 @@
 import { watch } from "$lib/utilities/watch/index.js";
 import type { Getter } from "$lib/internal/types.js";
+import { SvelteMap } from "svelte/reactivity";
+import { untrack } from "svelte";
 
 /**
  * Configuration options for the resource function
@@ -58,14 +60,14 @@ export type ResourceFetcher<Source, Data, RefetchInfo = unknown> = (
 	/** Current value of the source */
 	value: Source extends Array<unknown>
 		? {
-				[K in keyof Source]: Source[K];
-			}
+			[K in keyof Source]: Source[K];
+		}
 		: Source,
 	/** Previous value of the source */
 	previousValue: Source extends Array<unknown>
 		? {
-				[K in keyof Source]: Source[K];
-			}
+			[K in keyof Source]: Source[K];
+		}
 		: Source | undefined,
 	info: ResourceFetcherRefetchInfo<Data, RefetchInfo>
 ) => Promise<Data>;
@@ -126,7 +128,7 @@ function runResource<
 		Source,
 		Awaited<ReturnType<Fetcher>>,
 		RefetchInfo
-		// eslint-disable-next-line @typescript-eslint/no-explicit-any
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	> = ResourceFetcher<Source, any, RefetchInfo>,
 >(
 	source: Getter<Source> | Array<Getter<Source>>,
@@ -150,7 +152,8 @@ function runResource<
 
 	// Create state
 	let current = $state<Awaited<ReturnType<Fetcher>> | undefined>(initialValue);
-	let loading = $state(false);
+	const loadings = new SvelteMap<number, boolean>()
+	let fetchId = $state(0);
 	let error = $state<Error | undefined>(undefined);
 	let cleanupFns = $state<Array<() => void>>([]);
 
@@ -171,8 +174,9 @@ function runResource<
 		previousValue: Source | undefined | Array<Source | undefined>,
 		refetching: RefetchInfo | boolean = false
 	): Promise<Awaited<ReturnType<Fetcher>> | undefined> => {
+		const currentFetchId = ++fetchId;
 		try {
-			loading = true;
+			loadings.set(currentFetchId, true);
 			error = undefined;
 			runCleanup();
 
@@ -196,7 +200,7 @@ function runResource<
 			}
 			return undefined;
 		} finally {
-			loading = false;
+			loadings.delete(currentFetchId);
 		}
 	};
 
@@ -232,7 +236,7 @@ function runResource<
 			return current;
 		},
 		get loading() {
-			return loading;
+			return loadings.get(fetchId) ?? false;
 		},
 		get error() {
 			return error;
@@ -307,7 +311,7 @@ export function resource<
 		Source,
 		Awaited<ReturnType<Fetcher>>,
 		RefetchInfo
-		// eslint-disable-next-line @typescript-eslint/no-explicit-any
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	> = ResourceFetcher<Source, any, RefetchInfo>,
 >(
 	source: Getter<Source>,
@@ -325,7 +329,7 @@ export function resource<
 		Source,
 		Awaited<ReturnType<Fetcher>>,
 		RefetchInfo
-		// eslint-disable-next-line @typescript-eslint/no-explicit-any
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	> = ResourceFetcher<Source, any, RefetchInfo>,
 >(
 	source: Getter<Source>,
@@ -341,7 +345,7 @@ export function resource<
 		Sources,
 		Awaited<ReturnType<Fetcher>>,
 		RefetchInfo
-		// eslint-disable-next-line @typescript-eslint/no-explicit-any
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	> = ResourceFetcher<Sources, any, RefetchInfo>,
 >(
 	sources: { [K in keyof Sources]: Getter<Sources[K]> },
@@ -359,7 +363,7 @@ export function resource<
 		Sources,
 		Awaited<ReturnType<Fetcher>>,
 		RefetchInfo
-		// eslint-disable-next-line @typescript-eslint/no-explicit-any
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	> = ResourceFetcher<Sources, any, RefetchInfo>,
 >(
 	sources: { [K in keyof Sources]: Getter<Sources[K]> },
@@ -375,7 +379,7 @@ export function resource<
 		Source,
 		Awaited<ReturnType<Fetcher>>,
 		RefetchInfo
-		// eslint-disable-next-line @typescript-eslint/no-explicit-any
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	> = ResourceFetcher<Source, any, RefetchInfo>,
 >(
 	source: Getter<Source> | Array<Getter<Source>>,
@@ -420,7 +424,7 @@ export function resourcePre<
 		Source,
 		Awaited<ReturnType<Fetcher>>,
 		RefetchInfo
-		// eslint-disable-next-line @typescript-eslint/no-explicit-any
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	> = ResourceFetcher<Source, any, RefetchInfo>,
 >(
 	source: Getter<Source>,
@@ -438,7 +442,7 @@ export function resourcePre<
 		Source,
 		Awaited<ReturnType<Fetcher>>,
 		RefetchInfo
-		// eslint-disable-next-line @typescript-eslint/no-explicit-any
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	> = ResourceFetcher<Source, any, RefetchInfo>,
 >(
 	source: Getter<Source>,
@@ -454,7 +458,7 @@ export function resourcePre<
 		Sources,
 		Awaited<ReturnType<Fetcher>>,
 		RefetchInfo
-		// eslint-disable-next-line @typescript-eslint/no-explicit-any
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	> = ResourceFetcher<Sources, any, RefetchInfo>,
 >(
 	sources: {
@@ -474,7 +478,7 @@ export function resourcePre<
 		Sources,
 		Awaited<ReturnType<Fetcher>>,
 		RefetchInfo
-		// eslint-disable-next-line @typescript-eslint/no-explicit-any
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	> = ResourceFetcher<Sources, any, RefetchInfo>,
 >(
 	sources: {
@@ -492,7 +496,7 @@ export function resourcePre<
 		Source,
 		Awaited<ReturnType<Fetcher>>,
 		RefetchInfo
-		// eslint-disable-next-line @typescript-eslint/no-explicit-any
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	> = ResourceFetcher<Source, any, RefetchInfo>,
 >(
 	source: Getter<Source> | Array<Getter<Source>>,
