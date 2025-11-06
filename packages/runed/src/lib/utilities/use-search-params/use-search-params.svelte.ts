@@ -137,6 +137,12 @@ function serializeValue(
 		return String(value);
 	}
 }
+type ExtractParamValuesOptions = {
+	numberFields?: Set<string>;
+	arrayFields?: Set<string>;
+	dateFields?: Set<string>;
+	codecFields?: Set<string>;
+};
 
 /**
  * Extract and pre-process values from URLSearchParams
@@ -146,17 +152,22 @@ function serializeValue(
  *
  * @param searchParams The URLSearchParams object to extract values from
  * @param numberFields Optional set of field names that should be treated as numbers
+ * @param arrayFields Optional set of field names that should be treated as arrays (comma-separated values will be split)
  * @param dateFields Optional set of field names that should be treated as dates
  * @param codecFields Optional set of field names that have codecs (skip automatic conversion for these)
  * @returns An object with processed parameter values
  * @internal
  */
-function extractParamValues(
+export function extractParamValues(
 	searchParams: URLSearchParams,
-	numberFields: Set<string> = new Set(),
-	dateFields: Set<string> = new Set(),
-	codecFields: Set<string> = new Set()
+	options: ExtractParamValuesOptions = {}
 ): Record<string, unknown> {
+	const {
+		numberFields = new Set(),
+		arrayFields = new Set(),
+		dateFields = new Set(),
+		codecFields = new Set(),
+	} = options;
 	const params: Record<string, unknown> = {};
 
 	for (const [key, value] of searchParams.entries()) {
@@ -196,7 +207,7 @@ function extractParamValues(
 				}
 			}
 			// Handle comma-separated values as arrays (fallback format)
-			else if (value.includes(",")) {
+			else if (arrayFields.has(key) && value.includes(",")) {
 				params[key] = value.split(",");
 			}
 			// Keep everything else as strings (including codec fields)
@@ -226,6 +237,8 @@ interface SchemaInfo {
 	dateFields: Set<string>;
 	/** Map of date field names to their format ('date' or 'datetime') */
 	dateFormats: Map<string, "date" | "datetime">;
+	/** Set of field names that expect array types */
+	arrayFields: Set<string>;
 	/** Default values for all fields */
 	defaultValues: Record<string, unknown>;
 	/** Map of field names to their codec encode functions (for serialization) */
@@ -297,6 +310,7 @@ function extractSchemaInfo<Schema extends StandardSchemaV1>(schema: Schema): Sch
 			defaultValues: {},
 			codecEncoders: new Map(),
 			codecFields: new Set(),
+			arrayFields: new Set(),
 		};
 	}
 
@@ -307,13 +321,16 @@ function extractSchemaInfo<Schema extends StandardSchemaV1>(schema: Schema): Sch
 	const dateFormats = new Map<string, "date" | "datetime">();
 	const codecEncoders = new Map<string, (value: unknown) => unknown>();
 	const codecFields = new Set<string>();
+	const arrayFields = new Set<string>();
 
-	// Determine which fields are number or date types by checking default value types
+	// Determine which fields are number, date or array types by checking default value types
 	for (const [key, defaultValue] of Object.entries(defaultValues)) {
 		if (typeof defaultValue === "number") {
 			numberFields.add(key);
 		} else if (defaultValue instanceof Date) {
 			dateFields.add(key);
+		} else if (Array.isArray(defaultValue)) {
+			arrayFields.add(key);
 		}
 	}
 
@@ -348,6 +365,7 @@ function extractSchemaInfo<Schema extends StandardSchemaV1>(schema: Schema): Sch
 		defaultValues,
 		codecEncoders,
 		codecFields,
+		arrayFields,
 	};
 }
 
@@ -359,6 +377,7 @@ function extractSchemaInfo<Schema extends StandardSchemaV1>(schema: Schema): Sch
  * @param searchParams The URLSearchParams object to extract values from
  * @param schemaKeys Array of parameter keys that are defined in the schema
  * @param numberFields Set of field names that should be treated as numbers
+ * @param arrayFields Set of field names that should be treated as arrays (comma-separated values will be split)
  * @param dateFields Set of field names that should be treated as dates
  * @param codecFields Set of field names that have codecs (skip automatic conversion for these)
  * @returns An object with processed parameter values for schema-defined keys only
@@ -367,10 +386,14 @@ function extractSchemaInfo<Schema extends StandardSchemaV1>(schema: Schema): Sch
 function extractSelectiveParamValues(
 	searchParams: URLSearchParams,
 	schemaKeys: string[],
-	numberFields: Set<string> = new Set(),
-	dateFields: Set<string> = new Set(),
-	codecFields: Set<string> = new Set()
+	options: ExtractParamValuesOptions = {}
 ): Record<string, unknown> {
+	const {
+		numberFields = new Set(),
+		arrayFields = new Set(),
+		dateFields = new Set(),
+		codecFields = new Set(),
+	} = options;
 	const params: Record<string, unknown> = {};
 
 	// Only access parameters that are defined in the schema
@@ -414,8 +437,8 @@ function extractSelectiveParamValues(
 					params[key] = value; // Keep as string if not a valid date
 				}
 			}
-			// Handle comma-separated values as arrays (fallback format)
-			else if (value.includes(",")) {
+			// Handle comma-separated values as arrays (fallback format) - ONLY for array fields
+			else if (arrayFields.has(key) && value.includes(",")) {
 				params[key] = value.split(",");
 			}
 			// Keep everything else as strings (including codec fields)
@@ -563,6 +586,12 @@ class SearchParams<Schema extends StandardSchemaV1> {
 	#codecFields: Set<string>;
 
 	/**
+	 * Set of field names that expect array types based on schema validation
+	 * Used to determine when to split comma-separated values into arrays
+	 */
+	#arrayFields: Set<string>;
+
+	/**
 	 * Timer ID for debouncing URL updates
 	 * @private
 	 */
@@ -617,6 +646,8 @@ class SearchParams<Schema extends StandardSchemaV1> {
 		// Store default values, number fields, and date fields
 		this.#defaultValues = { ...schemaInfo.defaultValues };
 		this.#numberFields = schemaInfo.numberFields;
+		this.#numberFields = schemaInfo.numberFields;
+		this.#arrayFields = schemaInfo.arrayFields;
 		this.#dateFields = schemaInfo.dateFields;
 
 		// Merge date formats from schema info and options
@@ -626,8 +657,6 @@ class SearchParams<Schema extends StandardSchemaV1> {
 				this.#dateFormats.set(key, format);
 			}
 		}
-
-		// Store codec encoders
 		this.#codecEncoders = schemaInfo.codecEncoders;
 		this.#codecFields = schemaInfo.codecFields;
 	}
@@ -740,6 +769,46 @@ class SearchParams<Schema extends StandardSchemaV1> {
 			clearTimeout(this.#debounceTimer);
 			this.#debounceTimer = null;
 		}
+	}
+
+	/**
+	 * Sync local cache from URL search params
+	 * This is called when the URL changes externally (e.g., browser back/forward navigation)
+	 * @internal
+	 */
+	syncFromURL(urlParams: URLSearchParams): void {
+		const compressedParamName = this.#options.compressedParamName ?? "_data";
+
+		// Handle compressed mode
+		if (this.#options.compress && urlParams.has(compressedParamName)) {
+			try {
+				const compressedData = urlParams.get(compressedParamName) ?? "";
+				const decompressed = lzString.decompressFromEncodedURIComponent(compressedData);
+
+				if (decompressed) {
+					const decompressedObj = JSON.parse(decompressed);
+					const newCache = new SvelteURLSearchParams();
+
+					// populate cache with decompressed values
+					for (const [key, value] of Object.entries(decompressedObj)) {
+						const stringValue = this.#serializeValue(value);
+						newCache.set(key, stringValue);
+					}
+
+					untrack(() => (this.#localCache = newCache));
+					return;
+				}
+			} catch (e) {
+				console.error("Error syncing cache from compressed URL", e);
+			}
+		}
+
+		// Normal mode - copy current URL params to cache
+		const newCache = new SvelteURLSearchParams();
+		for (const [key, value] of urlParams.entries()) {
+			newCache.set(key, value);
+		}
+		untrack(() => (this.#localCache = newCache));
 	}
 
 	/**
@@ -1081,13 +1150,13 @@ class SearchParams<Schema extends StandardSchemaV1> {
 			return {};
 		}
 
-		// If not using compression, use the normal extraction with number, date, and codec field detection
-		return extractParamValues(
-			searchParams,
-			this.#numberFields,
-			this.#dateFields,
-			this.#codecFields
-		);
+		// If not using compression, use the normal extraction with number and array field detection
+		return extractParamValues(searchParams, {
+			numberFields: this.#numberFields,
+			arrayFields: this.#arrayFields,
+			dateFields: this.#dateFields,
+			codecFields: this.#codecFields,
+		});
 	}
 
 	/**
@@ -1585,13 +1654,12 @@ export function validateSearchParams<Schema extends StandardSchemaV1>(
 	} else {
 		// Normal (uncompressed) extraction - use selective extraction for fine-grained reactivity
 		const schemaInfo = extractSchemaInfo(schema);
-		const paramsObject = extractSelectiveParamValues(
-			url.searchParams,
-			schemaInfo.keys,
-			schemaInfo.numberFields,
-			schemaInfo.dateFields,
-			schemaInfo.codecFields
-		);
+		const paramsObject = extractSelectiveParamValues(url.searchParams, schemaInfo.keys, {
+			numberFields: schemaInfo.numberFields,
+			dateFields: schemaInfo.dateFields,
+			codecFields: schemaInfo.codecFields,
+			arrayFields: schemaInfo.arrayFields,
+		});
 
 		// Validate the parameters against the schema
 		let result = schema["~standard"].validate(paramsObject);
@@ -1753,19 +1821,22 @@ export function useSearchParams<Schema extends StandardSchemaV1>(
 	// Wait for hydration to complete before executing browser-specific initialization
 	const isMounted = new IsMounted();
 
+	// Track if we've done initial setup (separate from cache initialization)
+	let hasInitialized = false;
+
 	// Only run initialization logic after hydration is complete
 	$effect(() => {
-		if (!isMounted.current || !browser || building) return;
+		if (!isMounted.current || building) return;
 
-		// Remove incorrect params on initialization (only after hydration)
-		if (options.updateURL !== false) {
+		// Remove incorrect params on initialization (only after hydration, only once)
+		if (!hasInitialized && options.updateURL !== false) {
 			const schemaInfo = extractSchemaInfo(schema);
-			const currentParams = extractParamValues(
-				page.url.searchParams,
-				schemaInfo.numberFields,
-				schemaInfo.dateFields,
-				schemaInfo.codecFields
-			);
+			const currentParams = extractParamValues(page.url.searchParams, {
+				numberFields: schemaInfo.numberFields,
+				dateFields: schemaInfo.dateFields,
+				codecFields: schemaInfo.codecFields,
+				arrayFields: schemaInfo.arrayFields,
+			});
 			const validationResult = schema["~standard"].validate(currentParams);
 			if (
 				validationResult &&
@@ -1789,8 +1860,8 @@ export function useSearchParams<Schema extends StandardSchemaV1>(
 			}
 		}
 
-		// If showDefaults is true, we need to initialize the URL with all default values (only after hydration)
-		if (options.showDefaults) {
+		// If showDefaults is true, we need to initialize the URL with all default values (only after hydration, only once)
+		if (!hasInitialized && options.showDefaults) {
 			// Get all the schema information in one pass
 			const schemaInfo = extractSchemaInfo(schema);
 
@@ -1802,41 +1873,64 @@ export function useSearchParams<Schema extends StandardSchemaV1>(
 						dateFormats.set(key, format);
 					}
 				}
+				// If compression is enabled, use SearchParams.update() method which handles compression
+				if (options.compress) {
+					// Call the update method with the default values to properly handle compression
+					searchParams.update(
+						schemaInfo.defaultValues as Partial<StandardSchemaV1.InferOutput<Schema>>
+					);
+				} else {
+					// For non-compressed mode, manually build the URL
+					const currentParams = extractParamValues(page.url.searchParams, {
+						numberFields: schemaInfo.numberFields,
+						dateFields: schemaInfo.dateFields,
+						codecFields: schemaInfo.codecFields,
+						arrayFields: schemaInfo.arrayFields,
+					});
+					const newSearchParams = new URLSearchParams(page.url.searchParams.toString());
+					let needsUpdate = false;
 
-				// For non-compressed mode, manually build the URL
-				const currentParams = extractParamValues(
-					page.url.searchParams,
-					schemaInfo.numberFields,
-					schemaInfo.dateFields,
-					schemaInfo.codecFields
-				);
-				const newSearchParams = new URLSearchParams(page.url.searchParams.toString());
-				let needsUpdate = false;
+					// For each default value, add it to the URL if not already present
+					for (const [key, defaultValue] of Object.entries(schemaInfo.defaultValues)) {
+						// Skip if the parameter is already in the URL (don't override user values)
+						if (key in currentParams) continue;
 
-				// For each default value, add it to the URL if not already present
-				for (const [key, defaultValue] of Object.entries(schemaInfo.defaultValues)) {
-					// Skip if the parameter is already in the URL (don't override user values)
-					if (key in currentParams) continue;
+						needsUpdate = true;
 
-					needsUpdate = true;
+						if (defaultValue === null || defaultValue === undefined) {
+							continue;
+						}
 
-					if (defaultValue === null || defaultValue === undefined) {
-						continue;
+						// Use shared serialization logic that respects date formats
+						const stringValue = serializeValue(defaultValue, key, dateFormats);
+						newSearchParams.set(key, stringValue);
 					}
 
-					// Use shared serialization logic that respects date formats
-					const stringValue = serializeValue(defaultValue, key, dateFormats);
-					newSearchParams.set(key, stringValue);
-				}
-
-				// Only update the URL if we added parameters
-				if (needsUpdate) {
-					// Always use replaceState: true for initialization to avoid creating a new history entry
-					// Don't use debouncing for initialization as this is a one-time operation
-					goto("?" + newSearchParams.toString(), { replaceState: true });
+					// Only update the URL if we added parameters
+					if (needsUpdate) {
+						// Always use replaceState: true for initialization to avoid creating a new history entry
+						// Don't use debouncing for initialization as this is a one-time operation
+						goto("?" + newSearchParams.toString(), { replaceState: true });
+					}
 				}
 			}
 		}
+		hasInitialized = true;
+	});
+
+	// Sync local cache when URL changes (e.g., from browser back/forward navigation)
+	// This effect watches page.url.searchParams and updates the cache reactively
+	$effect(() => {
+		if (!isMounted.current || building || options.updateURL === false) return;
+
+		// Access page.url.searchParams to create reactivity dependency
+		const urlParams = page.url.searchParams;
+
+		// Don't sync if this is during initial mount (before cache is even initialized)
+		if (!hasInitialized) return;
+
+		// Sync URL to local cache
+		searchParams.syncFromURL(urlParams);
 	});
 
 	// Only run this logic in the browser and if debounce is enabled
