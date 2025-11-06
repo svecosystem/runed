@@ -81,12 +81,14 @@ export interface SearchParamsOptions {
  *
  * @param searchParams The URLSearchParams object to extract values from
  * @param numberFields Optional set of field names that should be treated as numbers
+ * @param arrayFields Optional set of field names that should be treated as arrays (comma-separated values will be split)
  * @returns An object with processed parameter values
  * @internal
  */
-function extractParamValues(
+export function extractParamValues(
 	searchParams: URLSearchParams,
-	numberFields: Set<string> = new Set()
+	numberFields: Set<string> = new Set(),
+	arrayFields: Set<string> = new Set()
 ): Record<string, unknown> {
 	const params: Record<string, unknown> = {};
 
@@ -116,8 +118,8 @@ function extractParamValues(
 			else if (numberFields.has(key) && value.trim() !== "" && !isNaN(Number(value))) {
 				params[key] = Number(value);
 			}
-			// Handle comma-separated values as arrays (fallback format)
-			else if (value.includes(",")) {
+			// Handle comma-separated values as arrays (fallback format) - ONLY for array fields
+			else if (arrayFields.has(key) && value.includes(",")) {
 				params[key] = value.split(",");
 			}
 			// Keep everything else as strings
@@ -143,6 +145,8 @@ interface SchemaInfo {
 	keys: string[];
 	/** Set of field names that expect number types */
 	numberFields: Set<string>;
+	/** Set of field names that expect array types */
+	arrayFields: Set<string>;
 	/** Default values for all fields */
 	defaultValues: Record<string, unknown>;
 }
@@ -163,21 +167,24 @@ function extractSchemaInfo<Schema extends StandardSchemaV1>(schema: Schema): Sch
 	const validationResult = schema["~standard"].validate({});
 
 	if (!validationResult || !("value" in validationResult)) {
-		return { keys: [], numberFields: new Set(), defaultValues: {} };
+		return { keys: [], numberFields: new Set(), arrayFields: new Set(), defaultValues: {} };
 	}
 
 	const defaultValues = validationResult.value as Record<string, unknown>;
 	const keys = Object.keys(defaultValues);
 	const numberFields = new Set<string>();
+	const arrayFields = new Set<string>();
 
-	// Determine which fields are number types by checking default value types
+	// Determine which fields are number or array types by checking default value types
 	for (const [key, defaultValue] of Object.entries(defaultValues)) {
 		if (typeof defaultValue === "number") {
 			numberFields.add(key);
+		} else if (Array.isArray(defaultValue)) {
+			arrayFields.add(key);
 		}
 	}
 
-	return { keys, numberFields, defaultValues };
+	return { keys, numberFields, arrayFields, defaultValues };
 }
 
 /**
@@ -188,13 +195,15 @@ function extractSchemaInfo<Schema extends StandardSchemaV1>(schema: Schema): Sch
  * @param searchParams The URLSearchParams object to extract values from
  * @param schemaKeys Array of parameter keys that are defined in the schema
  * @param numberFields Set of field names that should be treated as numbers
+ * @param arrayFields Set of field names that should be treated as arrays (comma-separated values will be split)
  * @returns An object with processed parameter values for schema-defined keys only
  * @internal
  */
 function extractSelectiveParamValues(
 	searchParams: URLSearchParams,
 	schemaKeys: string[],
-	numberFields: Set<string> = new Set()
+	numberFields: Set<string> = new Set(),
+	arrayFields: Set<string> = new Set()
 ): Record<string, unknown> {
 	const params: Record<string, unknown> = {};
 
@@ -229,8 +238,8 @@ function extractSelectiveParamValues(
 			else if (numberFields.has(key) && value.trim() !== "" && !isNaN(Number(value))) {
 				params[key] = Number(value);
 			}
-			// Handle comma-separated values as arrays (fallback format)
-			else if (value.includes(",")) {
+			// Handle comma-separated values as arrays (fallback format) - ONLY for array fields
+			else if (arrayFields.has(key) && value.includes(",")) {
 				params[key] = value.split(",");
 			}
 			// Keep everything else as strings
@@ -354,6 +363,12 @@ class SearchParams<Schema extends StandardSchemaV1> {
 	#numberFields: Set<string>;
 
 	/**
+	 * Set of field names that expect array types based on schema validation
+	 * Used to determine when to split comma-separated values into arrays
+	 */
+	#arrayFields: Set<string>;
+
+	/**
 	 * Timer ID for debouncing URL updates
 	 * @private
 	 */
@@ -405,9 +420,10 @@ class SearchParams<Schema extends StandardSchemaV1> {
 			{} as Record<string, true>
 		);
 
-		// Store default values and number fields
+		// Store default values, number fields, and array fields
 		this.#defaultValues = { ...schemaInfo.defaultValues };
 		this.#numberFields = schemaInfo.numberFields;
+		this.#arrayFields = schemaInfo.arrayFields;
 	}
 
 	/**
@@ -887,8 +903,8 @@ class SearchParams<Schema extends StandardSchemaV1> {
 			return {};
 		}
 
-		// If not using compression, use the normal extraction with number field detection
-		return extractParamValues(searchParams, this.#numberFields);
+		// If not using compression, use the normal extraction with number and array field detection
+		return extractParamValues(searchParams, this.#numberFields, this.#arrayFields);
 	}
 
 	/**
@@ -1311,7 +1327,8 @@ export function validateSearchParams<Schema extends StandardSchemaV1>(
 		const paramsObject = extractSelectiveParamValues(
 			url.searchParams,
 			schemaInfo.keys,
-			schemaInfo.numberFields
+			schemaInfo.numberFields,
+			schemaInfo.arrayFields
 		);
 
 		// Validate the parameters against the schema
@@ -1495,7 +1512,11 @@ export function useSearchParams<Schema extends StandardSchemaV1>(
 		// Remove incorrect params on initialization (only after hydration, only once)
 		if (!hasInitialized && options.updateURL !== false) {
 			const schemaInfo = extractSchemaInfo(schema);
-			const currentParams = extractParamValues(page.url.searchParams, schemaInfo.numberFields);
+			const currentParams = extractParamValues(
+				page.url.searchParams,
+				schemaInfo.numberFields,
+				schemaInfo.arrayFields
+			);
 			const validationResult = schema["~standard"].validate(currentParams);
 			if (
 				validationResult &&
@@ -1533,7 +1554,11 @@ export function useSearchParams<Schema extends StandardSchemaV1>(
 					);
 				} else {
 					// For non-compressed mode, use the original approach
-					const currentParams = extractParamValues(page.url.searchParams, schemaInfo.numberFields);
+					const currentParams = extractParamValues(
+						page.url.searchParams,
+						schemaInfo.numberFields,
+						schemaInfo.arrayFields
+					);
 					const newSearchParams = new URLSearchParams(page.url.searchParams.toString());
 					let needsUpdate = false;
 
