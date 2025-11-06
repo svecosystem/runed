@@ -463,4 +463,74 @@ describe("validateSearchParams", () => {
 			expect(typeof data.page).toBe("number");
 		});
 	});
+
+	describe("comma handling (issue #367)", () => {
+		it("preserves commas in string parameters without splitting into arrays", () => {
+			const schema = createSearchParamsSchema({
+				name: { type: "string", default: "" },
+				description: { type: "string", default: "" },
+				tags: { type: "array", default: [], arrayType: "" },
+			});
+
+			// string params with commas should NOT be split into arrays
+			const url = createURL("?name=Smith, John&description=Hello, world!");
+			const { data } = validateSearchParams(url, schema);
+
+			// strings with commas should remain as single string values
+			expect(data.name).toBe("Smith, John");
+			expect(typeof data.name).toBe("string");
+			expect(data.description).toBe("Hello, world!");
+			expect(typeof data.description).toBe("string");
+		});
+
+		it("splits comma-separated values only for array type parameters", () => {
+			const schema = createSearchParamsSchema({
+				name: { type: "string", default: "" },
+				tags: { type: "array", default: [], arrayType: "" },
+			});
+
+			// comma-separated values in array params SHOULD be split
+			const url = createURL("?name=Smith, John&tags=tag1,tag2,tag3");
+			const { data } = validateSearchParams(url, schema);
+
+			// string param should remain intact
+			expect(data.name).toBe("Smith, John");
+			expect(typeof data.name).toBe("string");
+
+			// array param should be split by comma
+			expect(data.tags).toEqual(["tag1", "tag2", "tag3"]);
+			expect(Array.isArray(data.tags)).toBe(true);
+		});
+
+		it("handles edge case of string with multiple commas", () => {
+			const schema = createSearchParamsSchema({
+				address: { type: "string", default: "" },
+			});
+
+			const url = createURL("?address=123 Main St, Apt 4B, City, State, 12345");
+			const { data } = validateSearchParams(url, schema);
+
+			// should keep full string with all commas intact
+			expect(data.address).toBe("123 Main St, Apt 4B, City, State, 12345");
+			expect(typeof data.address).toBe("string");
+		});
+
+		it("handles empty array using JSON format vs empty string", () => {
+			const schema = createSearchParamsSchema({
+				tags: { type: "array", default: ["default"], arrayType: "" },
+				emptyString: { type: "string", default: "default" },
+			});
+
+			const url = createURL("?tags=[]&emptyString=");
+			const { data } = validateSearchParams(url, schema);
+
+			// empty array JSON should parse as empty array
+			expect(data.tags).toEqual([]);
+			expect(Array.isArray(data.tags)).toBe(true);
+
+			// empty string should remain empty string
+			expect(data.emptyString).toBe("");
+			expect(typeof data.emptyString).toBe("string");
+		});
+	});
 });
