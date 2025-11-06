@@ -496,7 +496,7 @@ describe("validateSearchParams", () => {
 			// string param should remain intact
 			expect(data.name).toBe("Smith, John");
 			expect(typeof data.name).toBe("string");
-			
+
 			// array param should be split by comma
 			expect(data.tags).toEqual(["tag1", "tag2", "tag3"]);
 			expect(Array.isArray(data.tags)).toBe(true);
@@ -527,7 +527,7 @@ describe("validateSearchParams", () => {
 			// empty array JSON should parse as empty array
 			expect(data.tags).toEqual([]);
 			expect(Array.isArray(data.tags)).toBe(true);
-			
+
 			// empty string should remain empty string
 			expect(data.emptyString).toBe("");
 			expect(typeof data.emptyString).toBe("string");
