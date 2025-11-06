@@ -521,6 +521,46 @@ class SearchParams<Schema extends StandardSchemaV1> {
 	}
 
 	/**
+	 * Sync local cache from URL search params
+	 * This is called when the URL changes externally (e.g., browser back/forward navigation)
+	 * @internal
+	 */
+	syncFromURL(urlParams: URLSearchParams): void {
+		const compressedParamName = this.#options.compressedParamName ?? "_data";
+
+		// Handle compressed mode
+		if (this.#options.compress && urlParams.has(compressedParamName)) {
+			try {
+				const compressedData = urlParams.get(compressedParamName) ?? "";
+				const decompressed = lzString.decompressFromEncodedURIComponent(compressedData);
+
+				if (decompressed) {
+					const decompressedObj = JSON.parse(decompressed);
+					const newCache = new SvelteURLSearchParams();
+
+					// populate cache with decompressed values
+					for (const [key, value] of Object.entries(decompressedObj)) {
+						const stringValue = this.#serializeValue(value);
+						newCache.set(key, stringValue);
+					}
+
+					untrack(() => (this.#localCache = newCache));
+					return;
+				}
+			} catch (e) {
+				console.error("Error syncing cache from compressed URL", e);
+			}
+		}
+
+		// Normal mode - copy current URL params to cache
+		const newCache = new SvelteURLSearchParams();
+		for (const [key, value] of urlParams.entries()) {
+			newCache.set(key, value);
+		}
+		untrack(() => (this.#localCache = newCache));
+	}
+
+	/**
 	 * Update multiple parameters at once
 	 *
 	 * This is more efficient than setting multiple parameters individually
@@ -1445,12 +1485,15 @@ export function useSearchParams<Schema extends StandardSchemaV1>(
 	// Wait for hydration to complete before executing browser-specific initialization
 	const isMounted = new IsMounted();
 
+	// Track if we've done initial setup (separate from cache initialization)
+	let hasInitialized = false;
+
 	// Only run initialization logic after hydration is complete
 	$effect(() => {
 		if (!isMounted.current || !browser || building) return;
 
-		// Remove incorrect params on initialization (only after hydration)
-		if (options.updateURL !== false) {
+		// Remove incorrect params on initialization (only after hydration, only once)
+		if (!hasInitialized && options.updateURL !== false) {
 			const schemaInfo = extractSchemaInfo(schema);
 			const currentParams = extractParamValues(page.url.searchParams, schemaInfo.numberFields);
 			const validationResult = schema["~standard"].validate(currentParams);
@@ -1476,8 +1519,8 @@ export function useSearchParams<Schema extends StandardSchemaV1>(
 			}
 		}
 
-		// If showDefaults is true, we need to initialize the URL with all default values (only after hydration)
-		if (options.showDefaults) {
+		// If showDefaults is true, we need to initialize the URL with all default values (only after hydration, only once)
+		if (!hasInitialized && options.showDefaults) {
 			// Get all the schema information in one pass
 			const schemaInfo = extractSchemaInfo(schema);
 
@@ -1526,6 +1569,23 @@ export function useSearchParams<Schema extends StandardSchemaV1>(
 				}
 			}
 		}
+
+		hasInitialized = true;
+	});
+
+	// Sync local cache when URL changes (e.g., from browser back/forward navigation)
+	// This effect watches page.url.searchParams and updates the cache reactively
+	$effect(() => {
+		if (!isMounted.current || building || options.updateURL === false) return;
+
+		// Access page.url.searchParams to create reactivity dependency
+		const urlParams = page.url.searchParams;
+
+		// Don't sync if this is during initial mount (before cache is even initialized)
+		if (!hasInitialized) return;
+
+		// Sync URL to local cache
+		searchParams.syncFromURL(urlParams);
 	});
 
 	// Only run this logic in the browser and if debounce is enabled

@@ -90,6 +90,46 @@ test.describe("useSearchParams scenarios", () => {
 				}
 			});
 
+			if (!s.memory && !s.noHistory) {
+				test("back/forward navigation updates params reactively", async ({ page }) => {
+					await page.getByTestId("inc").click();
+					await expect(pageCount(page)).toHaveText("2");
+					if (s.debounce) {
+						await page.waitForTimeout(250);
+					}
+
+					await page.getByTestId("inc").click();
+					await expect(pageCount(page)).toHaveText("3");
+					if (s.debounce) {
+						await page.waitForTimeout(250);
+					}
+
+					await page.goBack();
+					if (s.compress) {
+						await page.waitForTimeout(100);
+					}
+					await expect(pageCount(page)).toHaveText("2");
+
+					await page.goBack();
+					if (s.compress) {
+						await page.waitForTimeout(100);
+					}
+					await expect(pageCount(page)).toHaveText("1");
+
+					await page.goForward();
+					if (s.compress) {
+						await page.waitForTimeout(100);
+					}
+					await expect(pageCount(page)).toHaveText("2");
+
+					await page.goForward();
+					if (s.compress) {
+						await page.waitForTimeout(100);
+					}
+					await expect(pageCount(page)).toHaveText("3");
+				});
+			}
+
 			test("reset restores defaults", async ({ page }) => {
 				await page.getByTestId("inc").click();
 				await page.getByTestId("reset").click();
