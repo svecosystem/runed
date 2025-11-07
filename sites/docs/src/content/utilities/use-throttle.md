@@ -16,7 +16,7 @@ category: Utilities
 
 ```svelte
 <script lang="ts">
-	import { useThrottle, watch } from "runed";
+	import { useThrottle } from "runed";
 
 	let search = $state("");
 	let throttledSearch = $state("");
