@@ -66,10 +66,14 @@
 	],
 	"peerDependencies": {
 		"svelte": "^5.7.0",
-		"@sveltejs/kit": "^2.21.0"
+		"@sveltejs/kit": "^2.21.0",
+		"zod": "^4.1.0"
 	},
 	"peerDependenciesMeta": {
 		"@sveltejs/kit": {
+			"optional": true
+		},
+		"zod": {
 			"optional": true
 		}
 	},
@@ -96,7 +100,8 @@
 		"tslib": "^2.4.1",
 		"typescript": "catalog:",
 		"vite": "catalog:",
-		"vitest": "^3.2.4"
+		"vitest": "^3.2.4",
+		"zod": "^4.1.0"
 	},
 	"dependencies": {
 		"dequal": "^2.0.3",

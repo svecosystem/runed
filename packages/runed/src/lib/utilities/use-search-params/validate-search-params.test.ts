@@ -1,6 +1,13 @@
-import { describe, it, expect, vi } from "vitest";
+import { describe, it, expect, vi, beforeAll } from "vitest";
 import { createSearchParamsSchema, validateSearchParams } from "./use-search-params.svelte.js";
 import * as lzString from "lz-string";
+
+// Set timezone to EDT (America/New_York) for consistent test results
+beforeAll(() => {
+	if (!process.env.TZ) {
+		process.env.TZ = "America/New_York";
+	}
+});
 
 // Reuse the schema from the test page
 const testSchema = createSearchParamsSchema({
@@ -9,13 +16,16 @@ const testSchema = createSearchParamsSchema({
 	active: { type: "boolean", default: false },
 	tags: { type: "array", default: [], arrayType: "" },
 	config: { type: "object", default: {}, objectType: { theme: "" } },
+	startDate: { type: "date", default: new Date("2023-01-01T00:00:00Z") },
+	endDate: { type: "date", default: new Date("2023-12-31T23:59:59Z") },
 });
 
 // Helper to create URL objects
 const createURL = (search: string) => new URL(`http://localhost:5173${search}`);
 
 // Define expected default string once
-const expectedDefaultsString = "page=1&filter=&active=false&tags=%5B%5D&config=%7B%7D";
+const expectedDefaultsString =
+	"page=1&filter=&active=false&tags=%5B%5D&config=%7B%7D&startDate=2023-01-01T00%3A00%3A00.000Z&endDate=2023-12-31T23%3A59%3A59.000Z";
 
 describe("validateSearchParams", () => {
 	it("parses standard URL parameters correctly, including defaults for missing", () => {
@@ -464,73 +474,378 @@ describe("validateSearchParams", () => {
 		});
 	});
 
-	describe("comma handling (issue #367)", () => {
-		it("preserves commas in string parameters without splitting into arrays", () => {
-			const schema = createSearchParamsSchema({
-				name: { type: "string", default: "" },
-				description: { type: "string", default: "" },
-				tags: { type: "array", default: [], arrayType: "" },
-			});
+	describe("Date parameter support", () => {
+		it("parses ISO8601 date strings from URL correctly", () => {
+			const url = createURL(
+				"?page=3&filter=test&startDate=2023-06-15T10:30:00.000Z&endDate=2023-06-20T18:00:00.000Z"
+			);
+			const { searchParams, data } = validateSearchParams(url, testSchema);
 
-			// string params with commas should NOT be split into arrays
-			const url = createURL("?name=Smith, John&description=Hello, world!");
-			const { data } = validateSearchParams(url, schema);
+			// Check URLSearchParams
+			expect(searchParams.get("page")).toBe("3");
+			expect(searchParams.get("filter")).toBe("test");
+			expect(searchParams.get("startDate")).toBe("2023-06-15T10:30:00.000Z");
+			expect(searchParams.get("endDate")).toBe("2023-06-20T18:00:00.000Z");
 
-			// strings with commas should remain as single string values
-			expect(data.name).toBe("Smith, John");
-			expect(typeof data.name).toBe("string");
-			expect(data.description).toBe("Hello, world!");
-			expect(typeof data.description).toBe("string");
+			// Check typed data object
+			expect(data.page).toBe(3); // number
+			expect(data.filter).toBe("test"); // string
+			expect(data.startDate).toBeInstanceOf(Date);
+			expect(data.endDate).toBeInstanceOf(Date);
+			expect(data.startDate.toISOString()).toBe("2023-06-15T10:30:00.000Z");
+			expect(data.endDate.toISOString()).toBe("2023-06-20T18:00:00.000Z");
 		});
 
-		it("splits comma-separated values only for array type parameters", () => {
-			const schema = createSearchParamsSchema({
-				name: { type: "string", default: "" },
-				tags: { type: "array", default: [], arrayType: "" },
-			});
+		it("returns default Date values when dates are missing from URL", () => {
+			const url = createURL("?page=5&filter=test"); // No date parameters
+			const { searchParams, data } = validateSearchParams(url, testSchema);
 
-			// comma-separated values in array params SHOULD be split
-			const url = createURL("?name=Smith, John&tags=tag1,tag2,tag3");
-			const { data } = validateSearchParams(url, schema);
+			// Check URLSearchParams - should include defaults
+			expect(searchParams.get("page")).toBe("5");
+			expect(searchParams.get("filter")).toBe("test");
+			expect(searchParams.get("startDate")).toBe("2023-01-01T00:00:00.000Z");
+			expect(searchParams.get("endDate")).toBe("2023-12-31T23:59:59.000Z");
 
-			// string param should remain intact
-			expect(data.name).toBe("Smith, John");
-			expect(typeof data.name).toBe("string");
-
-			// array param should be split by comma
-			expect(data.tags).toEqual(["tag1", "tag2", "tag3"]);
-			expect(Array.isArray(data.tags)).toBe(true);
+			// Check typed data object
+			expect(data.page).toBe(5);
+			expect(data.filter).toBe("test");
+			expect(data.startDate).toBeInstanceOf(Date);
+			expect(data.endDate).toBeInstanceOf(Date);
+			expect(data.startDate.toISOString()).toBe("2023-01-01T00:00:00.000Z");
+			expect(data.endDate.toISOString()).toBe("2023-12-31T23:59:59.000Z");
 		});
 
-		it("handles edge case of string with multiple commas", () => {
-			const schema = createSearchParamsSchema({
-				address: { type: "string", default: "" },
-			});
+		it("handles invalid date strings by falling back to defaults", () => {
+			const url = createURL("?endDate=invalid-date");
+			const { searchParams, data } = validateSearchParams(url, testSchema);
 
-			const url = createURL("?address=123 Main St, Apt 4B, City, State, 12345");
-			const { data } = validateSearchParams(url, schema);
+			// Check URLSearchParams - invalid date should use default
+			expect(searchParams.get("page")).toBe("1"); // default
+			expect(searchParams.get("filter")).toBe(""); // default
+			expect(searchParams.get("startDate")).toBe("2023-01-01T00:00:00.000Z"); // default (invalid input)
+			expect(searchParams.get("endDate")).toBe("2023-12-31T23:59:59.000Z"); // default (invalid input)
 
-			// should keep full string with all commas intact
-			expect(data.address).toBe("123 Main St, Apt 4B, City, State, 12345");
-			expect(typeof data.address).toBe("string");
+			// Check typed data object
+			expect(data.page).toBe(1);
+			expect(data.filter).toBe("");
+			expect(data.startDate).toBeInstanceOf(Date);
+			expect(data.endDate).toBeInstanceOf(Date);
+			expect(data.startDate.toISOString()).toBe("2023-01-01T00:00:00.000Z");
+			expect(data.endDate.toISOString()).toBe("2023-12-31T23:59:59.000Z");
 		});
 
-		it("handles empty array using JSON format vs empty string", () => {
-			const schema = createSearchParamsSchema({
-				tags: { type: "array", default: ["default"], arrayType: "" },
-				emptyString: { type: "string", default: "default" },
+		it("handles compressed parameters with dates", () => {
+			const dataToCompress = {
+				page: 5,
+				filter: "compressed",
+				startDate: new Date("2023-06-15T10:30:00.000Z"),
+				endDate: new Date("2023-06-20T18:00:00.000Z"),
+			};
+			const compressed = lzString.compressToEncodedURIComponent(
+				JSON.stringify({
+					...dataToCompress,
+					startDate: dataToCompress.startDate.toISOString(), // Dates are serialized as ISO strings
+					endDate: dataToCompress.endDate.toISOString(),
+				})
+			);
+			const url = createURL(`?_data=${compressed}`);
+			const { searchParams, data } = validateSearchParams(url, testSchema);
+
+			// Check URLSearchParams
+			expect(searchParams.get("page")).toBe("5");
+			expect(searchParams.get("filter")).toBe("compressed");
+			expect(searchParams.get("startDate")).toBe("2023-06-15T10:30:00.000Z");
+			expect(searchParams.get("endDate")).toBe("2023-06-20T18:00:00.000Z");
+
+			// Check typed data object
+			expect(data.page).toBe(5);
+			expect(data.filter).toBe("compressed");
+			expect(data.startDate).toBeInstanceOf(Date);
+			expect(data.endDate).toBeInstanceOf(Date);
+			expect(data.startDate.toISOString()).toBe("2023-06-15T10:30:00.000Z");
+			expect(data.endDate.toISOString()).toBe("2023-06-20T18:00:00.000Z");
+		});
+
+		it("respects dateFormats option for date-only serialization", () => {
+			// Use date-only format in URL (parsed as UTC midnight)
+			const url = createURL("?startDate=2023-06-15&endDate=2023-06-20T18:00:00.000Z");
+			const { searchParams, data } = validateSearchParams(url, testSchema, {
+				dateFormats: {
+					startDate: "date", // Date-only format
+					endDate: "datetime", // Full datetime format
+				},
 			});
 
-			const url = createURL("?tags=[]&emptyString=");
-			const { data } = validateSearchParams(url, schema);
+			// startDate should be serialized as YYYY-MM-DD (date-only format)
+			expect(searchParams.get("startDate")).toBe("2023-06-15");
+			// endDate should be serialized as full ISO8601 (datetime)
+			expect(searchParams.get("endDate")).toBe("2023-06-20T18:00:00.000Z");
 
-			// empty array JSON should parse as empty array
-			expect(data.tags).toEqual([]);
-			expect(Array.isArray(data.tags)).toBe(true);
+			// Check that startDate was parsed correctly
+			expect(data.startDate).toBeInstanceOf(Date);
+			// Date-only strings like "2023-06-15" are parsed as UTC midnight
+			expect(data.startDate.toISOString()).toBe("2023-06-15T00:00:00.000Z");
+		});
 
-			// empty string should remain empty string
-			expect(data.emptyString).toBe("");
-			expect(typeof data.emptyString).toBe("string");
+		it("uses datetime format by default when dateFormats not specified", () => {
+			const url = createURL("?startDate=2023-06-15T10:30:00.000Z");
+			const { searchParams, data } = validateSearchParams(url, testSchema);
+
+			// Should use full ISO8601 by default (datetime format)
+			expect(searchParams.get("startDate")).toBe("2023-06-15T10:30:00.000Z");
+
+			// Check that the date was parsed correctly
+			expect(data.startDate).toBeInstanceOf(Date);
+			expect(data.startDate.toISOString()).toBe("2023-06-15T10:30:00.000Z");
+		});
+	});
+
+	describe("Zod codec support", () => {
+		it("works with z.codec for date with YYYY-MM-DD format", async () => {
+			// Dynamically import Zod to make it optional
+			const { z } = await import("zod");
+
+			// Create a codec that converts between ISO date string and Date object
+			const stringToDate = z.codec(
+				z.iso.date(), // input schema: ISO date string
+				z.date(), // output schema: Date object
+				{
+					decode: (isoString) => new Date(isoString), // ISO string → Date
+					encode: (date) => date.toISOString().split("T")[0]!, // Date → YYYY-MM-DD
+				}
+			);
+
+			const zodSchema = z.object({
+				createdAt: stringToDate.default(() => new Date("2023-01-01T00:00:00Z")),
+			});
+
+			// Simulate URL with YYYY-MM-DD format
+			const url = createURL("?createdAt=2024-06-15");
+
+			const { searchParams, data } = validateSearchParams(url, zodSchema);
+
+			// Data should be parsed as Date object
+			expect(data.createdAt).toBeInstanceOf(Date);
+			expect(data.createdAt.toISOString()).toBe("2024-06-15T00:00:00.000Z");
+
+			// URL should be in YYYY-MM-DD format (not full ISO string)
+			expect(searchParams.get("createdAt")).toBe("2024-06-15");
+		});
+
+		it("works with z.codec for date with full ISO datetime format", async () => {
+			const { z } = await import("zod");
+
+			// Codec with full ISO datetime encoding - use z.iso.datetime() for full timestamps
+			const stringToDate = z.codec(
+				z.iso.datetime(), // Accepts full ISO datetime strings
+				z.date(),
+				{
+					decode: (isoString) => new Date(isoString),
+					encode: (date) => date.toISOString(), // Full ISO string
+				}
+			);
+
+			const zodSchema = z.object({
+				updatedAt: stringToDate.default(() => new Date("2023-12-31T23:59:59Z")),
+			});
+
+			const url = createURL("?updatedAt=2024-06-20T18:30:00.000Z");
+
+			const { searchParams, data } = validateSearchParams(url, zodSchema);
+
+			expect(data.updatedAt).toBeInstanceOf(Date);
+			expect(data.updatedAt.toISOString()).toBe("2024-06-20T18:30:00.000Z");
+
+			// Should preserve full ISO format
+			expect(searchParams.get("updatedAt")).toBe("2024-06-20T18:30:00.000Z");
+		});
+
+		it("works with z.codec for Unix timestamp format", async () => {
+			const { z } = await import("zod");
+
+			// Codec that uses Unix timestamps (seconds since epoch)
+			// Note: URL params are strings, so input schema should parse string to number
+			const unixTimestampCodec = z.codec(
+				z.string().transform((val) => parseInt(val, 10)), // input: string -> number
+				z.date(), // output: Date object
+				{
+					decode: (timestamp) => new Date(timestamp * 1000),
+					encode: (date) => Math.floor(date.getTime() / 1000),
+				}
+			);
+
+			const zodSchema = z.object({
+				timestamp: unixTimestampCodec.default(() => new Date("2023-01-01T00:00:00Z")),
+			});
+
+			// Unix timestamp for 2024-06-15T12:00:00Z is 1718452800
+			const url = createURL("?timestamp=1718452800");
+
+			const { searchParams, data } = validateSearchParams(url, zodSchema);
+
+			expect(data.timestamp).toBeInstanceOf(Date);
+			expect(data.timestamp.toISOString()).toBe("2024-06-15T12:00:00.000Z");
+
+			// Should serialize back to Unix timestamp
+			expect(searchParams.get("timestamp")).toBe("1718452800");
+		});
+
+		it("supports multiple codecs with different formats in same schema", async () => {
+			const { z } = await import("zod");
+
+			// Date-only codec (YYYY-MM-DD format)
+			const dateOnlyCodec = z.codec(
+				z.iso.date(), // Only accepts YYYY-MM-DD
+				z.date(),
+				{
+					decode: (isoString) => new Date(isoString),
+					encode: (date) => date.toISOString().split("T")[0]!, // Date → YYYY-MM-DD
+				}
+			);
+
+			// Full datetime codec (ISO 8601 with time)
+			const datetimeCodec = z.codec(
+				z.iso.datetime(), // Accepts full ISO datetime
+				z.date(),
+				{
+					decode: (isoString) => new Date(isoString),
+					encode: (date) => date.toISOString(),
+				}
+			);
+
+			const zodSchema = z.object({
+				birthDate: dateOnlyCodec.default(() => new Date("2000-01-01T00:00:00Z")),
+				lastLogin: datetimeCodec.default(() => new Date("2023-12-31T23:59:59Z")),
+			});
+
+			const url = createURL("?birthDate=1995-05-15&lastLogin=2024-06-20T14:30:00.000Z");
+
+			const { searchParams, data } = validateSearchParams(url, zodSchema);
+
+			// Both should be Date objects
+			expect(data.birthDate).toBeInstanceOf(Date);
+			expect(data.lastLogin).toBeInstanceOf(Date);
+
+			// But serialized differently
+			expect(searchParams.get("birthDate")).toBe("1995-05-15");
+			expect(searchParams.get("lastLogin")).toBe("2024-06-20T14:30:00.000Z");
+		});
+
+		it("codec decode is called automatically during validation", async () => {
+			const { z } = await import("zod");
+
+			const stringToDate = z.codec(z.iso.date(), z.date(), {
+				decode: (isoString) => new Date(isoString),
+				encode: (date) => date.toISOString().split("T")[0]!, // Date → YYYY-MM-DD
+			});
+
+			const zodSchema = z.object({
+				eventDate: stringToDate.default(() => new Date("2023-01-01T00:00:00Z")),
+			});
+
+			// URL provides string, codec.decode should convert to Date
+			const url = createURL("?eventDate=2024-10-21");
+
+			const { data } = validateSearchParams(url, zodSchema);
+
+			// Should be automatically decoded to Date by the codec
+			expect(data.eventDate).toBeInstanceOf(Date);
+			expect(data.eventDate.toISOString()).toBe("2024-10-21T00:00:00.000Z");
+		});
+
+		it("falls back to default value when codec receives invalid input", async () => {
+			const { z } = await import("zod");
+
+			const stringToDate = z.codec(z.iso.date(), z.date(), {
+				decode: (isoString) => new Date(isoString),
+				encode: (date) => date.toISOString().split("T")[0]!, // Date → YYYY-MM-DD
+			});
+
+			const defaultDate = new Date("2023-01-01T00:00:00Z");
+			const zodSchema = z.object({
+				validDate: stringToDate.default(() => defaultDate),
+			});
+
+			// Invalid date string
+			const url = createURL("?validDate=not-a-date");
+
+			const { searchParams, data } = validateSearchParams(url, zodSchema);
+
+			// Should fall back to default
+			expect(data.validDate).toBeInstanceOf(Date);
+			expect(data.validDate.toISOString()).toBe(defaultDate.toISOString());
+
+			// URL should have default serialized
+			expect(searchParams.get("validDate")).toBe("2023-01-01");
+			describe("comma handling (issue #367)", () => {
+				it("preserves commas in string parameters without splitting into arrays", () => {
+					const schema = createSearchParamsSchema({
+						name: { type: "string", default: "" },
+						description: { type: "string", default: "" },
+						tags: { type: "array", default: [], arrayType: "" },
+					});
+
+					// string params with commas should NOT be split into arrays
+					const url = createURL("?name=Smith, John&description=Hello, world!");
+					const { data } = validateSearchParams(url, schema);
+
+					// strings with commas should remain as single string values
+					expect(data.name).toBe("Smith, John");
+					expect(typeof data.name).toBe("string");
+					expect(data.description).toBe("Hello, world!");
+					expect(typeof data.description).toBe("string");
+				});
+
+				it("splits comma-separated values only for array type parameters", () => {
+					const schema = createSearchParamsSchema({
+						name: { type: "string", default: "" },
+						tags: { type: "array", default: [], arrayType: "" },
+					});
+
+					// comma-separated values in array params SHOULD be split
+					const url = createURL("?name=Smith, John&tags=tag1,tag2,tag3");
+					const { data } = validateSearchParams(url, schema);
+
+					// string param should remain intact
+					expect(data.name).toBe("Smith, John");
+					expect(typeof data.name).toBe("string");
+
+					// array param should be split by comma
+					expect(data.tags).toEqual(["tag1", "tag2", "tag3"]);
+					expect(Array.isArray(data.tags)).toBe(true);
+				});
+
+				it("handles edge case of string with multiple commas", () => {
+					const schema = createSearchParamsSchema({
+						address: { type: "string", default: "" },
+					});
+
+					const url = createURL("?address=123 Main St, Apt 4B, City, State, 12345");
+					const { data } = validateSearchParams(url, schema);
+
+					// should keep full string with all commas intact
+					expect(data.address).toBe("123 Main St, Apt 4B, City, State, 12345");
+					expect(typeof data.address).toBe("string");
+				});
+
+				it("handles empty array using JSON format vs empty string", () => {
+					const schema = createSearchParamsSchema({
+						tags: { type: "array", default: ["default"], arrayType: "" },
+						emptyString: { type: "string", default: "default" },
+					});
+
+					const url = createURL("?tags=[]&emptyString=");
+					const { data } = validateSearchParams(url, schema);
+
+					// empty array JSON should parse as empty array
+					expect(data.tags).toEqual([]);
+					expect(Array.isArray(data.tags)).toBe(true);
+
+					// empty string should remain empty string
+					expect(data.emptyString).toBe("");
+					expect(typeof data.emptyString).toBe("string");
+				});
+			});
 		});
 	});
 });

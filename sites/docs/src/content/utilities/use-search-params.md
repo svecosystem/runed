@@ -249,7 +249,106 @@ URL storage format:
 
 - Arrays are stored as JSON strings: `?tags=["sale","featured"]`
 - Objects are stored as JSON strings: `?config={"theme":"dark","fontSize":14}`
+- Dates are stored as ISO8601 strings: `?createdAt=2023-12-01T10:30:00.000Z` (or `YYYY-MM-DD` with
+  date-only format)
 - Primitive values are stored directly: `?page=2&filter=red`
+
+#### Date Format Support
+
+You can control how Date parameters are serialized in URLs using two approaches:
+
+**Option 1: Using `dateFormat` property in schema**
+
+```ts
+const schema = createSearchParamsSchema({
+	// Date-only format (YYYY-MM-DD) - great for birth dates, event dates
+	birthDate: {
+		type: "date",
+		default: new Date("1990-01-15"),
+		dateFormat: "date"
+	},
+
+	// Full datetime format (ISO8601) - great for timestamps
+	createdAt: {
+		type: "date",
+		default: new Date(),
+		dateFormat: "datetime"
+	},
+
+	// No format specified - defaults to 'datetime'
+	updatedAt: {
+		type: "date",
+		default: new Date()
+	}
+});
+
+const params = useSearchParams(schema);
+// URL: ?birthDate=1990-01-15&createdAt=2023-01-01T10:30:00.000Z&updatedAt=2023-12-25T18:30:00.000Z
+```
+
+**Option 2: Using `dateFormats` option (works with any validator)**
+
+```ts
+// Works with Zod, Valibot, Arktype, or createSearchParamsSchema
+const params = useSearchParams(zodSchema, {
+	dateFormats: {
+		birthDate: "date", // YYYY-MM-DD
+		createdAt: "datetime" // ISO8601
+	}
+});
+```
+
+**Date Format Details:**
+
+- **`'date'` format**: Serializes as `YYYY-MM-DD` (e.g., `2025-10-21`)
+  - More readable in URLs
+  - Perfect for calendar dates, birth dates, event dates
+  - Parsed as Date object with time set to midnight UTC
+- **`'datetime'` format** (default): Serializes as full ISO8601 (e.g., `2025-10-21T18:18:14.196Z`)
+  - Preserves exact time information
+  - Perfect for timestamps, created/updated times
+  - Full precision date and time
+
+**Practical Example:**
+
+```svelte
+<script lang="ts">
+	import { useSearchParams, createSearchParamsSchema } from "runed/kit";
+
+	const schema = createSearchParamsSchema({
+		eventDate: {
+			type: "date",
+			default: new Date("2025-01-01"),
+			dateFormat: "date"
+		},
+		createdAt: {
+			type: "date",
+			default: new Date(),
+			dateFormat: "datetime"
+		}
+	});
+
+	const params = useSearchParams(schema);
+</script>
+
+<label>
+	Event Date:
+	<input
+		type="date"
+		value={params.eventDate.toISOString().split("T")[0]}
+		oninput={(e) => (params.eventDate = new Date(e.target.value))} />
+</label>
+
+<label>
+	Created At:
+	<input
+		type="datetime-local"
+		value={params.createdAt.toISOString().slice(0, 16)}
+		oninput={(e) => (params.createdAt = new Date(e.target.value))} />
+</label>
+
+<!-- URL will be: ?eventDate=2025-01-01&createdAt=2025-10-21T18:18:14.196Z -->
+```
 
 ### `validateSearchParams`
 
@@ -266,12 +365,17 @@ Handles both standard URL parameters and compressed parameters (when compression
 
 - `url`: The URL object from SvelteKit load function
 - `schema`: A validation schema (createSearchParamsSchema, Zod, Valibot, etc.)
-- `options`: Optional configuration (like custom `compressedParamName`)
+- `options`: Optional configuration (like custom `compressedParamName` and `dateFormats`)
 
 **Returns:**
 
 - An object with `searchParams` and `data` properties, `searchParams` being the validated
   `URLSearchParams` and `data` being the validated object
+
+**Available options:**
+
+- `compressedParamName` (string): Custom name for compressed parameter (default: `_data`)
+- `dateFormats` (object): Map of field names to date formats (`'date'` or `'datetime'`)
 
 Example with SvelteKit page or layout load function:
 
@@ -283,13 +387,199 @@ export const load = ({ url, fetch }) => {
 	// Get validated search params as URLSearchParams object
 	// If you use a custom compressedParamName in useSearchParams, provide it here too:
 	const { searchParams } = validateSearchParams(url, productSchema, {
-		compressedParamName: "_compressed"
+		compressedParamName: "_compressed",
+		dateFormats: {
+			birthDate: "date", // Serialize as YYYY-MM-DD
+			createdAt: "datetime" // Serialize as ISO8601
+		}
 	});
 
 	// Use URLSearchParams directly with fetch
 	const response = await fetch(`/api/products?${searchParams.toString()}`);
 	return {
 		products: await response.json()
+	};
+};
+```
+
+### Advanced: Custom Serialization with Zod Codecs
+
+For advanced use cases where you need full control over how values are converted between URL strings
+and JavaScript types, you can use [Zod codecs](https://zod.dev/?id=codec) (Zod v4.1.0+). Codecs
+allow you to define custom bidirectional transformations that work seamlessly with URL parameters.
+
+#### Why Use Codecs?
+
+While the built-in `dateFormats` option works well for common cases, codecs give you complete
+control over serialization. Use codecs when you need to:
+
+- **Custom date formats**: Store dates as Unix timestamps, custom date strings, or other formats
+- **Complex type conversions**: Convert between incompatible types (e.g., number IDs ↔ full
+  objects)
+- **Data transformation**: Apply transformations during serialization (e.g., normalize, encrypt)
+- **Legacy API compatibility**: Match existing URL parameter formats from other systems
+- **Optimization**: Use more compact representations (e.g., `1234567890` instead of
+  `2009-02-13T23:31:30.000Z`)
+
+#### How Codecs Work
+
+A Zod codec defines two transformations:
+
+- **`decode`**: Converts URL string → JavaScript type (when reading from URL)
+- **`encode`**: Converts JavaScript type → URL string (when writing to URL)
+
+```ts
+import { z } from "zod";
+
+// Example 1: Unix timestamp codec (stores Date as number)
+const unixTimestampCodec = z.codec(
+	z.coerce.number(), // Input: number from URL string
+	z.date(), // Output: Date object in your app
+	{
+		decode: (timestamp) => new Date(timestamp * 1000), // number → Date
+		encode: (date) => Math.floor(date.getTime() / 1000) // Date → number
+	}
+);
+
+// Example 2: Date-only codec (stores Date as YYYY-MM-DD)
+const dateOnlyCodec = z.codec(
+	z.string(), // Input: string from URL
+	z.date(), // Output: Date object in your app
+	{
+		decode: (str) => new Date(str + "T00:00:00.000Z"), // "2025-01-15" → Date
+		encode: (date) => date.toISOString().split("T")[0] // Date → "2025-01-15"
+	}
+);
+
+// Example 3: Product ID codec (stores number as base36 string for shorter URLs)
+const compactIdCodec = z.codec(
+	z.string(), // Input: base36 string from URL
+	z.number(), // Output: number in your app
+	{
+		decode: (str) => parseInt(str, 36), // "abc123" → 225249695
+		encode: (num) => num.toString(36) // 225249695 → "abc123"
+	}
+);
+```
+
+#### Using Codecs in Your Schema
+
+```ts
+import { z } from "zod";
+
+const searchSchema = z.object({
+	// Regular fields work as before
+	query: z.string().default(""),
+	page: z.coerce.number().default(1),
+
+	// Unix timestamp - more compact than ISO datetime
+	createdAfter: unixTimestampCodec.default(new Date("2024-01-01")),
+
+	// Date-only format - cleaner for calendar dates
+	birthDate: dateOnlyCodec.default(new Date("1990-01-15")),
+
+	// Compact product IDs
+	productId: compactIdCodec.optional()
+});
+
+const params = useSearchParams(searchSchema);
+```
+
+#### Real-World Example: Event Search
+
+```svelte
+<script lang="ts">
+	import { z } from "zod";
+	import { useSearchParams } from "runed/kit";
+
+	// Define reusable codecs
+	const unixTimestamp = z.codec(z.coerce.number(), z.date(), {
+		decode: (ts) => new Date(ts * 1000),
+		encode: (date) => Math.floor(date.getTime() / 1000)
+	});
+
+	const dateOnly = z.codec(z.string(), z.date(), {
+		decode: (str) => new Date(str + "T00:00:00.000Z"),
+		encode: (date) => date.toISOString().split("T")[0]
+	});
+
+	// Schema with multiple codec types
+	const eventSearchSchema = z.object({
+		query: z.string().default(""),
+		// Date-only for event date (more readable in URL)
+		eventDate: dateOnly.default(new Date()),
+		// Unix timestamp for filters (more compact)
+		createdAfter: unixTimestamp.optional(),
+		updatedSince: unixTimestamp.optional()
+	});
+
+	const params = useSearchParams(eventSearchSchema);
+
+	// Work with Date objects in your app
+	$inspect(params.eventDate); // Date object
+	$inspect(params.createdAfter); // Date object or undefined
+</script>
+
+<!-- Bind to native date inputs -->
+<label>
+	Event Date:
+	<input
+		type="date"
+		value={params.eventDate.toISOString().split("T")[0]}
+		oninput={(e) => (params.eventDate = new Date(e.target.value))} />
+</label>
+
+<label>
+	Created After:
+	<input
+		type="date"
+		value={params.createdAfter?.toISOString().split("T")[0] ?? ""}
+		oninput={(e) =>
+			(params.createdAfter = e.target.value ? new Date(e.target.value) : undefined)} />
+</label>
+
+<!-- Clean URLs:
+     Without codecs: ?eventDate=2025-01-15T00:00:00.000Z&createdAfter=2024-01-01T00:00:00.000Z
+     With codecs:    ?eventDate=2025-01-15&createdAfter=1704067200
+-->
+```
+
+#### Codec Benefits Summary
+
+| Feature                   | Built-in dateFormats     | Zod Codecs                                        |
+| ------------------------- | ------------------------ | ------------------------------------------------- |
+| **Setup complexity**      | Simple                   | More configuration needed                         |
+| **Date formats**          | `date` and `datetime`    | Any custom format (Unix, relative, custom string) |
+| **URL size**              | Standard                 | Can be optimized (e.g., Unix timestamps)          |
+| **Type conversions**      | Date only                | Any type (numbers, objects, arrays, etc.)         |
+| **Validation**            | Basic                    | Full Zod validation + transformation              |
+| **Reusability**           | Per-field config         | Create reusable codec definitions                 |
+| **Legacy compatibility**  | Limited                  | Full control over format                          |
+| **Works with validators** | All (Zod, Valibot, etc.) | Zod only (v4.1.0+)                                |
+| **Server-side usage**     | Use `dateFormats` option | Automatic with `validateSearchParams`             |
+
+**When to use `dateFormats`**: Most applications with standard date handling needs
+
+**When to use codecs**: When you need custom formats, compact representations, or complex type
+conversions
+
+#### Server-Side Usage with Codecs
+
+Codecs work automatically with `validateSearchParams`:
+
+```ts
+// +page.server.ts
+import { validateSearchParams } from "runed/kit";
+import { eventSearchSchema } from "./schemas"; // Schema with codecs
+
+export const load = ({ url }) => {
+	// Codecs are automatically applied during validation
+	const { searchParams, data } = validateSearchParams(url, eventSearchSchema);
+
+	// data.eventDate is a Date object (decoded from URL string)
+	// searchParams contains properly encoded values for API calls
+	return {
+		events: await fetchEvents(searchParams)
 	};
 };
 ```
@@ -399,6 +689,20 @@ interface SearchParamsOptions {
 	 * @default false
 	 */
 	noScroll?: boolean;
+
+	/**
+	 * Specifies which date fields should use date-only format (YYYY-MM-DD) instead of full ISO8601 datetime.
+	 *
+	 * Map field names to their desired format:
+	 * - 'date': Serializes as YYYY-MM-DD (e.g., "2025-10-21")
+	 * - 'datetime': Serializes as full ISO8601 (e.g., "2025-10-21T18:18:14.196Z")
+	 *
+	 * Example:
+	 * { dateFormats: { birthDate: 'date', createdAt: 'datetime' } }
+	 *
+	 * @default undefined (all dates use datetime format)
+	 */
+	dateFormats?: Record<string, "date" | "datetime">;
 }
 
 type ReturnUseSearchParams<Schema extends StandardSchemaV1> = {
@@ -433,12 +737,13 @@ type ReturnUseSearchParams<Schema extends StandardSchemaV1> = {
 
 /**
  * Schema type for createSearchParamsSchema
- * Allows specifying more precise types for arrays and objects
+ * Allows specifying more precise types for arrays, objects, and dates
  */
 type SchemaTypeConfig<ArrayType = unknown, ObjectType = unknown> =
 	| { type: "string"; default?: string }
 	| { type: "number"; default?: number }
 	| { type: "boolean"; default?: boolean }
 	| { type: "array"; default?: ArrayType[]; arrayType?: ArrayType }
-	| { type: "object"; default?: ObjectType; objectType?: ObjectType };
+	| { type: "object"; default?: ObjectType; objectType?: ObjectType }
+	| { type: "date"; default?: Date; dateFormat?: "date" | "datetime" };
 ```

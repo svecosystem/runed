@@ -14,7 +14,7 @@ describe("extractParamValues", () => {
 		it("converts numeric strings to numbers when field is in numberFields", () => {
 			const params = new URLSearchParams("page=5&limit=10&code=123");
 			const numberFields = new Set(["page", "limit"]);
-			const result = extractParamValues(params, numberFields);
+			const result = extractParamValues(params, { numberFields });
 
 			expect(result.page).toBe(5);
 			expect(typeof result.page).toBe("number");
@@ -27,7 +27,7 @@ describe("extractParamValues", () => {
 		it("handles negative numbers", () => {
 			const params = new URLSearchParams("temperature=-5");
 			const numberFields = new Set(["temperature"]);
-			const result = extractParamValues(params, numberFields);
+			const result = extractParamValues(params, { numberFields });
 
 			expect(result.temperature).toBe(-5);
 		});
@@ -35,7 +35,7 @@ describe("extractParamValues", () => {
 		it("handles decimal numbers", () => {
 			const params = new URLSearchParams("price=19.99");
 			const numberFields = new Set(["price"]);
-			const result = extractParamValues(params, numberFields);
+			const result = extractParamValues(params, { numberFields });
 
 			expect(result.price).toBe(19.99);
 		});
@@ -43,7 +43,7 @@ describe("extractParamValues", () => {
 		it("keeps strings as strings when not in numberFields", () => {
 			const params = new URLSearchParams("name=John&id=12345");
 			const numberFields = new Set([]);
-			const result = extractParamValues(params, numberFields);
+			const result = extractParamValues(params, { numberFields });
 
 			expect(result.name).toBe("John");
 			expect(typeof result.name).toBe("string");
@@ -125,7 +125,7 @@ describe("extractParamValues", () => {
 		it("should split comma-separated values ONLY for array fields (currently fails)", () => {
 			const params = new URLSearchParams("name=Smith, John&tags=tag1,tag2,tag3");
 
-			const result = extractParamValues(params, new Set(), new Set(["tags"]));
+			const result = extractParamValues(params, { arrayFields: new Set(["tags"]) });
 
 			expect(result.name).toBe("Smith, John");
 			expect(typeof result.name).toBe("string");
@@ -134,7 +134,7 @@ describe("extractParamValues", () => {
 
 		it("should NOT treat CSV-like data as array by default", () => {
 			const params = new URLSearchParams("data=column1,column2,column3");
-			const result = extractParamValues(params, new Set(), new Set());
+			const result = extractParamValues(params);
 
 			expect(result.data).toBe("column1,column2,column3");
 			expect(typeof result.data).toBe("string");
@@ -200,7 +200,7 @@ describe("extractParamValues", () => {
 		it("processes multiple different types correctly", () => {
 			const params = new URLSearchParams('page=5&active=true&tags=["a","b"]&name=John Doe&empty=');
 			const numberFields = new Set(["page"]);
-			const result = extractParamValues(params, numberFields);
+			const result = extractParamValues(params, { numberFields });
 
 			expect(result.page).toBe(5);
 			expect(result.active).toBe(true);
@@ -212,7 +212,7 @@ describe("extractParamValues", () => {
 		it("name with comma should NOT be split even when number field specified", () => {
 			const params = new URLSearchParams("page=3&name=Smith, John");
 			const numberFields = new Set(["page"]);
-			const result = extractParamValues(params, numberFields);
+			const result = extractParamValues(params, { numberFields });
 
 			expect(result.page).toBe(3);
 			// Expected: name should remain as string
@@ -234,7 +234,7 @@ describe("extractParamValues", () => {
 		it("splits comma-separated values ONLY when field is marked as array", () => {
 			const params = new URLSearchParams("tags=red,%20blue,%20%20green");
 			const arrayFields = new Set(["tags"]);
-			const result = extractParamValues(params, new Set(), arrayFields);
+			const result = extractParamValues(params, { arrayFields });
 
 			expect(result.tags).toEqual(["red", " blue", "  green"]);
 			expect(Array.isArray(result.tags)).toBe(true);
@@ -243,7 +243,7 @@ describe("extractParamValues", () => {
 		it("splits numeric comma-separated values into array only for array fields", () => {
 			const params = new URLSearchParams("ids=1,2,3,4,5");
 			const arrayFields = new Set(["ids"]);
-			const result = extractParamValues(params, new Set(), arrayFields);
+			const result = extractParamValues(params, { arrayFields });
 
 			expect(result.ids).toEqual(["1", "2", "3", "4", "5"]);
 			expect(Array.isArray(result.ids)).toBe(true);
