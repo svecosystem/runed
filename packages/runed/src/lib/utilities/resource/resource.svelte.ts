@@ -1,7 +1,6 @@
 import { watch } from "$lib/utilities/watch/index.js";
 import type { Getter } from "$lib/internal/types.js";
 import { SvelteMap } from "svelte/reactivity";
-import { untrack } from "svelte";
 
 /**
  * Configuration options for the resource function
