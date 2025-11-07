@@ -1,5 +1,24 @@
 # runed
 
+## 0.36.0
+
+### Minor Changes
+
+- feat(IsIdle): add `trackLastActive` option to enable users to disable tracking the `lastActive`
+  time ([#363](https://github.com/svecosystem/runed/pull/363)) for performance optimizations
+
+### Patch Changes
+
+- fix(useSearchParams): don't treat comma separated strings as arrays unless the field type is array
+  ([#383](https://github.com/svecosystem/runed/pull/383))
+
+- feat(useSearchParams): Date support ([#368](https://github.com/svecosystem/runed/pull/368))
+
+- feat(useSearchParams): Zod codec support ([#368](https://github.com/svecosystem/runed/pull/368))
+
+- fix(useSearchParams): back/forward reactivity
+  ([#383](https://github.com/svecosystem/runed/pull/383))
+
 ## 0.35.1
 
 ### Patch Changes
