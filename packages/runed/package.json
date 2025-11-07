@@ -41,6 +41,7 @@
 		"build": "pnpm package",
 		"package": "svelte-kit sync && svelte-package && publint",
 		"test": "vitest --run && playwright test",
+		"test:unit": "vitest --watch",
 		"test:watch": "vitest --watch",
 		"test:ui": "vitest --watch --ui",
 		"test:integration": "playwright test",
