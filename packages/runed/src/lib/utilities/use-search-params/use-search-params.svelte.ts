@@ -1054,8 +1054,19 @@ class SearchParams<Schema extends StandardSchemaV1> {
 	 */
 	#handleCompressedUpdate(fullParamsObject: Record<string, unknown>): void {
 		try {
-			// Convert the entire parameters object to JSON
-			const jsonData = JSON.stringify(fullParamsObject);
+			// Start with all values, then serialize only fields that need special handling
+			const serializedObject: Record<string, unknown> = { ...fullParamsObject };
+
+			// Serialize date field and codec fields
+			for (const key of [...this.#dateFields, ...this.#codecFields]) {
+				const value = fullParamsObject[key];
+				if (value !== undefined && value !== null) {
+					serializedObject[key] = this.#serializeValue(value, key);
+				}
+			}
+
+			// Convert the serialized parameters object to JSON
+			const jsonData = JSON.stringify(serializedObject);
 
 			// Compress the JSON string
 			const compressed = lzString.compressToEncodedURIComponent(jsonData);

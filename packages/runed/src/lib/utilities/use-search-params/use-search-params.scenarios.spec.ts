@@ -517,7 +517,7 @@ test.describe("useSearchParams scenarios", () => {
 				await page.getByTestId("setCreatedAt").click();
 
 				// createdAt has dateFormat: "date" in schema, so it's serialized as date-only
-				// and becomes UTC midnight when read back
+				// and becomes UTC midnight when read back (consistent in all modes)
 				await expect(createdAtText(page)).toHaveText("2023-06-15T00:00:00.000Z");
 
 				if (s.debounce) {
@@ -533,8 +533,8 @@ test.describe("useSearchParams scenarios", () => {
 					const data = url.searchParams.get("_data")!;
 					const decompressed = decompress(data)!;
 					const obj = JSON.parse(decompressed);
-					// Compressed data stores full ISO string, not date-only format
-					expect(obj.createdAt).toBe("2023-06-15T10:30:00.000Z");
+					// Compressed data now respects dateFormat and stores date-only format
+					expect(obj.createdAt).toBe("2023-06-15");
 				} else {
 					// createdAt uses date-only format from schema property
 					await expect(page).toHaveURL(/createdAt=2023-06-15/);
