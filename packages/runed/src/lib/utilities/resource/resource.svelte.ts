@@ -1,5 +1,6 @@
 import { watch } from "$lib/utilities/watch/index.js";
 import type { Getter } from "$lib/internal/types.js";
+import { SvelteMap } from "svelte/reactivity";
 
 /**
  * Configuration options for the resource function
@@ -150,7 +151,8 @@ function runResource<
 
 	// Create state
 	let current = $state<Awaited<ReturnType<Fetcher>> | undefined>(initialValue);
-	let loading = $state(false);
+	const loadings = new SvelteMap<number, boolean>();
+	let fetchId = $state(0);
 	let error = $state<Error | undefined>(undefined);
 	let cleanupFns = $state<Array<() => void>>([]);
 
@@ -171,8 +173,9 @@ function runResource<
 		previousValue: Source | undefined | Array<Source | undefined>,
 		refetching: RefetchInfo | boolean = false
 	): Promise<Awaited<ReturnType<Fetcher>> | undefined> => {
+		const currentFetchId = ++fetchId;
 		try {
-			loading = true;
+			loadings.set(currentFetchId, true);
 			error = undefined;
 			runCleanup();
 
@@ -196,7 +199,7 @@ function runResource<
 			}
 			return undefined;
 		} finally {
-			loading = false;
+			loadings.delete(currentFetchId);
 		}
 	};
 
@@ -232,7 +235,7 @@ function runResource<
 			return current;
 		},
 		get loading() {
-			return loading;
+			return loadings.get(fetchId) ?? false;
 		},
 		get error() {
 			return error;

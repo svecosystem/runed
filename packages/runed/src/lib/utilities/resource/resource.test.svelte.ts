@@ -118,6 +118,30 @@ describe("resource", () => {
 			expect(fetchedValues).toEqual([1, 2]);
 			expect(promiseResource.current).toBe(2);
 		});
+
+		testWithEffect("no data race in loading state", async () => {
+			let input = $state(1);
+
+			const dataRaceResource = resource(
+				() => input,
+				async (input, _, { signal }): Promise<number> => {
+					return new Promise((resolve, reject) => {
+						signal.onabort = () => {
+							reject(new Error("Aborted " + input));
+						};
+						sleep(300).then(() => resolve(input));
+					});
+				}
+			);
+			for (let i = 0; i < 5; i++) {
+				await sleep(50);
+				expect(dataRaceResource.loading).toBe(true);
+				input += 1;
+			}
+
+			await sleep(500);
+			expect(dataRaceResource.loading).toBe(false);
+		});
 	});
 
 	describe("error handling", () => {
