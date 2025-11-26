@@ -80,6 +80,9 @@ const state = new PersistedState("user-preferences", initialValue, {
 	// Disable cross-tab synchronization (default: true)
 	syncTabs: false,
 
+	// Start disconnected from storage (default: true)
+	connected: false,
+
 	// Custom serialization handlers
 	serializer: {
 		serialize: superjson.stringify,
@@ -97,6 +100,42 @@ const state = new PersistedState("user-preferences", initialValue, {
 
 When `syncTabs` is enabled (default), changes are automatically synchronized across all browser tabs
 using the storage event.
+
+### Connection Control
+
+By default, the state is connected to storage on initialization and any changes to the state will
+persist to storage and reads from the state will be read from storage.
+
+For more control, you can control when the state connects to storage using the `connected` option
+and/or the `.connect()` and `.disconnect()` methods:
+
+```ts
+// Start disconnected from storage
+const state = new PersistedState("temp-data", initialValue, {
+	connected: false
+});
+
+// State changes are kept in memory only
+state.current = "new value";
+
+// Connect to storage when ready
+state.connect(); // Now persists to storage
+
+// Check connection status
+console.log(state.connected); // true
+
+// Disconnect from storage
+state.disconnect(); // Removes from storage, keeps value in memory
+```
+
+When disconnected:
+
+- State changes are kept in memory only
+- Storage changes are not reflected in the state
+- Cross-tab synchronization is disabled
+
+Calling `disconnect()` removes the current value from storage but preserves it in memory. Calling
+`connect()` immediately persists the current in-memory value to storage.
 
 ### Custom Serialization
 

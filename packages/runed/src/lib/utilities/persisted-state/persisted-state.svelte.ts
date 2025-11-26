@@ -19,12 +19,38 @@ function getStorage(storageType: StorageType, window: Window & typeof globalThis
 }
 
 type PersistedStateOptions<T> = {
-	/** The storage type to use. Defaults to `local`. */
+	/**
+	 * The storage type to use.
+	 *
+	 * @default "local"
+	 */
 	storage?: StorageType;
-	/** The serializer to use. Defaults to `JSON.stringify` and `JSON.parse`. */
+
+	/**
+	 * The serializer to use.
+	 *
+	 * @default { serialize: JSON.stringify, deserialize: JSON.parse }
+	 */
 	serializer?: Serializer<T>;
-	/** Whether to sync with the state changes from other tabs. Defaults to `true`. */
+
+	/**
+	 * Whether to sync with the state changes from other tabs.
+	 *
+	 * @default true
+	 */
 	syncTabs?: boolean;
+
+	/**
+	 * Whether to connect to storage on initialization, which means that updates to the state will
+	 * be persisted to storage and reads from the state will be read from storage.
+	 *
+	 * When `connected` is `false`, the state is not connected to storage and any changes to the state will
+	 * not be persisted to storage and any changes to storage will not be reflected in the state until
+	 * `.connect()` is called.
+	 *
+	 * @default true
+	 */
+	connected?: boolean;
 } & ConfigurableWindow;
 
 function proxy<T>(
@@ -77,18 +103,28 @@ export class PersistedState<T> {
 	#subscribe?: VoidFunction;
 	#update: VoidFunction | undefined;
 	#proxies = new WeakMap();
+	#connected: boolean;
+	#storageCleanup?: VoidFunction;
+	#window?: Window & typeof globalThis;
+	#syncTabs: boolean;
+	#storageType: StorageType;
 
 	constructor(key: string, initialValue: T, options: PersistedStateOptions<T> = {}) {
 		const {
 			storage: storageType = "local",
 			serializer = { serialize: JSON.stringify, deserialize: JSON.parse },
 			syncTabs = true,
+			connected = true,
 		} = options;
 		const window = "window" in options ? options.window : defaultWindow; // window is not mockable to be undefined without this, because JavaScript will fill undefined with `= default`
 
 		this.#current = initialValue;
 		this.#key = key;
 		this.#serializer = serializer;
+		this.#connected = connected;
+		this.#window = window;
+		this.#syncTabs = syncTabs;
+		this.#storageType = storageType;
 
 		if (window === undefined) return;
 
@@ -98,28 +134,25 @@ export class PersistedState<T> {
 		const existingValue = storage.getItem(key);
 		if (existingValue !== null) {
 			this.#current = this.#deserialize(existingValue);
-		} else {
+		} else if (connected) {
 			this.#serialize(initialValue);
 		}
 
-		this.#subscribe = createSubscriber((update) => {
-			this.#update = update;
-			const cleanup =
-				syncTabs && storageType === "local"
-					? on(window, "storage", this.#handleStorageEvent)
-					: null;
-			return () => {
-				cleanup?.();
-				this.#update = undefined;
-			};
-		});
+		this.#setupStorageListener();
 	}
 
 	get current(): T {
 		this.#subscribe?.();
 
-		const storageItem = this.#storage?.getItem(this.#key);
-		const root = storageItem ? this.#deserialize(storageItem) : this.#current;
+		let root: T | undefined;
+		if (this.#connected) {
+			// when we're connected to storage, we use storage as the source of truth
+			const storageItem = this.#storage?.getItem(this.#key);
+			root = storageItem ? this.#deserialize(storageItem) : this.#current;
+		} else {
+			// when we're not connected to storage, we use the current value in memory
+			root = this.#current;
+		}
 		return proxy(
 			root,
 			root,
@@ -151,8 +184,14 @@ export class PersistedState<T> {
 	}
 
 	#serialize(value: T | undefined): void {
+		if (!this.#connected) {
+			// when we're not connected to storage, we only update the value in memory
+			this.#current = value;
+			return;
+		}
+
 		try {
-			if (value != undefined) {
+			if (value !== undefined) {
 				this.#storage?.setItem(this.#key, this.#serializer.serialize(value));
 			}
 		} catch (error) {
@@ -161,5 +200,72 @@ export class PersistedState<T> {
 				error
 			);
 		}
+	}
+
+	#setupStorageListener(): void {
+		if (!this.#window || !this.#connected) return;
+		this.#subscribe = createSubscriber((update) => {
+			this.#update = update;
+			this.#storageCleanup =
+				this.#connected && this.#syncTabs && this.#storageType === "local"
+					? on(this.#window!, "storage", this.#handleStorageEvent)
+					: undefined;
+
+			return () => {
+				this.#storageCleanup?.();
+				this.#storageCleanup = undefined;
+				this.#update = undefined;
+			};
+		});
+	}
+
+	#teardownStorageListener(): void {
+		this.#storageCleanup?.();
+		this.#storageCleanup = undefined;
+		this.#subscribe = undefined;
+	}
+
+	/**
+	 * Returns whether the state is currently connected to storage.
+	 *
+	 * When `connected` is `false`, the state is not connected to storage and any
+	 * changes to the state will not be persisted to storage and any changes to storage
+	 * will not be reflected in the state.
+	 */
+	get connected(): boolean {
+		return this.#connected;
+	}
+
+	/**
+	 * Disconnects the state from storage, preventing updates to storage and stopping
+	 * cross-tab synchronization. The current value in storage is removed.
+	 *
+	 * Call `.connect()` to re-enable storage persistence.
+	 */
+	disconnect(): void {
+		if (!this.#connected) return;
+		// capture current value from storage before removing
+		const storageItem = this.#storage?.getItem(this.#key);
+		if (storageItem) {
+			this.#current = this.#deserialize(storageItem);
+		}
+		this.#connected = false;
+		this.#storage?.removeItem(this.#key);
+		this.#teardownStorageListener();
+	}
+
+	/**
+	 * Reconnects the state to storage, enabling storage persistence and cross-tab
+	 * synchronization. The current value is immediately persisted to storage.
+	 *
+	 * **NOTE**: By default, the state is already connected to storage and this method is
+	 * only useful to re-enable storage persistence after calling `disconnect()`
+	 * or starting with `connected: false` as an option.
+	 */
+	connect(): void {
+		if (this.#connected) return;
+		this.#connected = true;
+		this.#serialize(this.#current);
+		this.#setupStorageListener();
 	}
 }
