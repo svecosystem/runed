@@ -1,5 +1,14 @@
 # runed
 
+## 0.37.0
+
+### Minor Changes
+
+- feat(PersistedState): add `connect` and `disconnect` methods to control synchronization to storage
+  ([#359](https://github.com/svecosystem/runed/pull/359))
+
+- feat(PersistedState): allow `null` values ([#359](https://github.com/svecosystem/runed/pull/359))
+
 ## 0.36.0
 
 ### Minor Changes
