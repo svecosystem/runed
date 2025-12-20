@@ -41,6 +41,28 @@ Initialize `PersistedState` by providing a unique key and an initial value for t
 </div>
 ```
 
+### Reset
+
+You can reset back to the initial value passed to the constructor:
+
+```ts
+const state = new PersistedState("count", 0);
+
+state.current = 123;
+state.reset();
+console.log(state.current); // 0
+```
+
+### Clearing persisted storage
+
+When connected to storage, setting `current` to `undefined` removes the key from storage:
+
+```ts
+const state = new PersistedState<string | undefined>("draft", "hello");
+
+state.current = undefined; // removes "draft" from storage
+```
+
 ### Complex objects
 
 When persisting complex objects, only plain structures are deeply reactive.
