@@ -42,6 +42,19 @@ export const productSearchSchema = z.object({
 });
 ```
 
+<Callout type="warning">
+
+**All schema fields must have explicit default values.** Using `.optional()` without a default will cause fields to be silently ignored and not update the URL.
+
+```ts
+// ❌ This won't work
+z.string().optional()
+```
+
+This is because `useSearchParams` extracts field information by validating an empty object against your schema. Fields without defaults won't appear in the result, so the hook won't recognize them as valid parameters.
+
+</Callout>
+
 In your svelte code:
 
 ```svelte
@@ -479,6 +492,7 @@ const searchSchema = z.object({
 	birthDate: dateOnlyCodec.default(new Date("1990-01-15")),
 
 	// Compact product IDs
+	// Note: .optional() without default works for reading from URL, but won't be writable
 	productId: compactIdCodec.optional()
 });
 
@@ -509,6 +523,7 @@ const params = useSearchParams(searchSchema);
 		// Date-only for event date (more readable in URL)
 		eventDate: dateOnly.default(new Date()),
 		// Unix timestamp for filters (more compact)
+		// Note: .optional() without default works for reading from URL, but won't be writable
 		createdAfter: unixTimestamp.optional(),
 		updatedSince: unixTimestamp.optional()
 	});

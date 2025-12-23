@@ -2071,6 +2071,16 @@ export function useSearchParams<Schema extends StandardSchemaV1>(
 				target.set(prop as keyof StandardSchemaV1.InferOutput<Schema> & string, value);
 				return true;
 			}
+
+			if (import.meta.env?.DEV && typeof prop === "string") {
+				console.warn(
+					`[useSearchParams] Field "${prop}" not found in schema.\n` +
+						`Either:\n` +
+						`  1. It's a typo (check your schema)\n` +
+						`  2. It's optional without default (add .default())`
+				);
+			}
+
 			return Reflect.set(target, prop, value);
 		},
 	};
