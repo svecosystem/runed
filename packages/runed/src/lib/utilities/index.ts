@@ -22,6 +22,7 @@ export * from "./textarea-autosize/index.js";
 export * from "./throttled/index.js";
 export * from "./use-debounce/index.js";
 export * from "./use-event-listener/index.js";
+export * from "./use-fullscreen/index.js";
 export * from "./use-geolocation/index.js";
 export * from "./use-intersection-observer/index.js";
 export * from "./use-mutation-observer/index.js";
