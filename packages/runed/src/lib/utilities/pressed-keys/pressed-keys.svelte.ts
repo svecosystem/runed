@@ -76,7 +76,8 @@ export class PressedKeys {
 	has(...keys: string[]): boolean {
 		this.#subscribe?.();
 		const normalizedKeys = keys.map((key) => key.toLowerCase());
-		return normalizedKeys.every((key) => this.#pressedKeys.includes(key));
+		return normalizedKeys.length === this.#pressedKeys.length &&
+			normalizedKeys.every((key) => this.#pressedKeys.includes(key));
 	}
 
 	get all(): string[] {
