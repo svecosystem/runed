@@ -13,14 +13,6 @@ import { Callout } from '@svecodocs/kit';
 parameters in Svelte/SvelteKit apps. It supports validation, default values, compression,
 debouncing, and history control.
 
-## Demo
-
-<Demo />
-<Callout>
-	You can refresh this page and/or open it in another tab to see the count state being persisted
-	and synchronized across sessions and tabs.
-</Callout>
-
 ## Requirements
 
 - **`@sveltejs/kit`** must be installed in your project.
