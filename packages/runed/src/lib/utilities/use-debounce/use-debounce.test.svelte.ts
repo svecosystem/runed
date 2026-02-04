@@ -1,6 +1,8 @@
 import { describe, expect, vi } from "vitest";
 import { useDebounce } from "./use-debounce.svelte.js";
 import { testWithEffect } from "$lib/test/util.svelte.js";
+import { render } from "@testing-library/svelte";
+import UseDebounceReactivityTest from "./use-debounce-reactivity.test.svelte";
 
 describe("useDebounce", () => {
 	testWithEffect("Function does not get called immediately", async () => {
@@ -123,5 +125,34 @@ describe("useDebounce", () => {
 
 		debounced().catch(() => {});
 		await debounced.runScheduledNow();
+	});
+
+	testWithEffect("Is reactive", async () => {
+		const instance = render(UseDebounceReactivityTest);
+
+		expect(instance.component.debounced.pending).toBeTruthy();
+		expect(instance.queryByText("pending=true")).toBeInTheDocument();
+
+		await new Promise((resolve) => setTimeout(resolve, 200));
+
+		expect(instance.component.debounced.pending).toBeFalsy();
+		expect(instance.queryByText("pending=true")).not.toBeInTheDocument();
+		expect(instance.queryByText("pending=false")).toBeInTheDocument();
+
+		instance.unmount();
+	});
+
+	testWithEffect("raw is safe to use inside $derived", async () => {
+		const debounced = useDebounce.raw(() => {}, 100);
+
+		{
+			const value = $derived(debounced());
+			await value;
+		}
+
+		{
+			const value = $derived.by(() => debounced());
+			await value;
+		}
 	});
 });

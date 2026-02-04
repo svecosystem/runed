@@ -52,3 +52,17 @@ after a specified duration of inactivity.
 <button onclick={logCount.cancel} disabled={!logCount.pending}>Cancel message</button>
 <p>{logged || "Press the button!"}</p>
 ```
+
+---
+
+If you need to use this utility inside `$derived`, you can use `useDebounce.raw` instead. This has
+the downside of not having reactive properties like `pending`.
+
+```svelte
+<script lang="ts">
+	import { useDebounce } from "runed";
+
+	const debounced = useDebounce.raw(() => {}, 100);
+	const value = $derived(debounced());
+</script>
+```
