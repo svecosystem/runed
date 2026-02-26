@@ -4,10 +4,15 @@ import { createSubscriber } from "svelte/reactivity";
 
 type Serializer<T> = {
 	serialize: (value: T) => string;
-	deserialize: (value: string) => T | undefined;
+	deserialize: (value: string) => T;
 };
 
 type StorageType = "local" | "session";
+
+declare const NO_VALUE: unique symbol;
+
+// different from undefined to distinguish between deserialization failure and valid undefined value
+export type NoValue = typeof NO_VALUE;
 
 function getStorage(storageType: StorageType, window: Window & typeof globalThis): Storage {
 	switch (storageType) {
@@ -55,11 +60,11 @@ type PersistedStateOptions<T> = {
 
 function proxy<T>(
 	value: unknown,
-	root: T | undefined,
+	root: T | NoValue,
 	proxies: WeakMap<WeakKey, unknown>,
 	subscribe: VoidFunction | undefined,
 	update: VoidFunction | undefined,
-	serialize: (root?: T | undefined) => void
+	serialize: (root: T | NoValue) => void
 ): T {
 	if (value === null || typeof value !== "object") {
 		return value as T;
@@ -96,7 +101,7 @@ function proxy<T>(
  * @see {@link https://runed.dev/docs/utilities/persisted-state}
  */
 export class PersistedState<T> {
-	#current: T | undefined;
+	#current: T | NoValue;
 	#key: string;
 	#serializer: Serializer<T>;
 	#storage?: Storage;
@@ -144,7 +149,7 @@ export class PersistedState<T> {
 	get current(): T {
 		this.#subscribe?.();
 
-		let root: T | undefined;
+		let root: T | NoValue = NO_VALUE;
 		if (this.#connected) {
 			// when we're connected to storage, we use storage as the source of truth
 			const storageItem = this.#storage?.getItem(this.#key);
@@ -174,16 +179,16 @@ export class PersistedState<T> {
 		this.#update?.();
 	};
 
-	#deserialize(value: string): T | undefined {
+	#deserialize(value: string): T | NoValue {
 		try {
 			return this.#serializer.deserialize(value);
 		} catch (error) {
 			console.error(`Error when parsing "${value}" from persisted store "${this.#key}"`, error);
-			return;
+			return NO_VALUE;
 		}
 	}
 
-	#serialize(value: T | undefined): void {
+	#serialize(value: T | NoValue): void {
 		if (!this.#connected) {
 			// when we're not connected to storage, we only update the value in memory
 			this.#current = value;
@@ -191,7 +196,7 @@ export class PersistedState<T> {
 		}
 
 		try {
-			if (value !== undefined) {
+			if (value !== NO_VALUE) {
 				this.#storage?.setItem(this.#key, this.#serializer.serialize(value));
 			}
 		} catch (error) {
