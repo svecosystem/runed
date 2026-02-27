@@ -2,9 +2,11 @@ import { defaultWindow, type ConfigurableWindow } from "$lib/internal/configurab
 import { on } from "svelte/events";
 import { createSubscriber } from "svelte/reactivity";
 
+type NoUndefined<T> = undefined extends T ? never : T;
+
 type Serializer<T> = {
 	serialize: (value: T) => string;
-	deserialize: (value: string) => T | undefined;
+	deserialize: (value: string) => NoUndefined<T> | undefined;
 };
 
 type StorageType = "local" | "session";
@@ -55,18 +57,18 @@ type PersistedStateOptions<T> = {
 
 function proxy<T>(
 	value: unknown,
-	root: T | undefined,
+	root: NoUndefined<T> | undefined,
 	proxies: WeakMap<WeakKey, unknown>,
 	subscribe: VoidFunction | undefined,
 	update: VoidFunction | undefined,
-	serialize: (root?: T | undefined) => void
-): T {
+	serialize: (root?: NoUndefined<T> | undefined) => void
+): NoUndefined<T> {
 	if (value === null || typeof value !== "object") {
-		return value as T;
+		return value as NoUndefined<T>;
 	}
 	const proto = Object.getPrototypeOf(value);
 	if (proto !== null && proto !== Object.prototype && !Array.isArray(value)) {
-		return value as T;
+		return value as NoUndefined<T>;
 	}
 	let p = proxies.get(value);
 	if (!p) {
@@ -84,11 +86,13 @@ function proxy<T>(
 		});
 		proxies.set(value, p);
 	}
-	return p as T;
+	return p as NoUndefined<T>;
 }
 
 /**
  * Creates reactive state that is persisted and synchronized across browser sessions and tabs using Web Storage.
+ * The stored type must not include `undefined` as a valid value, if you with to have a empty value, use `null` instead.
+ * 
  * @param key The unique key used to store the state in the storage.
  * @param initialValue The initial value of the state if not already present in the storage.
  * @param options Configuration options including storage type, serializer for complex data types, and whether to sync state changes across tabs.
@@ -96,7 +100,7 @@ function proxy<T>(
  * @see {@link https://runed.dev/docs/utilities/persisted-state}
  */
 export class PersistedState<T> {
-	#current: T | undefined;
+	#current: NoUndefined<T> | undefined;
 	#key: string;
 	#serializer: Serializer<T>;
 	#storage?: Storage;
@@ -109,7 +113,7 @@ export class PersistedState<T> {
 	#syncTabs: boolean;
 	#storageType: StorageType;
 
-	constructor(key: string, initialValue: T, options: PersistedStateOptions<T> = {}) {
+	constructor(key: string, initialValue: NoUndefined<T>, options: PersistedStateOptions<T> = {}) {
 		const {
 			storage: storageType = "local",
 			serializer = { serialize: JSON.stringify, deserialize: JSON.parse },
@@ -141,10 +145,10 @@ export class PersistedState<T> {
 		this.#setupStorageListener();
 	}
 
-	get current(): T {
+	get current(): NoUndefined<T> {
 		this.#subscribe?.();
 
-		let root: T | undefined;
+		let root: NoUndefined<T> | undefined;
 		if (this.#connected) {
 			// when we're connected to storage, we use storage as the source of truth
 			const storageItem = this.#storage?.getItem(this.#key);
@@ -163,7 +167,7 @@ export class PersistedState<T> {
 		);
 	}
 
-	set current(newValue: T) {
+	set current(newValue: NoUndefined<T>) {
 		this.#serialize(newValue);
 		this.#update?.();
 	}
@@ -174,7 +178,7 @@ export class PersistedState<T> {
 		this.#update?.();
 	};
 
-	#deserialize(value: string): T | undefined {
+	#deserialize(value: string): NoUndefined<T> | undefined {
 		try {
 			return this.#serializer.deserialize(value);
 		} catch (error) {
@@ -183,7 +187,7 @@ export class PersistedState<T> {
 		}
 	}
 
-	#serialize(value: T | undefined): void {
+	#serialize(value: NoUndefined<T> | undefined): void {
 		if (!this.#connected) {
 			// when we're not connected to storage, we only update the value in memory
 			this.#current = value;
