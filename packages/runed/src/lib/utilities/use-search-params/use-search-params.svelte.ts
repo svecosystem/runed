@@ -1834,6 +1834,11 @@ export function useSearchParams<Schema extends StandardSchemaV1>(
 
 	// Track if we've done initial setup (separate from cache initialization)
 	let hasInitialized = false;
+	
+	// Initial URL sync to local cache - on both server and client
+	if (!building) {
+		searchParams.syncFromURL(page.url.searchParams);
+	}
 
 	// Only run initialization logic after hydration is complete
 	$effect(() => {
