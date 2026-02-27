@@ -63,16 +63,17 @@ You can now access:
 
 You can configure `ScrollState` via the following options:
 
-| Option                 | Type                                                     | Description                                                            |
-| ---------------------- | -------------------------------------------------------- | ---------------------------------------------------------------------- |
-| `element`              | `MaybeGetter<HTMLElement \| Window \| Document \| null>` | The scroll container (required).                                       |
-| `idle`                 | `MaybeGetter<number \| undefined>`                       | Debounce time (ms) after scroll ends. Default: `200`.                  |
-| `offset`               | `{ top?, bottom?, left?, right? }`                       | Pixel thresholds for "arrived" state detection. Default: `0` for all.  |
-| `onScroll`             | `(e: Event) => void`                                     | Callback for scroll events.                                            |
-| `onStop`               | `(e: Event) => void`                                     | Callback after scrolling stops.                                        |
-| `eventListenerOptions` | `AddEventListenerOptions`                                | Scroll listener options. Default: `{ passive: true, capture: false }`. |
-| `behavior`             | `ScrollBehavior`                                         | Scroll behavior: `"auto"`, `"smooth"`, etc. Default: `"auto"`.         |
-| `onError`              | `(error: unknown) => void`                               | Optional error handler. Default: `console.error`.                      |
+| Option                 | Type                                                     | Description                                                                             |
+| ---------------------- | -------------------------------------------------------- | --------------------------------------------------------------------------------------- |
+| `element`              | `MaybeGetter<HTMLElement \| Window \| Document \| null>` | The scroll container (required).                                                        |
+| `idle`                 | `MaybeGetter<number \| undefined>`                       | Debounce time (ms) after scroll ends. Default: `200`.                                   |
+| `offset`               | `{ top?, bottom?, left?, right? }`                       | Pixel thresholds for "arrived" state detection. Default: `0` for all.                   |
+| `observe`              | `MaybeGetter<boolean \| undefined>`                      | Enable MutationObserver to detect DOM changes affecting scroll state. Default: `false`. |
+| `onScroll`             | `(e: Event) => void`                                     | Callback for scroll events.                                                             |
+| `onStop`               | `(e: Event) => void`                                     | Callback after scrolling stops.                                                         |
+| `eventListenerOptions` | `AddEventListenerOptions`                                | Scroll listener options. Default: `{ passive: true, capture: false }`.                  |
+| `behavior`             | `ScrollBehavior`                                         | Scroll behavior: `"auto"`, `"smooth"`, etc. Default: `"auto"`.                          |
+| `onError`              | `(error: unknown) => void`                               | Optional error handler. Default: `console.error`.                                       |
 
 ## Notes
 
