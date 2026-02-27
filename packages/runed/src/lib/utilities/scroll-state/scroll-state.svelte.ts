@@ -1,5 +1,5 @@
 import type { MaybeGetter } from "$lib/internal/types.js";
-import { AnimationFrames } from "$lib/utilities/animation-frames/index.js";
+import { useMutationObserver } from "$lib/utilities/use-mutation-observer/index.js";
 import { useDebounce } from "$lib/utilities/use-debounce/index.js";
 import { useEventListener } from "$lib/utilities/use-event-listener/index.js";
 import { onMount } from "svelte";
@@ -33,6 +33,16 @@ export interface ScrollStateOptions {
 		  }
 		| undefined
 	>;
+
+	/**
+	 * Use MutationObserver to monitor DOM changes that might affect scroll state,
+	 * such as attribute modifications, child node additions/removals, or subtree changes.
+	 *
+	 * Useful when content changes dynamically without triggering scroll events.
+	 *
+	 * @default false
+	 */
+	observe?: MaybeGetter<boolean | undefined>;
 
 	/**
 	 * Called during scroll events.
@@ -86,6 +96,7 @@ export class ScrollState {
 	#options!: ScrollStateOptions;
 	element = $derived(extract(this.#options.element));
 	idle = $derived.by(() => extract(this.#options?.idle, 200));
+	observe = $derived(extract(this.#options.observe, false));
 	offset = $derived(
 		extract(this.#options.offset, {
 			left: 0,
@@ -171,8 +182,24 @@ export class ScrollState {
 			this.setArrivedState();
 		});
 
-		// overkill?
-		new AnimationFrames(() => this.setArrivedState());
+		if (
+			this.observe &&
+			this.element &&
+			this.element !== window &&
+			this.element !== window.document
+		) {
+			useMutationObserver(
+				() => this.element as HTMLElement | null,
+				() => {
+					this.setArrivedState();
+				},
+				{
+					attributes: true,
+					childList: true,
+					subtree: true,
+				}
+			);
+		}
 	}
 
 	/**
