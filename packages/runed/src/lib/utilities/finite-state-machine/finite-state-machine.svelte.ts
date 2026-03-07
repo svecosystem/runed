@@ -1,3 +1,5 @@
+import { DEV } from "esm-env";
+
 export type FSMLifecycleFn<StatesT extends string, EventsT extends string> = (
 	meta: LifecycleFnMeta<StatesT, EventsT>
 ) => void;
@@ -84,7 +86,7 @@ export class FiniteStateMachine<StatesT extends string, EventsT extends string> 
 				if (isLifecycleFnMeta<StatesT, EventsT>(args[0])) {
 					(action as FSMLifecycleFn<StatesT, EventsT>)(args[0]);
 				} else {
-					console.warn("Invalid metadata passed to lifecycle function of the FSM.");
+					if (DEV) console.warn("Invalid metadata passed to lifecycle function of the FSM.");
 				}
 			} else {
 				return (action as ActionFn<StatesT>)(...args);
@@ -92,7 +94,7 @@ export class FiniteStateMachine<StatesT extends string, EventsT extends string> 
 		} else if (typeof action === "string") {
 			return action as StatesT;
 		} else if (event !== "_enter" && event !== "_exit") {
-			console.warn("No action defined for event", event, "in state", this.#current);
+			if (DEV) console.warn("No action defined for event", event, "in state", this.#current);
 		}
 	}
 
