@@ -37,6 +37,9 @@ export function useThrottle<Args extends unknown[], Return>(
 					resolve = res;
 					reject = rej;
 				});
+				// Prevent unhandled rejection when cancel() is called
+				// without the caller attaching a .catch() handler
+				promise.catch(() => {});
 			}
 
 			if (now < nextAllowedTime) {
