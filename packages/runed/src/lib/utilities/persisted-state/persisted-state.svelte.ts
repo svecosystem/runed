@@ -1,4 +1,5 @@
 import { defaultWindow, type ConfigurableWindow } from "$lib/internal/configurable-globals.js";
+import { dequal } from "dequal";
 import { on } from "svelte/events";
 import { createSubscriber } from "svelte/reactivity";
 
@@ -51,6 +52,14 @@ type PersistedStateOptions<T> = {
 	 * @default true
 	 */
 	connected?: boolean;
+
+	/**
+	 * When `true`, writing a value deep-equal to `initialValue` removes the storage key instead of
+	 * persisting it (an absent key reads back as the default), keeping storage clean.
+	 *
+	 * @default false
+	 */
+	eraseWhenDefault?: boolean;
 } & ConfigurableWindow;
 
 function proxy<T>(
@@ -108,6 +117,8 @@ export class PersistedState<T> {
 	#window?: Window & typeof globalThis;
 	#syncTabs: boolean;
 	#storageType: StorageType;
+	#initialValue: T;
+	#eraseWhenDefault: boolean;
 
 	constructor(key: string, initialValue: T, options: PersistedStateOptions<T> = {}) {
 		const {
@@ -115,16 +126,20 @@ export class PersistedState<T> {
 			serializer = { serialize: JSON.stringify, deserialize: JSON.parse },
 			syncTabs = true,
 			connected = true,
+			eraseWhenDefault = false,
 		} = options;
 		const window = "window" in options ? options.window : defaultWindow; // window is not mockable to be undefined without this, because JavaScript will fill undefined with `= default`
 
-		this.#current = initialValue;
 		this.#key = key;
 		this.#serializer = serializer;
+		// clone so #current/#initialValue don't alias the caller's object (see #clone)
+		this.#current = this.#clone(initialValue);
 		this.#connected = connected;
 		this.#window = window;
 		this.#syncTabs = syncTabs;
 		this.#storageType = storageType;
+		this.#initialValue = this.#clone(initialValue);
+		this.#eraseWhenDefault = eraseWhenDefault;
 
 		if (window === undefined) return;
 
@@ -135,7 +150,7 @@ export class PersistedState<T> {
 		if (existingValue !== null) {
 			this.#current = this.#deserialize(existingValue);
 		} else if (connected) {
-			this.#serialize(initialValue);
+			this.#serialize(this.#current);
 		}
 
 		this.#setupStorageListener();
@@ -169,7 +184,15 @@ export class PersistedState<T> {
 	}
 
 	#handleStorageEvent = (event: StorageEvent): void => {
-		if (event.key !== this.#key || event.newValue === null) return;
+		if (event.key !== this.#key) return;
+		if (event.newValue === null) {
+			// a removed key resets to the default when erasing defaults; otherwise it's ignored
+			if (this.#eraseWhenDefault) {
+				this.#current = this.#clone(this.#initialValue);
+				this.#update?.();
+			}
+			return;
+		}
 		this.#current = this.#deserialize(event.newValue);
 		this.#update?.();
 	};
@@ -184,14 +207,20 @@ export class PersistedState<T> {
 	}
 
 	#serialize(value: T | undefined): void {
+		// keep the in-memory value in sync so `current`'s fallback isn't stale when the key is absent
+		this.#current = value;
+
 		if (!this.#connected) {
 			// when we're not connected to storage, we only update the value in memory
-			this.#current = value;
 			return;
 		}
 
 		try {
-			if (value !== undefined) {
+			if (value === undefined) return;
+			if (this.#eraseWhenDefault && dequal(value, this.#initialValue)) {
+				// an absent key reads back as the default, so clear it instead of persisting the default
+				this.#storage?.removeItem(this.#key);
+			} else {
 				this.#storage?.setItem(this.#key, this.#serializer.serialize(value));
 			}
 		} catch (error) {
@@ -199,6 +228,16 @@ export class PersistedState<T> {
 				`Error when writing value from persisted store "${this.#key}" to ${this.#storage}`,
 				error
 			);
+		}
+	}
+
+	// deep copy via the serializer so a mutable default isn't aliased: mutating `current` through the
+	// proxy must not corrupt #initialValue, which `eraseWhenDefault` compares against
+	#clone(value: T): T {
+		try {
+			return this.#serializer.deserialize(this.#serializer.serialize(value)) ?? value;
+		} catch {
+			return value;
 		}
 	}
 

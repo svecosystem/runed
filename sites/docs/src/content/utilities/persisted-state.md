@@ -83,6 +83,9 @@ const state = new PersistedState("user-preferences", initialValue, {
 	// Start disconnected from storage (default: true)
 	connected: false,
 
+	// Clear the storage key when the value equals the initial value (default: false)
+	eraseWhenDefault: true,
+
 	// Custom serialization handlers
 	serializer: {
 		serialize: superjson.stringify,
@@ -136,6 +139,18 @@ When disconnected:
 
 Calling `disconnect()` removes the current value from storage but preserves it in memory. Calling
 `connect()` immediately persists the current in-memory value to storage.
+
+### Erasing Defaults
+
+With `eraseWhenDefault: true`, writing a value deep-equal to `initialValue` removes the storage key
+instead of persisting it. An empty storage key is treated the same as a storage key equal to `initialValue`.
+
+```ts
+const htmlPreview = new PersistedState("page-123456:html-preview", false, { eraseWhenDefault: true });
+
+htmlPreview.current = true; // -> localStorage["page-123456:html-preview"] === "true"
+htmlPreview.current = false; //  localStorage["page-123456:html-preview"] === undefined -- key removed, reads back as false
+```
 
 ### Custom Serialization
 

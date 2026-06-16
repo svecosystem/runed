@@ -504,4 +504,83 @@ describe("PersistedState", async () => {
 			expect(persistedState.connected).toBe(true);
 		});
 	});
+
+	describe("eraseWhenDefault", () => {
+		testWithEffect("does not persist the initial value on construction", () => {
+			const persistedState = new PersistedState(key, initialValue, { eraseWhenDefault: true });
+			expect(persistedState.current).toBe(initialValue);
+			expect(localStorage.getItem(key)).toBeNull();
+		});
+
+		testWithEffect("persists non-default values", () => {
+			const persistedState = new PersistedState(key, initialValue, { eraseWhenDefault: true });
+			persistedState.current = newValue;
+			expect(persistedState.current).toBe(newValue);
+			expect(localStorage.getItem(key)).toBe(JSON.stringify(newValue));
+		});
+
+		testWithEffect("removes the key when the value returns to the default", () => {
+			const persistedState = new PersistedState(key, initialValue, { eraseWhenDefault: true });
+			persistedState.current = newValue;
+			expect(localStorage.getItem(key)).toBe(JSON.stringify(newValue));
+
+			persistedState.current = initialValue;
+			expect(localStorage.getItem(key)).toBeNull();
+		});
+
+		// Regression: after erasing the key, `current` must report the value that was just written,
+		// not a stale in-memory value left over from before.
+		testWithEffect("reads back the default after erasing, even when constructed from a value", () => {
+			localStorage.setItem(key, JSON.stringify(newValue));
+			const persistedState = new PersistedState(key, initialValue, { eraseWhenDefault: true });
+			expect(persistedState.current).toBe(newValue);
+
+			persistedState.current = initialValue;
+			expect(localStorage.getItem(key)).toBeNull();
+			expect(persistedState.current).toBe(initialValue);
+		});
+
+		// Regression: #current/#initialValue must not alias the caller's object, or mutating the
+		// reactive value through the proxy would also mutate the default that `dequal` compares against.
+		testWithEffect("does not alias the caller's initialValue object", () => {
+			const initial = { nested: { value: 1 } };
+			const persistedState = new PersistedState(key, initial, { eraseWhenDefault: true });
+
+			persistedState.current.nested.value = 2;
+			expect(initial.nested.value).toBe(1);
+			expect(localStorage.getItem(key)).not.toBeNull();
+
+			persistedState.current.nested.value = 1;
+			expect(localStorage.getItem(key)).toBeNull();
+		});
+
+		testWithEffect("deep-equal objects are treated as the default", () => {
+			const initial = { nested: { value: 1 } };
+			const persistedState = new PersistedState(key, initial, { eraseWhenDefault: true });
+			persistedState.current = { nested: { value: 2 } };
+			expect(localStorage.getItem(key)).not.toBeNull();
+
+			persistedState.current = { nested: { value: 1 } };
+			expect(localStorage.getItem(key)).toBeNull();
+			expect(persistedState.current).toEqual(initial);
+		});
+
+		testWithEffect("a cross-tab removal resets current to the default", () => {
+			$effect(() => {
+				const persistedState = new PersistedState(key, initialValue, { eraseWhenDefault: true });
+				persistedState.current = newValue;
+				expect(persistedState.current).toBe(newValue);
+
+				localStorage.removeItem(key);
+				window.dispatchEvent(
+					new StorageEvent("storage", {
+						key,
+						oldValue: JSON.stringify(newValue),
+						newValue: null,
+					})
+				);
+				expect(persistedState.current).toBe(initialValue);
+			});
+		});
+	});
 });
