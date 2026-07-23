@@ -9,12 +9,20 @@ type Serializer<T> = {
 
 type StorageType = "local" | "session";
 
-function getStorage(storageType: StorageType, window: Window & typeof globalThis): Storage {
-	switch (storageType) {
-		case "local":
-			return window.localStorage;
-		case "session":
-			return window.sessionStorage;
+function getStorage(
+	storageType: StorageType,
+	window: Window & typeof globalThis
+): Storage | undefined {
+	try {
+		switch (storageType) {
+			case "local":
+				return window.localStorage;
+			case "session":
+				return window.sessionStorage;
+		}
+	} catch {
+		// permission denied or disabled
+		return undefined;
 	}
 }
 
@@ -131,7 +139,7 @@ export class PersistedState<T> {
 		const storage = getStorage(storageType, window);
 		this.#storage = storage;
 
-		const existingValue = storage.getItem(key);
+		const existingValue = storage?.getItem(key) ?? null;
 		if (existingValue !== null) {
 			this.#current = this.#deserialize(existingValue);
 		} else if (connected) {
@@ -196,7 +204,7 @@ export class PersistedState<T> {
 			}
 		} catch (error) {
 			console.error(
-				`Error when writing value from persisted store "${this.#key}" to ${this.#storage}`,
+				`Error when writing value from persisted store "${this.#key}" to the storage`,
 				error
 			);
 		}
