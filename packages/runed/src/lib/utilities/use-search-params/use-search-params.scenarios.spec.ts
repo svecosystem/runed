@@ -553,6 +553,22 @@ test.describe("useSearchParams scenarios", () => {
 			await page.waitForTimeout(300);
 		});
 
+		test("coercion-equivalent assignments do not navigate", async ({ page }) => {
+			await page.getByTestId("setCoercionEquivalent").click();
+			await page.getByTestId("updateCoercionEquivalent").click();
+			await page.getByTestId("setEquivalentDate").click();
+
+			await expect(page.getByTestId("navigationCount")).toHaveText("0");
+			await expect(page).toHaveURL(route);
+		});
+
+		test("resetting default parameters does not navigate", async ({ page }) => {
+			await page.getByTestId("reset").click();
+
+			await expect(page.getByTestId("navigationCount")).toHaveText("0");
+			await expect(page).toHaveURL(route);
+		});
+
 		test("createdAt uses date-only format from schema property", async ({ page }) => {
 			const setCreatedAtButton = page.getByTestId("setCreatedAt");
 			await setCreatedAtButton.waitFor({ state: "visible" });
