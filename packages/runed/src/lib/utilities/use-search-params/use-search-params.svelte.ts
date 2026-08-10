@@ -889,13 +889,18 @@ class SearchParams<Schema extends StandardSchemaV1> {
 		if (result && "value" in result) {
 			const validatedResult = result.value as Record<string, unknown>;
 
-			// Always update local cache immediately (for instant reads)
 			const updatedCache = this.#updateParamsWithValidatedValues(
 				this.#localCache,
 				filteredValues,
 				validatedResult,
 				true // always treat as in-memory for cache updates
 			);
+
+			// Validation and serialization may normalize an apparently different input
+			// back to the value already stored in the cache.
+			if (updatedCache.toString() === this.#localCache.toString()) return;
+
+			// Always update local cache immediately (for instant reads)
 			this.#localCache = updatedCache as SvelteURLSearchParams;
 
 			// If updateURL is true and we're in browser, sync to URL
@@ -961,7 +966,9 @@ class SearchParams<Schema extends StandardSchemaV1> {
 				const stringValue = this.#serializeValue(value, key);
 				newCache.set(key, stringValue);
 			}
-			this.#localCache = newCache;
+			if (newCache.toString() !== this.#localCache.toString()) {
+				this.#localCache = newCache;
+			}
 
 			// If updateURL is true, sync to URL
 			if (this.#options.updateURL && BROWSER && !building) {
@@ -974,11 +981,16 @@ class SearchParams<Schema extends StandardSchemaV1> {
 			}
 		} else {
 			// Not showing defaults - just clear everything
-			this.#localCache = new SvelteURLSearchParams();
+			if (this.#localCache.size > 0) {
+				this.#localCache = new SvelteURLSearchParams();
+			}
 
 			// If updateURL is true, clear the URL
 			if (this.#options.updateURL && BROWSER && !building) {
-				goto("?", { replaceState: true, noScroll: this.#options.noScroll });
+				const currentParams = new URLSearchParams(window.location.search);
+				if (currentParams.size > 0) {
+					goto("?", { replaceState: true, noScroll: this.#options.noScroll });
+				}
 			}
 		}
 	}
@@ -1103,15 +1115,26 @@ class SearchParams<Schema extends StandardSchemaV1> {
 	 * @private
 	 */
 	#navigateWithParams(params: URLSearchParams) {
+		const serializedParams = params.toString();
 		const navigateToNewUrl = () => {
 			if (!BROWSER) return;
+			this.#debounceTimer = null;
+
+			const currentParams = new URLSearchParams(window.location.search);
+			if (serializedParams === currentParams.toString()) return;
+
 			// When pushHistory is false, use replaceState to avoid creating a browser history entry
 			const gotoOptions = !this.#options.pushHistory
 				? { replaceState: true, keepFocus: true }
 				: { keepFocus: true };
 
-			goto("?" + params.toString(), { ...gotoOptions, noScroll: this.#options.noScroll });
+			goto("?" + serializedParams, { ...gotoOptions, noScroll: this.#options.noScroll });
 		};
+
+		if (BROWSER) {
+			const currentParams = new URLSearchParams(window.location.search);
+			if (serializedParams === currentParams.toString()) return;
+		}
 
 		// If debounce is set, delay the URL update
 		if (this.#options.debounce && this.#options.debounce > 0) {
@@ -1279,13 +1302,18 @@ class SearchParams<Schema extends StandardSchemaV1> {
 			const validatedResult = result.value as Record<string, unknown>;
 			const updateObj = { [key]: value };
 
-			// Always update local cache immediately (for instant reads)
 			const updatedCache = this.#updateParamsWithValidatedValues(
 				this.#localCache,
 				updateObj,
 				validatedResult,
 				true // always treat as in-memory for cache updates
 			);
+
+			// Validation and serialization may normalize an apparently different input
+			// back to the value already stored in the cache.
+			if (updatedCache.toString() === this.#localCache.toString()) return;
+
+			// Always update local cache immediately (for instant reads)
 			this.#localCache = updatedCache as SvelteURLSearchParams;
 
 			// If updateURL is true, sync to URL
