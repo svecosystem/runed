@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { goto } from "$app/navigation";
 	import { page } from "$app/state";
 	import {
 		createSearchParamsSchema,
@@ -44,6 +45,10 @@
 	function setUpdatedAt() {
 		paramsObj.updatedAt = new Date("2023-06-20T18:00:00Z");
 	}
+	function scheduleUpdateThenNavigate() {
+		paramsObj.filter = "stale";
+		void goto("/test-search/default?filter=fresh");
+	}
 
 	// Create a derived value to avoid potential infinite loops
 	let createdAtString = $derived(
@@ -60,6 +65,9 @@
 <button data-testid="setBoth" onclick={setBoth}>Set both</button>
 <button data-testid="setCreatedAt" onclick={setCreatedAt}>Set createdAt</button>
 <button data-testid="setUpdatedAt" onclick={setUpdatedAt}>Set updatedAt</button>
+<button data-testid="scheduleUpdateThenNavigate" onclick={scheduleUpdateThenNavigate}
+	>Schedule update then navigate</button
+>
 <span data-testid="page">{paramsObj.page}</span>
 <span data-testid="filter">{paramsObj.filter}</span>
 <span data-testid="createdAt">{createdAtString}</span>

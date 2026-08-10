@@ -2,7 +2,7 @@ import { SvelteURLSearchParams } from "svelte/reactivity";
 import { dequal } from "dequal/lite";
 import * as lzString from "lz-string";
 import { browser, building } from "$app/environment";
-import { goto } from "$app/navigation";
+import { beforeNavigate, goto } from "$app/navigation";
 import { page } from "$app/state";
 import { IsMounted } from "../is-mounted/is-mounted.svelte.js";
 import { BROWSER } from "esm-env";
@@ -1946,6 +1946,10 @@ export function useSearchParams<Schema extends StandardSchemaV1>(
 
 	// Only run this logic in the browser and if debounce is enabled
 	if (browser && !building && options.debounce && options.debounce > 0) {
+		beforeNavigate(() => {
+			searchParams.cleanup();
+		});
+
 		$effect(() => {
 			// This effect runs once when the hook is initialized within a component.
 			// It has no dependencies, so it doesn't re-run.

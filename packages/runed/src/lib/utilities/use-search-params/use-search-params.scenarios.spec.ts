@@ -544,6 +544,16 @@ test.describe("useSearchParams scenarios", () => {
 		});
 	}
 
+	test("navigation cancels a pending debounced URL update", async ({ page }) => {
+		await page.goto("/test-search/debounce");
+		await page.waitForTimeout(300);
+		await page.getByTestId("scheduleUpdateThenNavigate").click();
+
+		await expect(page).toHaveURL(/\/test-search\/default\?filter=fresh$/);
+		await page.waitForTimeout(300);
+		await expect(page).toHaveURL(/\/test-search\/default\?filter=fresh$/);
+	});
+
 	// Test date format configuration (schema property and options)
 	test.describe("date-format-schema", () => {
 		const route = "/test-search/default";
