@@ -1,8 +1,8 @@
 <script lang="ts">
-	import RunedDark from "$lib/components/logos/runed-dark.svelte";
-	import RunedLight from "$lib/components/logos/runed-light.svelte";
+	import RunedDark from "#lib/components/logos/runed-dark.svelte";
+	import RunedLight from "#lib/components/logos/runed-light.svelte";
 	import { DocsLayout } from "@svecodocs/kit";
-	import { navigation } from "$lib/config/navigation";
+	import { navigation } from "#lib/config/navigation.js";
 
 	let { children } = $props();
 </script>

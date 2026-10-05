@@ -5,7 +5,7 @@ category: State
 ---
 
 <script>
-	import Demo from '$lib/components/demos/finite-state-machine.svelte';
+	import Demo from '#lib/components/demos/finite-state-machine.svelte';
 </script>
 
 ## Demo

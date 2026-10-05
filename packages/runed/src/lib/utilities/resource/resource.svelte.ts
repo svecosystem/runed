@@ -1,5 +1,5 @@
-import { watch } from "$lib/utilities/watch/index.js";
-import type { Getter } from "$lib/internal/types.js";
+import { watch } from "#lib/utilities/watch/index.js";
+import type { Getter } from "#lib/internal/types.js";
 
 /**
  * Configuration options for the resource function

@@ -1,9 +1,9 @@
 import { SvelteURLSearchParams } from "svelte/reactivity";
 import { dequal } from "dequal/lite";
 import * as lzString from "lz-string";
-import { browser, building } from "$app/environment";
+import { browser, building } from "$app/env";
 import { goto } from "$app/navigation";
-import { page } from "$app/state";
+import { page, type ReadonlyURLSearchParams } from "$app/state";
 import { IsMounted } from "../is-mounted/is-mounted.svelte.js";
 import { BROWSER } from "esm-env";
 import { untrack } from "svelte";
@@ -159,7 +159,7 @@ type ExtractParamValuesOptions = {
  * @internal
  */
 export function extractParamValues(
-	searchParams: URLSearchParams,
+	searchParams: ReadonlyURLSearchParams,
 	options: ExtractParamValuesOptions = {}
 ): Record<string, unknown> {
 	const {
@@ -384,7 +384,7 @@ function extractSchemaInfo<Schema extends StandardSchemaV1>(schema: Schema): Sch
  * @internal
  */
 function extractSelectiveParamValues(
-	searchParams: URLSearchParams,
+	searchParams: ReadonlyURLSearchParams,
 	schemaKeys: string[],
 	options: ExtractParamValuesOptions = {}
 ): Record<string, unknown> {
@@ -748,7 +748,7 @@ class SearchParams<Schema extends StandardSchemaV1> {
 	 * Example in a Svelte component with Svelte 5 runes:
 	 * ```svelte
 	 * <script>
-	 *   import { useSearchParams } from '$lib/hooks/useSearchParams.svelte';
+	 *   import { useSearchParams } from '#lib/hooks/useSearchParams.svelte';
 	 *
 	 *   // Using debounce, so we need to handle cleanup
 	 *   const searchParams = useSearchParams(schema, { debounce: 300 });
@@ -776,7 +776,7 @@ class SearchParams<Schema extends StandardSchemaV1> {
 	 * This is called when the URL changes externally (e.g., browser back/forward navigation)
 	 * @internal
 	 */
-	syncFromURL(urlParams: URLSearchParams): void {
+	syncFromURL(urlParams: ReadonlyURLSearchParams): void {
 		const compressedParamName = this.#options.compressedParamName ?? "_data";
 
 		// Handle compressed mode
@@ -978,7 +978,7 @@ class SearchParams<Schema extends StandardSchemaV1> {
 
 			// If updateURL is true, clear the URL
 			if (this.#options.updateURL && BROWSER && !building) {
-				goto("?", { replaceState: true, noScroll: this.#options.noScroll });
+				goto("?", { replace: true, reset: !this.#options.noScroll });
 			}
 		}
 	}
@@ -1105,12 +1105,13 @@ class SearchParams<Schema extends StandardSchemaV1> {
 	#navigateWithParams(params: URLSearchParams) {
 		const navigateToNewUrl = () => {
 			if (!BROWSER) return;
-			// When pushHistory is false, use replaceState to avoid creating a browser history entry
-			const gotoOptions = !this.#options.pushHistory
-				? { replaceState: true, keepFocus: true }
-				: { keepFocus: true };
-
-			goto("?" + params.toString(), { ...gotoOptions, noScroll: this.#options.noScroll });
+			// When pushHistory is false, replace the entry to avoid creating a browser history entry
+			// reset is always false to keep focus (e.g. while typing); scroll is reset manually instead
+			goto("?" + params.toString(), { replace: !this.#options.pushHistory, reset: false }).then(
+				() => {
+					if (!this.#options.noScroll) window.scrollTo(0, 0);
+				}
+			);
 		};
 
 		// If debounce is set, delay the URL update
@@ -1583,7 +1584,7 @@ export function createSearchParamsSchema<T extends Record<string, SchemaTypeConf
  *
  * Example with SvelteKit page or layout load function:
  * ```ts
- * import { validateSearchParams } from '$lib/hooks/useSearchParams.svelte';
+ * import { validateSearchParams } from '#lib/hooks/useSearchParams.svelte';
  * import { productSchema } from './schemas';
  *
  * export const load = ({ url }) => {
@@ -1866,7 +1867,7 @@ export function useSearchParams<Schema extends StandardSchemaV1>(
 					for (const key of invalidKeys) {
 						newSearchParams.delete(String(key));
 					}
-					goto("?" + newSearchParams.toString(), { replaceState: true });
+					goto("?" + newSearchParams.toString(), { replace: true });
 				}
 			}
 		}
@@ -1919,9 +1920,9 @@ export function useSearchParams<Schema extends StandardSchemaV1>(
 
 					// Only update the URL if we added parameters
 					if (needsUpdate) {
-						// Always use replaceState: true for initialization to avoid creating a new history entry
+						// Always use replace: true for initialization to avoid creating a new history entry
 						// Don't use debouncing for initialization as this is a one-time operation
-						goto("?" + newSearchParams.toString(), { replaceState: true });
+						goto("?" + newSearchParams.toString(), { replace: true });
 					}
 				}
 			}

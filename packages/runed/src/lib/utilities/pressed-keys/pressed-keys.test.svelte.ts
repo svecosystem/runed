@@ -1,6 +1,6 @@
 import { describe, expect } from "vitest";
 import { PressedKeys } from "./pressed-keys.svelte.js";
-import { testWithEffect } from "$lib/test/util.svelte.js";
+import { testWithEffect } from "#lib/test/util.svelte.js";
 import { flushSync } from "svelte";
 
 describe(PressedKeys, () => {

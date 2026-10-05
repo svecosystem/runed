@@ -1,4 +1,4 @@
-import type { MaybeElementGetter } from "$lib/internal/types.js";
+import type { MaybeElementGetter } from "#lib/internal/types.js";
 import {
 	ActiveElement,
 	type ActiveElementOptions,

@@ -1,6 +1,6 @@
 import { afterEach, beforeEach, describe, expect, vi } from "vitest";
 import { IsIdle } from "./is-idle.svelte.js";
-import { testWithEffect, vitestSetTimeoutWrapper } from "$lib/test/util.svelte.js";
+import { testWithEffect, vitestSetTimeoutWrapper } from "#lib/test/util.svelte.js";
 import { flushSync } from "svelte";
 
 describe("IsIdle", () => {

@@ -5,7 +5,7 @@ category: Browser
 ---
 
 <script>
-import Demo from '$lib/components/demos/use-event-listener.svelte';
+import Demo from '#lib/components/demos/use-event-listener.svelte';
 </script>
 
 ## Demo

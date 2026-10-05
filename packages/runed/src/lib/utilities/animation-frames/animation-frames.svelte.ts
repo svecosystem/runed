@@ -1,7 +1,7 @@
 import { untrack } from "svelte";
 import { extract } from "../extract/index.js";
-import type { MaybeGetter } from "$lib/internal/types.js";
-import { defaultWindow, type ConfigurableWindow } from "$lib/internal/configurable-globals.js";
+import type { MaybeGetter } from "#lib/internal/types.js";
+import { defaultWindow, type ConfigurableWindow } from "#lib/internal/configurable-globals.js";
 
 type RafCallbackParams = {
 	/** The number of milliseconds since the last frame. */

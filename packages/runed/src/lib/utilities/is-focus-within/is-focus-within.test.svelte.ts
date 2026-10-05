@@ -1,4 +1,4 @@
-import { effectRootScope } from "$lib/test/util.svelte.js";
+import { effectRootScope } from "#lib/test/util.svelte.js";
 import { describe, expect } from "vitest";
 import { IsFocusWithin } from "./is-focus-within.svelte.js";
 

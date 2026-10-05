@@ -5,7 +5,7 @@ category: Elements
 ---
 
 <script>
-import Demo from '$lib/components/demos/textarea-autosize.svelte';
+import Demo from '#lib/components/demos/textarea-autosize.svelte';
 </script>
 
 ## Demo

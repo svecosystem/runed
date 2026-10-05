@@ -56,8 +56,9 @@
 	</p>
 	<Slider
 		class="w-[300px]"
-		value={[fpsLimit]}
-		onValueChange={(value) => (fpsLimit = value[0] ?? 0)}
+		type="single"
+		value={fpsLimit}
+		onValueChange={(value) => (fpsLimit = value)}
 		min={0}
 		max={144}
 	/>

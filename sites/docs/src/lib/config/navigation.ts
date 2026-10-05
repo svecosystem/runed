@@ -1,5 +1,5 @@
 import { defineNavigation } from "@svecodocs/kit";
-import { docs } from "$content/index.js";
+import { docs } from "#content/index.js";
 import Notebook from "phosphor-svelte/lib/Notebook";
 import RocketLaunch from "phosphor-svelte/lib/RocketLaunch";
 import Tag from "phosphor-svelte/lib/Tag";

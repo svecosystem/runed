@@ -1,6 +1,6 @@
 import { describe, expect } from "vitest";
 import { Debounced } from "./index.js";
-import { testWithEffect } from "$lib/test/util.svelte.js";
+import { testWithEffect } from "#lib/test/util.svelte.js";
 
 describe("Debounced", () => {
 	testWithEffect("Value does not get updated immediately", async () => {

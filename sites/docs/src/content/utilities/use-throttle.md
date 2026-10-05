@@ -5,7 +5,7 @@ category: Utilities
 ---
 
 <script>
- import Demo from '$lib/components/demos/use-throttle.svelte';
+ import Demo from '#lib/components/demos/use-throttle.svelte';
 </script>
 
 ## Demo

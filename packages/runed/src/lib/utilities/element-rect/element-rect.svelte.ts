@@ -1,8 +1,8 @@
 import { extract } from "../extract/extract.svelte.js";
 import { useMutationObserver } from "../use-mutation-observer/use-mutation-observer.svelte.js";
 import { useResizeObserver } from "../use-resize-observer/use-resize-observer.svelte.js";
-import type { MaybeElementGetter, WritableProperties } from "$lib/internal/types.js";
-import type { ConfigurableWindow } from "$lib/internal/configurable-globals.js";
+import type { MaybeElementGetter, WritableProperties } from "#lib/internal/types.js";
+import type { ConfigurableWindow } from "#lib/internal/configurable-globals.js";
 
 type Rect = WritableProperties<Omit<DOMRect, "toJSON">>;
 

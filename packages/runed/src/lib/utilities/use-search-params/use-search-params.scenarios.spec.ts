@@ -67,7 +67,8 @@ test.describe("useSearchParams scenarios", () => {
 		test.describe(s.name, () => {
 			test.beforeEach(async ({ page }) => {
 				await page.goto(s.route);
-				await page.waitForTimeout(300);
+				await page.locator("body[data-hydrated]").waitFor({ state: "attached" });
+				await expect(page).toHaveURL(getExpectedURL(s, "mount"));
 			});
 
 			test("mount initial state", async ({ page }) => {
@@ -94,17 +95,15 @@ test.describe("useSearchParams scenarios", () => {
 
 			if (!s.memory && !s.noHistory) {
 				test("back/forward navigation updates params reactively", async ({ page }) => {
+					let previousURL = page.url();
 					await page.getByTestId("inc").click();
 					await expect(pageCount(page)).toHaveText("2");
-					if (s.debounce) {
-						await page.waitForTimeout(250);
-					}
+					await expect(page).not.toHaveURL(previousURL);
 
+					previousURL = page.url();
 					await page.getByTestId("inc").click();
 					await expect(pageCount(page)).toHaveText("3");
-					if (s.debounce) {
-						await page.waitForTimeout(250);
-					}
+					await expect(page).not.toHaveURL(previousURL);
 
 					await page.goBack();
 					if (s.compress) {
@@ -148,7 +147,7 @@ test.describe("useSearchParams scenarios", () => {
 					await page.waitForFunction(() => window.location.search.includes("_data="), {
 						timeout: 5000,
 					});
-					await expect(page.url()).toMatch(/_data=/);
+					await expect(page).toHaveURL(/_data=/);
 					const url = new URL(page.url());
 					const data = url.searchParams.get("_data")!;
 					const decompressed = decompress(data)!;
@@ -179,7 +178,7 @@ test.describe("useSearchParams scenarios", () => {
 				if (s.memory) {
 					await expect(page).toHaveURL(s.route);
 				} else if (s.compress) {
-					await expect(page.url()).toMatch(/_data=/);
+					await expect(page).toHaveURL(/_data=/);
 					const url = new URL(page.url());
 					const data = url.searchParams.get("_data")!;
 					const decompressed = decompress(data)!;
@@ -210,7 +209,7 @@ test.describe("useSearchParams scenarios", () => {
 					if (s.memory) {
 						await expect(page).toHaveURL(s.route);
 					} else if (s.compress) {
-						await expect(page.url()).toMatch(/_data=/);
+						await expect(page).toHaveURL(/_data=/);
 						const url = new URL(page.url());
 						const data = url.searchParams.get("_data")!;
 						const decompressed = decompress(data)!;
@@ -245,7 +244,7 @@ test.describe("useSearchParams scenarios", () => {
 					if (s.memory) {
 						await expect(page).toHaveURL(s.route);
 					} else if (s.compress) {
-						await expect(page.url()).toMatch(/_data=/);
+						await expect(page).toHaveURL(/_data=/);
 						const url = new URL(page.url());
 						const data = url.searchParams.get("_data")!;
 						const decompressed = decompress(data)!;
@@ -284,7 +283,7 @@ test.describe("useSearchParams scenarios", () => {
 					if (s.memory) {
 						await expect(page).toHaveURL(s.route);
 					} else if (s.compress) {
-						await expect(page.url()).toMatch(/_data=/);
+						await expect(page).toHaveURL(/_data=/);
 						const url = new URL(page.url());
 						const data = url.searchParams.get("_data")!;
 						const decompressed = decompress(data)!;
@@ -339,7 +338,7 @@ test.describe("useSearchParams scenarios", () => {
 					if (s.memory) {
 						await expect(page).toHaveURL(s.route);
 					} else if (s.compress) {
-						await expect(page.url()).toMatch(/_data=/);
+						await expect(page).toHaveURL(/_data=/);
 						const url = new URL(page.url());
 						const data = url.searchParams.get("_data")!;
 						const decompressed = decompress(data)!;
@@ -384,7 +383,7 @@ test.describe("useSearchParams scenarios", () => {
 					if (s.memory) {
 						await expect(page).toHaveURL(s.route);
 					} else if (s.compress) {
-						await expect(page.url()).toMatch(/_data=/);
+						await expect(page).toHaveURL(/_data=/);
 						const url = new URL(page.url());
 						const data = url.searchParams.get("_data")!;
 						const decompressed = decompress(data)!;
@@ -528,7 +527,7 @@ test.describe("useSearchParams scenarios", () => {
 				if (s.memory) {
 					await expect(page).toHaveURL(s.route);
 				} else if (s.compress) {
-					await expect(page.url()).toMatch(/_data=/);
+					await expect(page).toHaveURL(/_data=/);
 					const url = new URL(page.url());
 					const data = url.searchParams.get("_data")!;
 					const decompressed = decompress(data)!;
@@ -550,7 +549,7 @@ test.describe("useSearchParams scenarios", () => {
 
 		test.beforeEach(async ({ page }) => {
 			await page.goto(route);
-			await page.waitForTimeout(300);
+			await page.locator("body[data-hydrated]").waitFor({ state: "attached" });
 		});
 
 		test("createdAt uses date-only format from schema property", async ({ page }) => {
@@ -600,7 +599,7 @@ test.describe("useSearchParams scenarios", () => {
 
 		test.beforeEach(async ({ page }) => {
 			await page.goto(route);
-			await page.waitForTimeout(300);
+			await page.locator("body[data-hydrated]").waitFor({ state: "attached" });
 		});
 
 		test("dateFormats option overrides schema property for createdAt", async ({ page }) => {

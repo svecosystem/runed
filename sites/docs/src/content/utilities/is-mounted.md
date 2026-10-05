@@ -5,7 +5,7 @@ category: Component
 ---
 
 <script>
-import Demo from '$lib/components/demos/is-mounted.svelte';
+import Demo from '#lib/components/demos/is-mounted.svelte';
 </script>
 
 ## Demo

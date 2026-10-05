@@ -5,7 +5,7 @@ category: Reactivity
 ---
 
 <script>
-import Demo from '$lib/components/demos/use-search-params.svelte';
+import Demo from '#lib/components/demos/use-search-params.svelte';
 import { Callout } from '@svecodocs/kit';
 </script>
 

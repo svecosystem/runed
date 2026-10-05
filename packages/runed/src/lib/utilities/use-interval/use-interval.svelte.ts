@@ -1,5 +1,5 @@
 import { extract } from "../extract/index.js";
-import type { MaybeGetter } from "$lib/internal/types.js";
+import type { MaybeGetter } from "#lib/internal/types.js";
 import { watch } from "../watch/watch.svelte.js";
 
 export type UseIntervalOptions = {

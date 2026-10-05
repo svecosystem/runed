@@ -1,6 +1,6 @@
 import { describe, expect, vi } from "vitest";
 import { useDebounce } from "./use-debounce.svelte.js";
-import { testWithEffect } from "$lib/test/util.svelte.js";
+import { testWithEffect } from "#lib/test/util.svelte.js";
 
 describe("useDebounce", () => {
 	testWithEffect("Function does not get called immediately", async () => {
