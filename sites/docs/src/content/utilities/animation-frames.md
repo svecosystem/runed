@@ -5,7 +5,7 @@ category: Animation
 ---
 
 <script>
-import Demo from '$lib/components/demos/animation-frames.svelte';
+import Demo from '#lib/components/demos/animation-frames.svelte';
 </script>
 
 `AnimationFrames` provides a declarative API over the browser's

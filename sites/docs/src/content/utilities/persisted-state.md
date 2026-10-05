@@ -7,7 +7,7 @@ category: State
 ---
 
 <script>
-import Demo from '$lib/components/demos/persisted-state.svelte';
+import Demo from '#lib/components/demos/persisted-state.svelte';
 import { Callout } from '@svecodocs/kit'
 </script>
 

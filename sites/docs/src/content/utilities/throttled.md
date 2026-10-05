@@ -5,7 +5,7 @@ category: State
 ---
 
 <script>
-import Demo from '$lib/components/demos/throttled.svelte';
+import Demo from '#lib/components/demos/throttled.svelte';
 </script>
 
 ## Demo

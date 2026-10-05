@@ -5,7 +5,7 @@ category: Sensors
 ---
 
 <script>
-import Demo from '$lib/components/demos/pressed-keys.svelte';
+import Demo from '#lib/components/demos/pressed-keys.svelte';
 </script>
 
 ## Demo

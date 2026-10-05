@@ -1,9 +1,56 @@
 import { sveltekit } from "@sveltejs/kit/vite";
 import { defineConfig } from "vite";
 import tailwindcss from "@tailwindcss/vite";
+import { mdsx } from "mdsx";
+import adapterCf from "@sveltejs/adapter-cloudflare";
+import adapterAuto from "@sveltejs/adapter-auto";
+import { vitePreprocess } from "@sveltejs/vite-plugin-svelte";
+import mdsxConfig from "./mdsx.config.js";
+
+const isDev = process.env.NODE_ENV === "development";
+
+// Cloudflare sucks and won't let me run locally
+const adapter = isDev ? adapterAuto : adapterCf;
 
 export default defineConfig({
-	plugins: [sveltekit(), tailwindcss()],
+	plugins: [
+		sveltekit({
+			preprocess: [mdsx(mdsxConfig), vitePreprocess()],
+			extensions: [".svelte", ".md"],
+			adapter: adapter({
+				routes: {
+					// To avoid too many static assets being generated, we'll manually
+					// define the globs for them to save oru 100 include/exclude limit
+					exclude: [
+						"<build>",
+						// pre-rendered content
+						"/docs/*",
+						"/docs.html",
+						"/api/*",
+						// static
+						"/android-chrome-192x192.png",
+						"/android-chrome-512x512.png",
+						"/apple-touch-icon.png",
+						"/favicon-16x16.png",
+						"/favicon-32x32.png",
+						"/favicon.ico",
+						"/logo-dark.svg",
+						"/logo-light.svg",
+						"/mouse_sprite.png",
+						"/og.png",
+						"/site.webmanifest",
+					],
+				},
+			}),
+			prerender: {
+				handleMissingId: (details) => {
+					if (details.id === "#") return;
+					console.warn(details.message);
+				},
+			},
+		}),
+		tailwindcss(),
+	],
 	server: {
 		fs: {
 			strict: false,

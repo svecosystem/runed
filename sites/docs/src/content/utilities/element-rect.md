@@ -5,7 +5,7 @@ category: Elements
 ---
 
 <script>
-	import Demo from '$lib/components/demos/element-rect.svelte';
+	import Demo from '#lib/components/demos/element-rect.svelte';
 </script>
 
 `ElementRect` provides reactive access to an element's dimensions and position information,

@@ -7,7 +7,7 @@ category: Elements
 ---
 
 <script>
-import Demo from '$lib/components/demos/is-focus-within.svelte';
+import Demo from '#lib/components/demos/is-focus-within.svelte';
 </script>
 
 `IsFocusWithin` reactively tracks focus state within a container element, updating automatically

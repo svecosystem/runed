@@ -6,7 +6,7 @@ category: Elements
 ---
 
 <script>
-import Demo from '$lib/components/demos/scroll-state.svelte';
+import Demo from '#lib/components/demos/scroll-state.svelte';
 </script>
 
 ## Demo

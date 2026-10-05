@@ -5,7 +5,7 @@ category: Elements
 ---
 
 <script>
-import Demo from '$lib/components/demos/is-in-viewport.svelte';
+import Demo from '#lib/components/demos/is-in-viewport.svelte';
 </script>
 
 `IsInViewport` uses the [`useIntersectionObserver`](/docs/utilities/use-intersection-observer)

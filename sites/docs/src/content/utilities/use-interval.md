@@ -5,7 +5,7 @@ category: Utilities
 ---
 
 <script>
-	import Demo from '$lib/components/demos/use-interval.svelte';
+	import Demo from '#lib/components/demos/use-interval.svelte';
 </script>
 
 `useInterval` is a utility function that provides a reactive wrapper around `setInterval` with

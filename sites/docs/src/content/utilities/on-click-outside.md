@@ -5,8 +5,8 @@ category: Sensors
 ---
 
 <script>
-import Demo from '$lib/components/demos/on-click-outside.svelte';
-import DemoDialog from '$lib/components/demos/on-click-outside-dialog.svelte';
+import Demo from '#lib/components/demos/on-click-outside.svelte';
+import DemoDialog from '#lib/components/demos/on-click-outside-dialog.svelte';
 import { PropField } from '@svecodocs/kit'
 </script>
 

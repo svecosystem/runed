@@ -8,10 +8,10 @@
 		"dev:content": "velite dev --watch",
 		"dev:svelte": "pnpm build:search && vite dev",
 		"build:contributors": "tsx ./scripts/build-contributors-data.ts",
-		"build": "velite && pnpm build:search && vite build",
+		"build": "svelte-kit sync && velite && pnpm build:search && vite build",
 		"build:search": "tsx ./scripts/update-velite-output.js && tsx ./scripts/build-search-data.js",
 		"preview": "vite preview",
-		"check": "velite && pnpm build:search && svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
+		"check": "svelte-kit sync && velite && pnpm build:search && svelte-check --tsconfig ./tsconfig.json",
 		"check:watch": "pnpm build:content && svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch"
 	},
 	"license": "MIT",
@@ -30,23 +30,27 @@
 		"url": "https://github.com/svecosystem/runed.git"
 	},
 	"devDependencies": {
-		"@svecodocs/kit": "^0.5.1",
-		"@sveltejs/adapter-auto": "^6.0.1",
-		"@sveltejs/adapter-cloudflare": "^7.0.3",
+		"@svecodocs/kit": "^0.6.0",
+		"@sveltejs/adapter-auto": "^8.0.0",
+		"@sveltejs/adapter-cloudflare": "^8.0.0",
 		"@sveltejs/kit": "catalog:",
 		"@sveltejs/vite-plugin-svelte": "catalog:",
-		"@tailwindcss/vite": "4.1.13",
+		"@tailwindcss/vite": "4.3.3",
 		"@types/node": "catalog:",
 		"mdsx": "^0.0.6",
 		"phosphor-svelte": "^3.0.1",
 		"runed": "workspace:*",
 		"svelte": "catalog:",
 		"svelte-check": "catalog:",
-		"tailwindcss": "4.1.13",
+		"tailwindcss": "4.3.3",
 		"tsx": "^4.19.3",
 		"typescript": "catalog:",
 		"velite": "^0.2.1",
 		"vite": "catalog:"
 	},
-	"type": "module"
+	"type": "module",
+	"imports": {
+		"#lib/*": "./src/lib/*",
+		"#content/*": "./.velite/*"
+	}
 }

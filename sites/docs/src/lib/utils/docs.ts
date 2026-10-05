@@ -1,4 +1,4 @@
-import { docs, type Doc } from "$content/index.js";
+import { docs, type Doc } from "#content/index.js";
 import { error } from "@sveltejs/kit";
 import type { Component } from "svelte";
 
