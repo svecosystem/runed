@@ -1,0 +1,61 @@
+diff --git a/dist/components/dev/tw-indicator.svelte b/dist/components/dev/tw-indicator.svelte
+index 6efbbaf84d61092b7336fece467056807fadb12f..9e75929f546b00672ebcf466a640d1fe3868546f 100644
+--- a/dist/components/dev/tw-indicator.svelte
++++ b/dist/components/dev/tw-indicator.svelte
+@@ -1,5 +1,5 @@
+ <script lang="ts">
+-	import { dev } from "$app/environment";
++	import { dev } from "$app/env";
+ </script>
+ 
+ {#if dev}
+diff --git a/dist/components/layout/docs-sidebar.svelte b/dist/components/layout/docs-sidebar.svelte
+index 9988ac2d5356d300126b1fd30a07f06c32c11a2f..94dba439d8216e290406c037167ba6f5fa94f96a 100644
+--- a/dist/components/layout/docs-sidebar.svelte
++++ b/dist/components/layout/docs-sidebar.svelte
+@@ -1,6 +1,6 @@
+ <script lang="ts">
+ 	import * as Sidebar from "../ui/sidebar/index.js";
+-	import { page } from "$app/stores";
++	import { page } from "$app/state";
+ 	import type { Navigation, SidebarNavSection } from "../../types.js";
+ 	import type { Snippet } from "svelte";
+ 
+@@ -34,7 +34,7 @@
+ 						<Sidebar.MenuItem>
+ 							<Sidebar.MenuButton
+ 								class="h-9 gap-2 font-medium"
+-								isActive={anchor.href === $page.url.pathname}
++								isActive={anchor.href === page.url.pathname}
+ 							>
+ 								{#snippet child({ props })}
+ 									<a
+@@ -73,7 +73,7 @@
+ 	<Sidebar.Menu>
+ 		{#each section.items as subItem (subItem.title)}
+ 			<Sidebar.MenuItem>
+-				{@const isActive = subItem.href === $page.url.pathname}
++				{@const isActive = subItem.href === page.url.pathname}
+ 				<Sidebar.MenuButton {isActive}>
+ 					{#snippet child({ props })}
+ 						<a href={subItem.href} {...props}>{subItem.title}</a>
+diff --git a/dist/components/metadata.svelte b/dist/components/metadata.svelte
+index 0ef6049e93b57f39ce790ca9c3d6423a0d6c22a1..c50e285bc519ea7e59656bbd9a1c85948a43ee05 100644
+--- a/dist/components/metadata.svelte
++++ b/dist/components/metadata.svelte
+@@ -1,5 +1,5 @@
+ <script lang="ts">
+-	import { page } from "$app/stores";
++	import { page } from "$app/state";
+ 	import { useSiteConfig } from "../hooks/use-site-config.svelte.js";
+ 
+ 	const siteConfig = useSiteConfig();
+@@ -37,7 +37,7 @@
+ 	<meta name="twitter:creator" content="huntabyte" />
+ 	<meta property="og:title" content={title} />
+ 	<meta property="og:type" content="website" />
+-	<meta property="og:url" content={siteConfig.current.url + $page.url.pathname} />
++	<meta property="og:url" content={siteConfig.current.url + page.url.pathname} />
+ 	<meta property="og:image" content={ogImage?.url} />
+ 	<meta property="og:image:alt" content={title} />
+ 	<meta property="og:image:width" content={ogImage?.width} />

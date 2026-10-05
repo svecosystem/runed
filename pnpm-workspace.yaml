@@ -16,3 +16,6 @@ onlyBuiltDependencies:
   - "@tailwindcss/oxide"
   - msw
   - workerd
+
+patchedDependencies:
+  "@svecodocs/kit@0.5.1": patches/@svecodocs__kit@0.5.1.patch
