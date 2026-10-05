@@ -1,4 +1,4 @@
-import { effectRootScope } from "$lib/test/util.svelte.js";
+import { effectRootScope } from "#lib/test/util.svelte.js";
 import { describe, expect, it, beforeEach, afterEach } from "vitest";
 import { ActiveElement, activeElement } from "./index.js";
 

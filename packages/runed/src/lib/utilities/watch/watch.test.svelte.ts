@@ -1,7 +1,7 @@
 import { describe, expect } from "vitest";
 import { watch, watchOnce } from "./watch.svelte.js";
-import { testWithEffect } from "$lib/test/util.svelte.js";
-import { sleep } from "$lib/internal/utils/sleep.js";
+import { testWithEffect } from "#lib/test/util.svelte.js";
+import { sleep } from "#lib/internal/utils/sleep.js";
 
 describe("watch", () => {
 	testWithEffect("watchers only track their dependencies", async () => {

@@ -63,7 +63,7 @@
 	"type": "module",
 	"engines": {
 		"pnpm": ">=10.12.1",
-		"node": ">=20"
+		"node": ">=22.17"
 	},
 	"packageManager": "pnpm@10.17.0"
 }

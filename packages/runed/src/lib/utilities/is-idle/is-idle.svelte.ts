@@ -1,12 +1,12 @@
 import { extract } from "../extract/index.js";
 import { useDebounce } from "../use-debounce/index.js";
-import type { MaybeGetter } from "$lib/internal/types.js";
-import { useEventListener } from "$lib/utilities/use-event-listener/use-event-listener.svelte.js";
+import type { MaybeGetter } from "#lib/internal/types.js";
+import { useEventListener } from "#lib/utilities/use-event-listener/use-event-listener.svelte.js";
 import {
 	defaultWindow,
 	type ConfigurableDocument,
 	type ConfigurableWindow,
-} from "$lib/internal/configurable-globals.js";
+} from "#lib/internal/configurable-globals.js";
 
 type WindowEvent = keyof WindowEventMap;
 

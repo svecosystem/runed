@@ -1,10 +1,10 @@
-import type { MaybeGetter } from "$lib/internal/types.js";
-import { AnimationFrames } from "$lib/utilities/animation-frames/index.js";
-import { useDebounce } from "$lib/utilities/use-debounce/index.js";
-import { useEventListener } from "$lib/utilities/use-event-listener/index.js";
+import type { MaybeGetter } from "#lib/internal/types.js";
+import { AnimationFrames } from "#lib/utilities/animation-frames/index.js";
+import { useDebounce } from "#lib/utilities/use-debounce/index.js";
+import { useEventListener } from "#lib/utilities/use-event-listener/index.js";
 import { onMount } from "svelte";
 import { extract } from "../extract/extract.svelte.js";
-import { noop } from "$lib/internal/utils/function.js";
+import { noop } from "#lib/internal/utils/function.js";
 
 export interface ScrollStateOptions {
 	/**

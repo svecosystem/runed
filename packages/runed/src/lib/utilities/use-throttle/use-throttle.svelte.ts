@@ -1,5 +1,5 @@
 import { untrack } from "svelte";
-import type { MaybeGetter } from "$lib/internal/types.js";
+import type { MaybeGetter } from "#lib/internal/types.js";
 
 type UseThrottleReturn<Args extends unknown[], Return> = ((
 	this: unknown,

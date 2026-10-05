@@ -1,7 +1,7 @@
 import { describe, expect, beforeAll, afterAll, afterEach } from "vitest";
 import { setupServer } from "msw/node";
-import { testWithEffect } from "$lib/test/util.svelte.js";
-import { sleep } from "$lib/internal/utils/sleep.js";
+import { testWithEffect } from "#lib/test/util.svelte.js";
+import { sleep } from "#lib/internal/utils/sleep.js";
 import { resource } from "./index.js";
 import { handlers, type ResponseData, type SearchResponseData } from "./msw-handlers.js";
 

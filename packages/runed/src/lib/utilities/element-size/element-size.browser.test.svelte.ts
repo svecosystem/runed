@@ -1,4 +1,4 @@
-import { testWithEffect } from "$lib/test/util.svelte.js";
+import { testWithEffect } from "#lib/test/util.svelte.js";
 import { describe, expect, beforeEach, afterEach } from "vitest";
 import { ElementSize } from "./index.js";
 import { flushSync } from "svelte";

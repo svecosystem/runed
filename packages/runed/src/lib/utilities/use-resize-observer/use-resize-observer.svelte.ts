@@ -1,6 +1,6 @@
 import { extract } from "../extract/extract.svelte.js";
-import type { MaybeGetter } from "$lib/internal/types.js";
-import { defaultWindow, type ConfigurableWindow } from "$lib/internal/configurable-globals.js";
+import type { MaybeGetter } from "#lib/internal/types.js";
+import { defaultWindow, type ConfigurableWindow } from "#lib/internal/configurable-globals.js";
 
 export interface ResizeObserverSize {
 	readonly inlineSize: number;

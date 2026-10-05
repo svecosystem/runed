@@ -1,5 +1,5 @@
-import { type ConfigurableWindow } from "$lib/internal/configurable-globals.js";
-import type { MaybeElementGetter } from "$lib/internal/types.js";
+import { type ConfigurableWindow } from "#lib/internal/configurable-globals.js";
+import type { MaybeElementGetter } from "#lib/internal/types.js";
 import {
 	useIntersectionObserver,
 	type UseIntersectionObserverOptions,

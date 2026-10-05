@@ -1,5 +1,5 @@
-import type { MaybeGetter } from "$lib/internal/types.js";
-import { isFunction } from "$lib/internal/utils/is.js";
+import type { MaybeGetter } from "#lib/internal/types.js";
+import { isFunction } from "#lib/internal/utils/is.js";
 
 /**
  * Resolves a value that may be a getter function or a direct value.

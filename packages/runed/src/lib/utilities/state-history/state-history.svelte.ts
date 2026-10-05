@@ -1,6 +1,6 @@
 import { watch } from "../watch/watch.svelte.js";
-import type { MaybeGetter, Setter } from "$lib/internal/types.js";
-import { get } from "$lib/internal/utils/get.js";
+import type { MaybeGetter, Setter } from "#lib/internal/types.js";
+import { get } from "#lib/internal/utils/get.js";
 
 type LogEvent<T> = {
 	snapshot: T;

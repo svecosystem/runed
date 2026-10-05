@@ -1,4 +1,4 @@
-import type { MaybeGetter } from "$lib/internal/types.js";
+import type { MaybeGetter } from "#lib/internal/types.js";
 import { extract } from "../extract/extract.svelte.js";
 
 type UseDebounceReturn<Args extends unknown[], Return> = ((

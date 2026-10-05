@@ -1,6 +1,6 @@
 import { describe, expect } from "vitest";
 import { extract } from "./extract.svelte.js";
-import { testWithEffect } from "$lib/test/util.svelte.js";
+import { testWithEffect } from "#lib/test/util.svelte.js";
 
 describe("extract", () => {
 	testWithEffect("resolves primitive values", () => {

@@ -1,7 +1,9 @@
 import process from "node:process";
 import { sveltekit } from "@sveltejs/kit/vite";
+import { vitePreprocess } from "@sveltejs/vite-plugin-svelte";
 import { defineConfig } from "vitest/config";
 import { svelteTesting } from "@testing-library/svelte/vite";
+import { playwright } from "@vitest/browser-playwright";
 import type { Plugin } from "vite";
 
 const vitestBrowserConditionPlugin: Plugin = {
@@ -14,14 +16,18 @@ const vitestBrowserConditionPlugin: Plugin = {
 };
 
 export default defineConfig({
-	plugins: [vitestBrowserConditionPlugin, sveltekit(), svelteTesting()],
+	plugins: [
+		vitestBrowserConditionPlugin,
+		sveltekit({ preprocess: [vitePreprocess()] }),
+		svelteTesting(),
+	],
 	test: {
 		includeSource: ["src/**/*.{js,ts,svelte}"],
 		globals: true,
 		coverage: {
 			exclude: ["./setupTest.ts"],
 		},
-		workspace: [
+		projects: [
 			{
 				extends: true,
 				test: {
@@ -44,7 +50,7 @@ export default defineConfig({
 							},
 						],
 						enabled: true,
-						provider: "playwright",
+						provider: playwright(),
 						headless: true,
 					},
 				},

@@ -2,12 +2,12 @@ import {
 	defaultWindow,
 	type ConfigurableDocument,
 	type ConfigurableWindow,
-} from "$lib/internal/configurable-globals.js";
-import type { MaybeElementGetter } from "$lib/internal/types.js";
-import { getActiveElement, getOwnerDocument, isOrContainsTarget } from "$lib/internal/utils/dom.js";
-import { noop } from "$lib/internal/utils/function.js";
-import { isElement } from "$lib/internal/utils/is.js";
-import { sleep } from "$lib/internal/utils/sleep.js";
+} from "#lib/internal/configurable-globals.js";
+import type { MaybeElementGetter } from "#lib/internal/types.js";
+import { getActiveElement, getOwnerDocument, isOrContainsTarget } from "#lib/internal/utils/dom.js";
+import { noop } from "#lib/internal/utils/function.js";
+import { isElement } from "#lib/internal/utils/is.js";
+import { sleep } from "#lib/internal/utils/sleep.js";
 import { on } from "svelte/events";
 import { extract } from "../extract/extract.svelte.js";
 import { useDebounce } from "../use-debounce/use-debounce.svelte.js";

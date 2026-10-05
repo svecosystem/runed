@@ -1,21 +1,16 @@
 import "@testing-library/svelte/vitest";
 import "@testing-library/jest-dom/vitest";
 import { vi } from "vitest";
-import type { Navigation, Page } from "@sveltejs/kit";
-import { readable } from "svelte/store";
-import type * as environment from "$app/environment";
+import type * as env from "$app/env";
 import type * as navigation from "$app/navigation";
-import type * as stores from "$app/stores";
 
-// Mock SvelteKit runtime module $app/environment
-vi.mock("$app/environment", (): typeof environment => ({
+vi.mock("$app/env", (): typeof env => ({
 	browser: false,
 	dev: true,
 	building: false,
 	version: "any",
 }));
 
-// Mock SvelteKit runtime module $app/navigation
 vi.mock("$app/navigation", (): typeof navigation => ({
 	afterNavigate: () => {},
 	beforeNavigate: () => {},
@@ -23,61 +18,14 @@ vi.mock("$app/navigation", (): typeof navigation => ({
 	goto: () => Promise.resolve(),
 	invalidate: () => Promise.resolve(),
 	invalidateAll: () => Promise.resolve(),
+	refreshAll: () => Promise.resolve(),
 	preloadData: () => Promise.resolve({ type: "loaded" as const, status: 200, data: {} }),
 	preloadCode: () => Promise.resolve(),
 	onNavigate: () => {},
-	pushState: () => {},
-	replaceState: () => {},
-	// @ts-expect-error - testing
-	refreshAll: () => {},
+	pushState: () => Promise.resolve(),
+	replaceState: () => Promise.resolve(),
+	snapshot: () => {},
 }));
-
-// Mock SvelteKit runtime module $app/stores
-vi.mock("$app/stores", (): typeof stores => {
-	const getStores: typeof stores.getStores = () => {
-		const navigating = readable<Navigation | null>(null);
-		const page = readable<Page>({
-			// @ts-expect-error - shh
-			url: new URL("http://localhost"),
-			params: {},
-			route: {
-				id: null,
-			},
-			status: 200,
-			error: null,
-			data: {},
-			form: undefined,
-			state: {},
-		});
-		const updated = { subscribe: readable(false).subscribe, check: async () => false };
-
-		return { navigating, page, updated };
-	};
-
-	const page: typeof stores.page = {
-		subscribe(fn) {
-			return getStores().page.subscribe(fn);
-		},
-	};
-	const navigating: typeof stores.navigating = {
-		subscribe(fn) {
-			return getStores().navigating.subscribe(fn);
-		},
-	};
-	const updated: typeof stores.updated = {
-		subscribe(fn) {
-			return getStores().updated.subscribe(fn);
-		},
-		check: async () => false,
-	};
-
-	return {
-		getStores,
-		navigating,
-		page,
-		updated,
-	};
-});
 
 // eslint-disable-next-line @typescript-eslint/no-require-imports
 globalThis.ResizeObserver = require("resize-observer-polyfill");

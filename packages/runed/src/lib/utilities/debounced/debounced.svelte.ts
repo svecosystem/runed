@@ -1,7 +1,7 @@
 import { useDebounce } from "../use-debounce/use-debounce.svelte.js";
 import { watch } from "../watch/watch.svelte.js";
-import type { Getter, MaybeGetter } from "$lib/internal/types.js";
-import { noop } from "$lib/internal/utils/function.js";
+import type { Getter, MaybeGetter } from "#lib/internal/types.js";
+import { noop } from "#lib/internal/utils/function.js";
 
 /**
  * A wrapper over {@link useDebounce} that creates a debounced state.
