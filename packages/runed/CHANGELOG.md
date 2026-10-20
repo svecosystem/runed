@@ -1,5 +1,12 @@
 # runed
 
+## 0.38.0
+
+### Minor Changes
+
+- breaking: require SvelteKit 3 for `runed/kit` (`useSearchParams` now uses `$app/env` and SvelteKit
+  3's `goto` options) ([#432](https://github.com/svecosystem/runed/pull/432))
+
 ## 0.37.1
 
 ### Patch Changes
