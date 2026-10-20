@@ -5,7 +5,7 @@ category: Reactivity
 ---
 
 <script>
-import Demo from '$lib/components/demos/resource.svelte';
+import Demo from '#lib/components/demos/resource.svelte';
 import { Callout } from '@svecodocs/kit'
 </script>
 

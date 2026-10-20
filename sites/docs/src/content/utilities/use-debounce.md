@@ -5,7 +5,7 @@ category: Utilities
 ---
 
 <script>
-	import Demo from '$lib/components/demos/use-debounce.svelte';
+	import Demo from '#lib/components/demos/use-debounce.svelte';
 </script>
 
 `useDebounce` is a utility function that creates a debounced version of a callback function.

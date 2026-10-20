@@ -5,7 +5,7 @@ category: State
 ---
 
 <script>
-import Demo from '$lib/components/demos/previous.svelte';
+import Demo from '#lib/components/demos/previous.svelte';
 </script>
 
 The `Previous` utility creates a reactive wrapper that maintains the previous value of a getter

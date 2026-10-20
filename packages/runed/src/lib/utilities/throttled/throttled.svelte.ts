@@ -1,7 +1,7 @@
 import { useThrottle } from "../use-throttle/use-throttle.svelte.js";
 import { watch } from "../watch/watch.svelte.js";
-import type { Getter, MaybeGetter } from "$lib/internal/types.js";
-import { noop } from "$lib/internal/utils/function.js";
+import type { Getter, MaybeGetter } from "#lib/internal/types.js";
+import { noop } from "#lib/internal/utils/function.js";
 
 export class Throttled<T> {
 	#current: T = $state()!;

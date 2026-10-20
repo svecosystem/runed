@@ -1,6 +1,6 @@
 import { describe, expect, vi } from "vitest";
 import { useInterval } from "./use-interval.svelte.js";
-import { testWithEffect } from "$lib/test/util.svelte.js";
+import { testWithEffect } from "#lib/test/util.svelte.js";
 
 describe("useInterval", () => {
 	testWithEffect("Calls callback at specified interval", async () => {

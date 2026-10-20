@@ -2,7 +2,7 @@
 	import { PressedKeys, watch } from "runed";
 	import { fade, scale } from "svelte/transition";
 	import { cn, DemoContainer } from "@svecodocs/kit";
-	import RunedIcon from "$lib/components/logos/runed-icon.svelte";
+	import RunedIcon from "#lib/components/logos/runed-icon.svelte";
 
 	const keys = new PressedKeys();
 	const toPress = "Runed".split("");

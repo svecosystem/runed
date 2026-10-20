@@ -1,7 +1,7 @@
 import { describe, expect } from "vitest";
 import { flushSync } from "svelte";
 import { IsDocumentVisible } from "./is-document-visible.svelte.js";
-import { testWithEffect } from "$lib/test/util.svelte.js";
+import { testWithEffect } from "#lib/test/util.svelte.js";
 
 describe("IsDocumentVisible", () => {
 	testWithEffect("initializes from document.hidden", () => {

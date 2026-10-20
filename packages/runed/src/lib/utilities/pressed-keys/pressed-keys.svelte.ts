@@ -1,7 +1,7 @@
 import { on } from "svelte/events";
 import { createSubscriber } from "svelte/reactivity";
-import { watch } from "$lib/utilities/watch/index.js";
-import { defaultWindow, type ConfigurableWindow } from "$lib/internal/configurable-globals.js";
+import { watch } from "#lib/utilities/watch/index.js";
+import { defaultWindow, type ConfigurableWindow } from "#lib/internal/configurable-globals.js";
 
 const modifierKeys = ["meta", "control", "alt", "shift"];
 

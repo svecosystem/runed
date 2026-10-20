@@ -4,7 +4,7 @@
 		createSearchParamsSchema,
 		useSearchParams,
 		type SearchParamsOptions,
-	} from "$lib/utilities/use-search-params/use-search-params.svelte";
+	} from "#lib/utilities/use-search-params/use-search-params.svelte.js";
 	const mode = page.params.mode;
 
 	const schema = createSearchParamsSchema({
@@ -52,6 +52,10 @@
 	let updatedAtString = $derived(
 		paramsObj.updatedAt instanceof Date ? paramsObj.updatedAt.toISOString() : "Invalid Date"
 	);
+
+	$effect(() => {
+		document.body.dataset.hydrated = "";
+	});
 </script>
 
 <input data-testid="filter-input" bind:value={paramsObj.filter} />

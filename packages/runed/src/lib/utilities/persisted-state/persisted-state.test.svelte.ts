@@ -1,6 +1,6 @@
 import { describe, expect } from "vitest";
 
-import { testWithEffect } from "$lib/test/util.svelte.js";
+import { testWithEffect } from "#lib/test/util.svelte.js";
 import { PersistedState } from "./persisted-state.svelte.js";
 import { flushSync } from "svelte";
 

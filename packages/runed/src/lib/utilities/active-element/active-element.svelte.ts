@@ -2,8 +2,8 @@ import {
 	defaultWindow,
 	type ConfigurableDocumentOrShadowRoot,
 	type ConfigurableWindow,
-} from "$lib/internal/configurable-globals.js";
-import { getActiveElement } from "$lib/internal/utils/dom.js";
+} from "#lib/internal/configurable-globals.js";
+import { getActiveElement } from "#lib/internal/utils/dom.js";
 import { on } from "svelte/events";
 import { createSubscriber } from "svelte/reactivity";
 

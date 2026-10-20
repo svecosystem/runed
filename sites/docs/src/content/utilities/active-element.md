@@ -5,7 +5,7 @@ category: Elements
 ---
 
 <script>
-import Demo from '$lib/components/demos/active-element.svelte';
+import Demo from '#lib/components/demos/active-element.svelte';
 </script>
 
 `activeElement` provides reactive access to the currently focused DOM element in your application,

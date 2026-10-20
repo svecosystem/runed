@@ -1,5 +1,5 @@
 import { extract } from "../extract/extract.svelte.js";
-import type { MaybeGetter } from "$lib/internal/types.js";
+import type { MaybeGetter } from "#lib/internal/types.js";
 import { on } from "svelte/events";
 
 export type EventHandler<TEvent extends Event, TTarget extends EventTarget> = (

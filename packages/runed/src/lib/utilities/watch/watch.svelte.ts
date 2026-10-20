@@ -1,5 +1,5 @@
 import { untrack } from "svelte";
-import type { Getter } from "$lib/internal/types.js";
+import type { Getter } from "#lib/internal/types.js";
 
 function runEffect(flush: "post" | "pre", effect: () => void | VoidFunction): void {
 	switch (flush) {

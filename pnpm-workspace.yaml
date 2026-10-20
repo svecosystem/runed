@@ -3,16 +3,19 @@ packages:
   - sites/*
 
 catalog:
-  "@sveltejs/kit": ^2.42.0
-  "@sveltejs/vite-plugin-svelte": ^6.2.0
-  "@types/node": ^20.19.16
-  svelte: ^5.39.3
-  svelte-check: ^4.3.1
-  typescript: ^5.9.2
-  vite: ^7.1.5
-  vitest: ^3.2.4
+  "@sveltejs/kit": ^3.0.0
+  "@sveltejs/vite-plugin-svelte": ^7.3.1
+  "@types/node": ^22.20.5
+  svelte: ^5.57.1
+  svelte-check: ^4.7.6
+  typescript: ^6.0.3
+  vite: ^8.3.2
+  vitest: ^5.0.3
 
 onlyBuiltDependencies:
   - "@tailwindcss/oxide"
   - msw
   - workerd
+
+patchedDependencies:
+  "@svecodocs/kit@0.5.1": patches/@svecodocs__kit@0.5.1.patch

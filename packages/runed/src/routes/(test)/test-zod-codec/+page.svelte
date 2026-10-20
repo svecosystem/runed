@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { useSearchParams } from "$lib/utilities/use-search-params/use-search-params.svelte";
+	import { useSearchParams } from "#lib/utilities/use-search-params/use-search-params.svelte.js";
 	import { z } from "zod";
 
 	// Create a codec that converts between ISO date string (YYYY-MM-DD) and Date object
@@ -49,6 +49,10 @@
 	let updatedAtString = $derived(
 		paramsObj.updatedAt instanceof Date ? paramsObj.updatedAt.toISOString() : "Invalid Date"
 	);
+
+	$effect(() => {
+		document.body.dataset.hydrated = "";
+	});
 </script>
 
 <div>

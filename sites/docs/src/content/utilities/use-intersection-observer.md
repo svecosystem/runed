@@ -5,7 +5,7 @@ category: Elements
 ---
 
 <script>
-import Demo from '$lib/components/demos/use-intersection-observer.svelte';
+import Demo from '#lib/components/demos/use-intersection-observer.svelte';
 import { Callout } from '@svecodocs/kit'
 </script>
 

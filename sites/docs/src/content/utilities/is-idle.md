@@ -5,7 +5,7 @@ category: Sensors
 ---
 
 <script>
-import Demo from '$lib/components/demos/is-idle.svelte';
+import Demo from '#lib/components/demos/is-idle.svelte';
 </script>
 
 `IsIdle` tracks user activity and determines if they're idle based on a configurable timeout. It

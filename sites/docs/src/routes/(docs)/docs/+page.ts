@@ -1,4 +1,4 @@
-import { getDoc } from "$lib/utils/docs.js";
+import { getDoc } from "#lib/utils/docs.js";
 
 export const prerender = true;
 

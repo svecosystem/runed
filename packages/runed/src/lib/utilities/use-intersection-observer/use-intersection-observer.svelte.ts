@@ -1,7 +1,7 @@
 import { extract } from "../extract/extract.svelte.js";
-import type { MaybeElementGetter, MaybeGetter } from "$lib/internal/types.js";
-import { get } from "$lib/internal/utils/get.js";
-import { defaultWindow, type ConfigurableWindow } from "$lib/internal/configurable-globals.js";
+import type { MaybeElementGetter, MaybeGetter } from "#lib/internal/types.js";
+import { get } from "#lib/internal/utils/get.js";
+import { defaultWindow, type ConfigurableWindow } from "#lib/internal/configurable-globals.js";
 
 export interface UseIntersectionObserverOptions
 	extends Omit<IntersectionObserverInit, "root">,

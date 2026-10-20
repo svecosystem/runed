@@ -1,8 +1,8 @@
 import {
 	defaultNavigator,
 	type ConfigurableNavigator,
-} from "$lib/internal/configurable-globals.js";
-import type { WritableProperties } from "$lib/internal/types.js";
+} from "#lib/internal/configurable-globals.js";
+import type { WritableProperties } from "#lib/internal/types.js";
 
 export type UseGeolocationOptions = Partial<PositionOptions> & {
 	/**

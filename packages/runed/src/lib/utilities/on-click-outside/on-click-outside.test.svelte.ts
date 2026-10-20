@@ -1,13 +1,13 @@
-import { describe, expect, vi, beforeEach, afterEach } from "vitest";
+import { describe, expect, vi, beforeEach, afterEach, type Mock } from "vitest";
 import { tick } from "svelte";
 import { onClickOutside } from "./on-click-outside.svelte.js";
-import { testWithEffect } from "$lib/test/util.svelte.js";
+import { testWithEffect } from "#lib/test/util.svelte.js";
 
 describe("onClickOutside", () => {
 	let container: HTMLDivElement;
 	let innerButton: HTMLButtonElement;
 	let outsideButton: HTMLButtonElement;
-	let callbackFn: ReturnType<typeof vi.fn>;
+	let callbackFn: Mock<(event: PointerEvent | FocusEvent) => void>;
 
 	class MockPointerEvent extends Event {
 		clientX: number;

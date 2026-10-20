@@ -5,7 +5,7 @@ category: Sensors
 ---
 
 <script>
-import Demo from '$lib/components/demos/is-document-visible.svelte';
+import Demo from '#lib/components/demos/is-document-visible.svelte';
 </script>
 
 `IsDocumentVisible` provides a reactive boolean that reflects the current document visibility state.

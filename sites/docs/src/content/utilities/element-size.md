@@ -5,7 +5,7 @@ category: Elements
 ---
 
 <script>
-	import Demo from '$lib/components/demos/element-size.svelte';
+	import Demo from '#lib/components/demos/element-size.svelte';
 </script>
 
 `ElementSize` provides reactive access to an element's width and height, automatically updating when

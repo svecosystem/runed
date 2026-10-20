@@ -1,4 +1,4 @@
-import type { Getter } from "$lib/internal/types.js";
+import type { Getter } from "#lib/internal/types.js";
 
 /**
  * Holds the previous value of a getter.

@@ -2,7 +2,7 @@ import {
 	defaultWindow,
 	type ConfigurableDocument,
 	type ConfigurableWindow,
-} from "$lib/internal/configurable-globals.js";
+} from "#lib/internal/configurable-globals.js";
 import { on } from "svelte/events";
 
 export type IsDocumentVisibleOptions = ConfigurableWindow & ConfigurableDocument;

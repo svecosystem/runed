@@ -1,4 +1,4 @@
-import { defaultWindow, type ConfigurableWindow } from "$lib/internal/configurable-globals.js";
+import { defaultWindow, type ConfigurableWindow } from "#lib/internal/configurable-globals.js";
 import { on } from "svelte/events";
 import { createSubscriber } from "svelte/reactivity";
 

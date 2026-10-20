@@ -5,7 +5,7 @@ category: Elements
 ---
 
 <script>
-import Demo from '$lib/components/demos/use-resize-observer.svelte';
+import Demo from '#lib/components/demos/use-resize-observer.svelte';
 </script>
 
 ## Demo

@@ -5,7 +5,7 @@ category: Sensors
 ---
 
 <script>
-import Demo from '$lib/components/demos/use-geolocation.svelte';
+import Demo from '#lib/components/demos/use-geolocation.svelte';
 </script>
 
 `useGeolocation` is a reactive wrapper around the browser's
