@@ -70,13 +70,13 @@ via `resource.pre()`.
 
 <input type="number" bind:value={id} />
 
-{#if searchResults.loading}
+{#if searchResource.loading}
 	<div>Loading...</div>
-{:else if searchResults.error}
-	<div>Error: {searchResults.error.message}</div>
+{:else if searchResource.error}
+	<div>Error: {searchResource.error.message}</div>
 {:else}
 	<ul>
-		{#each searchResults.current ?? [] as result}
+		{#each searchResource.current ?? [] as result}
 			<li>{result.title}</li>
 		{/each}
 	</ul>
