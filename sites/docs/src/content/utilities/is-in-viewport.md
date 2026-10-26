@@ -48,6 +48,7 @@ one-time animations or loading content when it becomes visible:
 	const inViewport = new IsInViewport(() => targetNode, {
 		once: true
 	});
+	const hasBeenSeen = $derived(inViewport.current);
 </script>
 
 <div bind:this={targetNode} class="transition" class="transition-opacity {hasBeenSeen ? 'opacity-100' : 'opacity-0'}">
