@@ -96,6 +96,7 @@ function proxy<T>(
  * @see {@link https://runed.dev/docs/utilities/persisted-state}
  */
 export class PersistedState<T> {
+	#initial: T;
 	#current: T | undefined;
 	#key: string;
 	#serializer: Serializer<T>;
@@ -118,7 +119,7 @@ export class PersistedState<T> {
 		} = options;
 		const window = "window" in options ? options.window : defaultWindow; // window is not mockable to be undefined without this, because JavaScript will fill undefined with `= default`
 
-		this.#current = initialValue;
+		this.#initial = this.#current = initialValue;
 		this.#key = key;
 		this.#serializer = serializer;
 		this.#connected = connected;
@@ -168,6 +169,20 @@ export class PersistedState<T> {
 		this.#update?.();
 	}
 
+	/**
+	 * Resets the state back to the initial value provided to the constructor.
+	 *
+	 * When connected to storage, an initial value of `undefined` results in the key
+	 * being removed from storage.
+	 * (If the initial value is `null`, it will be persisted as the string `"null"`
+	 * by the default JSON serializer.)
+	 */
+	reset() {
+		this.#current = this.#initial;
+		this.#serialize(this.#initial);
+		this.#update?.();
+	}
+
 	#handleStorageEvent = (event: StorageEvent): void => {
 		if (event.key !== this.#key || event.newValue === null) return;
 		this.#current = this.#deserialize(event.newValue);
@@ -193,6 +208,9 @@ export class PersistedState<T> {
 		try {
 			if (value !== undefined) {
 				this.#storage?.setItem(this.#key, this.#serializer.serialize(value));
+			} else {
+				this.#current = value;
+				this.#storage?.removeItem(this.#key);
 			}
 		} catch (error) {
 			console.error(

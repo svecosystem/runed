@@ -103,6 +103,36 @@ describe("PersistedState", async () => {
 			expect(persistedState.current).toBe(initialValue);
 		});
 
+		testWithEffect("removes the key when set to undefined", () => {
+			const persistedState = new PersistedState<string | undefined>(key, initialValue);
+			expect(localStorage.getItem(key)).toBe(JSON.stringify(initialValue));
+
+			persistedState.current = undefined;
+			expect(persistedState.current).toBeUndefined();
+			expect(localStorage.getItem(key)).toBeNull();
+		});
+
+		testWithEffect("reset restores the initial value after modifications", () => {
+			const persistedState = new PersistedState(key, initialValue);
+			persistedState.current = newValue;
+			expect(persistedState.current).toBe(newValue);
+			expect(localStorage.getItem(key)).toBe(JSON.stringify(newValue));
+
+			persistedState.reset();
+			expect(persistedState.current).toBe(initialValue);
+			expect(localStorage.getItem(key)).toBe(JSON.stringify(initialValue));
+		});
+
+		testWithEffect("reset removes the key if initial value is undefined", () => {
+			localStorage.setItem(key, JSON.stringify(existingValue));
+			const persistedState = new PersistedState<string | undefined>(key, undefined);
+			expect(localStorage.getItem(key)).toBe(JSON.stringify(existingValue));
+
+			persistedState.reset();
+			expect(persistedState.current).toBeUndefined();
+			expect(localStorage.getItem(key)).toBeNull();
+		});
+
 		testWithEffect("uses persisted value if it is found", () => {
 			localStorage.setItem(key, JSON.stringify(existingValue));
 			const persistedState = new PersistedState(key, initialValue);
