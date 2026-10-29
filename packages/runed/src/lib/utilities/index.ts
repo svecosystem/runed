@@ -8,6 +8,8 @@ export * from "./extract/index.js";
 export * from "./finite-state-machine/index.js";
 export * from "./is-focus-within/index.js";
 export * from "./is-idle/index.js";
+export * from "./is-hovered/index.js";
+export * from "./is-hovered/index.js";
 export * from "./is-in-viewport/index.js";
 export * from "./is-mounted/index.js";
 export * from "./is-document-visible/index.js";
