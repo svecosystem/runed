@@ -11,15 +11,14 @@ export type ElementRectOptions = ConfigurableWindow & {
 };
 
 /**
- * Returns a reactive value holding the size of `node`.
+ * Returns a reactive value holding the rect of `node`.
  *
  * Accepts an `options` object with the following properties:
- * - `initialSize`: The initial size of the element. Defaults to `{ width: 0, height: 0 }`.
- * - `box`: The box model to use. Can be either `"content-box"` or `"border-box"`. Defaults to `"border-box"`.
+ * - `initialRect`: The initial rect of the element. Defaults to `{ x: 0, y: 0, width: 0, height: 0 }`.
  *
  * @returns an object with `width` and `height` properties.
  *
- * @see {@link https://runed.dev/docs/utilities/element-size}
+ * @see {@link https://runed.dev/docs/utilities/element-rect}
  */
 export class ElementRect {
 	#rect: Rect = $state({
