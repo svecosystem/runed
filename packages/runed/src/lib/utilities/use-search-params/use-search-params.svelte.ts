@@ -700,10 +700,12 @@ class SearchParams<Schema extends StandardSchemaV1> {
 		}
 
 		// Normal mode - copy current URL params to cache
-		const newCache = new SvelteURLSearchParams();
+		// fill a plain URLSearchParams since SvelteURLSearchParams.set() throws inside async $derived
+		const params = new URLSearchParams();
 		for (const [key, value] of urlParams.entries()) {
-			newCache.set(key, value);
+			params.set(key, value);
 		}
+		const newCache = new SvelteURLSearchParams(params);
 		untrack(() => (this.#localCache = newCache));
 	}
 
