@@ -849,4 +849,63 @@ describe("validateSearchParams", () => {
 			});
 		});
 	});
+
+	describe("string fields and single-item arrays (issue #436)", () => {
+		const builtInSchema = createSearchParamsSchema({
+			q: { type: "string", default: "" },
+			tags: { type: "array", default: [], arrayType: "" },
+		});
+
+		it("keeps boolean-like and JSON-like strings with createSearchParamsSchema", () => {
+			for (const q of ["true", "false", "[1]", '{"a":1}', "[]", "{}"]) {
+				const url = createURL(`?q=${encodeURIComponent(q)}`);
+				const { data, searchParams } = validateSearchParams(url, builtInSchema);
+
+				expect(data.q).toBe(q);
+				expect(searchParams.get("q")).toBe(q);
+			}
+		});
+
+		it("parses a single comma-free value as a one-item array with createSearchParamsSchema", () => {
+			expect(validateSearchParams(createURL("?tags=a"), builtInSchema).data.tags).toEqual(["a"]);
+			expect(validateSearchParams(createURL("?tags=a,b"), builtInSchema).data.tags).toEqual([
+				"a",
+				"b",
+			]);
+		});
+
+		it("keeps boolean-like and JSON-like strings with a Zod schema", async () => {
+			const { z } = await import("zod");
+			const zodSchema = z.object({
+				q: z.string().default(""),
+				active: z.boolean().default(false),
+				tags: z.array(z.string()).default([]),
+			});
+
+			for (const q of ["true", "false", "[1]", '{"a":1}']) {
+				const url = createURL(`?q=${encodeURIComponent(q)}&active=true`);
+				const { data } = validateSearchParams(url, zodSchema);
+
+				expect(data.q).toBe(q);
+				expect(data.active).toBe(true);
+			}
+		});
+
+		it("parses a single comma-free value as a one-item array with a Zod schema", async () => {
+			const { z } = await import("zod");
+			const zodSchema = z.object({
+				q: z.string().default(""),
+				tags: z.array(z.string()).default([]),
+			});
+
+			expect(validateSearchParams(createURL("?tags=a"), zodSchema).data).toEqual({
+				q: "",
+				tags: ["a"],
+			});
+			expect(validateSearchParams(createURL("?tags=a,b"), zodSchema).data).toEqual({
+				q: "",
+				tags: ["a", "b"],
+			});
+		});
+	});
 });

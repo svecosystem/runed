@@ -142,7 +142,76 @@ type ExtractParamValuesOptions = {
 	arrayFields?: Set<string>;
 	dateFields?: Set<string>;
 	codecFields?: Set<string>;
+	stringFields?: Set<string>;
 };
+
+/**
+ * Convert one raw URL string value to the JavaScript type the schema expects.
+ * Shared by extractParamValues and extractSelectiveParamValues.
+ * @internal
+ */
+function convertParamValue(
+	key: string,
+	value: string,
+	options: Required<ExtractParamValuesOptions>
+): unknown {
+	const { numberFields, arrayFields, dateFields, codecFields, stringFields } = options;
+
+	// String fields are written to the URL verbatim, so read them back verbatim.
+	// Without this, "true" or "[1]" would turn into a boolean or an array.
+	if (stringFields.has(key)) return value;
+
+	// Special handling for empty arrays and objects
+	if (value === "[]") return [];
+	if (value === "{}") return {};
+
+	// Try to parse as JSON for complex objects/arrays
+	// This handles cases like ?obj={"foo":"bar"} or ?arr=[1,2,3]
+	if (value.startsWith("{") || value.startsWith("[")) {
+		try {
+			return JSON.parse(value);
+		} catch {
+			// If JSON parsing fails, treat as regular string
+			return value;
+		}
+	}
+
+	// Boolean values are stored as strings, convert them
+	if (value === "true" || value === "false") {
+		return value === "true";
+	}
+	// Only convert to number if it looks numeric AND the schema expects a number
+	// This handles cases like ?page=2 or ?price=19.99
+	if (numberFields.has(key) && value.trim() !== "" && !isNaN(Number(value))) {
+		return Number(value);
+	}
+	// Convert to Date if the schema expects a date, the value is a valid ISO8601 string,
+	// AND the field doesn't have a codec (codecs handle their own conversion)
+	if (dateFields.has(key) && !codecFields.has(key) && value.trim() !== "") {
+		const dateValue = new Date(value);
+		// Keep as string if not a valid date
+		return isNaN(dateValue.getTime()) ? value : dateValue;
+	}
+	// Handle comma-separated values as arrays (fallback format) - ONLY for array fields.
+	// A single item without a comma (?tags=a) is a one-item array too.
+	if (arrayFields.has(key) && value !== "") {
+		return value.split(",");
+	}
+	// Keep everything else as strings (including codec fields)
+	return value;
+}
+
+function resolveExtractOptions(
+	options: ExtractParamValuesOptions
+): Required<ExtractParamValuesOptions> {
+	return {
+		numberFields: options.numberFields ?? new Set(),
+		arrayFields: options.arrayFields ?? new Set(),
+		dateFields: options.dateFields ?? new Set(),
+		codecFields: options.codecFields ?? new Set(),
+		stringFields: options.stringFields ?? new Set(),
+	};
+}
 
 /**
  * Extract and pre-process values from URLSearchParams
@@ -162,63 +231,11 @@ export function extractParamValues(
 	searchParams: ReadonlyURLSearchParams,
 	options: ExtractParamValuesOptions = {}
 ): Record<string, unknown> {
-	const {
-		numberFields = new Set(),
-		arrayFields = new Set(),
-		dateFields = new Set(),
-		codecFields = new Set(),
-	} = options;
+	const resolved = resolveExtractOptions(options);
 	const params: Record<string, unknown> = {};
 
 	for (const [key, value] of searchParams.entries()) {
-		try {
-			// Special handling for empty arrays and objects
-			if (value === "[]") {
-				params[key] = [];
-				continue;
-			}
-
-			if (value === "{}") {
-				params[key] = {};
-				continue;
-			}
-
-			// Try to parse as JSON for complex objects/arrays
-			// This handles cases like ?obj={"foo":"bar"} or ?arr=[1,2,3]
-			if (value.startsWith("{") || value.startsWith("[")) {
-				params[key] = JSON.parse(value);
-			}
-			// Boolean values are stored as strings, convert them
-			else if (value === "true" || value === "false") {
-				params[key] = value === "true";
-			}
-			// Only convert to number if it looks numeric AND the schema expects a number
-			else if (numberFields.has(key) && value.trim() !== "" && !isNaN(Number(value))) {
-				params[key] = Number(value);
-			}
-			// Convert to Date if the schema expects a date, the value is a valid ISO8601 string,
-			// AND the field doesn't have a codec (codecs handle their own conversion)
-			else if (dateFields.has(key) && !codecFields.has(key) && value.trim() !== "") {
-				const dateValue = new Date(value);
-				if (!isNaN(dateValue.getTime())) {
-					params[key] = dateValue;
-				} else {
-					params[key] = value; // Keep as string if not a valid date
-				}
-			}
-			// Handle comma-separated values as arrays (fallback format)
-			else if (arrayFields.has(key) && value.includes(",")) {
-				params[key] = value.split(",");
-			}
-			// Keep everything else as strings (including codec fields)
-			else {
-				params[key] = value;
-			}
-		} catch {
-			// If JSON parsing fails, treat as regular string
-			// This ensures we don't throw errors during type conversion
-			params[key] = value;
-		}
+		params[key] = convertParamValue(key, value, resolved);
 	}
 
 	return params;
@@ -245,6 +262,8 @@ interface SchemaInfo {
 	codecEncoders: Map<string, (value: unknown) => unknown>;
 	/** Set of field names that have codecs (used to skip automatic type conversion) */
 	codecFields: Set<string>;
+	/** Set of field names that expect string types (read verbatim, no type conversion) */
+	stringFields: Set<string>;
 }
 
 /**
@@ -311,6 +330,7 @@ function extractSchemaInfo<Schema extends StandardSchemaV1>(schema: Schema): Sch
 			codecEncoders: new Map(),
 			codecFields: new Set(),
 			arrayFields: new Set(),
+			stringFields: new Set(),
 		};
 	}
 
@@ -322,6 +342,7 @@ function extractSchemaInfo<Schema extends StandardSchemaV1>(schema: Schema): Sch
 	const codecEncoders = new Map<string, (value: unknown) => unknown>();
 	const codecFields = new Set<string>();
 	const arrayFields = new Set<string>();
+	const stringFields = new Set<string>();
 
 	// Determine which fields are number, date or array types by checking default value types
 	for (const [key, defaultValue] of Object.entries(defaultValues)) {
@@ -331,6 +352,8 @@ function extractSchemaInfo<Schema extends StandardSchemaV1>(schema: Schema): Sch
 			dateFields.add(key);
 		} else if (Array.isArray(defaultValue)) {
 			arrayFields.add(key);
+		} else if (typeof defaultValue === "string") {
+			stringFields.add(key);
 		}
 	}
 
@@ -353,6 +376,8 @@ function extractSchemaInfo<Schema extends StandardSchemaV1>(schema: Schema): Sch
 			if (encoder) {
 				codecEncoders.set(key, encoder);
 				codecFields.add(key);
+				// Codecs decode the raw value themselves
+				stringFields.delete(key);
 			}
 		}
 	}
@@ -366,6 +391,7 @@ function extractSchemaInfo<Schema extends StandardSchemaV1>(schema: Schema): Sch
 		codecEncoders,
 		codecFields,
 		arrayFields,
+		stringFields,
 	};
 }
 
@@ -388,12 +414,7 @@ function extractSelectiveParamValues(
 	schemaKeys: string[],
 	options: ExtractParamValuesOptions = {}
 ): Record<string, unknown> {
-	const {
-		numberFields = new Set(),
-		arrayFields = new Set(),
-		dateFields = new Set(),
-		codecFields = new Set(),
-	} = options;
+	const resolved = resolveExtractOptions(options);
 	const params: Record<string, unknown> = {};
 
 	// Only access parameters that are defined in the schema
@@ -401,55 +422,7 @@ function extractSelectiveParamValues(
 	for (const key of schemaKeys) {
 		const value = searchParams.get(key);
 		if (value === null) continue;
-
-		try {
-			if (value === "[]") {
-				params[key] = [];
-				continue;
-			}
-
-			if (value === "{}") {
-				params[key] = {};
-				continue;
-			}
-
-			// Try to parse as JSON for complex objects/arrays
-			// This handles cases like ?obj={"foo":"bar"} or ?arr=[1,2,3]
-			if (value.startsWith("{") || value.startsWith("[")) {
-				params[key] = JSON.parse(value);
-			}
-			// Boolean values are stored as strings, convert them
-			else if (value === "true" || value === "false") {
-				params[key] = value === "true";
-			}
-			// Only convert to number if it looks numeric AND the schema expects a number
-			// This handles cases like ?page=2 or ?price=19.99
-			else if (numberFields.has(key) && value.trim() !== "" && !isNaN(Number(value))) {
-				params[key] = Number(value);
-			}
-			// Convert to Date if the schema expects a date, the value is a valid ISO8601 string,
-			// AND the field doesn't have a codec (codecs handle their own conversion)
-			else if (dateFields.has(key) && !codecFields.has(key) && value.trim() !== "") {
-				const dateValue = new Date(value);
-				if (!isNaN(dateValue.getTime())) {
-					params[key] = dateValue;
-				} else {
-					params[key] = value; // Keep as string if not a valid date
-				}
-			}
-			// Handle comma-separated values as arrays (fallback format) - ONLY for array fields
-			else if (arrayFields.has(key) && value.includes(",")) {
-				params[key] = value.split(",");
-			}
-			// Keep everything else as strings (including codec fields)
-			else {
-				params[key] = value;
-			}
-		} catch {
-			// If JSON parsing fails, treat as regular string
-			// This ensures we don't throw errors during type conversion
-			params[key] = value;
-		}
+		params[key] = convertParamValue(key, value, resolved);
 	}
 
 	return params;
@@ -586,6 +559,12 @@ class SearchParams<Schema extends StandardSchemaV1> {
 	#codecFields: Set<string>;
 
 	/**
+	 * Set of field names that expect string types
+	 * Used to read their values from the URL verbatim
+	 */
+	#stringFields: Set<string>;
+
+	/**
 	 * Set of field names that expect array types based on schema validation
 	 * Used to determine when to split comma-separated values into arrays
 	 */
@@ -659,6 +638,7 @@ class SearchParams<Schema extends StandardSchemaV1> {
 		}
 		this.#codecEncoders = schemaInfo.codecEncoders;
 		this.#codecFields = schemaInfo.codecFields;
+		this.#stringFields = schemaInfo.stringFields;
 	}
 
 	/**
@@ -1168,6 +1148,7 @@ class SearchParams<Schema extends StandardSchemaV1> {
 			arrayFields: this.#arrayFields,
 			dateFields: this.#dateFields,
 			codecFields: this.#codecFields,
+			stringFields: this.#stringFields,
 		});
 	}
 
@@ -1671,6 +1652,7 @@ export function validateSearchParams<Schema extends StandardSchemaV1>(
 			dateFields: schemaInfo.dateFields,
 			codecFields: schemaInfo.codecFields,
 			arrayFields: schemaInfo.arrayFields,
+			stringFields: schemaInfo.stringFields,
 		});
 
 		// Validate the parameters against the schema
@@ -1848,6 +1830,7 @@ export function useSearchParams<Schema extends StandardSchemaV1>(
 				dateFields: schemaInfo.dateFields,
 				codecFields: schemaInfo.codecFields,
 				arrayFields: schemaInfo.arrayFields,
+				stringFields: schemaInfo.stringFields,
 			});
 			const validationResult = schema["~standard"].validate(currentParams);
 			if (
@@ -1898,6 +1881,7 @@ export function useSearchParams<Schema extends StandardSchemaV1>(
 						dateFields: schemaInfo.dateFields,
 						codecFields: schemaInfo.codecFields,
 						arrayFields: schemaInfo.arrayFields,
+						stringFields: schemaInfo.stringFields,
 					});
 					const newSearchParams = new URLSearchParams(page.url.searchParams.toString());
 					let needsUpdate = false;
