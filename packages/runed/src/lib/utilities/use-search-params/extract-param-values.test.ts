@@ -257,4 +257,50 @@ describe("extractParamValues", () => {
 			expect(typeof result.ids).toBe("string");
 		});
 	});
+
+	describe("string fields and single-item arrays (issue #436)", () => {
+		it("keeps boolean-like and JSON-like values as strings for string fields", () => {
+			const params = new URLSearchParams(
+				"a=true&b=false&c=%5B1%5D&d=%7B%22a%22%3A1%7D&e=%5B%5D&f=%7B%7D"
+			);
+			const stringFields = new Set(["a", "b", "c", "d", "e", "f"]);
+			const result = extractParamValues(params, { stringFields });
+
+			expect(result).toEqual({
+				a: "true",
+				b: "false",
+				c: "[1]",
+				d: '{"a":1}',
+				e: "[]",
+				f: "{}",
+			});
+		});
+
+		it("still converts boolean-like and JSON-like values for other fields", () => {
+			const params = new URLSearchParams("q=true&flag=true&list=%5B1%5D");
+			const stringFields = new Set(["q"]);
+			const result = extractParamValues(params, { stringFields });
+
+			expect(result.q).toBe("true");
+			expect(result.flag).toBe(true);
+			expect(result.list).toEqual([1]);
+		});
+
+		it("turns a single value without a comma into a one-item array for array fields", () => {
+			const params = new URLSearchParams("tags=a&ids=1");
+			const arrayFields = new Set(["tags", "ids"]);
+			const result = extractParamValues(params, { arrayFields });
+
+			expect(result.tags).toEqual(["a"]);
+			expect(result.ids).toEqual(["1"]);
+		});
+
+		it("keeps an empty value as a string for array fields", () => {
+			const params = new URLSearchParams("tags=");
+			const arrayFields = new Set(["tags"]);
+			const result = extractParamValues(params, { arrayFields });
+
+			expect(result.tags).toBe("");
+		});
+	});
 });
